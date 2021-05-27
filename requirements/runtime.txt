@@ -1,0 +1,14 @@
+pyyaml
+yacs
+tqdm
+colorama
+matplotlib
+tensorboardX
+tensorboard
+six
+terminaltables
+addict
+pandas
+seaborn
+regex;sys_platform=='win32'
+yapf
