@@ -12,7 +12,7 @@ the [mmdetection](https://github.com/open-mmlab/mmdetection) and [mmcv](https://
 
 ## Changelog
 
-v1.0.0 was released in 5/9/2020.
+v1.0.1 was released in 5/9/2020.
 
 ## Benchmark and model zoo
 
