@@ -24,7 +24,7 @@ c. Install PyTorch and torchvision following the [official instructions](https:/
 d. Clone the WTISignalProcesssing repository.
 
 ```shell
-git clone SaiTeam@10.117.63.34:/home/SaiTeam/Git/wtisignalprocessing.git
+git clone https://github.com/WTISP-LAB/wtisignalprocessing.git
 cd wtisignalprocessing
 ```
 
