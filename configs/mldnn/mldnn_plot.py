@@ -59,6 +59,25 @@ plot = dict(
             has_snr_classifier=True,
         ),
     ],
+    # Set the configs about training and test curves
+    train_test_curves=[
+        dict(
+            type='SNRModulationCurve',
+            name='cldnn_iq-ap.pdf',
+            legends=legends,
+            log_dir=log_dir,
+            methods=[
+                dict(
+                    config='cldnn_deepsig_iq_201610A',
+                    name='CLDNN-IQ',
+                ),
+                dict(
+                    config='cldnn_deepsig_ap_201610A',
+                    name='CLDNN-AP',
+                ),
+            ],
+        ),
+    ],
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
 
@@ -212,7 +231,7 @@ plot = dict(
                 ),
             ],
         ),
-        # deepsig 201601A compare with modulation
+        # deepsig 201601A compare with constellation and fb
         dict(
             type='SNRModulationCurve',
             name='deepsig_201610A_co_fb.pdf',
