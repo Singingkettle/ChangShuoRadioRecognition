@@ -218,6 +218,8 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
                      snr, fontsize=18, fontweight='bold')
     ax.set_xlabel(xlbl, fontsize=18, fontweight='bold')
     ax.set_ylabel(ylbl, fontsize=18, fontweight='bold')
+    ax.tick_params(which='major', bottom=True,
+                   top=False, left=True, right=False)
     plt.tight_layout()  # set layout slim
     fig.savefig(save_path, bbox_inches='tight')
     plt.close(fig)
@@ -268,10 +270,7 @@ class ConfusionMap(object):
     def _evaluate(self, results, save_dir, prefix=None):
         confusion_matrix = np.zeros((len(self.SNRS), len(
             self.CLASSES), len(self.CLASSES)), dtype=np.float64)
-        if len(self.CLASSES) > 10:
-            figsize = [16, 16]
-        else:
-            figsize = [8, 8]
+        figsize = [len(self.CLASSES)/11*7, len(self.CLASSES)/11*7]
         for idx in range(len(self.ann_info)):
             ann = self.ann_info[idx]
             snrs = ann['snrs']
