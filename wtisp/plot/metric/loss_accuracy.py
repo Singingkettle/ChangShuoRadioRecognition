@@ -70,15 +70,19 @@ def plot_train_curve(log_infos, legend, save_path, legend_configs):
     # Customize the major grid
     ax.grid(b=True, which='major', linestyle='-',
             linewidth='0.5', color='black', alpha=0.2)
-    # Customize the minor grid
-    ax.grid(b=True, which='minor', linestyle=':',
-            linewidth='0.5', color='black', alpha=0.5)
+    # # Customize the minor grid
+    # ax.grid(b=True, which='minor', linestyle=':',
+    #         linewidth='0.5', color='black', alpha=0.5)
 
     plt.tick_params(which='minor', bottom=False,
                     top=False, left=False, right=False)
+    plt.tick_params(which='major', bottom=True,
+                    top=False, left=True, right=False)
 
     ax.tick_params(which='minor', bottom=False,
                    top=False, left=False, right=False)
+    ax.tick_params(which='major', bottom=True,
+                   top=False, left=True, right=False)
 
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
@@ -133,15 +137,19 @@ def plot_test_curve(log_infos, legend, save_path, legend_configs):
     # Customize the major grid
     ax.grid(b=True, which='major', linestyle='-',
             linewidth='0.5', color='black', alpha=0.2)
-    # Customize the minor grid
-    ax.grid(b=True, which='minor', linestyle=':',
-            linewidth='0.5', color='black', alpha=0.5)
+    # # Customize the minor grid
+    # ax.grid(b=True, which='minor', linestyle=':',
+    #         linewidth='0.5', color='black', alpha=0.5)
 
     plt.tick_params(which='minor', bottom=False,
                     top=False, left=False, right=False)
+    plt.tick_params(which='major', bottom=True,
+                    top=False, left=True, right=False)
 
     ax.tick_params(which='minor', bottom=False,
                    top=False, left=False, right=False)
+    ax.tick_params(which='major', bottom=True,
+                   top=False, left=True, right=False)
 
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')

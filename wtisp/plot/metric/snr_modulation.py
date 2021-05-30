@@ -22,9 +22,14 @@ def plot_snr_accuracy_curve(snr_accuracys, legends, save_path, legend_configs):
     fig, ax = get_new_fig('Curve', [8, 8])
     SNRS = snr_accuracys[0]['SNRS']
     xs = np.array([i for i in range(len(SNRS))]) / (len(SNRS) - 1)
-    ax.set_xticks(xs)  # values
     xs_str = ['%9d' % i for i in SNRS]
+    ax.set_xticks(xs)  # values
     ax.set_xticklabels(xs_str)  # labels
+
+    ys = np.array([i for i in range(11)]) / 10
+    ys_str = ['%.1f' % i for i in ys]
+    ax.set_yticks(ys)  # values
+    ax.set_yticklabels(ys_str)  # labels
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
 
@@ -81,15 +86,19 @@ def plot_snr_accuracy_curve(snr_accuracys, legends, save_path, legend_configs):
     # Customize the major grid
     ax.grid(b=True, which='major', linestyle='-',
             linewidth='0.5', color='black', alpha=0.2)
-    # Customize the minor grid
-    ax.grid(b=True, which='minor', linestyle=':',
-            linewidth='0.5', color='black', alpha=0.5)
+    # # Customize the minor grid
+    # ax.grid(b=True, which='minor', linestyle=':',
+    #         linewidth='0.5', color='black', alpha=0.5)
 
     plt.tick_params(which='minor', bottom=False,
                     top=False, left=False, right=False)
+    plt.tick_params(which='major', bottom=True,
+                    top=False, left=True, right=False)
 
     ax.tick_params(which='minor', bottom=False,
                    top=False, left=False, right=False)
+    ax.tick_params(which='major', bottom=True,
+                   top=False, left=True, right=False)
     plt.setp(ax.get_xticklabels(), rotation=50,
              horizontalalignment='right')
     plt.tight_layout()  # set layout slim
@@ -138,6 +147,11 @@ def plot_modulation_f1_curve(modulation_f1s, legends, save_path, legend_configs,
     xs_str = ['%9s' % i for i in CLASSES]
     ax.set_xticks(xs)  # values
     ax.set_xticklabels(xs_str)  # labels
+
+    ys = np.array([i for i in range(11)]) / 10
+    ys_str = ['%.1f' % i for i in ys]
+    ax.set_yticks(ys)  # values
+    ax.set_yticklabels(ys_str)  # labels
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
 
@@ -195,15 +209,19 @@ def plot_modulation_f1_curve(modulation_f1s, legends, save_path, legend_configs,
     # Customize the major grid
     ax.grid(b=True, which='major', linestyle='-',
             linewidth='0.5', color='black', alpha=0.2)
-    # Customize the minor grid
-    ax.grid(b=True, which='minor', linestyle=':',
-            linewidth='0.5', color='black', alpha=0.5)
+    # # Customize the minor grid
+    # ax.grid(b=True, which='minor', linestyle=':',
+    #         linewidth='0.5', color='black', alpha=0.5)
 
     plt.tick_params(which='minor', bottom=False,
                     top=False, left=False, right=False)
+    plt.tick_params(which='major', bottom=True,
+                    top=False, left=True, right=False)
 
     ax.tick_params(which='minor', bottom=False,
                    top=False, left=False, right=False)
+    ax.tick_params(which='major', bottom=True,
+                   top=False, left=True, right=False)
     plt.setp(ax.get_xticklabels(), rotation=25,
              horizontalalignment='right')
     plt.tight_layout()  # set layout slim
