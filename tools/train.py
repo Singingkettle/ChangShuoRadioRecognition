@@ -3,7 +3,7 @@ import copy
 import os
 import os.path as osp
 import time
-
+import shutil
 import torch
 
 from wtisp import __version__
@@ -69,8 +69,8 @@ def main():
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
 
-    # Delete the old files
-    os.removedirs(cfg.work_dir)
+    # Delete the old saved log files and models
+    shutil.rmtree(cfg.work_dir)
 
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
