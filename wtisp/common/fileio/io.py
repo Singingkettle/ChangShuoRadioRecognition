@@ -1,6 +1,6 @@
 # Copyright (c) Open-MMLab. All rights reserved.
 from pathlib import Path
-
+import os
 from .handlers import BaseFileHandler, JsonHandler, PickleHandler, YamlHandler
 from ..utils import is_list_of, is_str
 
@@ -109,3 +109,13 @@ def register_handler(file_formats, **kwargs):
         return cls
 
     return wrap
+
+
+def del_files(path_file):
+    ls = os.listdir(path_file)
+    for i in ls:
+        f_path = os.path.join(path_file, i)
+        if os.path.isdir(f_path):
+            del_files(f_path)
+        else:
+            os.remove(f_path)

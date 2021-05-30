@@ -9,6 +9,7 @@ import torch
 from wtisp import __version__
 from wtisp.apis import set_random_seed, train_task
 from wtisp.common import get_root_logger, collect_env
+from wtisp.common.fileio import del_files
 from wtisp.common.utils import DictAction, Config, mkdir_or_exist
 from wtisp.dataset import build_dataset
 from wtisp.models import build_task
@@ -70,7 +71,7 @@ def main():
                                 osp.splitext(osp.basename(args.config))[0])
 
     # Delete the old saved log files and models
-    shutil.rmtree(cfg.work_dir)
+    del_files(cfg.work_dir)
 
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
