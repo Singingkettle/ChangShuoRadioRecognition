@@ -408,33 +408,49 @@ plot = dict(
         #     has_snr_classifier=True,
         # ),
 
+        # dict(
+        #     type='ConfusionMap',
+        #     log_dir=log_dir,
+        #     name='confusion_map_fmldnn_201801A.pdf',
+        #     config='fmldnn_fmlnetv33_640_0.0010_0.5_deepsig_201610A',
+        #     has_snr_classifier=True,
+        # ),
+        # dict(
+        #     type='ConfusionMap',
+        #     log_dir=log_dir,
+        #     name='confusion_map_fmldnn_201801A.pdf',
+        #     config='fmldnn_fmlnetv33_640_0.0015_0.5_deepsig_201610A',
+        #     has_snr_classifier=True,
+        # ),
+        # dict(
+        #     type='ConfusionMap',
+        #     log_dir=log_dir,
+        #     name='confusion_map_fmldnn_201801A.pdf',
+        #     config='fmldnn_fmlnetv34_640_0.0010_0.5_deepsig_201610A',
+        #     has_snr_classifier=True,
+        # ),
+        # dict(
+        #     type='ConfusionMap',
+        #     log_dir=log_dir,
+        #     name='confusion_map_fmldnn_201801A.pdf',
+        #     config='fmldnn_fmlnetv34_640_0.0015_0.5_deepsig_201610A',
+        #     has_snr_classifier=True,
+        # ),
+
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
-            config='fmldnn_fmlnetv33_640_0.0010_0.5_deepsig_201610A',
+            config='fmldnn_fmlnetv35_640_0.0010_0.5_deepsig_201610A',
             has_snr_classifier=True,
         ),
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
-            config='fmldnn_fmlnetv33_640_0.0015_0.5_deepsig_201610A',
+            config='fmldnn_fmlnetv35_640_0.0015_0.5_deepsig_201610A',
             has_snr_classifier=True,
         ),
-        dict(
-            type='ConfusionMap',
-            log_dir=log_dir,
-            name='confusion_map_fmldnn_201801A.pdf',
-            config='fmldnn_fmlnetv34_640_0.0010_0.5_deepsig_201610A',
-            has_snr_classifier=True,
-        ),
-        dict(
-            type='ConfusionMap',
-            log_dir=log_dir,
-            name='confusion_map_fmldnn_201801A.pdf',
-            config='fmldnn_fmlnetv34_640_0.0015_0.5_deepsig_201610A',
-            has_snr_classifier=True,
-        ),
+
     ],
 )

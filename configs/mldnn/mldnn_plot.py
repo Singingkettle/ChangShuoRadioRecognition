@@ -58,24 +58,11 @@ plot = dict(
             config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
             has_snr_classifier=True,
         ),
-    ],
-    # Set the configs about training and test curves
-    train_test_curves=[
         dict(
-            type='SNRModulationCurve',
-            name='cldnn_iq-ap.pdf',
-            legends=legends,
+            type='ConfusionMap',
             log_dir=log_dir,
-            methods=[
-                dict(
-                    config='cldnn_deepsig_iq_201610A',
-                    name='CLDNN-IQ',
-                ),
-                dict(
-                    config='cldnn_deepsig_ap_201610A',
-                    name='CLDNN-AP',
-                ),
-            ],
+            name='confusion_map_vggnet-co_201610A.pdf',
+            config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
         ),
     ],
     # Set the configs about snr accuracy and modulation F1 score
