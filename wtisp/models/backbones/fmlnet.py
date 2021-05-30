@@ -45,12 +45,110 @@ class SELayerV2(nn.Module):
             nn.Linear(nhid, in_channels, bias=False),
             nn.Softmax(dim=1)
         )
-
     def forward(self, x):
         b, c, _ = x.size()
         y = self.avg_pool(x).view(b, c)
         y = self.fc(y).view(b, c, 1)
         return y
+
+
+class SSLayer(nn.Module):
+    def __init__(self, in_channels, reduction=16):
+        super(SSLayer, self).__init__()
+        if in_channels < reduction:
+            nhid = 2
+        else:
+            nhid = in_channels // reduction
+        self.avg_pool = nn.AdaptiveAvgPool1d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(in_channels, nhid, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(nhid, in_channels, bias=False),
+        )
+        self.norm = nn.Softmax(dim=1)
+        self.temperature = 100
+    def forward(self, x):
+        b, c, _ = x.size()
+        y = self.avg_pool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1)
+        y = y * self.temperature
+        y = self.norm(y)
+        return y
+
+
+class SALayer(nn.Module):
+    def __init__(self, in_channels):
+        super(SALayer, self).__init__()
+
+        # N * 30 * 40
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(in_channels, in_channels * 2, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2),
+        )
+
+        # N * 60 * 20
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(in_channels * 2, in_channels * 4, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2),
+        )
+
+        # N * 120 * 10
+        self.conv3 = nn.Sequential(
+            nn.Conv1d(in_channels * 4, in_channels * 8, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2),
+        )
+
+        # N * 120 * 10
+        self.econv = nn.Sequential(
+            nn.Conv1d(in_channels * 8, in_channels * 8, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
+
+        # N * 60 * 20
+        self.uconv3 = nn.Sequential(
+            nn.Upsample(scale_factor=2, mode='nearest'),
+            nn.Conv1d(in_channels * 8, in_channels * 4, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
+
+        # N * 30 * 40
+        self.uconv2 = nn.Sequential(
+            nn.Upsample(scale_factor=2, mode='nearest'),
+            nn.Conv1d(in_channels * 4, in_channels * 2, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
+
+        # N * 15 * 80
+        self.uconv1 = nn.Sequential(
+            nn.Upsample(scale_factor=2, mode='nearest'),
+            nn.Conv1d(in_channels * 2, in_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
+
+        self.sw = nn.Sequential(
+            nn.Conv1d(in_channels, 1, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        dx1 = self.conv1(x)
+        dx2 = self.conv2(dx1)
+        dx3 = self.conv3(dx2)
+        dx4 = self.econv(dx3)
+        dx = dx4 + dx3
+        ux3 = self.uconv3(dx)
+        ux3 = ux3 + dx2
+        ux2 = self.uconv2(ux3)
+        ux2 = ux2 + dx1
+        ux1 = self.uconv1(ux2)
+        x = x + ux1
+        x = self.sw(x)
+
+        return x
 
 
 class PositionalEncoding(nn.Module):
@@ -2265,7 +2363,6 @@ class FMLNetV33(nn.Module):
         fx1 = x[:, 7, :]
         fx2 = x[:, -1, :]
 
-
         fx3 = torch.cat([c_x, x], dim=2)
 
         return dict(fx0=fx0, fx1=fx1, fx2=fx2, fx3=fx3)
@@ -2369,3 +2466,83 @@ class FMLNetV34(nn.Module):
         return dict(fx0=fx0, fx1=fx1, fx2=fx2, fx3=fx3)
 
 
+@BACKBONES.register_module()
+class FMLNetV35(nn.Module):
+    def __init__(self, dropout_rate=0.5, avg_pool=None):
+        super(FMLNetV35, self).__init__()
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(4, 128, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 128, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 80, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+        )
+
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+        else:
+            self.has_avg_pool = False
+
+        self.se = SELayer(15)
+        self.sa = SALayer(15)
+        self.si = SSLayer(15)
+        self.lstm1 = nn.LSTM(input_size=80, hidden_size=40,
+                             num_layers=1, batch_first=True, bidirectional=True)
+        self.dp = nn.Dropout(dropout_rate)
+        self.lstm2 = nn.LSTM(input_size=80, hidden_size=50,
+                             num_layers=1, batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                if isinstance(m, nn.Conv1d):
+                    nn.init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                if isinstance(m, nn.LSTM):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(4, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(4, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+        se_w = self.se(c_x)
+        sa_w = self.sa(c_x)
+        x, _ = self.lstm1(c_x)
+
+        x = torch.mul(x, se_w)
+        x = torch.mul(x, sa_w)
+
+        x = self.dp(x)
+
+        si_w = self.si(x)
+        x, _ = self.lstm2(x)
+
+        x = torch.mul(x, si_w)
+        x = torch.sum(x, dim=1)
+
+        return x
