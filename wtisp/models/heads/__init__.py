@@ -1,6 +1,7 @@
 from .amc_head import (AMCHead, DSAMCHead, MergeAMCHead,
                        MLAMCHead, MLHeadNoWeight, FMLHeadNoWeight,
-                       FMLHierarchicalHead, FMergeAMCHead, FPNAMCHead)
+                       FMLHierarchicalHead, FMergeAMCHead, FPNAMCHead,
+                       FMLHead)
 from .base_head import BaseHead
 from .hamc_head import HAMCHead
 from .location_head import LocationHead
@@ -11,5 +12,5 @@ __all__ = [
     'BaseHead', 'AMCHead', 'DSAMCHead', 'MergeAMCHead',
     'MLAMCHead', 'SeparatorHead', 'LocationHead', 'MLHeadNoWeight',
     'HAMCHead', 'FMLHeadNoWeight', 'SEIHead', 'SEICCHead', 'FMLHierarchicalHead',
-    'FPNAMCHead', 'FMergeAMCHead'
+    'FPNAMCHead', 'FMergeAMCHead', 'FMLHead'
 ]
