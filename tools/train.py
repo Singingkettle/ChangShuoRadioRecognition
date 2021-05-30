@@ -13,7 +13,7 @@ from wtisp.common.fileio import del_files
 from wtisp.common.utils import DictAction, Config, mkdir_or_exist
 from wtisp.dataset import build_dataset
 from wtisp.models import build_task
-from wtisp.runner import init_dist
+from wtisp.runner import init_dist, get_dist_info
 
 
 def parse_args():
@@ -70,8 +70,7 @@ def main():
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
 
-    # Delete the old saved log files and models
-    del_files(cfg.work_dir)
+
 
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
@@ -83,9 +82,14 @@ def main():
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
         distributed = False
+        del_files(cfg.work_dir)
     else:
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
+        # Delete the old saved log files and models
+        rank, _ = get_dist_info()
+        if rank == 0:
+            del_files(cfg.work_dir)
 
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))
