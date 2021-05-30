@@ -59,7 +59,7 @@ class FMLDNN(BaseAMC):
             x = torch.cat((iqs, aps), dim=1)
         x = self.extract_feat(x)
         losses = self.classifier_head.forward_train(
-            x, mod_labels=mod_labels, snr_labels=snr_labels)
+            x, mod_labels=mod_labels, snr_labels=snr_labels, low_weight=low_weight, high_weight=high_weight)
 
         return losses
 
