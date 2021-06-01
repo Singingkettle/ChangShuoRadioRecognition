@@ -18,6 +18,7 @@ from .mlnet import (MLNetV1, MLNetV2, MLNetV3, MLNetV4, MLNetV5,
 from .resnet_co import ResNetCO
 from .tanhnet import TanhNet
 from .vggnet_co import VGGNetCO
+from .cpcstn import (CPCNN, CSTN, CPCSTN)
 
 __all__ = [
     'CNNNet', 'ResNet', 'DensNet',
@@ -39,5 +40,6 @@ __all__ = [
     'FMLNetV26', 'FMLNetV30', 'FMLNetV33',
     'FMLNetV27', 'FMLNetV28', 'FMLNetV29',
     'AlexNetCO', 'GoogleNetCO', 'ResNetCO',
-    'VGGNetCO', 'CoBoNet', 'FMLNetV34', 'FMLNetV35'
+    'VGGNetCO', 'CoBoNet', 'FMLNetV34',
+    'CPCNN', 'CSTN', 'CPCSTN'
 ]
