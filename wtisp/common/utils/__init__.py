@@ -1,4 +1,4 @@
-from .config import ConfigDict, Config, DictAction
+from .config import ConfigDict, Config, DictAction, filter_config
 from .ext_loader import load_ext
 from .flops_counter import get_model_complexity_info
 from .fuse_conv_bn import fuse_conv_bn
@@ -20,5 +20,5 @@ __all__ = [
     'track_iter_progress',
     'track_parallel_progress', 'track_progress', 'build_from_cfg', 'Registry', 'Timer', 'TimerError', 'check_time',
     'check_file_exist', 'fopen', 'is_filepath', 'mkdir_or_exist', 'scandir', 'symlink', 'ConfigDict', 'Config',
-    'DictAction', 'fuse_conv_bn', 'load_ext', 'get_model_complexity_info'
+    'DictAction', 'fuse_conv_bn', 'load_ext', 'get_model_complexity_info', 'filter_config'
 ]

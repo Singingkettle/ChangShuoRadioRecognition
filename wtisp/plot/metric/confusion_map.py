@@ -8,25 +8,26 @@ import seaborn as sn
 from matplotlib.collections import QuadMesh
 from pandas import DataFrame
 
-from wtisp.common.fileio import load as IOLoad
+from .utils import load_annotation
 from ..builder import CONFUSIONS
 
 plt.rcParams["font.family"] = "Times New Roman"
 
 
-def get_new_fig(fn, figsize=[9, 9]):
+def get_new_fig(fn, fig_size=None):
     """ Init graphics """
-    fig1 = plt.figure(fn, figsize)
+    if fig_size is None:
+        fig_size = [9, 9]
+    fig1 = plt.figure(fn, fig_size)
     ax1 = fig1.gca()  # Get Current Axis
     ax1.cla()  # clear existing plot
     return fig1, ax1
 
 
-def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, fmt, show_null_values=0):
+def config_cell_text_and_colors(array_df, lin, col, o_text, face_colors, position, fz, show_null_values=0):
     """
       config cell text and colors
       and return text elements to add and to dell
-      @TODO: use fmt
     """
     text_add = []
     text_del = []
@@ -39,16 +40,17 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
     # last line  and/or last column
     if (col == (ccl - 1)) or (lin == (ccl - 1)):
         # tots and percents
-        if (cell_val != 0):
+        per_ok = 0
+        if cell_val != 0:
             if (col == ccl - 1) and (lin == ccl - 1):
                 tot_rig = 0
                 for i in range(array_df.shape[0] - 1):
                     tot_rig += array_df[i][i]
                 per_ok = (float(tot_rig) / cell_val) * 100
-            elif (col == ccl - 1):
+            elif col == ccl - 1:
                 tot_rig = array_df[lin][lin]
                 per_ok = (float(tot_rig) / cell_val) * 100
-            elif (lin == ccl - 1):
+            elif lin == ccl - 1:
                 tot_rig = array_df[col][col]
                 per_ok = (float(tot_rig) / cell_val) * 100
             per_err = 100 - per_ok
@@ -58,16 +60,16 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
         if per_ok == 100:
             per_ok_s = '100%'
         else:
-            per_ok_s = '%.2f%%' % (per_ok)
+            per_ok_s = '%.2f%%' % per_ok
 
         # text to DEL
-        text_del.append(oText)
+        text_del.append(o_text)
 
         # text to ADD
         font_prop = fm.FontProperties(weight='bold', size=fz)
         text_kwargs = dict(color='black', ha="center", va="center",
                            gid='sum', fontproperties=font_prop)
-        lis_txt = ['%d' % (cell_val), per_ok_s, '%.2f%%' % (per_err)]
+        lis_txt = ['%d' % cell_val, per_ok_s, '%.2f%%' % per_err]
         lis_kwa = [text_kwargs]
         dic = text_kwargs.copy()
         dic['color'] = 'g'
@@ -75,41 +77,40 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
         dic = text_kwargs.copy()
         dic['color'] = 'r'
         lis_kwa.append(dic)
-        lis_pos = [(oText._x, oText._y - 0.3), (oText._x,
-                                                oText._y), (oText._x, oText._y + 0.3)]
+        lis_pos = [(o_text._x, o_text._y - 0.3), (o_text._x, o_text._y), (o_text._x, o_text._y + 0.3)]
         for i in range(len(lis_txt)):
-            newText = dict(x=lis_pos[i][0], y=lis_pos[i]
+            new_text = dict(x=lis_pos[i][0], y=lis_pos[i]
             [1], text=lis_txt[i], kw=lis_kwa[i])
             # print 'lin: %s, col: %s, newText: %s' %(lin, col, newText)
-            text_add.append(newText)
+            text_add.append(new_text)
         # print '\n'
 
         # set background color for sum cells (last line and last column)
         carr = [1, 1, 1, 1.0]
         if (col == ccl - 1) and (lin == ccl - 1):
             carr = [0.9, 0.9, 0.9, 1.0]
-        facecolors[posi] = carr
+        face_colors[position] = carr
 
     else:
-        if (per > 0):
+        if per > 0:
             txt = '%s\n%.2f%%' % (cell_val, per)
         else:
-            if (show_null_values == 0):
+            if show_null_values == 0:
                 txt = ''
-            elif (show_null_values == 1):
+            elif show_null_values == 1:
                 txt = '0'
             else:
                 txt = '0\n0.0%'
-        oText.set_text(txt)
+        o_text.set_text(txt)
 
         # main diagonal
-        if (col == lin):
-            # set color of the textin the diagonal to white
-            oText.set_color('black')
+        if col == lin:
+            # set color of the text in the diagonal to white
+            o_text.set_color('black')
             # set background color in the diagonal to blue
-            facecolors[posi] = [0.35, 0.8, 0.55, 1.0]
+            face_colors[position] = [0.35, 0.8, 0.55, 1.0]
         else:
-            oText.set_color('black')
+            o_text.set_color('black')
 
     return text_add, text_del
 
@@ -125,13 +126,10 @@ def insert_totals(df_cm):
     df_cm['Recall'] = sum_lin
     sum_col.append(np.sum(sum_lin))
     df_cm.loc['Precision'] = sum_col
-    # df_cm['sum_row'] = sum_lin
-    # sum_col.append(np.sum(sum_lin))
-    # df_cm.loc['sum_col'] = sum_col
 
 
 def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Oranges", fmt='.2f', fz=9,
-                                 lw=0.5, cbar=False, figsize=[8, 8], show_null_values=0, pred_val_axis='x'):
+                                 lw=0.5, cbar=False, fig_size=None, show_null_values=0, pred_val_axis='x'):
     """
       print conf matrix with default layout (like matlab)
       params:
@@ -145,7 +143,9 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
                         'col' or 'x': show predicted values in columns (x axis) instead lines
                         'lin' or 'y': show predicted values in lines   (y axis)
     """
-    if (pred_val_axis in ('col', 'x')):
+    if fig_size is None:
+        fig_size = [8, 8]
+    if pred_val_axis in ('col', 'x'):
         xlbl = 'Predicted Modulation'
         ylbl = 'True Modulation'
     else:
@@ -159,9 +159,9 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
     # this is for print always in the same window
     if snr is None:
         fig, ax1 = get_new_fig(
-            'Confusion Matrix of Mean Average SNRs', figsize)
+            'Confusion Matrix of Mean Average SNRs', fig_size)
     else:
-        fig, ax1 = get_new_fig('Confusion Matrix of %ddB' % snr, figsize)
+        fig, ax1 = get_new_fig('Confusion Matrix of %ddB' % snr, fig_size)
 
     # thanks for seaborn
     ax = sn.heatmap(df_cm, annot=annot, annot_kws={"size": fz}, linewidths=lw, ax=ax1,
@@ -181,23 +181,23 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
 
     # face colors list
     quadmesh = ax.findobj(QuadMesh)[0]
-    facecolors = quadmesh.get_facecolors()
+    face_colors = quadmesh.get_facecolors()
 
     # iter in text elements
     array_df = np.array(df_cm.to_records(index=False).tolist())
     text_add = []
     text_del = []
-    posi = -1  # from left to right, bottom to top.
+    position = -1  # from left to right, bottom to top.
     for t in ax.collections[0].axes.texts:  # ax.texts:
         pos = np.array(t.get_position()) - [0.5, 0.5]
         lin = int(pos[1])
         col = int(pos[0])
-        posi += 1
-        # print ('>>> pos: %s, posi: %s, val: %s, txt: %s' %(pos, posi, array_df[lin][col], t.get_text()))
+        position += 1
+        # print ('>>> pos: %s, position: %s, val: %s, txt: %s' %(pos, position, array_df[lin][col], t.get_text()))
 
         # set text
-        txt_res = configcell_text_and_colors(
-            array_df, lin, col, t, facecolors, posi, fz, fmt, show_null_values)
+        txt_res = config_cell_text_and_colors(
+            array_df, lin, col, t, face_colors, position, fz, show_null_values)
 
         text_add.extend(txt_res[0])
         text_del.extend(txt_res[1])
@@ -227,15 +227,18 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
 
 @CONFUSIONS.register_module()
 class ConfusionMap(object):
-    def __init__(self, log_dir, name, config, only_all=False, has_snr_classifier=False):
+    def __init__(self, log_dir, name, method, only_all=False):
         self.log_dir = log_dir
         self.name = name
-        self.config = config
-        self.has_snr_classifier = has_snr_classifier
+        self.config = method['config']
+        if 'has_snr_classifier' in method:
+            self.has_snr_classifier = method['has_snr_classifier']
+        else:
+            self.has_snr_classifier = False
         self.only_all = only_all
         self.format_out_dir = os.path.join(
             self.log_dir, self.config, 'format_out')
-        if has_snr_classifier:
+        if self.has_snr_classifier:
             # self.snr_results = np.load(os.path.join(
             #     self.format_out_dir, 'snr_pre.npy'))
             self.low_results = np.load(os.path.join(
@@ -248,29 +251,13 @@ class ConfusionMap(object):
             self.results = np.load(os.path.join(
                 self.format_out_dir, 'pre.npy'))
 
-        self.SNRS, self.CLASSES, self.mods_dict, self.snrs_dict, self.ann_info = self.load_annotations(
+        self.SNRS, self.CLASSES, self.mods_dict, self.snrs_dict, self.ann_info = load_annotation(
             os.path.join(self.format_out_dir, 'ann.json'))
-
-    def load_annotations(self, ann_file):
-        """Load annotation from annotation file."""
-        annos = IOLoad(ann_file)
-        SNRS = annos['SNRS']
-        CLASSES = annos['CLASSES']
-        ann_info = annos['ANN']
-        mods_dict = annos['mods_dict']
-        snrs_dict = annos['snrs_dict']
-
-        replace_dict = {'PAM4': '4PAM', 'QAM16': '16QAM', 'QAM64': '64QAM'}
-        for index, item in enumerate(CLASSES):
-            if item in replace_dict:
-                CLASSES[index] = replace_dict[item]
-
-        return SNRS, CLASSES, mods_dict, snrs_dict, ann_info
 
     def _evaluate(self, results, save_dir, prefix=None):
         confusion_matrix = np.zeros((len(self.SNRS), len(
             self.CLASSES), len(self.CLASSES)), dtype=np.float64)
-        figsize = [len(self.CLASSES)/11*7, len(self.CLASSES)/11*7]
+        fig_size = [int(len(self.CLASSES) / 11 * 7), int(len(self.CLASSES) / 11 * 7)]
         for idx in range(len(self.ann_info)):
             ann = self.ann_info[idx]
             snrs = ann['snrs']
@@ -298,7 +285,7 @@ class ConfusionMap(object):
                 df_cm = DataFrame(conf, index=self.CLASSES,
                                   columns=self.CLASSES)
                 # colormap: see this and choose your more dear
-                pretty_plot_confusion_matrix(df_cm, snr, save_path, figsize=figsize)
+                pretty_plot_confusion_matrix(df_cm, snr, save_path, fig_size=fig_size)
 
         conf = np.sum(confusion_matrix, axis=0)
         if prefix is None:
@@ -309,7 +296,7 @@ class ConfusionMap(object):
         # get pandas dataframe
         df_cm = DataFrame(conf, index=self.CLASSES, columns=self.CLASSES)
         # colormap: see this and choose your more dear
-        pretty_plot_confusion_matrix(df_cm, None, save_path, figsize=figsize)
+        pretty_plot_confusion_matrix(df_cm, None, save_path, fig_size=fig_size)
 
     def plot(self, save_dir):
         if self.has_snr_classifier:

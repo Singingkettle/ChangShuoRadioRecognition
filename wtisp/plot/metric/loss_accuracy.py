@@ -11,15 +11,17 @@ from ..builder import TRAINTESTCURVES
 plt.rcParams["font.family"] = "Times New Roman"
 
 
-def get_new_fig(fn, figsize=[9, 9]):
+def get_new_fig(fn, fig_size=None):
     """ Init graphics """
-    fig = plt.figure(fn, figsize)
+    if fig_size is None:
+        fig_size = [9, 9]
+    fig = plt.figure(fn, fig_size)
     ax = fig.gca()  # Get Current Axis
     ax.cla()  # clear existing plot
     return fig, ax
 
 
-def plot_train_curve(log_infos, legend, save_path, legend_configs):
+def plot_train_curve(log_infos, legend, save_path, legend_config):
     fig, ax = get_new_fig('Training Curve', [8, 8])
     ax.set_xlim(0, 400)
     ax.set_ylim(0, 3)
@@ -49,9 +51,9 @@ def plot_train_curve(log_infos, legend, save_path, legend_configs):
 
             ax.plot(
                 xs, ys, label=legend_name, linewidth=1,
-                color=legend_configs[legend[legend_name]]['color'],
-                linestyle=legend_configs[legend[legend_name]]['linestyle'],
-                marker=legend_configs[legend[legend_name]]['marker'],
+                color=legend_config[legend[legend_name]]['color'],
+                linestyle=legend_config[legend[legend_name]]['linestyle'],
+                marker=legend_config[legend[legend_name]]['marker'],
                 markersize=5,
             )
 
@@ -89,7 +91,7 @@ def plot_train_curve(log_infos, legend, save_path, legend_configs):
     plt.close()
 
 
-def plot_test_curve(log_infos, legend, save_path, legend_configs):
+def plot_test_curve(log_infos, legend, save_path, legend_config):
     fig, ax = get_new_fig('Test Curve', [8, 8])
     ax.set_xlim(0, 400)
     ax.set_ylim(0, 1)
@@ -116,9 +118,9 @@ def plot_test_curve(log_infos, legend, save_path, legend_configs):
 
             ax.plot(
                 xs, ys, label=legend_name, linewidth=1,
-                color=legend_configs[legend[legend_name]]['color'],
-                linestyle=legend_configs[legend[legend_name]]['linestyle'],
-                marker=legend_configs[legend[legend_name]]['marker'],
+                color=legend_config[legend[legend_name]]['color'],
+                linestyle=legend_config[legend[legend_name]]['linestyle'],
+                marker=legend_config[legend[legend_name]]['marker'],
                 markersize=5,
             )
 
@@ -174,19 +176,19 @@ def load_json_log(json_log):
 
 @TRAINTESTCURVES.register_module()
 class LossAccuracyCurve(object):
-    def __init__(self, log_dir, name, legends, methods, legend_configs=None):
+    def __init__(self, log_dir, name, legend, method, legend_config=None):
         self.log_dir = log_dir
         self.log_infos = []
         self.name = name
-        self.legends = legends
-        self.legend_configs = legend_configs
+        self.legend = legend
+        self.legend_config = legend_config
 
-        if isinstance(methods, list):
-            for method_config in methods:
+        if isinstance(method, list):
+            for method_config in method:
                 json_info = self.find_json_log(**method_config)
                 self.log_infos.append(json_info)
         else:
-            raise ValueError('The variable of methods must be list!')
+            raise ValueError('The variable of method must be list!')
 
     def find_json_log(self, config, name, has_snr_classifier=False):
         json_paths = glob.glob(os.path.join(
@@ -210,17 +212,17 @@ class LossAccuracyCurve(object):
     def plot(self, save_dir):
         train_curve_save_path = os.path.join(save_dir, 'train_' + self.name)
         print('Save: ' + train_curve_save_path)
-        plot_train_curve(self.log_infos, self.legends,
-                         train_curve_save_path, self.legend_configs)
+        plot_train_curve(self.log_infos, self.legend,
+                         train_curve_save_path, self.legend_config)
 
         test_curve_save_path = os.path.join(save_dir, 'test_' + self.name)
         print('Save: ' + test_curve_save_path)
-        plot_test_curve(self.log_infos, self.legends,
-                        test_curve_save_path, self.legend_configs)
+        plot_test_curve(self.log_infos, self.legend,
+                        test_curve_save_path, self.legend_config)
 
 
 if __name__ == '__main__':
-    methods = [
+    method_list = [
         dict(
             config='cnn2_deepsig_iq_201610A',
             name='CNN2-IQ',
@@ -234,8 +236,8 @@ if __name__ == '__main__':
     ]
     from .legend_config import LegendConfig
 
-    legend_configs = LegendConfig(18)
-    legends = {
+    legend_config_list = LegendConfig(18)
+    legend_list = {
         'MLDNN': 0,
         'CLDNN-IQ': 1,
         'CLDNN-AP': 2,
@@ -256,6 +258,6 @@ if __name__ == '__main__':
         'MLDNN-Grade': 17,
     }
     confusion = LossAccuracyCurve('/home/citybuster/Data/SignalProcessing/Workdir',
-                                  'cnn2_deepsig_iq_201610A.pdf', legends, methods, legend_configs)
+                                  'cnn2_deepsig_iq_201610A.pdf', legend_list, method_list, legend_config_list)
     confusion.run(
         '/home/citybuster/Data/SignalProcessing/Workdir/cnn2_deepsig_iq_201610A/fig/')

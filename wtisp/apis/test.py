@@ -6,8 +6,8 @@ import tempfile
 import time
 
 import torch
-import torch.nn as nn
 import torch.distributed as dist
+import torch.nn as nn
 
 from ..common.fileio import dump, load
 from ..common.utils import ProgressBar
@@ -18,8 +18,8 @@ def apply_dropout(m):
     if isinstance(m, nn.Dropout):
         m.train()
 
-def single_gpu_test(model, data_loader, dropout_alive=False):
 
+def single_gpu_test(model, data_loader, dropout_alive=False):
     model.eval()
     if dropout_alive:
         model.apply(apply_dropout)

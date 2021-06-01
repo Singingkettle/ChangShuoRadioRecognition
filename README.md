@@ -59,6 +59,10 @@ Please refer to [install.md](docs/install.md) for installation and dataset prepa
 
 Please see [getting_started.md](docs/getting_started.md) for the basic usage of WTISP.
 
+## Benchmark Results
+
+Please see [summary.md](docs/summary.md) for the benchmark results.
+
 ## Version Control
 
 For version control, we use the git. Pleease refer the [**This tutorial**](docs/git_tutorial.md)

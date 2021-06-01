@@ -1,6 +1,6 @@
 import argparse
 
-from wtisp.common.utils import Config
+from wtisp.common.utils import Config, filter_config
 from wtisp.plot import build_plot
 
 
@@ -20,7 +20,8 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg.pretty_text)
 
-    plot = build_plot(cfg.plot)
+    config_legend_map, config_method_map = filter_config(cfg, mode='summary')
+    plot = build_plot(cfg.plot, config_legend_map, config_method_map)
 
     plot.plot()
 

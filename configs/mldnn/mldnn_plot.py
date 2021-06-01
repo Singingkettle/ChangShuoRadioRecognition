@@ -1,5 +1,5 @@
 log_dir = '/home/citybuster/Data/SignalProcessing/Workdir'
-legends = {
+legend = {
     'MLDNN': 0,
     'CLDNN-IQ': 1,
     'CLDNN-AP': 2,
@@ -41,28 +41,37 @@ plot = dict(
     type='MLDNNPlot',
     log_dir=log_dir,
     config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
-    legends=legends,
+    legend=legend,
     # Set the configs about confusion maps
-    confusion_maps=[
+    confusion_map=[
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
             name='confusion_map_mldnn_201610A.pdf',
-            config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
-            has_snr_classifier=True,
+            method=dict(
+                config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+                has_snr_classifier=True,
+                name='MLDNN',
+            ),
         ),
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
             name='confusion_map_mldnn_201801A.pdf',
-            config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
-            has_snr_classifier=True,
+            method=dict(
+                config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
+                has_snr_classifier=True,
+                name='MLDNN',
+            ),
         ),
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
             name='confusion_map_vggnet-co_201610A.pdf',
-            config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
+            method=dict(
+                config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
+                name='VGGNet-CO',
+            ),
         ),
     ],
     # Set the configs about snr accuracy and modulation F1 score
@@ -72,9 +81,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='cldnn_iq-ap.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='cldnn_deepsig_iq_201610A',
                     name='CLDNN-IQ',
@@ -88,9 +97,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='cgdnn2_iq-ap.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='crdnn_gru_ap_deepsig_201610A',
                     name='CGDNN2-AP',
@@ -104,9 +113,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='cldnn2_iq-ap.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='crdnn_lstm_ap_deepsig_201610A',
                     name='CLDNN2-AP',
@@ -123,9 +132,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='ablation_data.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 # data, iq, ap
                 dict(
                     config='cnn3_deepsig_iq_201610A',
@@ -188,9 +197,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='deepsig_201610A_iq_ap.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
                     name='MLDNN',
@@ -222,9 +231,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='deepsig_201610A_co_fb.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
                     name='MLDNN',
@@ -261,9 +270,9 @@ plot = dict(
         dict(
             type='SNRModulationCurve',
             name='deepsig_201801A_iq_ap.pdf',
-            legends=legends,
+            legend=legend,
             log_dir=log_dir,
-            methods=[
+            method=[
                 dict(
                     config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
                     name='MLDNN',
@@ -292,4 +301,13 @@ plot = dict(
             ],
         ),
     ],
+    summary=dict(
+        type='ModulationSummary',
+        name='.md',
+        log_dir=log_dir,
+        dataset=[
+            '201610A',
+            '201801A',
+        ],
+    ),
 )

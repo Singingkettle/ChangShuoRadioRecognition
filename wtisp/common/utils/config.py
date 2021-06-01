@@ -1,5 +1,8 @@
 # Copyright (c) Open-MMLab. All rights reserved.
 import ast
+import glob
+import json
+import os
 import os.path as osp
 import platform
 import shutil
@@ -7,6 +10,7 @@ import sys
 import tempfile
 from argparse import Action, ArgumentParser
 from collections import abc
+from collections import defaultdict
 from importlib import import_module
 
 from addict import Dict
@@ -460,3 +464,134 @@ class DictAction(Action):
                 val = val[0]
             options[key] = val
         setattr(namespace, self.dest, options)
+
+
+def filter_config(cfg, is_regeneration=False, mode='test'):
+    configs = dict()
+    train_configs = dict()
+    config_legend_map = dict()
+    config_method_map = dict()
+
+    def extract_info(m):
+        c = m['config']
+        if 'has_snr_classifier' in m:
+            h = m['has_snr_classifier']
+        else:
+            h = False
+        if c in configs:
+            configs[c] = (configs[c] or h)
+            if config_legend_map[c] is not m['name']:
+                raise ValueError(
+                    'The config {} sis assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
+        else:
+            configs[c] = h
+            config_legend_map[c] = m['name']
+            config_method_map[c] = m
+
+    # Add config from confusion_map
+    if 'confusion_map' in cfg.plot:
+        if isinstance(cfg.plot['confusion_map'], dict):
+            confusion_map = cfg.plot['confusion_map']
+            method = confusion_map['method']
+            extract_info(method)
+        elif isinstance(cfg.plot['confusion_map'], list):
+            for confusion_map in cfg.plot['confusion_map']:
+                method = confusion_map['method']
+                extract_info(method)
+        else:
+            raise ValueError('The confusion maps must be list or dict!')
+
+    # Add config from train_test_curve
+    if 'train_test_curve' in cfg.plot:
+        if isinstance(cfg.plot['train_test_curve'], dict):
+            train_test_curve = cfg.plot['train_test_curve']
+            for method in train_test_curve['method']:
+                extract_info(method)
+        elif isinstance(cfg.plot['train_test_curve'], list):
+            for train_test_curve in cfg.plot['train_test_curve']:
+                for method in train_test_curve['method']:
+                    extract_info(method)
+        else:
+            raise ValueError('The train test curves must be list or dict!')
+
+    # Add config from snr_modulation
+    if 'snr_modulation' in cfg.plot:
+        if isinstance(cfg.plot['snr_modulation'], dict):
+            snr_modulation = cfg.plot['snr_modulation']
+            for method in snr_modulation['method']:
+                extract_info(method)
+        elif isinstance(cfg.plot['snr_modulation'], list):
+            for snr_modulation in cfg.plot['snr_modulation']:
+                for method in snr_modulation['method']:
+                    extract_info(method)
+        else:
+            raise ValueError('The snr_modulation must be list or dict!')
+
+    for config, has_snr_classifier in configs.items():
+        if osp.isdir(osp.join(cfg.log_dir, config)):
+            format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
+            json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
+            npy_paths = glob.glob(osp.join(format_out_dir, '*.npy'))
+            if not is_regeneration:
+                if (len(json_paths) == 1) and ((len(npy_paths) == 1) or (len(npy_paths) == 4)) and (
+                        not is_regeneration):
+                    continue
+        if 'feature_based' in config:
+            train_configs[config] = -1
+        else:
+            best_epoch = get_the_best_checkpoint(
+                cfg.log_dir, config, has_snr_classifier)
+            if best_epoch > 0:
+                train_configs[config] = best_epoch
+
+    no_train_configs = list(set(configs.keys()) - set(train_configs.keys()))
+
+    if mode is 'test':
+        return train_configs
+    elif mode is 'train':
+        return no_train_configs
+    elif mode is 'summary':
+        return config_legend_map, config_method_map
+    else:
+        raise ValueError('Unknown mod {} for filtering config'.format(mode))
+
+
+def load_json_log(json_log):
+    log_dict = dict()
+    with open(json_log, 'r') as log_file:
+        for line in log_file:
+            log = json.loads(line.strip())
+            # skip lines without `epoch` field
+            if 'epoch' not in log:
+                continue
+            epoch = log.pop('epoch')
+            if epoch not in log_dict:
+                log_dict[epoch] = defaultdict(list)
+            for k, v in log.items():
+                log_dict[epoch][k].append(v)
+    return log_dict
+
+
+def get_the_best_checkpoint(log_dir, config, has_snr_classifier):
+    json_paths = glob.glob(os.path.join(log_dir, config, '*.json'))
+
+    if len(json_paths) > 0:
+        # assume that the last json file is right version
+        json_paths = sorted(json_paths)
+        log_dict = load_json_log(json_paths[-1])
+        if has_snr_classifier:
+            metric = 'merge/snr_mean_all'
+        else:
+            metric = 'common/snr_mean_all'
+
+        epochs = list(log_dict.keys())
+        accuracy = 0
+        best_epoch = 0
+        for epoch in epochs:
+            if log_dict[epoch]['mode'][-1] == 'val':
+                if log_dict[epoch][metric][0] > accuracy:
+                    accuracy = log_dict[epoch][metric][0]
+                    best_epoch = epoch
+    else:
+        best_epoch = 0
+    return best_epoch
