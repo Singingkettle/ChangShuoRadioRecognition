@@ -1,12 +1,11 @@
-import copy
 import os
 import os.path as osp
 import pickle
-from scipy.special import softmax
 
 import matplotlib.pyplot as plt
 import numpy as np
-from cvxopt import solvers, matrix, log, div, mul
+from cvxopt import solvers, matrix, div, mul
+from scipy.special import softmax
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
@@ -713,8 +712,10 @@ class WTIMCDataset(Dataset):
         r_w, r_o = ridge_regression(pre_matrix, self.targets, 0)
         c_w, c_o = cross_entropy(pre_matrix, self.targets, 0)
 
-        r_eval_results = self._evaluate_mod(np.reshape(np.dot(r_w, pre_matrix), (-1, len(self.CLASSES))), prefix='rg-weight_')
-        c_eval_results = self._evaluate_mod(np.reshape(np.dot(c_w, pre_matrix), (-1, len(self.CLASSES))), prefix='ce-weight_')
+        r_eval_results = self._evaluate_mod(np.reshape(np.dot(r_w, pre_matrix), (-1, len(self.CLASSES))),
+                                            prefix='rg-weight_')
+        c_eval_results = self._evaluate_mod(np.reshape(np.dot(c_w, pre_matrix), (-1, len(self.CLASSES))),
+                                            prefix='ce-weight_')
         return r_eval_results, c_eval_results
 
     def evaluate(self, results, logger=None):

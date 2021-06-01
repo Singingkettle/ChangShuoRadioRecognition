@@ -4,7 +4,7 @@ import os.path as osp
 
 import torch
 
-from wtisp.common.utils import Config, mkdir_or_exist
+from wtisp.common.utils import Config, mkdir_or_exist, filter_config
 
 
 def parse_args():
@@ -27,8 +27,6 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg.pretty_text)
 
-    configs = set()
-
     if args.scripts_dir is not None:
         scripts_dir = osp.join(args.scripts_dir, 'train_' + cfg.plot['config'])
     else:
@@ -37,50 +35,7 @@ def main():
     # create work_dir
     mkdir_or_exist(osp.abspath(scripts_dir))
 
-    # Add config from confusion_maps
-    if 'confusion_maps' in cfg.plot:
-        if isinstance(cfg.plot['confusion_maps'], dict):
-            config = cfg.plot['confusion_maps']['config']
-            if config not in configs:
-                configs.add(config)
-
-        elif isinstance(cfg.plot['confusion_maps'], list):
-            for confusion_map in cfg.plot['confusion_maps']:
-                config = confusion_map['config']
-                if config not in configs:
-                    configs.add(config)
-        else:
-            raise ValueError('The confusion maps must be list or dict!')
-
-    # Add config from train_test_curves
-    if 'train_test_curves' in cfg.plot:
-        train_test_curves = cfg.plot['train_test_curves']
-        if isinstance(train_test_curves, dict):
-            for method in train_test_curves['methods']:
-                if method['config'] not in configs:
-                    configs.add(method['config'])
-        elif isinstance(train_test_curves, list):
-            for train_test_curve in train_test_curves:
-                for method in train_test_curve['methods']:
-                    if method['config'] not in configs:
-                        configs.add(method['config'])
-        else:
-            raise ValueError('The train test curves must be list or dict!')
-
-    # Add config from snr_modulation
-    if 'snr_modulation' in cfg.plot:
-        snr_modulation = cfg.plot['snr_modulation']
-        if isinstance(snr_modulation, dict):
-            for method in snr_modulation['methods']:
-                if method['config'] not in configs:
-                    configs.add(method['config'])
-        elif isinstance(snr_modulation, list):
-            for snr_accuracy in snr_modulation:
-                for method in snr_accuracy['methods']:
-                    if method['config'] not in configs:
-                        configs.add(method['config'])
-        else:
-            raise ValueError('The snr_modulation must be list or dict!')
+    no_train_configs = filter_config(cfg, mode='train')
 
     base_master_port = 29647
 
@@ -89,13 +44,12 @@ def main():
     count_index = 0
     group_index = 0
     gpu_num = torch.cuda.device_count()
-    configs = list(configs)
-    configs = sorted(configs)
+    no_train_configs = sorted(no_train_configs)
 
     if not args.multi_gpu:
         args.group_num = gpu_num
 
-    for config in configs:
+    for config in no_train_configs:
         if args.multi_gpu:
             python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} --master_port={} tools/train.py'.format(
                 gpu_num, base_master_port + method_index)

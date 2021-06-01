@@ -108,4 +108,3 @@ class NLLLoss(nn.Module):
             avg_factor=avg_factor,
             **kwargs)
         return loss_cls
-

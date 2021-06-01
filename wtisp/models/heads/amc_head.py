@@ -118,7 +118,7 @@ class MergeAMCHead(BaseHead):
         merge_x = torch.add(low_snr_pred, high_snr_pred)
 
         if self.with_log:
-            merge_x = torch.where(merge_x>0, merge_x, merge_x.new_tensor(1))
+            merge_x = torch.where(merge_x > 0, merge_x, merge_x.new_tensor(1))
             merge_x = torch.log(merge_x)
 
         return merge_x
@@ -321,6 +321,7 @@ class FMLHierarchicalHead(BaseHead):
         lstm2_x = self.classifier_head[2](x['lstm2'])
 
         return dict(cnn=cnn_x, lstm1=lstm1_x, lstm2=lstm2_x)
+
 
 @HEADS.register_module()
 class FMergeAMCHead(BaseHead):

@@ -45,6 +45,7 @@ class SELayerV2(nn.Module):
             nn.Linear(nhid, in_channels, bias=False),
             nn.Softmax(dim=1)
         )
+
     def forward(self, x):
         b, c, _ = x.size()
         y = self.avg_pool(x).view(b, c)
@@ -67,6 +68,7 @@ class SSLayer(nn.Module):
         )
         self.norm = nn.Softmax(dim=1)
         self.temperature = 100
+
     def forward(self, x):
         b, c, _ = x.size()
         y = self.avg_pool(x).view(b, c)
@@ -2546,3 +2548,85 @@ class FMLNetV35(nn.Module):
         x = torch.sum(x, dim=1)
 
         return x
+
+
+@BACKBONES.register_module()
+class FMLNetV36(nn.Module):
+    def __init__(self, dropout_rate=0.5, avg_pool=None):
+        super(FMLNetV36, self).__init__()
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(4, 128, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 128, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 80, kernel_size=(1, 3), stride=(1, 2)),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+        )
+
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+        else:
+            self.has_avg_pool = False
+
+        self.se = SELayer(15)
+        self.sa = SALayer(15)
+        self.lstm = nn.LSTM(input_size=80, hidden_size=40, dropout=dropout_rate,
+                            num_layers=2, batch_first=True, bidirectional=True)
+
+        self.inter_orthogonal_net = nn.Sequential(
+            nn.Conv1d(15, 2, kernel_size=3, padding=0),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm1d(2),
+        )
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                if isinstance(m, nn.Conv1d):
+                    nn.init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                if isinstance(m, nn.LSTM):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(4, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(4, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+        se_w = self.se(c_x)
+        sa_w = self.sa(c_x)
+        x, _ = self.lstm1(c_x)
+
+        x = torch.mul(x, se_w)
+        x = torch.mul(x, sa_w)
+        x = self.inter_orthogonal_net(x)
+
+        x_high = x[:, 0, :]
+        x_low = x[:, 1, :]
+        with torch.no_grad():
+            x_snr = x.reshape(-1, 2 * 78)
+
+        return [x_snr, x_high, x_low, x]
