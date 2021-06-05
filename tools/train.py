@@ -80,14 +80,16 @@ def main():
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
         distributed = False
-        del_files(cfg.work_dir)
+        if osp.isdir(cfg.work_dir):
+            del_files(cfg.work_dir)
     else:
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
         # Delete the old saved log files and models
         rank, _ = get_dist_info()
         if rank == 0:
-            del_files(cfg.work_dir)
+            if osp.isdir(cfg.work_dir):
+                del_files(cfg.work_dir)
 
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))

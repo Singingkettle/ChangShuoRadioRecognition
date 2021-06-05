@@ -501,18 +501,19 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         else:
             raise ValueError('The confusion maps must be list or dict!')
 
-    # Add config from train_test_curve
-    if 'train_test_curve' in cfg.plot:
-        if isinstance(cfg.plot['train_test_curve'], dict):
-            train_test_curve = cfg.plot['train_test_curve']
-            for method in train_test_curve['method']:
-                extract_info(method)
-        elif isinstance(cfg.plot['train_test_curve'], list):
-            for train_test_curve in cfg.plot['train_test_curve']:
+    if mode is 'train':
+        # Add config from train_test_curve
+        if 'train_test_curve' in cfg.plot:
+            if isinstance(cfg.plot['train_test_curve'], dict):
+                train_test_curve = cfg.plot['train_test_curve']
                 for method in train_test_curve['method']:
                     extract_info(method)
-        else:
-            raise ValueError('The train test curves must be list or dict!')
+            elif isinstance(cfg.plot['train_test_curve'], list):
+                for train_test_curve in cfg.plot['train_test_curve']:
+                    for method in train_test_curve['method']:
+                        extract_info(method)
+            else:
+                raise ValueError('The train test curves must be list or dict!')
 
     # Add config from snr_modulation
     if 'snr_modulation' in cfg.plot:

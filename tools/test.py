@@ -89,11 +89,12 @@ def main():
 
     # build the dataloader
     samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 4)
+    workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 4)
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=samples_per_gpu,
-        workers_per_gpu=4,
+        workers_per_gpu=workers_per_gpu,
         dist=distributed,
         shuffle=False)
 

@@ -13,6 +13,28 @@ from ..common.fileio import dump as IODump
 from ..common.fileio import load as IOLoad
 
 
+def data_normalization(a):
+    a = (a - np.expand_dims(np.min(a, axis=1), axis=1)) / np.expand_dims((np.max(a, axis=1) - np.min(a, axis=1)),
+                                                                         axis=1)
+    return a
+
+
+def data_standardization(a):
+    a = (a - np.expand_dims(np.mean(a, axis=1), axis=1)) / np.expand_dims(np.std(a, axis=1), axis=1)
+    return a
+
+
+def data_nothing(a):
+    return a
+
+
+_NORMMODES = dict(
+    normalization=data_normalization,
+    standardization=data_standardization,
+    nothing=data_nothing,
+)
+
+
 def generate_targets(ann_file):
     annos = IOLoad(ann_file)
     anno_data = annos['data']
@@ -161,7 +183,7 @@ class WTIMCDataset(Dataset):
                  multi_label=False, test_mode=False, snr_threshold=0,
                  use_snr_label=False, item_weights=None, channel_mode=False,
                  use_hard_label=False, hard_modulations=None, data_aug=False,
-                 use_teacher_label=False, teacher_config=None):
+                 use_teacher_label=False, teacher_config=None, process_mode='nothing'):
         self.ann_file = ann_file
         self.iq = iq
         self.ap = ap
@@ -180,6 +202,7 @@ class WTIMCDataset(Dataset):
         self.teacher_config = teacher_config
         self.hard_modulations = hard_modulations
         self.data_aug = data_aug
+        self.process_mode = process_mode
 
         if self.data_root is not None:
             if not osp.isabs(self.ann_file):
@@ -367,6 +390,8 @@ class WTIMCDataset(Dataset):
         file_path = osp.join(
             self.data_root, 'sequence_data', data_type, file_name)
         seq_data = np.load(file_path)
+        seq_data = _NORMMODES[self.process_mode](seq_data)
+
         seq_data = seq_data.astype(np.float32)
         num_path = 2
         if self.data_aug:

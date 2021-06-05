@@ -107,8 +107,9 @@ def plot_test_curve(log_infos, legend, save_path, legend_config):
             num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1]
             for epoch in epochs:
                 if log_dict[epoch]['mode'][-1] == 'val':
-                    xs.append(epoch)
-                    ys.append(log_dict[epoch][metric])
+                    if epoch % 10 == 0:
+                        xs.append(epoch)
+                        ys.append(log_dict[epoch][metric])
             xs = np.array(xs)
             ys = np.array(ys)
             if legend_suffix[j] is not None:

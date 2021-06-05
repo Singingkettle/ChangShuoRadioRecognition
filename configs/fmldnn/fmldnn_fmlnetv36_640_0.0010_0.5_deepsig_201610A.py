@@ -1,10 +1,11 @@
 _base_ = '../_base_/default_runtime.py'
 
+batch_size = 640
 dataset_type = 'WTIMCDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 data = dict(
-    samples_per_gpu=80,
-    workers_per_gpu=2,
+    samples_per_gpu=batch_size,
+    workers_per_gpu=16,
     train=dict(
         type=dataset_type,
         data_root=data_root,
@@ -43,16 +44,16 @@ data = dict(
 model = dict(
     type='FMLDNN',
     backbone=dict(
-        type='FMLNetV35',
+        type='FMLNetV36',
     ),
     classifier_head=dict(
-        type='FMLHead',
+        type='FMLAUXHead',
         heads=[
             # Snr Head
             dict(
                 type='AMCHead',
                 num_classes=2,
-                in_features=100,
+                in_features=156,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -63,7 +64,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=100,
+                in_features=78,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -74,7 +75,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=100,
+                in_features=78,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -86,7 +87,32 @@ model = dict(
                 type='MergeAMCHead',
                 loss_cls=dict(
                     type='NLLLoss',
-                    loss_weight=1,
+                    loss_weight=0,
+                ),
+            ),
+            # Inter Head
+            dict(
+                type='InterOrthogonalHead',
+                num_bases=2,
+                batch_size=batch_size,
+                bmm='cosine',
+                is_abs=True,
+                loss_aux=dict(
+                    type='LogisticLoss',
+                    loss_weight=1
+                ),
+            ),
+            # Intra Head
+            dict(
+                type='IntraOrthogonalHead',
+                in_features=156,  # keep the same as snr head
+                batch_size=batch_size,  # keep the same as samples_per_gpu
+                num_classes=11,
+                mm='cosine',
+                is_abs=True,
+                loss_aux=dict(
+                    type='LogisticLoss',
+                    loss_weight=1
                 ),
             ),
         ]

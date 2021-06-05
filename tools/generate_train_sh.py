@@ -12,9 +12,10 @@ def parse_args():
         description='WTISignalProcessing Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
     parser.add_argument('--scripts_dir', help='dir to save the train.sh files')
-    parser.add_argument('--group_num', default=8, type=int, help='number of configs in one train.sh file')
+    parser.add_argument('--group_num', default=24, type=int, help='number of configs in one train.sh file')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
-    parser.add_argument('--multi_gpu', default=True, type=bool, help='the dir to save logs and models')
+    parser.add_argument('--multi_gpu', default=False, action='store_true',
+                        help='the dir to save logs and models')
     args = parser.parse_args()
     return args
 
@@ -46,9 +47,7 @@ def main():
     gpu_num = torch.cuda.device_count()
     no_train_configs = sorted(no_train_configs)
 
-    if not args.multi_gpu:
-        args.group_num = gpu_num
-
+    gpu_index = 0
     for config in no_train_configs:
         if args.multi_gpu:
             python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} --master_port={} tools/train.py'.format(
@@ -61,7 +60,7 @@ def main():
         if args.multi_gpu:
             end_sh = ' --seed 0 --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
         else:
-            end_sh = ' --gpu-ids {:d} --seed 0 > /dev/null 2>&1 &\n\n\n\n'.format(count_index)
+            end_sh = ' --gpu-ids {} --seed 0 > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
 
         start_info = 'echo \"Start Train: {}\"\n\n'.format(config_sh)
         train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh
@@ -73,6 +72,10 @@ def main():
             train_sh = ''
             count_index = 0
             group_index += 1
+        if not args.multi_gpu:
+            gpu_index += 1
+            if gpu_index >= gpu_num:
+                gpu_index = 0
 
     if train_sh is not '':
         with open(os.path.join(scripts_dir, 'train_{:02d}.sh'.format(group_index)), 'w') as f:

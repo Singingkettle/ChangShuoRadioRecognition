@@ -12,12 +12,14 @@ class FMLDNN(BaseAMC):
             self,
             backbone,
             classifier_head,
+            channel_mode=False,
             train_cfg=None,
             test_cfg=None,
             pre_trained=None):
         super(FMLDNN, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
+        self.channel_mode = channel_mode
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 
@@ -56,7 +58,10 @@ class FMLDNN(BaseAMC):
         elif aps is None:
             x = iqs
         else:
-            x = torch.cat((iqs, aps), dim=1)
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
         x = self.extract_feat(x)
         losses = self.classifier_head.forward_train(
             x, mod_labels=mod_labels, snr_labels=snr_labels, low_weight=low_weight, high_weight=high_weight)
@@ -69,11 +74,18 @@ class FMLDNN(BaseAMC):
         elif aps is None:
             x = iqs
         else:
-            x = torch.cat((iqs, aps), dim=1)
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
         x = self.extract_feat(x)
-        outs = self.classifier_head(x)
+        outs = self.classifier_head(x, mode='test')
 
         if isinstance(outs, dict):
+            if 'inter' in outs:
+                outs.pop('inter', None)
+            if 'intra' in outs:
+                outs.pop('intra', None)
             results_list = []
             keys = list(outs.keys())
             batch_size = outs[keys[0]].shape[0]

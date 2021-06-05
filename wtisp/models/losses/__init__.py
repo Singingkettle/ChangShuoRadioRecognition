@@ -4,10 +4,12 @@ from .focal_loss import FocalLoss, sigmoid_focal_loss
 from .mse_loss import MSELoss, mse_loss
 from .nll_loss import NLLLoss, nll
 from .utils import reduce_loss, weight_reduce_loss, weighted_loss
+from .logistic_loss import LogisticLoss
+from .ghm_loss import  GHMC
 
 __all__ = [
     'MSELoss', 'mse_loss', 'CrossEntropyLoss', 'cross_entropy',
     'NLLLoss', 'nll', 'reduce_loss',
     'weight_reduce_loss', 'weighted_loss', 'FocalLoss', 'sigmoid_focal_loss',
-    'ContrastiveLoss'
+    'ContrastiveLoss', 'GHMC'
 ]

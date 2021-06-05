@@ -8,7 +8,7 @@ from .fmlnet import (FMLNetV1, FMLNetV2, FMLNetV3, FMLNetV4, FMLNetV5, FMLNetV6,
                      FMLNetV10, FMLNetV11, FMLNetV12, FMLNetV13, FMLNetV14, FMLNetV15, FMLNetV16, FMLNetV17,
                      FMLNetV18, FMLNetV19, FMLNetV20, FMLNetV21, FMLNetV22, FMLNetV23, FMLNetV24, FMLNetV25,
                      FMLNetV26, FMLNetV27, FMLNetV28, FMLNetV29, FMLNetV30, FMLNetV31, FMLNetV32, FMLNetV33,
-                     FMLNetV34, FMLNetV35)
+                     FMLNetV34, FMLNetV35, FMLNetV36, FMLNetV37)
 from .googlenet_co import GoogleNetCO
 from .hclnet import HCLNetV1
 from .mlclnet import MLCLNet
@@ -41,5 +41,6 @@ __all__ = [
     'FMLNetV27', 'FMLNetV28', 'FMLNetV29',
     'AlexNetCO', 'GoogleNetCO', 'ResNetCO',
     'VGGNetCO', 'CoBoNet', 'FMLNetV34',
-    'CPCNN', 'CSTN', 'CPCSTN'
+    'FMLNetV36', 'FMLNetV37',
+    'CPCNN', 'CSTN', 'CPCSTN',
 ]
