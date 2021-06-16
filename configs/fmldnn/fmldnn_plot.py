@@ -16,7 +16,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-0.1-1000_batchsize-640_lr-0.0010_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv38-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00054-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -26,7 +26,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-0.1-1000_batchsize-640_lr-0.0015_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv38-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00059-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -36,7 +36,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-0.1-1000_batchsize-640_lr-0.0020_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv38-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -46,7 +46,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-0.1-1000_batchsize-640_lr-0.0025_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv38-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00074-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -57,7 +57,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-1.0-1000_batchsize-640_lr-0.0010_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00054-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -67,7 +67,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-1.0-1000_batchsize-640_lr-0.0015_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00059-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -77,7 +77,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-1.0-1000_batchsize-640_lr-0.0020_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),
@@ -87,7 +87,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_fmldnn_201801A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv38-ia-channel-spatial-attention_famcauxhead-focal-1.0-1000_batchsize-640_lr-0.0025_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.01-1000_batchsize-640_lr-0.00074-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
                 has_snr_classifier=True,
                 name='FMLDNN-V38',
             ),

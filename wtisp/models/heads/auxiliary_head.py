@@ -52,7 +52,7 @@ _BMMFUNCTIONS = dict(inner_product=_bmm_inner_product, cosine=_bmm_cosine_simila
 
 @HEADS.register_module()
 class InterOrthogonalHead(BaseHead):
-    def __init__(self, num_bases, batch_size, expansion=3,
+    def __init__(self, num_bases, batch_size, expansion=1,
                  bmm='inner_product', loss_aux=None, is_abs=False):
         super(InterOrthogonalHead, self).__init__()
         self.num_bases = num_bases
@@ -74,8 +74,9 @@ class InterOrthogonalHead(BaseHead):
         indices = x.new_tensor(self.indices).long()
         inter_inner_products = self.bmm_f(x, x)
         x = inter_inner_products.view(self.batch_size, -1)
+        x = x * self.expansion
         if self.is_abs:
-            x = torch.abs(x) * self.expansion
+            x = torch.abs(x)
 
         label = -1 * x.new_ones((self.batch_size, self.num_bases * self.num_bases))
         weight = x.new_full((self.batch_size, self.num_bases * self.num_bases), self.weight_scalar)
@@ -87,13 +88,14 @@ class InterOrthogonalHead(BaseHead):
 
 @HEADS.register_module()
 class IntraOrthogonalHead(BaseHead):
-    def __init__(self, in_features, batch_size, num_classes, expansion=3,
+    def __init__(self, in_features, batch_size, num_classes, expansion=1,
                  mm='inner_product', loss_aux=None, is_abs=False):
         super(IntraOrthogonalHead, self).__init__()
         self.in_features = in_features
         self.batch_size = batch_size
         self.num_classes = num_classes
         self.expansion = expansion
+        self.mm = mm
         if mm in _MMFUNCTIONS:
             self.mm_f = _MMFUNCTIONS[mm]
         else:
@@ -107,9 +109,11 @@ class IntraOrthogonalHead(BaseHead):
     def loss(self, x, mod_labels=None, **kwargs):
         x = x.view(self.batch_size, self.in_features)
         x = self.mm_f(x, x)
-        x = x - torch.max(x)
+        if self.mm is not 'cosine':
+            x = x - torch.max(x)
+        x = x * self.expansion
         if self.is_abs:
-            x = torch.abs(x) * self.expansion
+            x = torch.abs(x)
 
         label = x.new_full((self.batch_size, self.num_classes), 0)
         label[torch.arange(self.batch_size), mod_labels[:, 0]] = 1
@@ -124,4 +128,39 @@ class IntraOrthogonalHead(BaseHead):
         label[label == 0] = -1
         label[torch.arange(self.batch_size), torch.arange(self.batch_size)] = 0
         loss_intra_orthogonal = self.loss_inter_orthogonal(x, label, weight)
+        return dict(loss_intra_orthogonal=loss_intra_orthogonal)
+
+
+@HEADS.register_module()
+class IntraOrthogonalHeadV2(BaseHead):
+    def __init__(self, in_features, batch_size, num_classes, expansion=1,
+                 mm='inner_product', loss_aux=None, is_abs=False):
+        super(IntraOrthogonalHeadV2, self).__init__()
+        self.in_features = in_features
+        self.batch_size = batch_size
+        self.num_classes = num_classes
+        self.expansion = expansion
+        self.mm = mm
+        if mm in _MMFUNCTIONS:
+            self.mm_f = _MMFUNCTIONS[mm]
+        else:
+            raise ValueError('Unknown mm mode {}!!!'.format(mm))
+        self.is_abs = is_abs
+        self.loss_inter_orthogonal = build_loss(loss_aux)
+
+    def init_weights(self):
+        pass
+
+    def loss(self, x, mod_labels=None, **kwargs):
+        x = x.view(self.batch_size, self.in_features)
+        x = self.mm_f(x, x)
+        x = x * self.expansion
+        if self.is_abs:
+            x = torch.abs(x)
+
+        label = x.new_full((self.batch_size, self.num_classes), 0)
+        label[torch.arange(self.batch_size), mod_labels[:, 0]] = 1
+        label = torch.mm(label, torch.transpose(label, 0, 1))
+        label[torch.arange(self.batch_size), torch.arange(self.batch_size)] = 0
+        loss_intra_orthogonal = self.loss_inter_orthogonal(x, label)
         return dict(loss_intra_orthogonal=loss_intra_orthogonal)

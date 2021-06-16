@@ -1,6 +1,8 @@
 from .focal_loss import (SigmoidFocalLoss, SoftmaxFocalLoss,
                          sigmoid_focal_loss, softmax_focal_loss)
+from .indrnn import IndRNN, IndRNNv2
 
 __all__ = [
-    'SigmoidFocalLoss', 'SoftmaxFocalLoss', 'sigmoid_focal_loss', 'softmax_focal_loss'
+    'SigmoidFocalLoss', 'SoftmaxFocalLoss', 'sigmoid_focal_loss', 'softmax_focal_loss',
+    'IndRNN', 'IndRNNv2'
 ]

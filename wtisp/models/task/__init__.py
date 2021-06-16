@@ -15,6 +15,7 @@ from .mbrfi import MBRFI
 from .ml_cldnn import MLCLDNN
 from .ml_dscldnn import MLDSCLDNN
 from .mldnn import MLDNN
+from .rescldnn import ResCLDNN
 from .rescnn import ResCNN
 from .rilcldnn import RILCLDNN
 from .sei import BaseSEI
@@ -24,5 +25,6 @@ from .tcnn import TCNN
 __all__ = [
     'BaseSeparator', 'BaseAMC', 'TCNN', 'CLDNN', 'CNN2', 'CNN3', 'CNN4',
     'CRNN', 'DensCNN', 'DSCLDNN', 'MLCLDNN', 'MLDSCLDNN', 'ResCNN', 'RILCLDNN',
-    'CTDNN', 'MLDNN', 'HCLDNN', 'FMLDNN', 'HardEasy', 'CNNCO', 'BaseSEI', 'MBRFI'
+    'CTDNN', 'MLDNN', 'HCLDNN', 'FMLDNN', 'HardEasy', 'CNNCO', 'BaseSEI', 'MBRFI',
+    'ResCLDNN'
 ]

@@ -158,3 +158,9 @@ full description about the [config system](config.md).
 sudo kill -s 9 $(ps aux | grep mldnn_*_201610A.py | awk '{print $2}')
 sudo kill -9 $(nvidia-smi | sed -n 's/|\s*[0-9]*\s*\([0-9]*\)\s*.*/\1/p' | sort | uniq | sed '/^$/d')
 ```
+
+## GPU State
+
+```shell
+ watch -n 0.1 --color gpustat --c
+```

@@ -2,7 +2,7 @@ from .amc_head import (AMCHead, DSAMCHead, MergeAMCHead,
                        MLAMCHead, MLHeadNoWeight, FMLHeadNoWeight,
                        FMLHierarchicalHead, FMergeAMCHead, FPNAMCHead,
                        FMLHead, FMLAUXHead, FAMCAUXHead, DSAMCAUXHead)
-from .auxiliary_head import InterOrthogonalHead, IntraOrthogonalHead
+from .auxiliary_head import InterOrthogonalHead, IntraOrthogonalHead, IntraOrthogonalHeadV2
 from .base_head import BaseHead
 from .hamc_head import HAMCHead
 from .location_head import LocationHead
@@ -14,5 +14,5 @@ __all__ = [
     'MLAMCHead', 'SeparatorHead', 'LocationHead', 'MLHeadNoWeight',
     'HAMCHead', 'FMLHeadNoWeight', 'SEIHead', 'SEICCHead', 'FMLHierarchicalHead',
     'FPNAMCHead', 'FMergeAMCHead', 'FMLHead', 'InterOrthogonalHead', 'IntraOrthogonalHead',
-    'FMLAUXHead', 'FAMCAUXHead', 'DSAMCAUXHead'
+    'FMLAUXHead', 'FAMCAUXHead', 'DSAMCAUXHead', 'IntraOrthogonalHeadV2'
 ]

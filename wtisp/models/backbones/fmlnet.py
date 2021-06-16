@@ -153,7 +153,6 @@ class SALayer(nn.Module):
         return x
 
 
-
 class SALayerV2(nn.Module):
     def __init__(self, in_channels):
         super(SALayerV2, self).__init__()
@@ -2651,7 +2650,7 @@ class FMLNetV36(nn.Module):
         x_high = x[:, 1, :]
         with torch.no_grad():
             x_snr = torch.clone(x)
-            x_snr = x_snr.view(-1, 2*78)
+            x_snr = x_snr.view(-1, 2 * 78)
 
         return [x_snr, x_low, x_high, x]
 
@@ -2815,6 +2814,737 @@ class FMLNetV38(nn.Module):
         if self.has_sa:
             sa_w = self.sa(c_x)
             x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV39(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, has_sa=False, avg_pool=None):
+        super(FMLNetV39, self).__init__()
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.gru = nn.GRU(input_size=80, hidden_size=50,
+                          num_layers=2, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.mean(x, dim=1)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV40(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 has_sa=False, avg_pool=None):
+        super(FMLNetV40, self).__init__()
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(in_features, 256, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(256, 256, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(256, 160, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+        )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.gru = nn.GRU(input_size=80, hidden_size=50,
+                          num_layers=2, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        batch_size = x.shape[0]
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x)
+        x = torch.cat([x[:, :80, :], x[:, 80:, :]], dim=0)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+
+        iq_fea = x[:batch_size, :]
+        ap_fea = x[batch_size:, :]
+        with torch.no_grad():
+            snr_fea = torch.add(iq_fea, ap_fea)
+
+        return [snr_fea, iq_fea, ap_fea]
+
+
+@BACKBONES.register_module()
+class FMLNetV41(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, has_sa=False, avg_pool=None):
+        super(FMLNetV41, self).__init__()
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.gru = nn.GRU(input_size=80, hidden_size=50,
+                          num_layers=2, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+        self.dp = nn.Dropout(dropout_rate)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+        x = self.dp(x)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV42(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 has_sa=False, avg_pool=None):
+        super(FMLNetV42, self).__init__()
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(in_features, 128, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 128, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+            nn.Conv2d(128, 80, kernel_size=(1, 3), groups=2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(dropout_rate),
+        )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.gru = nn.GRU(input_size=40, hidden_size=50,
+                          num_layers=2, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+        self.dp = nn.Dropout(dropout_rate)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        batch_size = x.shape[0]
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x)
+        x = torch.cat([x[:, :40, :], x[:, 40:, :]], dim=0)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+        x = self.dp(x)
+
+        iq_fea = x[:batch_size, :]
+        ap_fea = x[batch_size:, :]
+        with torch.no_grad():
+            snr_fea = torch.add(iq_fea, ap_fea)
+
+        return [snr_fea, iq_fea, ap_fea]
+
+
+from ...ops import IndRNN, IndRNNv2
+
+
+@BACKBONES.register_module()
+class FMLNetV43(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, has_sa=False, avg_pool=None):
+        super(FMLNetV43, self).__init__()
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.indrnn = IndRNN(input_size=80, hidden_size=50, batch_norm=True,
+                             num_layers=2, batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, IndRNN):
+                    for name, param in m.named_parameters():
+                        if "bias" in name:
+                            param.data.zero_()
+                        elif "weight_hh" in name:
+                            nn.init.constant_(param, 1)
+                        elif "weight_ih" in name:
+                            nn.init.normal_(param, 0, 0.01)
+                        else:
+                            param.data.normal_(0, 0.01)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.indrnn(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV44(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, has_sa=False, avg_pool=None):
+        super(FMLNetV44, self).__init__()
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.indrnn = IndRNNv2(input_size=80, hidden_size=50, batch_norm=True,
+                               num_layers=2, batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, IndRNNv2):
+                    for name, param in m.named_parameters():
+                        if "bias" in name:
+                            param.data.zero_()
+                        elif "weight_hh" in name:
+                            nn.init.constant_(param, 1)
+                        elif "weight_ih" in name:
+                            nn.init.normal_(param, 0, 0.01)
+                        else:
+                            param.data.normal_(0, 0.01)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.indrnn(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV45(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, has_sa=False, avg_pool=None):
+        super(FMLNetV45, self).__init__()
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 80, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127)
+        else:
+            self.se = SELayer(122)
+            self.has_avg_pool = False
+
+        if has_sa:
+            self.has_sa = True
+            if avg_pool:
+                self.sa = SALayerV2(127)
+            else:
+                self.sa = SALayerV2(122)
+        else:
+            self.has_sa = False
+
+        self.gru = nn.GRU(input_size=80, hidden_size=50,
+                          num_layers=3, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+        if self.has_sa:
+            sa_w = self.sa(c_x)
+            x = torch.mul(x, sa_w)
+        x = torch.sum(x, dim=1)
+
+        return x
+
+
+@BACKBONES.register_module()
+class FMLNetV46(nn.Module):
+
+    def __init__(self, dropout_rate=0.5, in_features=4,
+                 channel_mode=False, skip_connection=False,
+                 reduction=16, avg_pool=None):
+        super(FMLNetV46, self).__init__()
+        self.skip_connection = skip_connection
+        # For low snr
+        if channel_mode:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 100, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+            )
+        else:
+            self.conv_net = nn.Sequential(
+                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.Conv2d(256, 100, kernel_size=(1, 3)),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dropout_rate),
+                nn.AvgPool2d((in_features, 1)),
+            )
+        if avg_pool is not None:
+            self.has_avg_pool = True
+            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
+            self.se = SELayer(127, reduction=reduction)
+        else:
+            self.se = SELayer(122, reduction=reduction)
+            self.has_avg_pool = False
+
+        self.gru = nn.GRU(input_size=100, hidden_size=50,
+                          num_layers=2, dropout=dropout_rate,
+                          batch_first=True, bidirectional=True)
+
+    def init_weights(self, pre_trained=None):
+        if isinstance(pre_trained, str):
+            logger = logging.getLogger()
+            load_checkpoint(self, pre_trained, strict=False, logger=logger)
+        elif pre_trained is None:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    nn.init.xavier_uniform_(m.weight)
+                    if m.bias is not None:
+                        nn.init.constant_(m.bias, 0)
+                elif isinstance(m, nn.GRU):
+                    for name, param in m.named_parameters():
+                        if 'weight_ih' in name:
+                            for ih in param.chunk(3, 0):
+                                nn.init.xavier_uniform_(ih)
+                        elif 'weight_hh' in name:
+                            for hh in param.chunk(3, 0):
+                                nn.init.orthogonal_(hh)
+                        elif 'bias_ih' in name:
+                            nn.init.zeros_(param)
+                        elif 'bias_hh' in name:
+                            nn.init.zeros_(param)
+
+    def forward(self, x):
+        x = self.conv_net(x)
+        if self.has_avg_pool:
+            x = self.avg_pool_layer(x)
+        x = torch.squeeze(x, dim=2)
+        c_x = torch.transpose(x, 1, 2)
+
+        se_w = self.se(c_x)
+        x, _ = self.gru(c_x)
+        x = torch.mul(x, se_w)
+
+        if self.skip_connection:
+            x = x + c_x
+
         x = torch.sum(x, dim=1)
 
         return x

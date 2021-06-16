@@ -35,10 +35,7 @@ the [official instructions](https://www.mathworks.com/help/matlab/matlab_externa
 f. Install build requirements and then install WTISignalProcesssing.
 
 ```shell
-pip install -r requirements/build.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install -r requirements/docs.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install -r requirements/runtime.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install -r requirements/tests.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -v -e .  # or "python setup.py develop"
 ```
 
