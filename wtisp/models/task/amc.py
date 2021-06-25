@@ -4,7 +4,7 @@ from collections import OrderedDict
 import torch
 import torch.distributed as dist
 import torch.nn as nn
-
+from collections import namedtuple
 from ...common import get_root_logger, print_log
 
 
@@ -62,16 +62,39 @@ class BaseAMC(nn.Module, metaclass=ABCMeta):
         on whether ``return_loss`` is ``True``.
         """
         if return_loss:
-            return self.forward_train(iqs, aps, cos, **kwargs)
+            if isinstance(iqs, dict):
+                if 'iqs' not in iqs:
+                    iqs['iqs'] = None
+                if 'aps' not in iqs:
+                    iqs['aps'] = None
+                if 'cos' not in iqs:
+                    iqs['cos'] = None
+                result = self.forward_train(**iqs, **kwargs)
+                result = namedtuple('loss', result.keys())(*result.values())
+                return result
+            else:
+                return self.forward_train(iqs, aps, cos, **kwargs)
         else:
-            return self.forward_test(iqs, aps, cos, **kwargs)
+            if isinstance(iqs, dict):
+                if 'iqs' not in iqs:
+                    iqs['iqs'] = None
+                if 'aps' not in iqs:
+                    iqs['aps'] = None
+                if 'cos' not in iqs:
+                    iqs['cos'] = None
+                result = self.forward_test(**iqs, **kwargs)
+                if isinstance(result, dict):
+                    result = namedtuple('loss', result.keys())(*result.values())
+                return result
+            else:
+                return self.forward_test(iqs, aps, cos, **kwargs)
 
     def _parse_losses(self, losses):
         """Parse the raw outputs (losses) of the network.
 
         Args:
             losses (dict): Raw output of the network, which usually contain
-                losses and other necessary infomation.
+                losses and other necessary information.
 
         Returns:
             tuple[Tensor, dict]: (loss, log_vars), loss is the loss tensor \

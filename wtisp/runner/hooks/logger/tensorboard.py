@@ -2,10 +2,12 @@
 import os.path as osp
 
 import matplotlib.pyplot as plt
+import torch
 
 from .base import LoggerHook
 from ..hook import HOOKS
 from ...dist_utils import master_only
+from ....common.parallel import is_module_wrapper
 from ....common.utils import TORCH_VERSION
 
 
@@ -14,6 +16,7 @@ class TensorboardLoggerHook(LoggerHook):
 
     def __init__(self,
                  log_dir=None,
+                 add_graph=True,
                  interval=10,
                  ignore_last=True,
                  reset_flag=True,
@@ -21,6 +24,8 @@ class TensorboardLoggerHook(LoggerHook):
         super(TensorboardLoggerHook, self).__init__(interval, ignore_last,
                                                     reset_flag, by_epoch)
         self.log_dir = log_dir
+        self.add_graph = add_graph
+        self.writer = None
 
     @master_only
     def before_run(self, runner):
@@ -63,3 +68,18 @@ class TensorboardLoggerHook(LoggerHook):
     @master_only
     def after_run(self, runner):
         self.writer.close()
+
+    @master_only
+    def before_epoch(self, runner):
+        if runner.epoch == 0 and self.add_graph:
+            if is_module_wrapper(runner.model):
+                _model = runner.model.module
+            else:
+                _model = runner.model
+            device = next(_model.parameters()).device
+            data = next(iter(runner.data_loader))
+            for key, value in data.items():
+                data[key] = value.to(device)
+
+            with torch.no_grad():
+                self.writer.add_graph(_model, data)
