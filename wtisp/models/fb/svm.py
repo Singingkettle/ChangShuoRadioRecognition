@@ -1,5 +1,9 @@
+import copy
+
 import joblib
+import numpy as np
 from sklearn import svm
+from tqdm import tqdm
 
 from ..builder import FBS
 
@@ -27,5 +31,9 @@ class SVM(object):
             self.save_model()
             return True
         else:
-            label = self.svm.predict(data)
+            label = []
+            for item in tqdm(data):
+                item = np.reshape(item, (1, -1))
+                label.append(self.svm.predict(item))
+            label = np.concatenate(label, axis=0)
             return label

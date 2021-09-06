@@ -85,7 +85,7 @@ class InfoNCELoss(nn.Module):
         Returns:
             torch.Tensor: The calculated loss
         """
-        x = -1*F.log_softmax(inner_product/self.temperature, dim=1)
+        x = -1 * F.log_softmax(inner_product / self.temperature, dim=1)
         x = torch.multiply(x, label)
         weight = torch.mean(label, dim=1)
         x = torch.multiply(x, weight[:, None])

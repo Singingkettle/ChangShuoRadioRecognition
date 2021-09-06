@@ -83,4 +83,3 @@ lr_config = dict(
     policy='step',
     gamma=0.3,
     step=[300, 500])
-

@@ -59,3 +59,5 @@ i. Install cvx package
 ```shell
 pip3 install cvxopt
 ```
+
+j. Install tsnecuda, following the [link](https://github.com/CannyLab/tsne-cuda)

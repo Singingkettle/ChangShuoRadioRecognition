@@ -14,24 +14,19 @@ class HCLNetV1(nn.Module):
         super(HCLNetV1, self).__init__()
         # For low snr
         self.conv_net = nn.Sequential(
-            nn.Conv2d(1, 256, kernel_size=(1, 3)),
+            nn.Conv2d(2, 256, kernel_size=(1, 3)),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.Conv2d(256, 256, kernel_size=(1, 3)),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Conv2d(256, 80, kernel_size=(2, 3)),
+            nn.Conv2d(256, 80, kernel_size=(1, 3)),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
         )
-        self.gru1 = nn.GRU(input_size=80,
-                           hidden_size=100, batch_first=True)
-        self.dropout1 = nn.Dropout(0.5)
-        self.gru2 = nn.GRU(input_size=100,
-                           hidden_size=50, batch_first=True)
-        self.dropout2 = nn.Dropout(0.5)
-        self.gru3 = nn.GRU(input_size=50,
-                           hidden_size=50, batch_first=True)
+        self.gru1 = nn.GRU(input_size=80, hidden_size=40, batch_first=True, bidirectional=True)
+        self.dropout = nn.Dropout(0.5)
+        self.gru2 = nn.GRU(input_size=80, hidden_size=40, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -71,14 +66,10 @@ class HCLNetV1(nn.Module):
     def forward(self, x):
         c_fea = self.conv_net(x)
 
-        x = torch.squeeze(c_fea, dim=2)
-        x = torch.transpose(x, 1, 2)
-        x, _ = self.gru1(x)
-        fea1 = self.dropout1(x)
+        c_fea = torch.squeeze(c_fea, dim=2)
+        c_fea = torch.transpose(c_fea, 1, 2)
+        g_fea1, _ = self.gru1(c_fea)
+        fea = self.dropout(g_fea1)
+        g_fea2, _ = self.gru2(fea)
 
-        x, _ = self.gru2(fea1)
-        fea2 = self.dropout2(x)
-
-        fea3, _ = self.gru3(fea2)
-
-        return (c_fea, fea1[:, -1, :], fea2[:, -1, :], fea3[:, -1, :])
+        return dict(cnn=torch.mean(c_fea, dim=1), gru1=torch.mean(g_fea1, dim=1), gru2=torch.mean(g_fea2, dim=1))

@@ -1,4 +1,5 @@
 from .alexnet_co import AlexNetCO
+from .cemee import CEMEENet
 from .cnnnet import CNNNet, ResNet, DensNet
 from .cobonet import CoBoNet
 from .cpcstn import (CPCNN, CSTN, CPCSTN)
@@ -10,7 +11,7 @@ from .fmlnet import (FMLNetV1, FMLNetV2, FMLNetV3, FMLNetV4, FMLNetV5, FMLNetV6,
                      FMLNetV18, FMLNetV19, FMLNetV20, FMLNetV21, FMLNetV22, FMLNetV23, FMLNetV24, FMLNetV25,
                      FMLNetV26, FMLNetV27, FMLNetV28, FMLNetV29, FMLNetV30, FMLNetV31, FMLNetV32, FMLNetV33,
                      FMLNetV34, FMLNetV35, FMLNetV36, FMLNetV37, FMLNetV38, FMLNetV39, FMLNetV40, FMLNetV41,
-                     FMLNetV42, FMLNetV43, FMLNetV44, FMLNetV45, FMLNetV46)
+                     FMLNetV42, FMLNetV43, FMLNetV44, FMLNetV45, FMLNetV46, FMLNetV47, FMLNetV48, FMLNetV49)
 from .googlenet_co import GoogleNetCO
 from .hclnet import HCLNetV1
 from .mlclnet import MLCLNet
@@ -46,7 +47,9 @@ __all__ = [
     'FMLNetV36', 'FMLNetV37', 'FMLNetV38',
     'FMLNetV39', 'FMLNetV40', 'FMLNetV41',
     'FMLNetV42', 'FMLNetV44', 'FMLNetV43',
-    'FMLNetV45', 'FMLNetV46',
+    'FMLNetV45', 'FMLNetV46', 'FMLNetV47',
+    'FMLNetV48', 'FMLNetV35', 'FMLNetV49',
     'FMLNetV35', 'FMLNetV32', 'FMLNetV31',
     'CPCNN', 'CSTN', 'CPCSTN', 'ResCLNetV1',
+    'CEMEENet',
 ]

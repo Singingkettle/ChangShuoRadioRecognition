@@ -49,7 +49,7 @@ test_cfg = dict()
 total_epochs = 100
 evaluation = dict(interval=10)
 # Optimizer
-#optimizer = dict(type='RMSprop', lr=0.001, alpha=0.9, eps=1e-07)
+# optimizer = dict(type='RMSprop', lr=0.001, alpha=0.9, eps=1e-07)
 optimizer = dict(type='Adam')
 optimizer_config = dict(grad_clip=None)
 # learning policy

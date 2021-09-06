@@ -1,6 +1,6 @@
-from .legend_config import LegendConfig
-from .mldnn_plot import MLDNNPlot
+from wtisp.plot.config.legend_config import LegendConfig
+from .common_plot import CommonPlot
 
 __all__ = [
-    'MLDNNPlot', 'LegendConfig'
+    'CommonPlot', 'LegendConfig'
 ]

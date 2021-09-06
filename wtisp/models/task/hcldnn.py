@@ -1,3 +1,5 @@
+import torch
+
 from .amc import BaseAMC
 from ..builder import TASKS, build_backbone, build_head
 from ...common.utils import outs2result
@@ -6,13 +8,17 @@ from ...common.utils import outs2result
 @TASKS.register_module()
 class HCLDNN(BaseAMC):
 
-    def __init__(self, backbone, classifier_head, is_iq=True, train_cfg=None, test_cfg=None):
+    def __init__(self, backbone, classifier_head, channel_mode=False, train_cfg=None, test_cfg=None):
         super(HCLDNN, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
-        self.is_iq = is_iq
+        self.channel_mode= channel_mode
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+        if 'vis_fea' in self.test_cfg:
+            self.vis_fea = self.test_cfg['vis_fea']
+        else:
+            self.vis_fea = False
 
         # init weights
         self.init_weights()
@@ -35,29 +41,60 @@ class HCLDNN(BaseAMC):
         return x
 
     def forward_train(self, iqs, aps, cos, mod_labels):
-        if self.is_iq:
-            x = self.extract_feat(iqs)
+        if iqs is None:
+            x = aps
+        elif aps is None:
+            x = iqs
         else:
-            x = self.extract_feat(aps)
-        losses = self.classifier_head.forward_train(
-            x, mod_labels=mod_labels)
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
+        x = self.extract_feat(x)
+        losses = self.classifier_head.forward_train(x, mod_labels=mod_labels)
 
         return losses
 
     def simple_test(self, iqs, aps, cos):
-        if self.is_iq:
-            x = self.extract_feat(iqs)
+        if iqs is None:
+            x = aps
+        elif aps is None:
+            x = iqs
         else:
-            x = self.extract_feat(aps)
-        outs = self.classifier_head(x)
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
+        x = self.extract_feat(x)
+        outs = self.classifier_head(x, vis_fea=self.vis_fea)
 
-        results_list = []
-        keys = list(outs.keys())
-        batch_size = outs[keys[0]].shape[0]
-        for idx in range(batch_size):
-            item = dict()
-            for key_str in keys:
-                item[key_str] = outs2result(outs[key_str][idx, :])
-            results_list.append(item)
+        if isinstance(outs, dict):
+            results_list = []
+            keys = list(outs.keys())
+            batch_size = outs[keys[0]].shape[0]
+            for idx in range(batch_size):
+                item = dict()
+                for key_str in keys:
+                    item[key_str] = outs2result(outs[key_str][idx, :])
+                results_list.append(item)
+        else:
+            results_list = []
+            for idx in range(outs.shape[0]):
+                result = outs2result(outs[idx, :])
+                results_list.append(result)
 
         return results_list
+
+    def forward_dummy(self, iqs, aps, cos):
+        if iqs is None:
+            x = aps
+        elif aps is None:
+            x = iqs
+        else:
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
+        x = self.extract_feat(x)
+        outs = self.classifier_head(x, vis_fea=self.vis_fea, mode='test')
+        return outs

@@ -2,12 +2,11 @@ import os.path as osp
 
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
-from ..common.fileio import load as IOLoad
 from ..common.fileio import dump as IODump
+from ..common.fileio import load as IOLoad
 
 
 @DATASETS.register_module()
@@ -86,7 +85,7 @@ class SlotDataset(Dataset):
         self.data_infos, self.mods_dict, self.snrs_dict = self.load_annotations(
             self.ann_file)
         self.index_class_dict = {index: mod for mod,
-                                 index in self.mods_dict.items()}
+                                                index in self.mods_dict.items()}
         self.index_snr_dict = {index: float(snr)
                                for snr, index in self.snrs_dict.items()}
 
@@ -323,7 +322,7 @@ class SlotDataset(Dataset):
                                  'labels size {:d}'.format(idx, snrs.size, labels.size))
 
         confusion_matrix = confusion_matrix / \
-            np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2)
+                           np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2)
 
         eval_results = dict()
         for snr_index, snr in enumerate(self.SNRS):
@@ -355,7 +354,7 @@ class SlotDataset(Dataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-            format(len(results), len(self)))
+                format(len(results), len(self)))
 
         json_results = []
         for idx in range(len(self)):
@@ -389,7 +388,7 @@ class SlotDataset(Dataset):
                                  'labels size {:d}'.format(idx, snrs.size, labels.size))
 
         confusion_matrix = confusion_matrix / \
-            np.expand_dims(np.sum(confusion_matrix, axis=1), axis=1)
+                           np.expand_dims(np.sum(confusion_matrix, axis=1), axis=1)
 
         eval_results = dict()
         for snr_index, snr in enumerate(self.SNRS):

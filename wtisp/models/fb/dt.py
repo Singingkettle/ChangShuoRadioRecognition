@@ -1,5 +1,7 @@
 import joblib
+import numpy as np
 from sklearn import tree
+from tqdm import tqdm
 
 from ..builder import FBS
 
@@ -29,7 +31,11 @@ class Tree(object):
             self.save_model()
             return True
         elif self.mode is 'test':
-            label = self.tree.predict(data)
+            label = []
+            for item in tqdm(data):
+                item = np.reshape(item, (1, -1))
+                label.append(self.tree.predict(item))
+            label = np.concatenate(label, axis=0)
             return label
         else:
             return None

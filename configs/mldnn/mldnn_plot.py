@@ -38,7 +38,7 @@ legend = {
 }
 
 plot = dict(
-    type='MLDNNPlot',
+    type='CommonPlot',
     log_dir=log_dir,
     config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
     legend=legend,

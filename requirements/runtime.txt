@@ -12,3 +12,4 @@ pandas
 seaborn
 regex;sys_platform=='win32'
 yapf
+pyzmq

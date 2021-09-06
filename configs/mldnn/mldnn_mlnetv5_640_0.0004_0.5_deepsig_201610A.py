@@ -95,3 +95,6 @@ optimizer = dict(type='Adam', lr=0.0004)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='fixed')
+
+# for flops calculation
+input_shape = [(1, 2, 128), (1, 2, 128), (1, 128, 128)]

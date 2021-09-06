@@ -22,6 +22,10 @@ class FMLDNN(BaseAMC):
         self.channel_mode = channel_mode
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+        if 'vis_fea' in self.test_cfg:
+            self.vis_fea = self.test_cfg['vis_fea']
+        else:
+            self.vis_fea = False
 
         # init weights
         self.init_weights(pre_trained)
@@ -79,7 +83,7 @@ class FMLDNN(BaseAMC):
             else:
                 x = torch.cat((iqs, aps), dim=2)
         x = self.extract_feat(x)
-        outs = self.classifier_head(x, mode='test')
+        outs = self.classifier_head(x, vis_fea=self.vis_fea, mode='test')
 
         if isinstance(outs, dict):
             if 'inter' in outs:
@@ -101,3 +105,17 @@ class FMLDNN(BaseAMC):
                 results_list.append(result)
 
         return results_list
+
+    def forward_dummy(self, iqs, aps, cos):
+        if iqs is None:
+            x = aps
+        elif aps is None:
+            x = iqs
+        else:
+            if self.channel_mode:
+                x = torch.cat((iqs, aps), dim=1)
+            else:
+                x = torch.cat((iqs, aps), dim=2)
+        x = self.extract_feat(x)
+        outs = self.classifier_head(x, vis_fea=self.vis_fea, mode='test')
+        return outs

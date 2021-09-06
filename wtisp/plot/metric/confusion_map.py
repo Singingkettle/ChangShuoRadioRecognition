@@ -159,7 +159,7 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
     # this is for print always in the same window
     if snr is None:
         fig, ax1 = get_new_fig(
-            'Confusion Matrix of Mean Average SNRs', fig_size)
+            'Confusion Matrix of All SNRs', fig_size)
     else:
         fig, ax1 = get_new_fig('Confusion Matrix of %ddB' % snr, fig_size)
 
@@ -211,7 +211,7 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
 
     # titles and legends
     if snr is None:
-        ax.set_title('Confusion Matrix of Mean Average SNRs',
+        ax.set_title('Confusion Matrix of All SNRs',
                      fontsize=18, fontweight='bold')
     else:
         ax.set_title('Confusion Matrix of %ddB' %

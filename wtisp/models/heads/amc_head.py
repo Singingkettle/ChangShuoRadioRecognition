@@ -7,7 +7,8 @@ from ..builder import HEADS, build_loss, build_head
 
 @HEADS.register_module()
 class AMCHead(BaseHead):
-    def __init__(self, num_classes, in_features=10560, out_features=256, loss_cls=None, requires_grad=True):
+    def __init__(self, num_classes, in_features=10560, out_features=256,
+                 loss_cls=None, requires_grad=True):
         super(AMCHead, self).__init__()
         if loss_cls is None:
             loss_cls = dict(
@@ -43,11 +44,17 @@ class AMCHead(BaseHead):
         loss_cls = self.loss_cls(x, mod_labels, weight=weight)
         return dict(loss_cls=loss_cls)
 
-    def forward(self, x, **kwargs):
+    def forward(self, x, vis_fea=False, **kwargs):
         x = x.reshape(-1, self.in_features)
-        x = self.classifier(x)
+        if vis_fea:
+            x = self.classifier[0](x)
+            fea = self.classifier[1](x)
+            x = self.classifier[2](fea)
+            pre = self.classifier[3](x)
+            return dict(fea=fea, pre=pre)
+        pre = self.classifier(x)
 
-        return x
+        return pre
 
 
 @HEADS.register_module()
@@ -79,9 +86,9 @@ class DSAMCHead(BaseHead):
 
     def forward(self, x, **kwargs):
         x = x.reshape(-1, self.in_features)
-        x = self.classifier(x)
+        pre = self.classifier(x)
 
-        return x
+        return pre
 
 
 @HEADS.register_module()
@@ -108,20 +115,20 @@ class MergeAMCHead(BaseHead):
         return dict(loss_cls=loss_cls)
 
     def forward(self, x, **kwargs):
-        snr_p = self.softmax(x['snr_x'])
-        low_p = self.softmax(x['low_x'])
-        high_p = self.softmax(x['high_x'])
+        snr_p = self.softmax(x['snr_pre'])
+        low_p = self.softmax(x['low_pre'])
+        high_p = self.softmax(x['high_pre'])
 
         low_snr_pred = torch.mul(low_p, snr_p[:, -1:])
 
         high_snr_pred = torch.mul(high_p, snr_p[:, :1])
-        merge_x = torch.add(low_snr_pred, high_snr_pred)
+        merge_pre = torch.add(low_snr_pred, high_snr_pred)
 
         if self.with_log:
-            merge_x = torch.where(merge_x > 0, merge_x, merge_x.new_tensor(1))
-            merge_x = torch.log(merge_x)
+            merge_pre = torch.where(merge_pre > 0, merge_pre, merge_pre.new_tensor(1))
+            merge_pre = torch.log(merge_pre)
 
-        return merge_x
+        return merge_pre
 
 
 @HEADS.register_module()
@@ -141,11 +148,11 @@ class MLAMCHead(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, low_weight=None, high_weight=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels, weight=low_weight)
+            x['low_pre'], mod_labels=mod_labels, weight=low_weight)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels, weight=high_weight)
+            x['high_pre'], mod_labels=mod_labels, weight=high_weight)
 
         losses['loss_snr'] = snr_loss['loss_cls']
         losses['loss_low'] = low_loss['loss_cls']
@@ -154,10 +161,10 @@ class MLAMCHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x)
-        low_x = self.classifier_head[1](x)
-        high_x = self.classifier_head[2](x)
-        return dict(snr=snr_x, low=low_x, high=high_x)
+        snr_pre = self.classifier_head[0](x)
+        low_pre = self.classifier_head[1](x)
+        high_pre = self.classifier_head[2](x)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
 
 
 @HEADS.register_module()
@@ -177,13 +184,13 @@ class MLHead(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, low_weight=None, high_weight=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels, weight=low_weight)
+            x['low_pre'], mod_labels=mod_labels, weight=low_weight)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels, weight=high_weight)
+            x['high_pre'], mod_labels=mod_labels, weight=high_weight)
         merge_loss = self.classifier_head[3].loss(
-            x['merge'], mod_labels=mod_labels)
+            x['merge_pre'], mod_labels=mod_labels)
 
         losses['loss_snr'] = snr_loss['loss_cls']
         losses['loss_low'] = low_loss['loss_cls']
@@ -193,13 +200,13 @@ class MLHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x[0])
-        low_x = self.classifier_head[1](x[1])
-        high_x = self.classifier_head[2](x[2])
-        x = dict(snr_x=snr_x, low_x=low_x, high_x=high_x)
-        merge_x = self.classifier_head[3](x)
+        snr_pre = self.classifier_head[0](x[0])
+        low_pre = self.classifier_head[1](x[1])
+        high_pre = self.classifier_head[2](x[2])
+        x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
+        merge_pre = self.classifier_head[3](x)
 
-        return dict(snr=snr_x, low=low_x, high=high_x, merge=merge_x)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -219,13 +226,13 @@ class MLHeadNoWeight(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels)
+            x['low_pre'], mod_labels=mod_labels)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels)
+            x['high_pre'], mod_labels=mod_labels)
         merge_loss = self.classifier_head[3].loss(
-            x['merge'], mod_labels=mod_labels)
+            x['merge_pre'], mod_labels=mod_labels)
 
         losses['loss_snr'] = snr_loss['loss_cls']
         losses['loss_low'] = low_loss['loss_cls']
@@ -235,13 +242,13 @@ class MLHeadNoWeight(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x[0])
-        low_x = self.classifier_head[1](x[1])
-        high_x = self.classifier_head[2](x[2])
-        x = dict(snr_x=snr_x, low_x=low_x, high_x=high_x)
-        merge_x = self.classifier_head[3](x)
+        snr_pre = self.classifier_head[0](x[0])
+        low_pre = self.classifier_head[1](x[1])
+        high_pre = self.classifier_head[2](x[2])
+        x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
+        merge_pre = self.classifier_head[3](x)
 
-        return dict(snr=snr_x, low=low_x, high=high_x, merge=merge_x)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -261,13 +268,13 @@ class FMLHeadNoWeight(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels)
+            x['low_pre'], mod_labels=mod_labels)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels)
+            x['high_pre'], mod_labels=mod_labels)
         merge_loss = self.classifier_head[3].loss(
-            x['merge'], mod_labels=mod_labels)
+            x['merge_pre'], mod_labels=mod_labels)
 
         losses['loss_snr'] = snr_loss['loss_cls']
         losses['loss_low'] = low_loss['loss_cls']
@@ -277,13 +284,13 @@ class FMLHeadNoWeight(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x)
-        low_x = self.classifier_head[1](x)
-        high_x = self.classifier_head[2](x)
-        x = dict(snr_x=snr_x, low_x=low_x, high_x=high_x)
-        merge_x = self.classifier_head[3](x)
+        snr_pre = self.classifier_head[0](x)
+        low_pre = self.classifier_head[1](x)
+        high_pre = self.classifier_head[2](x)
+        x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
+        merge_pre = self.classifier_head[3](x)
 
-        return dict(snr=snr_x, low=low_x, high=high_x, merge=merge_x)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -303,11 +310,11 @@ class FMLHierarchicalHead(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['cnn'], mod_labels=mod_labels)
+            x['cnn_pre'], mod_labels=mod_labels)
         low_loss = self.classifier_head[1].loss(
-            x['lstm1'], mod_labels=mod_labels)
+            x['lstm1_pre'], mod_labels=mod_labels)
         high_loss = self.classifier_head[2].loss(
-            x['lstm2'], mod_labels=mod_labels)
+            x['lstm2_pre'], mod_labels=mod_labels)
 
         losses['loss_cnn'] = snr_loss['loss_cls']
         losses['loss_lstm1'] = low_loss['loss_cls']
@@ -316,11 +323,11 @@ class FMLHierarchicalHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        cnn_x = self.classifier_head[0](x['cnn'])
-        lstm1_x = self.classifier_head[1](x['lstm1'])
-        lstm2_x = self.classifier_head[2](x['lstm2'])
+        cnn_pre = self.classifier_head[0](x['cnn'])
+        lstm1_pre = self.classifier_head[1](x['lstm1'])
+        lstm2_pre = self.classifier_head[2](x['lstm2'])
 
-        return dict(cnn=cnn_x, lstm1=lstm1_x, lstm2=lstm2_x)
+        return dict(cnn_pre=cnn_pre, lstm1_pre=lstm1_pre, lstm2_pre=lstm2_pre)
 
 
 @HEADS.register_module()
@@ -401,14 +408,14 @@ class FPNAMCHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        fx0 = self.classifier_head[0](x['fx0'])
-        fx1 = self.classifier_head[1](x['fx1'])
-        fx2 = self.classifier_head[2](x['fx2'])
+        fx0_pre = self.classifier_head[0](x['fx0'])
+        fx1_pre = self.classifier_head[1](x['fx1'])
+        fx2_pre = self.classifier_head[2](x['fx2'])
 
-        x = dict(fx0=fx0, fx1=fx1, fx2=fx2, fx3=x['fx3'])
-        fx3 = self.classifier_head[3](x)
+        x = dict(fx0_pre=fx0_pre, fx1_pre=fx1_pre, fx2_pre=fx2_pre, fx3_pre=x['fx3'])
+        fx3_pre = self.classifier_head[3](x)
 
-        return dict(fx0=fx0, fx1=fx1, fx2=fx2, fx3=fx3)
+        return dict(fx0_pre=fx0_pre, fx1_pre=fx1_pre, fx2_pre=fx2_pre, fx3_pre=fx3_pre)
 
 
 @HEADS.register_module()
@@ -428,13 +435,13 @@ class FMLHead(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, low_weight=None, high_weight=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels, weight=low_weight)
+            x['low_pre'], mod_labels=mod_labels, weight=low_weight)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels, weight=high_weight)
+            x['high_pre'], mod_labels=mod_labels, weight=high_weight)
         merge_loss = self.classifier_head[3].loss(
-            x['merge'], mod_labels=mod_labels)
+            x['merge_pre'], mod_labels=mod_labels)
 
         losses['loss_snr'] = snr_loss['loss_cls']
         losses['loss_low'] = low_loss['loss_cls']
@@ -444,13 +451,13 @@ class FMLHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x)
-        low_x = self.classifier_head[1](x)
-        high_x = self.classifier_head[2](x)
-        x = dict(snr_x=snr_x, low_x=low_x, high_x=high_x)
-        merge_x = self.classifier_head[3](x)
+        snr_pre = self.classifier_head[0](x)
+        low_pre = self.classifier_head[1](x)
+        high_pre = self.classifier_head[2](x)
+        x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
+        merge_pre = self.classifier_head[3](x)
 
-        return dict(snr=snr_x, low=low_x, high=high_x, merge=merge_x)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -470,18 +477,18 @@ class FMLAUXHead(BaseHead):
     def loss(self, x, mod_labels=None, snr_labels=None, low_weight=None, high_weight=None, **kwargs):
         losses = dict()
         snr_loss = self.classifier_head[0].loss(
-            x['snr'], mod_labels=snr_labels)
+            x['snr_pre'], mod_labels=snr_labels)
         low_loss = self.classifier_head[1].loss(
-            x['low'], mod_labels=mod_labels, weight=low_weight)
+            x['low_pre'], mod_labels=mod_labels, weight=low_weight)
         high_loss = self.classifier_head[2].loss(
-            x['high'], mod_labels=mod_labels, weight=high_weight)
+            x['high_pre'], mod_labels=mod_labels, weight=high_weight)
         merge_loss = self.classifier_head[3].loss(
-            x['merge'], mod_labels=mod_labels)
+            x['merge_pre'], mod_labels=mod_labels)
         inter_loss = self.classifier_head[4].loss(
-            x['inter']
+            x['inter_pre']
         )
         intra_loss = self.classifier_head[5].loss(
-            x['intra'], mod_labels=mod_labels
+            x['intra_pre'], mod_labels=mod_labels
         )
 
         losses['loss_snr'] = snr_loss['loss_cls']
@@ -494,13 +501,14 @@ class FMLAUXHead(BaseHead):
         return losses
 
     def forward(self, x, **kwargs):
-        snr_x = self.classifier_head[0](x[0])
-        low_x = self.classifier_head[1](x[1])
-        high_x = self.classifier_head[2](x[2])
-        x_ = dict(snr_x=snr_x, low_x=low_x, high_x=high_x)
-        merge_x = self.classifier_head[3](x_)
+        snr_pre = self.classifier_head[0](x[0])
+        low_pre = self.classifier_head[1](x[1])
+        high_pre = self.classifier_head[2](x[2])
+        x_ = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
+        merge_pre = self.classifier_head[3](x_)
 
-        return dict(snr=snr_x, low=low_x, high=high_x, merge=merge_x, inter=x[3], intra=x[3])
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge=merge_pre, inter_pre=x[3],
+                    intra_pre=x[3])
 
 
 @HEADS.register_module()
@@ -555,11 +563,11 @@ class FAMCAUXHead(BaseHead):
         loss_aux = self.aux_head.loss(x['fea'], mod_labels)
         return dict(loss_cls=loss_cls, loss_aux=loss_aux['loss_intra_orthogonal'])
 
-    def forward(self, x, mode='train'):
+    def forward(self, x, vis_fea=False, mode='train'):
         x = x.reshape(-1, self.in_features)
         fea = self.fea(x)
         pre = self.pre(fea)
-        if mode is 'train':
+        if (mode is 'train') or vis_fea:
             return dict(fea=fea, pre=pre)
         else:
             return pre

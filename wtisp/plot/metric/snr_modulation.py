@@ -73,7 +73,7 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
     #             p_str = p_str + '&%.3f' % p
     #     # print(p_str + '\\\\')
 
-    leg = ax.legend(loc='lower right', prop={'size': 15, 'weight': 'bold'})
+    leg = ax.legend(loc='lower right', prop={'size': 10, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('SNRs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Accuracy', fontsize=18, fontweight='bold')
@@ -105,7 +105,7 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
              horizontalalignment='right')
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
-    plt.close()
+    plt.close(fig)
 
 
 def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, reorder=True):
@@ -196,7 +196,7 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     #             p_str = p_str + '&%.3f' % p
     #     print(p_str + '\\\\')
 
-    leg = ax.legend(loc='lower left', prop={'size': 15, 'weight': 'bold'})
+    leg = ax.legend(loc='lower left', prop={'size': 10, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Modulations', fontsize=18, fontweight='bold')
     ax.set_ylabel('F1 Score', fontsize=18, fontweight='bold')
@@ -228,7 +228,7 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
              horizontalalignment='right')
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
-    plt.close()
+    plt.close(fig)
 
 
 @SNRMODULATIONS.register_module()
@@ -262,7 +262,7 @@ if __name__ == '__main__':
             has_snr_classifier=False,
         ),
     ]
-    from .legend_config import LegendConfig
+    from ..config.legend_config import LegendConfig
 
     legend_config_list = LegendConfig(18)
     legend_list = {

@@ -181,6 +181,50 @@ class StepLrUpdaterHook(LrUpdaterHook):
 
 
 @HOOKS.register_module()
+class CstepLrUpdaterHook(LrUpdaterHook):
+
+    def __init__(self, step, gamma, **kwargs):
+        assert isinstance(gamma, (list, float))
+        assert isinstance(step, (list, int))
+
+        if isinstance(gamma, list):
+            for g in gamma:
+                assert isinstance(g, float)
+        else:
+            raise TypeError('"gamma" must be a list[float]')
+
+        if isinstance(step, list):
+            for s in step:
+                assert isinstance(s, int) and s > 0
+        else:
+            raise TypeError('"step" must be a list[integer]')
+
+        if isinstance(gamma, list) and isinstance(step, list):
+            assert len(gamma) == len(step)
+        else:
+            raise TypeError('"step and gamma" must be a list[integer] and list[float], and have the same length')
+
+        self.step = step
+        self.gamma = [1.0] * (len(gamma) + 1)
+        tmp = 1.0
+        for i, g in enumerate(gamma):
+            tmp = tmp * g
+            self.gamma[i + 1] = tmp
+
+        super(CstepLrUpdaterHook, self).__init__(**kwargs)
+
+    def get_lr(self, runner, base_lr):
+        progress = runner.epoch if self.by_epoch else runner.iter
+
+        exp = len(self.step)
+        for i, s in enumerate(self.step):
+            if progress < s:
+                exp = i
+                break
+        return base_lr * self.gamma[exp]
+
+
+@HOOKS.register_module()
 class ExpLrUpdaterHook(LrUpdaterHook):
 
     def __init__(self, gamma, **kwargs):

@@ -1,11 +1,11 @@
-checkpoint_config = dict(interval=1)
+checkpoint_config = dict(interval=10)
 # yapf:disable
 log_config = dict(
     interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
         # which has bug to work with the matlab.engine
-        dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook', add_graph=False)
     ])
 dist_params = dict(backend='nccl')
 log_level = 'INFO'

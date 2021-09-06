@@ -1,5 +1,6 @@
 import os
 import os.path as osp
+import pickle
 
 import numpy as np
 
@@ -13,12 +14,36 @@ class FBDataset(object):
     CLASSES = None
     SNRS = None
 
-    def __init__(self, ann_file, data_root=None):
+    def __init__(self, ann_file, use_cache_data=True, data_root=None):
         self.ann_file = ann_file
         self.data_root = data_root
+        self.use_cache_data = use_cache_data
+
         if self.data_root is not None:
             if not osp.isabs(self.ann_file):
                 self.ann_file = osp.join(self.data_root, self.ann_file)
+
+                # cache data in init
+                if self.use_cache_data:
+                    pkl_dir = os.path.join(self.data_root, 'cache_pkl')
+                    if not os.path.isdir(pkl_dir):
+                        os.makedirs(pkl_dir)
+
+                    if 'train_and_val' in ann_file:
+                        cache_data_path = os.path.join(pkl_dir, 'train_and_val')
+                    elif 'train' in ann_file:
+                        cache_data_path = os.path.join(pkl_dir, 'train')
+                    elif 'val' in ann_file:
+                        cache_data_path = os.path.join(pkl_dir, 'val')
+                    elif 'test' in ann_file:
+                        cache_data_path = os.path.join(pkl_dir, 'test')
+                    else:
+                        raise ValueError(
+                            'Please set correct data mode ["train_and_val", "train", "val", "test"] in {}'.format(
+                                ann_file))
+
+                    self.iq_data = []
+                    self.load_cache_data(cache_data_path + '-iq.pkl')
 
         # load annotations
         self.data, self.label, self.data_infos, self.mods_dict, self.snrs_dict = self.load_data(self.ann_file)
@@ -32,6 +57,12 @@ class FBDataset(object):
             self.CLASSES[class_index] = self.index_class_dict[class_index]
         for snr_index in self.index_snr_dict.keys():
             self.SNRS[snr_index] = self.index_snr_dict[snr_index]
+
+    def load_cache_data(self, cache_data_path=None):
+        if os.path.isfile(cache_data_path):
+            self.iq_data = pickle.load(open(cache_data_path, 'rb'))
+        else:
+            raise ValueError('cache data does not exist')
 
     def __len__(self):
         """Total number of samples of data."""
@@ -86,10 +117,16 @@ class FBDataset(object):
 
         return cumulants
 
-    def load_cum(self, data_type, file_name):
-        file_path = osp.join(
-            self.data_root, 'sequence_data', data_type, file_name)
-        seq_data = np.load(file_path)
+    def load_cum(self, data_type, file_name, idx=None):
+        if self.use_cache_data:
+            seq_data = self.iq_data[idx]
+            seq_data = np.reshape(seq_data, [2, -1])
+            seq_data = seq_data.astype(np.float32)
+        else:
+            file_path = osp.join(
+                self.data_root, 'sequence_data', data_type, file_name)
+            seq_data = np.load(file_path)
+            seq_data = seq_data.astype(np.float32)
         cum_data = self.generate_cumulants(seq_data)
 
         return cum_data
@@ -98,7 +135,7 @@ class FBDataset(object):
         """Load data from annotation file."""
         annos = IOLoad(ann_file)
         anno_data = annos['data']
-        data = np.concatenate([self.load_cum('iq', item['filename']) for item in anno_data])
+        data = np.concatenate([self.load_cum('iq', item['filename'], idx) for idx, item in enumerate(anno_data)])
         label = np.array([item['ann']['labels'][0] for item in anno_data])
 
         # data = np.zeros((len(anno_data), 9), dtype=np.float64)
@@ -203,7 +240,7 @@ class FBDataset(object):
             results (numpy.ndarray]): Testing results of the
                 dataset.
         """
-        assert isinstance(results, np.ndarray), 'results must be a list'
+        assert isinstance(results, np.ndarray), 'results must be a np.ndarray'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
                 format(len(results), len(self)))

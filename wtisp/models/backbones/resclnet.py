@@ -27,10 +27,10 @@ class ResCLBlock(nn.Module):
             nn.Dropout(dropout_rate)
         )
         if rnn is 'gru':
-            self.rnn = nn.GRU(input_size=out_channels, hidden_size=out_channels//2,
+            self.rnn = nn.GRU(input_size=out_channels, hidden_size=out_channels // 2,
                               batch_first=True, num_layers=1, bidirectional=True)
         elif rnn is 'lstm':
-            self.rnn = nn.LSTM(input_size=out_channels, hidden_size=out_channels//2,
+            self.rnn = nn.LSTM(input_size=out_channels, hidden_size=out_channels // 2,
                                batch_first=True, num_layers=1, bidirectional=True)
         else:
             raise ValueError('Unknown rnn mode {}!!!'.format(rnn))

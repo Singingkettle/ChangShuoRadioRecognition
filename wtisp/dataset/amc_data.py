@@ -1,14 +1,18 @@
 import os
 import os.path as osp
 import pickle
+import zlib
 
 import matplotlib.pyplot as plt
 import numpy as np
-from cvxopt import solvers, matrix, div, mul
+import zmq
+from scipy.optimize import minimize
 from scipy.special import softmax
 from torch.utils.data import Dataset
+from tqdm import tqdm
 
 from .builder import DATASETS
+from .zmq import ZMQConfig
 from ..common.fileio import dump as IODump
 from ..common.fileio import load as IOLoad
 
@@ -43,77 +47,139 @@ def generate_targets(ann_file):
     for item_index, item in enumerate(anno_data):
         targets[item_index, item['ann']['labels'][0]] = 1
 
-    return targets.reshape(1, -1)
+    return targets
 
 
-def ridge_regression(p, t, l):
-    p = p.astype(dtype=np.float64)
+# def get_merge_weight(p, t):
+#     p = p.astype(dtype=np.float64)
+#     t = t.astype(dtype=np.float64)
+#     n = p.shape[0]
+#
+#     G = -1 * spdiag(matrix(1.0, (n, 1)))
+#     h = matrix(0.0, (n, 1))
+#     A = matrix(1.0, (1, n))
+#     b = matrix(1.0, (1, 1))
+#
+#     def F(x=None, z=None):
+#         if x is None:
+#             x0 = np.ones((n, 1), dtype=np.float64)/n
+#             return 0, matrix(x0)
+#         if min(x) < 0.0:
+#             return None
+#         w = np.array(x)
+#         w = np.reshape(w.T, (n, 1, 1))
+#
+#         # forward pass
+#         y0 = p * 100
+#         y1 = y0 * w
+#         y2 = np.sum(y1, axis=0)
+#         y3 = np.exp(y2)
+#         y4 = np.sum(y3, axis=1)[:, None]
+#         y5 = y3 / y4
+#         y6 = y5 - t
+#         y7 = np.power(y6, 2)
+#         f = np.sum(y7[:])
+#
+#         y8 = 2 * y6 * y5 * (1 - y5)
+#         y9 = y8[None, :, :]
+#         y10 = y9 * y0
+#         Df = np.sum(np.sum(y10, axis=2), axis=1)
+#         Df = np.reshape(Df, (1, -1))
+#         Df = matrix(Df)
+#         if z is None:
+#             return f, Df
+#         y11 = 2 * (-3 * np.power(y5, 2) + (2 + 2 * t) * y5 - t) * y5 * (1 - y5)
+#         y12 = np.reshape(y11, (1, -1))
+#         y13 = np.reshape(y0, (3, -1))
+#         y14 = y13 * y12
+#         H = y14 @ y13.T
+#         H = matrix(H) * z[0]
+#         return f, Df, H
+#
+#     sol = solvers.cp(F)
+#     # sol = solvers.cp(F, G=G, h=h, A=A, b=b)
+#
+#     return np.array(sol['x'].T)
+
+def obj_fun(x, t, w, n):
+    w = np.reshape(w, (n, 1, 1))
+
+    # forward pass
+    y0 = x * 100
+    y1 = y0 * w
+    y2 = np.sum(y1, axis=0)
+    y3 = np.exp(y2)
+    y4 = np.sum(y3, axis=1)[:, None]
+    y5 = y3 / y4
+    y6 = y5 - t
+    y7 = np.power(y6, 2)
+    f = np.sum(y7[:]) / 1000
+
+    y8 = 2 * y6 * y5 * (1 - y5) / 1000 * t
+    y9 = y8[None, :, :]
+    y10 = y9 * y0
+    Df = np.sum(np.sum(y10, axis=2), axis=1)
+    Df = np.reshape(Df, (-1, 1))
+    return f, Df
+
+
+def get_merge_weight(x, t):
+    x = x.astype(dtype=np.float64)
     t = t.astype(dtype=np.float64)
-    n = p.shape[0]
-    G = -1 * np.eye(n, dtype=np.float64)
-    h = np.zeros((n, 1), dtype=np.float64)
-    P = np.dot(p, p.transpose()) + l / 2
-    q = np.dot(p, t.transpose())
-    A = np.ones((1, n), dtype=np.float64)
-    b = np.ones((1, 1), dtype=np.float64)
+    n = x.shape[0]
 
-    G = matrix(G)
-    h = matrix(h)
-    P = matrix(P)
-    q = matrix(q)
-    A = matrix(A)
-    b = matrix(b)
+    def min_obj(w):
+        w = np.reshape(w, (-1, 1, 1))
+        y0 = x * 100
+        y1 = y0 * w
+        y2 = np.sum(y1, axis=0)
+        y3 = np.exp(y2)
+        y4 = np.sum(y3, axis=1)[:, None]
+        y5 = y3 / y4
+        y6 = (y5 - t) / 10000
+        y7 = np.power(y6, 2)
+        f = np.sum(y7[:])
+        return f
 
-    sol = solvers.qp(P, q, G, h, A=A, b=b)
+    def obj_der(w):
+        w = np.reshape(w, (-1, 1, 1))
+        y0 = x * 100
+        y1 = y0 * w
+        y2 = np.sum(y1, axis=0)
+        y3 = np.exp(y2)
+        y4 = np.sum(y3, axis=1)[:, None]
+        y5 = y3 / y4
+        y6 = y5 - t
 
-    return np.array(sol['x'].T), float(sol['primal objective'])
+        y8 = 2 * y6 * y5 * (1 - y5) / 10000
+        y9 = y8[None, :, :]
+        y10 = y9 * y0
+        df = np.sum(np.sum(y10, axis=2), axis=1)
+        df = np.reshape(df, (-1,))
 
+        return df
 
-def cross_entropy(p, t, l):
-    # TODO: There are some bug in this function about div(), the matrix y has zero elements
-    p = p.astype(dtype=np.float64)
-    t = t.astype(dtype=np.float64)
-    n = p.shape[0]
-    G = -1 * np.eye(n, dtype=np.float64)
-    h = np.zeros((n, 1), dtype=np.float64)
-    A = np.ones((1, n), dtype=np.float64)
-    b = np.ones((1, 1), dtype=np.float64)
-    l = float(l)
+    def obj_hess(w):
+        w = np.reshape(w, (-1, 1, 1))
+        y0 = x * 100
+        y1 = y0 * w
+        y2 = np.sum(y1, axis=0)
+        y3 = np.exp(y2)
+        y4 = np.sum(y3, axis=1)[:, None]
+        y5 = y3 / y4
 
-    G = matrix(G)
-    h = matrix(h)
-    A = matrix(A)
-    b = matrix(b)
+        y11 = 2 * (-3 * np.power(y5, 2) + (2 + 2 * t) * y5 - t) * y5 * (1 - y5) / 10000
+        y12 = np.reshape(y11, (1, -1))
+        y13 = np.reshape(y0, (3, -1))
+        y14 = y13 * y12
+        H = y14 @ y13.T
+        return H
 
-    p = matrix(p)
-    t = matrix(t)
-
-    h_d = np.ones((n, 1), dtype=np.float64)
-    h_d = matrix(h_d)
-
-    def F(x=None, z=None):
-        if x is None:
-            x0 = np.ones((n, 1), dtype=np.float64) / n
-            x0[0, 0] = 1 - np.sum(x0)
-            return 0, matrix(x0)
-
-        y = p.T * x
-        f1 = matrix(-np.sum(np.log(np.power(np.array(y), np.array(t.T)))))
-        # f1 = -t * log(y)
-        f2 = x.T * x * 0.5 * l
-        f = sum(f1 + f2)
-        d1 = div(t.T, y)
-        Df = -p * d1 + l * x
-        if z is None:
-            return f, Df.T
-        d1 = div(d1, y)
-        H = (mul(h_d * d1.T, p) * p.T + l) * z[0]
-
-        return f, Df.T, H
-
-    sol = solvers.cp(F, G=G, h=h, A=A, b=b)
-
-    return np.array(sol['x'].T), float(sol['primal objective'])
+    w0 = np.ones((n,), dtype=np.float64) / n
+    res = minimize(min_obj, w0, method='trust-exact', jac=obj_der, hess=obj_hess,
+                   options={'gtol': 1e-6, 'disp': True})
+    best_w = res.x
+    return best_w
 
 
 @DATASETS.register_module()
@@ -139,12 +205,12 @@ class WTIMCDataset(Dataset):
                 ]
 
                 mods:{
-                    'BPSK': 0, 
+                    'BPSK': 0,
                     ...
                 }
 
                 snrs:{
-                    -10: 0, 
+                    -10: 0,
                     ...
                 }
 
@@ -183,7 +249,8 @@ class WTIMCDataset(Dataset):
                  multi_label=False, test_mode=False, snr_threshold=0,
                  use_snr_label=False, item_weights=None, channel_mode=False,
                  use_hard_label=False, hard_modulations=None, data_aug=False,
-                 use_teacher_label=False, teacher_config=None, process_mode='nothing'):
+                 use_teacher_label=False, teacher_config=None, process_mode='nothing',
+                 use_cache=False, use_zmq=False, use_compress=False, merge_res=None):
         self.ann_file = ann_file
         self.iq = iq
         self.ap = ap
@@ -203,6 +270,10 @@ class WTIMCDataset(Dataset):
         self.hard_modulations = hard_modulations
         self.data_aug = data_aug
         self.process_mode = process_mode
+        self.use_cache = use_cache
+        self.use_zmq = use_zmq
+        self.use_compress = use_compress
+        self.merge_res = merge_res
 
         if self.data_root is not None:
             if not osp.isabs(self.ann_file):
@@ -237,6 +308,91 @@ class WTIMCDataset(Dataset):
 
         # the targets are for knowledge distillation
         self.targets = generate_targets(self.ann_file)
+
+        # cache data in init
+        if self.use_cache:
+            pkl_dir = os.path.join(self.data_root, 'cache_pkl')
+            if not os.path.isdir(pkl_dir):
+                os.makedirs(pkl_dir)
+
+            if self.test_mode:
+                cache_data_path = os.path.join(pkl_dir, 'test')
+            else:
+                if 'train_and_val' in ann_file:
+                    cache_data_path = os.path.join(pkl_dir, 'train_and_val')
+                elif 'train' in ann_file:
+                    cache_data_path = os.path.join(pkl_dir, 'train')
+                elif 'val' in ann_file:
+                    cache_data_path = os.path.join(pkl_dir, 'val')
+                else:
+                    raise ValueError(
+                        'Please set correct data mode ["train_and_val", "train", "val", "test"] in {}'.format(ann_file))
+
+            self.cache_data = dict()
+            if self.iq:
+                self.load_cache_data_in_init('iq', cache_data_path + '-iq.pkl')
+            if self.ap:
+                self.load_cache_data_in_init('ap', cache_data_path + '-ap.pkl')
+            if self.co:
+                self.load_cache_data_in_init('co', cache_data_path + '-filter_size_{:<.3f}_stride_{:<.3f}'.format(
+                    self.filter[0], self.filter[1]) + '-co.pkl')
+
+        if self.use_zmq or self.use_compress:
+            item_info = self.data_infos[0]
+            file_name = item_info['filename']
+            self.data_info = dict()
+            if self.iq:
+                data = self.load_data_from_file('iq', file_name)
+                self.data_info['iq'] = data.shape
+            if self.ap:
+                data = self.load_data_from_file('ap', file_name)
+                self.data_info['ap'] = data.shape
+            if self.co:
+                data = self.load_data_from_file('co', file_name)
+                self.data_info['co'] = data.shape
+
+        if self.use_compress:
+            compress_dir = os.path.join(self.data_root, 'zmq_cache_pkl_by_byte_compress')
+
+            if self.test_mode:
+                compress_data_path = os.path.join(compress_dir, 'test')
+            else:
+                if 'train_and_val' in ann_file:
+                    compress_data_path = os.path.join(compress_dir, 'train_and_val')
+                elif 'train' in ann_file:
+                    compress_data_path = os.path.join(compress_dir, 'train')
+                elif 'val' in ann_file:
+                    compress_data_path = os.path.join(compress_dir, 'val')
+                else:
+                    raise ValueError(
+                        'Please set correct data mode ["train_and_val", "train", "val", "test"] in {}'.format(ann_file))
+
+            self.compress_data = dict()
+            if self.iq:
+                self.load_compress_data_in_init('iq', compress_data_path + '-iq.pkl')
+            if self.ap:
+                self.load_compress_data_in_init('ap', compress_data_path + '-ap.pkl')
+            if self.co:
+                self.load_compress_data_in_init('co', compress_data_path + '-filter_size_{:<.3f}_stride_{:<.3f}'.format(
+                    self.filter[0], self.filter[1]) + '-co.pkl')
+
+    def load_compress_data_in_init(self, data_type, compress_data_path=None):
+        if os.path.isfile(compress_data_path):
+            self.compress_data[data_type] = pickle.load(open(compress_data_path, 'rb'))
+
+    def load_cache_data_in_init(self, data_type, cache_data_path=None):
+        if os.path.isfile(cache_data_path):
+            self.cache_data[data_type] = pickle.load(open(cache_data_path, 'rb'))
+        else:
+            data_list = []
+            for idx in tqdm(range(len(self))):
+                item_info = self.data_infos[idx]
+                file_name = item_info['filename']
+                data = self.load_data_from_file(data_type, file_name)
+                data = data.astype(np.float32)
+                data_list.append(data)
+            pickle.dump(data_list, open(cache_data_path, 'wb'))
+            self.cache_data[data_type] = data_list
 
     def _set_group_flag(self):
         """Set flag according to the mean value (ms) of signal data snrs.
@@ -386,24 +542,78 @@ class WTIMCDataset(Dataset):
 
         return ann
 
-    def load_seq_data(self, data_type, file_name):
-        file_path = osp.join(
-            self.data_root, 'sequence_data', data_type, file_name)
-        seq_data = np.load(file_path)
-        seq_data = _NORMMODES[self.process_mode](seq_data)
+    def load_compress_data(self, data_type, idx=-1):
+        array_str = self.compress_data[data_type][idx]
+        array_str = zlib.decompress(array_str)
+        data = np.frombuffer(array_str, dtype=np.float32).reshape(self.data_info[data_type])
+        return data
 
-        seq_data = seq_data.astype(np.float32)
-        num_path = 2
-        if self.data_aug:
-            seq_aug = np.roll(seq_data, -1) - seq_data
-            seq_data = np.vstack([seq_data, seq_aug])
-            num_path += 2
-        if self.channel_mode:
-            seq_data = np.reshape(seq_data, (num_path, 1, -1))
+    def load_data_by_zmq(self, data_type, idx=-1):
+        if self.test_mode:
+            run_mode = 'val'
         else:
-            seq_data = np.reshape(seq_data, (1, num_path, -1))
+            run_mode = 'train'
+        context = zmq.Context()
+        socket = context.socket(zmq.REQ)
+        # TODO, set the port_increment together with zmq/server.sh used by zmq/server.py, for now it's manual
+        port_increment = 100
+        tcp_address = 'tcp://localhost:{}'.format(ZMQConfig['port'] + np.random.randint(port_increment))
+        socket.connect(tcp_address)
+        try:
+            data_index_str = '{}-{}-{:d}'.format(run_mode, data_type, idx)
+            data_index_str = data_index_str.encode('utf-8')
+            socket.send(data_index_str)
+            array_str = socket.recv()
+            array_str = zlib.decompress(array_str)
+            data = np.frombuffer(array_str, dtype=np.float32).reshape(self.data_info[data_type])
+            return data
+        except Exception as e:
+            print(e)
+            raise ValueError('Something wrong with the zmq usage!!! Please check the code and fix the bug')
 
-        return seq_data
+    def load_data_from_cache(self, data_type, idx=-1):
+        return self.cache_data[data_type][idx]
+
+    def load_data_from_file(self, data_type, file_name):
+        if data_type == 'co':
+            co_path = osp.join(self.data_root, 'constellation_data',
+                               'filter_size_{:<.3f}_stride_{:<.3f}'.format(self.filter[0], self.filter[1]),
+                               file_name)
+            co_data = np.load(co_path)
+            return co_data
+        else:
+            file_path = osp.join(
+                self.data_root, 'sequence_data', data_type, file_name)
+            seq_data = np.load(file_path)
+            return seq_data
+
+    def load_data(self, data_type, file_name, idx=-1):
+
+        if self.use_cache:
+            data = self.load_data_from_cache(data_type, idx)
+        elif self.use_zmq:
+            data = self.load_data_by_zmq(data_type, idx)
+        elif self.use_compress:
+            data = self.load_compress_data(data_type, idx)
+        else:
+            data = self.load_data_from_file(data_type, file_name)
+
+        data = data.astype(np.float32)
+        if data_type == 'co':
+            data = np.expand_dims(data, axis=0)
+        else:
+            data = _NORMMODES[self.process_mode](data)
+            num_path = 2
+            if self.data_aug:
+                aug_part = np.roll(data, -1) - data
+                data = np.vstack([data, aug_part])
+                num_path += 2
+            if self.channel_mode:
+                data = np.reshape(data, (num_path, 1, -1))
+            else:
+                data = np.reshape(data, (1, num_path, -1))
+
+        return data
 
     def prepare_train_data(self, idx):
         """Get training data.
@@ -421,19 +631,15 @@ class WTIMCDataset(Dataset):
         data = {}
 
         if self.iq:
-            iq_data = self.load_seq_data('iq', file_name)
+            iq_data = self.load_data('iq', file_name, idx)
             data['iqs'] = iq_data
 
         if self.ap:
-            ap_data = self.load_seq_data('ap', file_name)
+            ap_data = self.load_data('ap', file_name, idx)
             data['aps'] = ap_data
 
         if self.co:
-            co_path = osp.join(self.data_root, 'constellation_data',
-                               'filter_size_{:<.3f}_stride_{:<.3f}'.format(self.filter[0], self.filter[1]), file_name)
-            co_data = np.load(co_path)
-            co_data = co_data.astype(np.float32)
-            co_data = np.expand_dims(co_data, axis=0)
+            co_data = self.load_data('co', file_name, idx)
             data['cos'] = co_data
 
         ann = self.get_ann_info(idx)
@@ -469,19 +675,15 @@ class WTIMCDataset(Dataset):
         data = {}
 
         if self.iq:
-            iq_data = self.load_seq_data('iq', file_name)
+            iq_data = self.load_data('iq', file_name, idx)
             data['iqs'] = iq_data
 
         if self.ap:
-            ap_data = self.load_seq_data('ap', file_name)
+            ap_data = self.load_data('ap', file_name, idx)
             data['aps'] = ap_data
 
         if self.co:
-            co_path = osp.join(self.data_root, 'constellation_data',
-                               'filter_size_{:<.3f}_stride_{:<.3f}'.format(self.filter[0], self.filter[1]), file_name)
-            co_data = np.load(co_path)
-            co_data = co_data.astype(np.float32)
-            co_data = np.expand_dims(co_data, axis=0)
+            co_data = self.load_data('co', file_name, idx)
             data['cos'] = co_data
 
         return data
@@ -725,23 +927,21 @@ class WTIMCDataset(Dataset):
 
         return eval_results
 
-    def _process_weight(self, results_dict, prefix=''):
+    def _process_merge(self, results_dict, prefix=''):
         pre_matrix = []
-        for key_str in results_dict.keys():
+        for key_str in results_dict:
             pre_data = results_dict[key_str]
             pre_data = self._reshape_result(pre_data, len(self.CLASSES))
             pre_data = softmax(pre_data, axis=1)
-            pre_matrix.append(pre_data.reshape(1, -1))
-        pre_matrix = np.vstack(pre_matrix)
+            pre_data = pre_data[None, :, :]
+            pre_matrix.append(pre_data)
+        pre_matrix = np.concatenate(pre_matrix, axis=0)
+        w = get_merge_weight(pre_matrix, self.targets)
+        merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results_dict), -1)))
+        merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
+        eval_results = self._evaluate_mod(merge_matrix, prefix='merge/')
 
-        r_w, r_o = ridge_regression(pre_matrix, self.targets, 0)
-        c_w, c_o = cross_entropy(pre_matrix, self.targets, 0)
-
-        r_eval_results = self._evaluate_mod(np.reshape(np.dot(r_w, pre_matrix), (-1, len(self.CLASSES))),
-                                            prefix='rg-weight_')
-        c_eval_results = self._evaluate_mod(np.reshape(np.dot(c_w, pre_matrix), (-1, len(self.CLASSES))),
-                                            prefix='ce-weight_')
-        return r_eval_results, c_eval_results
+        return eval_results
 
     def evaluate(self, results, logger=None):
         """Evaluate the dataset.
@@ -759,18 +959,23 @@ class WTIMCDataset(Dataset):
 
             eval_results = dict()
             for key_str in format_results.keys():
+                if 'fea' in key_str:
+                    continue
                 sub_eval_results = self.process_single_head(
                     format_results[key_str], prefix=key_str + '/')
                 eval_results.update(sub_eval_results)
 
-            format_results.pop('snr', None)
-            format_results.pop('hard', None)
-            if len(format_results.keys()) > 1:
-                eval_results_upperbound = self._process_upperbound(format_results)
-                # r_eval_results, c_eval_results = self._process_weight(format_results)
-                eval_results.update(eval_results_upperbound)
-                # eval_results.update(r_eval_results)
-                # eval_results.update(c_eval_results)
+            if self.merge_res:
+                merge_results = self._process_merge(format_results)
+                eval_results.update(merge_results)
+            # format_results.pop('snr', None)
+            # format_results.pop('hard', None)
+            # if len(format_results.keys()) > 1:
+            #     eval_results_upperbound = self._process_upperbound(format_results)
+            #     # r_eval_results, c_eval_results = self._process_weight(format_results)
+            #     eval_results.update(eval_results_upperbound)
+            #     # eval_results.update(r_eval_results)
+            #     # eval_results.update(c_eval_results)
         else:
             eval_results = self.process_single_head(results, prefix='common/')
 
@@ -790,23 +995,12 @@ class WTIMCDataset(Dataset):
                 format(len(results), len(self)))
 
         def format_out_single(results, save_path):
-            if 'snr' in save_path:
-                if self.item_weights is None:
-                    results = [result.reshape(1, 2)
-                               for result in results]
-                else:
-                    results = [result.reshape(1, len(self.item_weights))
-                               for result in results]
-                results = np.concatenate(results, axis=0)
-                results = np.reshape(results, (len(self), -1))
-            else:
-                results = [result.reshape(1, len(self.CLASSES))
-                           for result in results]
-                results = np.concatenate(results, axis=0)
-                results = np.reshape(results, (len(self), -1))
+            results = [result.reshape(1, -1) for result in results]
+            results = np.concatenate(results, axis=0)
+            results = np.reshape(results, (len(self), -1))
             np.save(save_path, results)
 
-        if self.use_snr_label:
+        if isinstance(results[0], dict):
             format_results = {key_str: [] for key_str in results[0].keys()}
             for item in results:
                 for key_str in item.keys():
@@ -814,7 +1008,7 @@ class WTIMCDataset(Dataset):
 
             for key_str in format_results.keys():
                 sub_results = format_results[key_str]
-                save_path = os.path.join(out_dir, key_str + '_pre.npy')
+                save_path = os.path.join(out_dir, key_str + '.npy')
                 format_out_single(sub_results, save_path)
         else:
             save_path = os.path.join(out_dir, 'pre.npy')

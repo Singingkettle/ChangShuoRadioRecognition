@@ -1,4 +1,5 @@
 import logging
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,7 +8,7 @@ from ..builder import BACKBONES
 from ...runner import load_checkpoint
 
 
-@ BACKBONES.register_module()
+@BACKBONES.register_module()
 class CPCNN(nn.Module):
     def __init__(self, num_slot, num_filter, slot_size):
         super(CPCNN, self).__init__()
@@ -34,7 +35,7 @@ class CPCNN(nn.Module):
         self.rnn_layer1 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.rnn_layer2 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.den = nn.Sequential(
-            nn.Linear(64*num_slot, 32),
+            nn.Linear(64 * num_slot, 32),
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
             nn.Linear(32, 16),
@@ -53,17 +54,16 @@ class CPCNN(nn.Module):
                     if m.bias is not None:
                         nn.init.constant_(m.bias, 0)
 
-
     def forward(self, co):
-        #co (80, 9, 128, 128)
-        #co = self.stn_layer(co)
-        x = co.view(-1, 1, self.slot_size, self.slot_size) #co (80*9, 1, 128, 128)
+        # co (80, 9, 128, 128)
+        # co = self.stn_layer(co)
+        x = co.view(-1, 1, self.slot_size, self.slot_size)  # co (80*9, 1, 128, 128)
         x1 = self.conv1(x)
         x2 = self.conv2(x1)
-        x3 = self.conv3(x2) #(80*9, 3, 16, 16)
-        fea = x3.view(-1, 1, self.fea_num) #(80*9, 1, 3*16*16) 
+        x3 = self.conv3(x2)  # (80*9, 3, 16, 16)
+        fea = x3.view(-1, 1, self.fea_num)  # (80*9, 1, 3*16*16)
 
-        out = fea.view(-1, self.num_slot, self.fea_num) #(80, 9, 3*16*16)
+        out = fea.view(-1, self.num_slot, self.fea_num)  # (80, 9, 3*16*16)
         out1, _ = self.rnn_layer1(out)  #
         out2, _ = self.rnn_layer2(out)  # (N, L, 64)
         out2 = torch.flip(out2, [1])  # reverse
@@ -73,10 +73,11 @@ class CPCNN(nn.Module):
 
         return out
 
+
 class STNNet(nn.Module):
     def __init__(self, slot_size):
         super(STNNet, self).__init__()
-        self.in_fea =10 * (((((slot_size-7) +1 )//2-5)+1)//2) ** 2
+        self.in_fea = 10 * (((((slot_size - 7) + 1) // 2 - 5) + 1) // 2) ** 2
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
             nn.Conv2d(1, 8, kernel_size=7),
@@ -100,18 +101,19 @@ class STNNet(nn.Module):
             [1, 0, 0, 1], dtype=torch.float))
 
     # Spatial transformer network forward function
-    def forward(self, x):#(80*9,1,128,128)
-        xs = self.localization(x) #(80*9,10,28,28)
-        xs = xs.view(-1, self.in_fea)#(80*9,7840)
-        theta = self.fc_loc(xs)#(90,4)
-        theta = theta.view(-1, 2, 2)#(90*8,2,2)
+    def forward(self, x):  # (80*9,1,128,128)
+        xs = self.localization(x)  # (80*9,10,28,28)
+        xs = xs.view(-1, self.in_fea)  # (80*9,7840)
+        theta = self.fc_loc(xs)  # (90,4)
+        theta = theta.view(-1, 2, 2)  # (90*8,2,2)
         p1d = (0, 1)
-        theta = F.pad(theta, p1d, "constant", 0) #(90*8,2,3)
-        
-        grid = F.affine_grid(theta, x.size()) #x.size(80*9, 1, 128, 128)   grid(80, 128, 128, 2)
-        x = F.grid_sample(x, grid) # 80*9, 1, 128, 128
+        theta = F.pad(theta, p1d, "constant", 0)  # (90*8,2,3)
+
+        grid = F.affine_grid(theta, x.size())  # x.size(80*9, 1, 128, 128)   grid(80, 128, 128, 2)
+        x = F.grid_sample(x, grid)  # 80*9, 1, 128, 128
 
         return x
+
 
 class SlotbasicBlock(nn.Module):
     def __init__(self, num_filter):
@@ -140,7 +142,7 @@ class SlotbasicBlock(nn.Module):
         return x3
 
 
-@ BACKBONES.register_module()
+@BACKBONES.register_module()
 class CSTN(nn.Module):
     def __init__(self, num_slot, num_filter, slot_size):
         super(CSTN, self).__init__()
@@ -157,7 +159,7 @@ class CSTN(nn.Module):
         self.rnn_layer1 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.rnn_layer2 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.den = nn.Sequential(
-            nn.Linear(64*num_slot, 32),
+            nn.Linear(64 * num_slot, 32),
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
             nn.Linear(32, 16),
@@ -181,7 +183,7 @@ class CSTN(nn.Module):
 
     def forward(self, co):
         # co (80, 9, 128, 128)
-        co = co.view(-1, 1, self.slot_size, self.slot_size) #co (80*9, 1, 128, 128)
+        co = co.view(-1, 1, self.slot_size, self.slot_size)  # co (80*9, 1, 128, 128)
         co = self.stn_layer(co)
         co = co.view(-1, self.num_slot, self.slot_size, self.slot_size)
         out = []
@@ -205,7 +207,7 @@ class CSTN(nn.Module):
         return out
 
 
-@ BACKBONES.register_module()
+@BACKBONES.register_module()
 class CPCSTN(nn.Module):
     def __init__(self, num_slot, num_filter, slot_size):
         super(CPCSTN, self).__init__()
@@ -233,7 +235,7 @@ class CPCSTN(nn.Module):
         self.rnn_layer1 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.rnn_layer2 = nn.LSTM(self.fea_num, 64, batch_first=True)
         self.den = nn.Sequential(
-            nn.Linear(64*num_slot, 32),
+            nn.Linear(64 * num_slot, 32),
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
             nn.Linear(32, 16),
@@ -252,18 +254,17 @@ class CPCSTN(nn.Module):
                     if m.bias is not None:
                         nn.init.constant_(m.bias, 0)
 
-
     def forward(self, co):
-        #co (80, 9, 128, 128)
-        co = co.view(-1, 1, self.slot_size, self.slot_size) #co (80*9, 1, 128, 128)
+        # co (80, 9, 128, 128)
+        co = co.view(-1, 1, self.slot_size, self.slot_size)  # co (80*9, 1, 128, 128)
         co = self.stn_layer(co)
-        #co = co.view(-1, 1, self.slot_size, self.slot_size) #co (80*9, 1, 128, 128)
-        x1 = self.conv1(co)#(80*9,3,64,64)
-        x2 = self.conv2(x1)#(80*9,3,32,32)
-        x3 = self.conv3(x2) #(80*9, 3, 16, 16)
-        fea = x3.view(-1, 1, self.fea_num) #(80*9, 1, 3*16*16) 
+        # co = co.view(-1, 1, self.slot_size, self.slot_size) #co (80*9, 1, 128, 128)
+        x1 = self.conv1(co)  # (80*9,3,64,64)
+        x2 = self.conv2(x1)  # (80*9,3,32,32)
+        x3 = self.conv3(x2)  # (80*9, 3, 16, 16)
+        fea = x3.view(-1, 1, self.fea_num)  # (80*9, 1, 3*16*16)
 
-        out = fea.view(-1, self.num_slot, self.fea_num) #(80, 9, 3*16*16)
+        out = fea.view(-1, self.num_slot, self.fea_num)  # (80, 9, 3*16*16)
         out1, _ = self.rnn_layer1(out)  #
         out2, _ = self.rnn_layer2(out)  # (N, L, 64)
         out2 = torch.flip(out2, [1])  # reverse
@@ -272,4 +273,3 @@ class CPCSTN(nn.Module):
         out = self.den(out)  # self.den.forward(out)
 
         return out
-

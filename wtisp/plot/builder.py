@@ -5,6 +5,8 @@ TRAINTESTCURVES = Registry('traintestcurve')
 SNRMODULATIONS = Registry('snrmodulation')
 SUMMARIES = Registry('summary')
 PLOTS = Registry('plot')
+VISFEATURES = Registry('fea')
+FLOPS = Registry('flop')
 
 
 def build(cfg, registry, default_args=None):
@@ -27,6 +29,15 @@ def build(cfg, registry, default_args=None):
         return plots
     else:
         return build_from_cfg(cfg, registry, default_args)
+
+
+def build_flops(cfg):
+    """Build flops"""
+    return build(cfg, FLOPS)
+
+def build_vis_features(cfg, scatter_config=None):
+    """Build vis fea."""
+    return build(cfg, VISFEATURES, dict(scatter_config=scatter_config))
 
 
 def build_summary(cfg, config_legend_map=None, config_method_map=None):

@@ -34,7 +34,7 @@ import torch.nn as nn
 
 def get_model_complexity_info(model,
                               input_shape,
-                              print_per_layer_stat=True,
+                              print_per_layer_state=True,
                               as_strings=True,
                               flush=False,
                               ost=sys.stdout):
@@ -63,7 +63,7 @@ def get_model_complexity_info(model,
     Args:
         model (nn.Module): The model for complexity calculation.
         input_shape (list[tuple]): Input shape list used for calculation.
-        print_per_layer_stat (bool): Whether to print complexity information
+        print_per_layer_state (bool): Whether to print complexity information
             for each layer in a model. Default: True.
         as_strings (bool): Output FLOPs and params counts in a string form.
             Default: True.
@@ -83,35 +83,30 @@ def get_model_complexity_info(model,
     flops_model.eval()
     flops_model.start_flops_count()
 
-    try:
-        batch_iq = torch.ones(()).new_empty(
-            (1, *input_shape[0]),
-            dtype=next(flops_model.parameters()).dtype,
-            device=next(flops_model.parameters()).device)
-        batch_ap = torch.ones(()).new_empty(
-            (1, *input_shape[1]),
-            dtype=next(flops_model.parameters()).dtype,
-            device=next(flops_model.parameters()).device)
-        batch_co = torch.ones(()).new_empty(
-            (1, *input_shape[2]),
-            dtype=next(flops_model.parameters()).dtype,
-            device=next(flops_model.parameters()).device)
-    except StopIteration:
-        # Avoid StopIteration for models which have no parameters,
-        # like `nn.Relu()`, `nn.AvgPool2d`, etc.
-        batch_iq = torch.ones(()).new_empty((1, *input_shape[0]))
-        batch_ap = torch.ones(()).new_empty((1, *input_shape[1]))
-        batch_co = torch.ones(()).new_empty((1, *input_shape[2]))
+    def generate_input_tensor(shape):
+        try:
+            data = torch.ones(()).new_empty(
+                (1, *shape),
+                dtype=next(flops_model.parameters()).dtype,
+                device=next(flops_model.parameters()).device)
+        except StopIteration:
+            # Avoid StopIteration for models which have no parameters,
+            # like `nn.Relu()`, `nn.AvgPool2d`, etc.
+            data = torch.ones(()).new_empty((1, *shape))
+        return data
+    inputs = list()
+    for shape in input_shape:
+        inputs.append(generate_input_tensor(shape))
 
     # starting time
     start = time.time()
-    _ = flops_model(batch_iq, batch_ap, batch_co)
+    _ = flops_model(*inputs)
     # end time
     end = time.time()
     inference_time = end - start
 
     flops_count, params_count = flops_model.compute_average_flops_cost()
-    if print_per_layer_stat:
+    if print_per_layer_state:
         print_model_with_flops(
             flops_model, flops_count, params_count, ost=ost, flush=flush)
     flops_model.stop_flops_count()
@@ -122,7 +117,7 @@ def get_model_complexity_info(model,
     return flops_count, params_count, inference_time
 
 
-def flops_to_string(flops, units='GFLOPs', precision=2):
+def flops_to_string(flops, units='MFLOPs', precision=2):
     """Convert FLOPs number into a string.
 
     Note that Here we take a multiply-add counts as one FLOP.
@@ -614,9 +609,10 @@ def remove_batch_counter_hook_function(module):
 def add_flops_counter_variable_or_reset(module):
     if is_supported_instance(module):
         if hasattr(module, '__flops__') or hasattr(module, '__params__'):
-            print('Warning: variables __flops__ or __params__ are already '
-                  'defined for the module' + type(module).__name__ +
-                  ' ptflops can affect your code!')
+            pass
+            # print('Warning: variables __flops__ or __params__ are already '
+            #       'defined for the module' + type(module).__name__ +
+            #       ' ptflops can affect your code!')
         module.__flops__ = 0
         module.__params__ = get_model_parameters_number(module)
 

@@ -57,7 +57,7 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
                 markersize=5,
             )
 
-    leg = ax.legend(loc='upper right', prop={'size': 15, 'weight': 'bold'})
+    leg = ax.legend(loc='upper right', prop={'size': 10, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Epochs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Loss', fontsize=18, fontweight='bold')
@@ -125,7 +125,7 @@ def plot_test_curve(log_infos, legend, save_path, legend_config):
                 markersize=5,
             )
 
-    leg = ax.legend(loc='lower right', prop={'size': 15, 'weight': 'bold'})
+    leg = ax.legend(loc='lower right', prop={'size': 10, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Epochs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Accuracy', fontsize=18, fontweight='bold')
@@ -235,7 +235,7 @@ if __name__ == '__main__':
             has_snr_classifier=False,
         ),
     ]
-    from .legend_config import LegendConfig
+    from ..config.legend_config import LegendConfig
 
     legend_config_list = LegendConfig(18)
     legend_list = {

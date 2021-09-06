@@ -26,6 +26,8 @@ def load_annotation(ann_file):
     for index, item in enumerate(CLASSES):
         if item in replace_dict:
             CLASSES[index] = replace_dict[item]
+            mods_dict[replace_dict[item]] = mods_dict[item]
+            mods_dict.pop(item)
     return SNRS, CLASSES, mods_dict, snrs_dict, ann_info
 
 

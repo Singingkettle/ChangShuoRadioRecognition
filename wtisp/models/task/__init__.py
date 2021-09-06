@@ -1,4 +1,5 @@
 from .amc import BaseAMC
+from .cemee import CEMEE
 from .cldnn import CLDNN
 from .cnn2 import CNN2
 from .cnn3 import CNN3

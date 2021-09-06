@@ -56,6 +56,9 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
+    ## TODO: set the vis_fea value in a more elegant way
+    cfg.test_cfg['vis_fea'] = False
+
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -80,7 +83,7 @@ def main():
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
         distributed = False
-        if osp.isdir(cfg.work_dir):
+        if osp.isdir(cfg.work_dir) and (not cfg.resume_from):
             del_files(cfg.work_dir)
     else:
         distributed = True
@@ -88,7 +91,7 @@ def main():
         # Delete the old saved log files and models
         rank, _ = get_dist_info()
         if rank == 0:
-            if osp.isdir(cfg.work_dir):
+            if osp.isdir(cfg.work_dir) and (not cfg.resume_from):
                 del_files(cfg.work_dir)
 
     # create work_dir
@@ -116,9 +119,11 @@ def main():
     logger.info(f'Config:\n{cfg.pretty_text}')
 
     # set random seeds
+    if hasattr(cfg, 'seed'):
+        args.seed = cfg.seed
     if args.seed is not None:
         logger.info(f'Set random seed to {args.seed}, '
-                    f'deterministic: {True}')
+                    f'deterministic: {args.deterministic}')
         set_random_seed(args.seed, deterministic=args.deterministic)
     cfg.seed = args.seed
     meta['seed'] = args.seed

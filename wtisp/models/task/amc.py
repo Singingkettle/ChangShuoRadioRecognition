@@ -1,10 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
+from collections import namedtuple
 
 import torch
 import torch.distributed as dist
 import torch.nn as nn
-from collections import namedtuple
+
 from ...common import get_root_logger, print_log
 
 
@@ -31,7 +32,7 @@ class BaseAMC(nn.Module, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def simple_test(self, iq, ap, co, **kwargs):
+    def simple_test(self, iqs, asp, cos, **kwargs):
         pass
 
     @abstractmethod
