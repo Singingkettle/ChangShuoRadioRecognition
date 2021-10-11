@@ -55,7 +55,7 @@ def build_train_test_curve(cfg, legend_config=None):
     return build(cfg, TRAINTESTCURVES, dict(legend_config=legend_config))
 
 
-def build_snr_modulation(cfg, legend_config=None):
+def build_accuracy_f1(cfg, legend_config=None):
     """Build snr accuracy."""
     return build(cfg, SNRMODULATIONS, dict(legend_config=legend_config))
 

@@ -2,9 +2,10 @@ import os
 import shutil
 
 from ..builder import (PLOTS, build_confusion_map, build_train_test_curve,
-                       build_snr_modulation, build_summary, build_vis_features, build_flops)
+                       build_accuracy_f1, build_summary, build_vis_features, build_flops)
 from ..config.legend_config import LegendConfig
 from ..config.scatter_config import ScatterConfig
+
 
 @PLOTS.register_module()
 class CommonPlot(object):
@@ -46,10 +47,10 @@ class CommonPlot(object):
 
         if snr_modulation is not None:
             if isinstance(snr_modulation, dict):
-                self.plot_blocks.append(build_snr_modulation(
+                self.plot_blocks.append(build_accuracy_f1(
                     snr_modulation, legend_config=self.legend_config))
             elif isinstance(snr_modulation, list):
-                self.plot_blocks.extend(build_snr_modulation(
+                self.plot_blocks.extend(build_accuracy_f1(
                     snr_modulation, legend_config=self.legend_config))
             else:
                 raise ValueError('The confusion maps must be a list or dict!')

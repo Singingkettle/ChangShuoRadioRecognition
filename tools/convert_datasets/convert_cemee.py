@@ -7,8 +7,6 @@ Author: Citybuster
 Time: 2021/8/21 12:06
 Email: chagshuo@bupt.edu.cn
 """
-import os
-import os.path as osp
 
 import h5py
 import numpy as np

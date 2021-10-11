@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class LegendConfig:
     def __init__(self, num_methods):
         self.colors = [

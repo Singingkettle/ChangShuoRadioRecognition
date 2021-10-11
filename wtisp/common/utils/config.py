@@ -467,24 +467,19 @@ class DictAction(Action):
 
 
 def filter_config(cfg, is_regeneration=False, mode='test'):
-    configs = dict()
+    configs = []
     train_configs = dict()
     config_legend_map = dict()
     config_method_map = dict()
 
     def extract_info(m):
         c = m['config']
-        if 'has_snr_classifier' in m:
-            h = m['has_snr_classifier']
-        else:
-            h = False
         if c in configs:
-            configs[c] = (configs[c] or h)
             if config_legend_map[c] is not m['name']:
                 raise ValueError(
                     'The config {} sis assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
         else:
-            configs[c] = h
+            configs.append(c)
             config_legend_map[c] = m['name']
             config_method_map[c] = m
 
@@ -528,7 +523,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         else:
             raise ValueError('The snr_modulation must be list or dict!')
 
-    for config, has_snr_classifier in configs.items():
+    for config in configs:
         if osp.isdir(osp.join(cfg.log_dir, config)):
             format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
             json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
@@ -540,12 +535,13 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         if 'feature_based' in config:
             train_configs[config] = -1
         else:
+            print(config)
             best_epoch = get_the_best_checkpoint(
-                cfg.log_dir, config, has_snr_classifier)
+                cfg.log_dir, config)
             if best_epoch > 0:
                 train_configs[config] = best_epoch
 
-    no_train_configs = list(set(configs.keys()) - set(train_configs.keys()))
+    no_train_configs = list(set(configs) - set(train_configs.keys()))
 
     if mode is 'test':
         return train_configs
@@ -573,25 +569,32 @@ def load_json_log(json_log):
     return log_dict
 
 
-def get_the_best_checkpoint(log_dir, config, has_snr_classifier):
+def get_the_best_checkpoint(log_dir, config):
     json_paths = glob.glob(os.path.join(log_dir, config, '*.json'))
 
     if len(json_paths) > 0:
         # assume that the last json file is right version
         json_paths = sorted(json_paths)
         log_dict = load_json_log(json_paths[-1])
-        if has_snr_classifier:
-            metric = 'merge/snr_mean_all'
-        else:
-            metric = 'common/snr_mean_all'
 
         epochs = list(log_dict.keys())
+        final_metric = 'final/snr_mean_all'
+        for epoch in epochs:
+            if log_dict[epoch]['mode'][-1] == 'val':
+                if 'common/snr_mean_all' in log_dict[epoch]:
+                    final_metric = 'common/snr_mean_all'
+                elif 'merge/snr_mean_all' in log_dict[epoch]:
+                    final_metric = 'merge/snr_mean_all'
+                else:
+                    final_metric = 'final/snr_mean_all'
+                break
+
         accuracy = 0
         best_epoch = 0
         for epoch in epochs:
             if log_dict[epoch]['mode'][-1] == 'val':
-                if log_dict[epoch][metric][0] > accuracy:
-                    accuracy = log_dict[epoch][metric][0]
+                if log_dict[epoch][final_metric][0] > accuracy:
+                    accuracy = log_dict[epoch][final_metric][0]
                     best_epoch = epoch
     else:
         best_epoch = 0

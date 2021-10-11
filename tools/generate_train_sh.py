@@ -12,7 +12,7 @@ def parse_args():
         description='WTISignalProcessing Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
     parser.add_argument('--scripts_dir', help='dir to save the train.sh files')
-    parser.add_argument('--group_num', default=2, type=int, help='number of configs in one train.sh file')
+    parser.add_argument('--group_num', default=24, type=int, help='number of configs in one train.sh file')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('--multi_gpu', default=False, action='store_true',
                         help='the dir to save logs and models')
@@ -45,7 +45,6 @@ def main():
     count_index = 0
     group_index = 0
     gpu_num = torch.cuda.device_count()
-    gpu_num = 2
     no_train_configs = sorted(no_train_configs)
 
     gpu_index = 0

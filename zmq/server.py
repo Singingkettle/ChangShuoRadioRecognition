@@ -1,7 +1,7 @@
 import argparse
 import os
 import pickle
-from multiprocessing import Process, RawArray
+from multiprocessing import Process
 
 import zmq
 

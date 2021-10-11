@@ -1,5 +1,3 @@
-import torch
-
 from .amc import BaseAMC
 from ..builder import TASKS, build_backbone, build_head
 from ...common.utils import outs2result

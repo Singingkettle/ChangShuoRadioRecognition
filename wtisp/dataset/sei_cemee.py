@@ -9,14 +9,12 @@ Email: chagshuo@bupt.edu.cn
 """
 
 import os
-import os.path as osp
 
 import h5py
 import numpy as np
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
-from ..common.fileio import dump as IODump
 
 
 @DATASETS.register_module()

@@ -820,32 +820,32 @@ class WTIMCDataset(Dataset):
         optimization_time = time.time() - optimization_start_time
         merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results_dict), -1)))
         merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
-        eval_results = self._evaluate_mod(merge_matrix, prefix='merge/')
+        eval_results = self._evaluate_mod(merge_matrix, prefix='final/')
 
 
         ## This part of code is only for the ablation study about HCGDNN, which should be commented in the usual way.
         print('\n====================================================================================\n')
-        print('time:%f, accuracy:%f'.format(optimization_time, eval_results['merge/snr_mean_all']))
+        print('time:{:f}, accuracy:{:f}'.format(optimization_time, eval_results['final/snr_mean_all']))
         print('\n=====================================================================================\n')
-        search_step_list = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+        search_step_list = [0.1, 0.01]
         for search_step in search_step_list:
+            search_start_time = time.time()
             search_weight_list = get_merge_weight_by_search(len(results_dict), search_step)
             cur_max_accuracy = 0
-            search_start_time = 0
             for search_weight in search_weight_list:
                 search_weight = np.array(search_weight)
                 search_weight = np.reshape(search_weight, (1, -1))
-                merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results_dict), -1)))
-                merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
-                tmp_eval_results = self._evaluate_mod(merge_matrix, prefix='tmp/')
-                if cur_max_accuracy > tmp_eval_results['tmp/snr_mean_all']:
+                tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results_dict), -1)))
+                tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, len(self.CLASSES)))
+                tmp_eval_results = self._evaluate_mod(tmp_merge_matrix, prefix='tmp/')
+                if cur_max_accuracy < tmp_eval_results['tmp/snr_mean_all']:
                     cur_max_accuracy = tmp_eval_results['tmp/snr_mean_all']
             search_time = time.time() - search_start_time
             print('\n====================================================================================\n')
-            print('time:%f, accuracy:%f'.format(search_time, cur_max_accuracy))
+            print('time:{:f}, accuracy:{:f}'.format(search_time, cur_max_accuracy))
             print('\n====================================================================================\n')
 
-        return eval_results
+        return eval_results, merge_matrix
 
     def evaluate(self, results, logger=None):
         """Evaluate the dataset.
@@ -870,8 +870,8 @@ class WTIMCDataset(Dataset):
                 eval_results.update(sub_eval_results)
 
             if self.merge_res and len(format_results)>1:
-                merge_results = self._process_merge(format_results)
-                eval_results.update(merge_results)
+                merge_eval_results, _ = self._process_merge(format_results)
+                eval_results.update(merge_eval_results)
             # format_results.pop('snr', None)
             # format_results.pop('hard', None)
             # if len(format_results.keys()) > 1:
@@ -881,7 +881,7 @@ class WTIMCDataset(Dataset):
             #     # eval_results.update(r_eval_results)
             #     # eval_results.update(c_eval_results)
         else:
-            eval_results = self.process_single_head(results, prefix='common/')
+            eval_results = self.process_single_head(results, prefix='final/')
 
         return eval_results
 
@@ -917,8 +917,8 @@ class WTIMCDataset(Dataset):
 
             if self.merge_res and len(format_results)>1:
                 save_path = os.path.join(out_dir, 'pre.npy')
-                merge_results = self._process_merge(format_results)
-                format_out_single(merge_results, save_path)
+                _, merge_matrix = self._process_merge(format_results)
+                format_out_single(merge_matrix, save_path)
         else:
             save_path = os.path.join(out_dir, 'pre.npy')
             format_out_single(results, save_path)

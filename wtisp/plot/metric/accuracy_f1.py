@@ -1,10 +1,9 @@
-import copy
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .utils import load_method
+from .utils import load_method, reorder_results, radar_factory
 from ..builder import SNRMODULATIONS
 
 plt.rcParams["font.family"] = "Times New Roman"
@@ -109,37 +108,6 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
 
 
 def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, reorder=True):
-    def reorder_results(f1s):
-        if len(f1s) == 1:
-            min_modulation_f1s = copy.deepcopy(f1s[0]['f1s'])
-
-        else:
-            num_modulations = len(f1s[0]['f1s'])
-            num_method = len(f1s)
-            min_modulation_f1s = copy.deepcopy(f1s[0]['f1s'])
-            for modulation_index in range(num_modulations):
-                for method_index in range(1, num_method):
-                    if min_modulation_f1s[modulation_index] > f1s[method_index]['f1s'][modulation_index]:
-                        min_modulation_f1s[modulation_index] = copy.copy(
-                            f1s[method_index]['f1s'][modulation_index])
-        sort_indices = np.argsort(np.array(min_modulation_f1s) * -1)
-
-        new_modulation_f1s = []
-        num_method = len(f1s)
-        for method_index in range(num_method):
-            new_f1s = list()
-            new_CLASSES = list()
-            new_modulation_f1 = dict()
-            for modulation_index in sort_indices:
-                new_f1s.append(copy.copy(f1s[method_index]['f1s'][modulation_index]))
-                new_CLASSES.append(copy.copy(f1s[method_index]['CLASSES'][modulation_index]))
-            new_modulation_f1['f1s'] = copy.deepcopy(new_f1s)
-            new_modulation_f1['CLASSES'] = copy.deepcopy(new_CLASSES)
-            new_modulation_f1['average_f1'] = copy.deepcopy(f1s[method_index]['average_f1'])
-            new_modulation_f1['name'] = copy.deepcopy(f1s[method_index]['name'])
-            new_modulation_f1s.append(new_modulation_f1)
-        return new_modulation_f1s
-
     if reorder:
         modulation_f1s = reorder_results(modulation_f1s)
 
@@ -231,9 +199,41 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     plt.close(fig)
 
 
+def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_config, reorder=True):
+    if reorder:
+        modulation_f1s = reorder_results(modulation_f1s)
+
+    CLASSES = modulation_f1s[0]['CLASSES']
+    theta = radar_factory(len(CLASSES), frame='polygon')
+    fig, ax = plt.subplots(figsize=(8, 8), nrows=1, ncols=1, subplot_kw=dict(projection='radar'))
+    fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9)
+
+    f1s_list = []
+    legend_list = []
+    ax.set_rgrids([0.2, 0.4, 0.6, 0.8, 1.0])
+    for i, modulation_f1 in enumerate(modulation_f1s):
+        f1s = modulation_f1['f1s']
+        average_f1 = modulation_f1['average_f1']
+        method_name = modulation_f1['name']
+        legend_name = method_name + ' [{:.3f}]'.format(average_f1)
+        f1s_list.append(f1s)
+        legend_list.append(legend_name)
+        ax.plot(theta, f1s, color=legend_config[legend[method_name]]['color'])
+        ax.fill(theta, f1s, facecolor=legend_config[legend[method_name]]['color'], alpha=0.25)
+    ax.set_varlabels(CLASSES)
+    leg = ax.legend(legend_list, loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                    prop={'size': 10, 'weight': 'bold'}, handletextpad=0.2,
+                    markerscale=20, ncol=len(legend_list), columnspacing=0.2)
+    leg.get_frame().set_edgecolor('black')
+    ax.set_title('Modulation-F1 Score Radar Chart', fontsize=18, fontweight='bold')
+    plt.tight_layout()  # set layout slim
+    plt.savefig(save_path, bbox_inches='tight')
+    plt.close(fig)
+
+
 @SNRMODULATIONS.register_module()
 class SNRModulationCurve(object):
-    def __init__(self, log_dir, name, legend, method, legend_config=None):
+    def __init__(self, log_dir, name, legend, method, analyze_self_with_multi_prediction=False, legend_config=None):
         self.log_dir = log_dir
         self.name = name
         self.legend = legend
@@ -241,16 +241,22 @@ class SNRModulationCurve(object):
         self.legend_config = legend_config
         self.SNRS = None
         self.CLASSES = None
-        self.snr_accuracies, self.modulation_f1s = load_method(self)
+        self.snr_accuracies, self.modulation_f1s = load_method(self, is_self=analyze_self_with_multi_prediction)
 
     def plot(self, save_dir):
         save_path = os.path.join(save_dir, 'snr_accuracy_' + self.name)
         print('Save: ' + save_path)
         plot_snr_accuracy_curve(
             self.snr_accuracies, self.legend, save_path, self.legend_config)
-        save_path = os.path.join(save_dir, 'modulation_f1_' + self.name)
+
+        save_path = os.path.join(save_dir, 'modulation_f1_curve_' + self.name)
         print('Save: ' + save_path)
         plot_modulation_f1_curve(
+            self.modulation_f1s, self.legend, save_path, self.legend_config)
+
+        save_path = os.path.join(save_dir, 'modulation_f1_radar_chart_' + self.name)
+        print('Save: ' + save_path)
+        plot_modulation_f1_radar_chart(
             self.modulation_f1s, self.legend, save_path, self.legend_config)
 
 
