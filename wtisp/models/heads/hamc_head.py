@@ -48,7 +48,7 @@ class HAMCHead(BaseHead):
             fea = self.fea(x[bx])
             pre = self.pre(fea)
             if vis_fea:
-                outs[bx+'_fea'] = fea
-            outs[bx+'_pre'] = pre
+                outs[bx + '_fea'] = fea
+            outs[bx + '_pre'] = pre
 
         return outs

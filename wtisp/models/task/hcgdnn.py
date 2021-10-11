@@ -12,7 +12,7 @@ class HCGDNN(BaseAMC):
         super(HCGDNN, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
-        self.channel_mode= channel_mode
+        self.channel_mode = channel_mode
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
         if 'vis_fea' in self.test_cfg:

@@ -10,7 +10,6 @@ Email: chagshuo@bupt.edu.cn
 
 import numpy as np
 
-
 a1 = np.array([[0.1, 0.9], [0.2, 0.8]])
 a2 = np.array([[0.15, 0.85], [0.25, 0.75]])
 a3 = np.array([[0.05, 0.95], [0.35, 0.65]])
@@ -20,13 +19,14 @@ w1 = np.reshape(w1, (-1, 1, 1))
 w2 = np.array([0.200000005, 0.2, 0.6])
 w2 = np.reshape(w2, (-1, 1, 1))
 
-t = np.array([[0,1],[0,1]])
+t = np.array([[0, 1], [0, 1]])
 
 m = x.shape[0]
 n = x.shape[1]
 
 r1 = 1490 / n
 r2 = 110050 / n
+
 
 def min_obj(w):
     w = np.reshape(w, (-1, 1, 1))
@@ -42,6 +42,7 @@ def min_obj(w):
     y7 = np.power(y6, 2)
     f = np.mean(y7[:])
     return f
+
 
 def obj_der(w):
     w = np.reshape(w, (-1, 1, 1))
@@ -64,6 +65,7 @@ def obj_der(w):
     df = np.sum(np.sum(y8, axis=2), axis=1) * r1
 
     return df
+
 
 def obj_hess(w):
     w = np.reshape(w, (-1, 1, 1))
@@ -107,6 +109,6 @@ def obj_hess(w):
     return H
 
 
-df = (min_obj(w2)-min_obj(w2))/0.000000005
+df = (min_obj(w2) - min_obj(w2)) / 0.000000005
 df_ = obj_der(w1)[0]
 print(df - df_)

@@ -94,6 +94,7 @@ def get_model_complexity_info(model,
             # like `nn.Relu()`, `nn.AvgPool2d`, etc.
             data = torch.ones(()).new_empty((1, *shape))
         return data
+
     inputs = list()
     for shape in input_shape:
         inputs.append(generate_input_tensor(shape))

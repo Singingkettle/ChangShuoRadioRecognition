@@ -48,7 +48,7 @@ plot = dict(
 
         # Motivations
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='scbdn.pdf',
             legends=legends,
             log_dir=log_dir,
@@ -64,7 +64,7 @@ plot = dict(
             ],
         ),
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='lcbdn.pdf',
             legends=legends,
             log_dir=log_dir,
@@ -80,7 +80,7 @@ plot = dict(
             ],
         ),
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='slcbdn.pdf',
             legends=legends,
             log_dir=log_dir,
@@ -99,7 +99,7 @@ plot = dict(
         # Ablation Study of Adam
 
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='ablation_Adam.pdf',
             legends=legends,
             log_dir=log_dir,
@@ -145,7 +145,7 @@ plot = dict(
 
         # table
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='table.pdf',
             legends=legends,
             log_dir=log_dir,

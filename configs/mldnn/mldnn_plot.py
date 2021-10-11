@@ -79,7 +79,7 @@ plot = dict(
 
         # Motivations
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='cldnn_iq-ap.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -95,7 +95,7 @@ plot = dict(
             ],
         ),
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='cgdnn2_iq-ap.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -111,7 +111,7 @@ plot = dict(
             ],
         ),
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='cldnn2_iq-ap.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -130,7 +130,7 @@ plot = dict(
         # Ablation Study by an incremental way
 
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='ablation_data.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -195,7 +195,7 @@ plot = dict(
 
         # deepsig 201610A compare with I/Q A/P
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201610A_iq_ap.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -229,7 +229,7 @@ plot = dict(
         ),
         # deepsig 201601A compare with constellation and fb
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201610A_co_fb.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -268,7 +268,7 @@ plot = dict(
 
         # deepsig 201801A compare with I/Q A/P
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201801A_iq_ap.pdf',
             legend=legend,
             log_dir=log_dir,

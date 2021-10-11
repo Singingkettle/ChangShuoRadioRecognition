@@ -73,7 +73,6 @@ class GetFlops(object):
                f'Input shape: {input_shape}\n' \
                f'Flops: {flops}\nParams: {params}\nInference Time: {inference_time}\n{split_line}'
 
-
     def plot(self, save_dir):
         save_path = os.path.join(save_dir, 'flops.txt')
         with open(save_path, 'w') as f:
@@ -83,4 +82,3 @@ class GetFlops(object):
                 f.write(flops_str)
                 torch.cuda.empty_cache()
                 sleep(30)
-

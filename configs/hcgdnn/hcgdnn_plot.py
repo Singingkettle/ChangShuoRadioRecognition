@@ -75,7 +75,7 @@ plot = dict(
     snr_modulation=[
         # Ablation Study by an incremental way
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='ablation_data.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -118,9 +118,67 @@ plot = dict(
             ],
         ),
 
+        # deepsig 201610A for cnn gru1
+        dict(
+            type='AccuracyF1Plot',
+            name='motivation_cg1_deepsig_201610A.pdf',
+            legend=legend,
+            log_dir=log_dir,
+            method=[
+                # CNN
+                dict(
+                    config='hcgdnn_abl_cnn_deepsig_iq_201610A',
+                    name='HCGDNN-CNN',
+                ),
+                # GRU1
+                dict(
+                    config='hcgdnn_abl_gru1_deepsig_iq_201610A',
+                    name='HCGDNN-GRU1',
+                ),
+            ],
+        ),
+        # deepsig 201610A for cnn gru2
+        dict(
+            type='AccuracyF1Plot',
+            name='motivation_cg2_deepsig_201610A.pdf',
+            legend=legend,
+            log_dir=log_dir,
+            method=[
+                # CNN
+                dict(
+                    config='hcgdnn_abl_cnn_deepsig_iq_201610A',
+                    name='HCGDNN-CNN',
+                ),
+                # GRU2
+                dict(
+                    config='hcgdnn_abl_gru2_deepsig_iq_201610A',
+                    name='HCGDNN-GRU2',
+                ),
+            ],
+        ),
+        # deepsig 201610A for gru1 gru2
+        dict(
+            type='AccuracyF1Plot',
+            name='motivation_g1g2_deepsig_201610A.pdf',
+            legend=legend,
+            log_dir=log_dir,
+            method=[
+                # GRU1
+                dict(
+                    config='hcgdnn_abl_gru1_deepsig_iq_201610A',
+                    name='HCGDNN-GRU1',
+                ),
+                # GRU2
+                dict(
+                    config='hcgdnn_abl_gru2_deepsig_iq_201610A',
+                    name='HCGDNN-GRU2',
+                ),
+            ],
+        ),
+
         # deepsig 201610A
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201610A.pdf',
             legend=legend,
             log_dir=log_dir,

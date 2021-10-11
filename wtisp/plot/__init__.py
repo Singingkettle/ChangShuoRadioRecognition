@@ -1,13 +1,13 @@
-from .builder import (CONFUSIONS, TRAINTESTCURVES, SNRMODULATIONS, SUMMARIES, VISFEATURES,
+from .builder import (CONFUSIONS, LOSSACCURACIES, ACCURACYF1S, SUMMARIES, VISFEATURES,
                       PLOTS, build, build_confusion_map,
-                      build_train_test_curve, build_accuracy_f1, build_plot,
+                      build_loss_accuracy_plot, build_accuracy_f1_plot, build_plot,
                       build_summary, build_vis_features, build_flops)
 from .metric import *
 from .task import *
 
 __all__ = [
-    'CONFUSIONS', 'TRAINTESTCURVES', 'SNRMODULATIONS', 'SUMMARIES', 'VISFEATURES',
+    'CONFUSIONS', 'LOSSACCURACIES', 'ACCURACYF1S', 'SUMMARIES', 'VISFEATURES',
     'PLOTS', 'build', 'build_confusion_map',
-    'build_train_test_curve', 'build_accuracy_f1',
+    'build_loss_accuracy_plot', 'build_accuracy_f1_plot',
     'build_plot', 'build_summary', 'build_vis_features', 'build_flops'
 ]

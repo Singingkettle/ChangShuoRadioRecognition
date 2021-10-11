@@ -100,9 +100,9 @@ class HCGNetV2(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -222,7 +222,6 @@ class HCGNetV3(nn.Module):
         return dict(cnn=c_fea[:, -1, :], gru1=g_fea1[:, -1, :], gru2=g_fea2[:, -1, :])
 
 
-
 @BACKBONES.register_module()
 class HCGNetV4(nn.Module):
 
@@ -248,8 +247,8 @@ class HCGNetV4(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -324,9 +323,9 @@ class HCGNetV5(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(0.5)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -423,6 +422,7 @@ class HCGNetCNN(nn.Module):
 
         return torch.sum(c_fea, dim=1)
 
+
 @BACKBONES.register_module()
 class HCGNetGRU1(nn.Module):
 
@@ -448,7 +448,7 @@ class HCGNetGRU1(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -522,9 +522,9 @@ class HCGNetGRU2(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -600,7 +600,7 @@ class HCGNetCG1(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -674,9 +674,9 @@ class HCGNetCG2(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -752,9 +752,9 @@ class HCGNetG1G2(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
-        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size//2, batch_first=True, bidirectional=True)
+        self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):

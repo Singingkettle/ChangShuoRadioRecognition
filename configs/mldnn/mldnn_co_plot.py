@@ -47,7 +47,7 @@ plot = dict(
     snr_modulation=[
         # deepsig 201601A compare with constellation and fb
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201801A_co_fb.pdf',
             legend=legend,
             log_dir=log_dir,

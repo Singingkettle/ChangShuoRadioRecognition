@@ -100,7 +100,7 @@ plot = dict(
     snr_modulation=[
         # Ablation Study by an incremental way
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='ablation_data.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -146,7 +146,7 @@ plot = dict(
 
         # deepsig 201610A
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='deepsig_201610A.pdf',
             legend=legend,
             log_dir=log_dir,
@@ -212,7 +212,7 @@ plot = dict(
 
         # # deepsig 201801A
         # dict(
-        #     type='SNRModulationCurve',
+        #     type='AccuracyF1Plot',
         #     name='deepsig_201801A_iq_ap.pdf',
         #     legend=legend,
         #     log_dir=log_dir,

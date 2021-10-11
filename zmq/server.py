@@ -30,6 +30,7 @@ def load_cache_data(cache_data_dir, ann_file, data_type, filter_config=None):
 
     return data
 
+
 def zmq_server(server_index):
     print("Start ZMQ Server %02d" % server_index)
     context = zmq.Context()

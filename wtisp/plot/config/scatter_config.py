@@ -16,7 +16,6 @@ class ScatterConfig:
                            '*', 'h', 'H', '+', 'x', 'X', 's', 'd'
                        ] * len(labels)
 
-
         self.scatter_config = dict()
         label_index = 0
         for label in labels:

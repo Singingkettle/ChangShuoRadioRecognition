@@ -6,7 +6,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ..builder import TRAINTESTCURVES
+from ..builder import LOSSACCURACIES
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -175,8 +175,8 @@ def load_json_log(json_log):
     return log_dict
 
 
-@TRAINTESTCURVES.register_module()
-class LossAccuracyCurve(object):
+@LOSSACCURACIES.register_module()
+class LossAccuracyPlot(object):
     def __init__(self, log_dir, name, legend, method, legend_config=None):
         self.log_dir = log_dir
         self.log_infos = []
@@ -258,7 +258,7 @@ if __name__ == '__main__':
         'MLDNN-Att': 16,
         'MLDNN-Grade': 17,
     }
-    confusion = LossAccuracyCurve('/home/citybuster/Data/SignalProcessing/Workdir',
-                                  'cnn2_deepsig_iq_201610A.pdf', legend_list, method_list, legend_config_list)
+    confusion = LossAccuracyPlot('/home/citybuster/Data/SignalProcessing/Workdir',
+                                 'cnn2_deepsig_iq_201610A.pdf', legend_list, method_list, legend_config_list)
     confusion.run(
         '/home/citybuster/Data/SignalProcessing/Workdir/cnn2_deepsig_iq_201610A/fig/')

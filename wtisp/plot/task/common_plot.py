@@ -1,8 +1,8 @@
 import os
 import shutil
 
-from ..builder import (PLOTS, build_confusion_map, build_train_test_curve,
-                       build_accuracy_f1, build_summary, build_vis_features, build_flops)
+from ..builder import (PLOTS, build_confusion_map, build_loss_accuracy_plot,
+                       build_accuracy_f1_plot, build_summary, build_vis_features, build_flops)
 from ..config.legend_config import LegendConfig
 from ..config.scatter_config import ScatterConfig
 
@@ -37,20 +37,20 @@ class CommonPlot(object):
 
         if train_test_curve is not None:
             if isinstance(train_test_curve, dict):
-                self.plot_blocks.append(build_train_test_curve(
+                self.plot_blocks.append(build_loss_accuracy_plot(
                     train_test_curve, legend_config=self.legend_config))
             elif isinstance(train_test_curve, list):
-                self.plot_blocks.extend(build_train_test_curve(
+                self.plot_blocks.extend(build_loss_accuracy_plot(
                     train_test_curve, legend_config=self.legend_config))
             else:
                 raise ValueError('The confusion maps must be a list or dict!')
 
         if snr_modulation is not None:
             if isinstance(snr_modulation, dict):
-                self.plot_blocks.append(build_accuracy_f1(
+                self.plot_blocks.append(build_accuracy_f1_plot(
                     snr_modulation, legend_config=self.legend_config))
             elif isinstance(snr_modulation, list):
-                self.plot_blocks.extend(build_accuracy_f1(
+                self.plot_blocks.extend(build_accuracy_f1_plot(
                     snr_modulation, legend_config=self.legend_config))
             else:
                 raise ValueError('The confusion maps must be a list or dict!')

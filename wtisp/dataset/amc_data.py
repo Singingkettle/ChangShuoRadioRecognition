@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import pickle
+import time
 import zlib
 
 import matplotlib.pyplot as plt
@@ -9,7 +10,6 @@ import zmq
 from scipy.special import softmax
 from torch.utils.data import Dataset
 from tqdm import tqdm
-import time
 
 from .builder import DATASETS
 from .merge import get_merge_weight_by_optimization, get_merge_weight_by_search
@@ -808,7 +808,7 @@ class WTIMCDataset(Dataset):
         pre_matrix = np.concatenate(pre_matrix, axis=0)
         pre_max_index = np.argmax(pre_matrix, axis=2)
         pre_max_index = np.sum(pre_max_index, axis=0)
-        gt_max_index = np.argmax(self.targets, axis=1)*len(pre_matrix)
+        gt_max_index = np.argmax(self.targets, axis=1) * len(pre_matrix)
         no_zero_index = np.nonzero((pre_max_index - gt_max_index))[0]
 
         bad_pre_matrix = pre_matrix[:, no_zero_index[:], :]
@@ -821,7 +821,6 @@ class WTIMCDataset(Dataset):
         merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results_dict), -1)))
         merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
         eval_results = self._evaluate_mod(merge_matrix, prefix='final/')
-
 
         ## This part of code is only for the ablation study about HCGDNN, which should be commented in the usual way.
         print('\n====================================================================================\n')
@@ -869,7 +868,7 @@ class WTIMCDataset(Dataset):
                     format_results[key_str], prefix=key_str + '/')
                 eval_results.update(sub_eval_results)
 
-            if self.merge_res and len(format_results)>1:
+            if self.merge_res and len(format_results) > 1:
                 merge_eval_results, _ = self._process_merge(format_results)
                 eval_results.update(merge_eval_results)
             # format_results.pop('snr', None)
@@ -915,7 +914,7 @@ class WTIMCDataset(Dataset):
                 save_path = os.path.join(out_dir, key_str + '.npy')
                 format_out_single(sub_results, save_path)
 
-            if self.merge_res and len(format_results)>1:
+            if self.merge_res and len(format_results) > 1:
                 save_path = os.path.join(out_dir, 'pre.npy')
                 _, merge_matrix = self._process_merge(format_results)
                 format_out_single(merge_matrix, save_path)

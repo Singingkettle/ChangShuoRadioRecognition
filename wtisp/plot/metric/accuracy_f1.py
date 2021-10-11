@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from .utils import load_method, reorder_results, radar_factory
-from ..builder import SNRMODULATIONS
+from ..builder import ACCURACYF1S
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -231,8 +231,8 @@ def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_con
     plt.close(fig)
 
 
-@SNRMODULATIONS.register_module()
-class SNRModulationCurve(object):
+@ACCURACYF1S.register_module()
+class AccuracyF1Plot(object):
     def __init__(self, log_dir, name, legend, method, analyze_self_with_multi_prediction=False, legend_config=None):
         self.log_dir = log_dir
         self.name = name
@@ -291,6 +291,6 @@ if __name__ == '__main__':
         'MLDNN-Att': 16,
         'MLDNN-Grade': 17,
     }
-    confusion = SNRModulationCurve('/home/citybuster/Data/SignalProcessing/Workdir',
-                                   'cnn2_deepsig_iq_201610A.pdf', legend_list, method_list, legend_config_list)
+    confusion = AccuracyF1Plot('/home/citybuster/Data/SignalProcessing/Workdir',
+                               'cnn2_deepsig_iq_201610A.pdf', legend_list, method_list, legend_config_list)
     confusion.plot('./')

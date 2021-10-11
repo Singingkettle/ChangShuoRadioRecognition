@@ -39,7 +39,7 @@ plot = dict(
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
         dict(
-            type='SNRModulationCurve',
+            type='AccuracyF1Plot',
             name='mbrfi_co.pdf',
             legends=legends,
             log_dir=log_dir,
