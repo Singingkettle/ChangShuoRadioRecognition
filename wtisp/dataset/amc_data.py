@@ -6,12 +6,13 @@ import zlib
 import matplotlib.pyplot as plt
 import numpy as np
 import zmq
-from scipy.optimize import minimize
 from scipy.special import softmax
 from torch.utils.data import Dataset
 from tqdm import tqdm
+import time
 
 from .builder import DATASETS
+from .merge import get_merge_weight_by_optimization, get_merge_weight_by_search
 from .zmq import ZMQConfig
 from ..common.fileio import dump as IODump
 from ..common.fileio import load as IOLoad
@@ -48,138 +49,6 @@ def generate_targets(ann_file):
         targets[item_index, item['ann']['labels'][0]] = 1
 
     return targets
-
-
-# def get_merge_weight(p, t):
-#     p = p.astype(dtype=np.float64)
-#     t = t.astype(dtype=np.float64)
-#     n = p.shape[0]
-#
-#     G = -1 * spdiag(matrix(1.0, (n, 1)))
-#     h = matrix(0.0, (n, 1))
-#     A = matrix(1.0, (1, n))
-#     b = matrix(1.0, (1, 1))
-#
-#     def F(x=None, z=None):
-#         if x is None:
-#             x0 = np.ones((n, 1), dtype=np.float64)/n
-#             return 0, matrix(x0)
-#         if min(x) < 0.0:
-#             return None
-#         w = np.array(x)
-#         w = np.reshape(w.T, (n, 1, 1))
-#
-#         # forward pass
-#         y0 = p * 100
-#         y1 = y0 * w
-#         y2 = np.sum(y1, axis=0)
-#         y3 = np.exp(y2)
-#         y4 = np.sum(y3, axis=1)[:, None]
-#         y5 = y3 / y4
-#         y6 = y5 - t
-#         y7 = np.power(y6, 2)
-#         f = np.sum(y7[:])
-#
-#         y8 = 2 * y6 * y5 * (1 - y5)
-#         y9 = y8[None, :, :]
-#         y10 = y9 * y0
-#         Df = np.sum(np.sum(y10, axis=2), axis=1)
-#         Df = np.reshape(Df, (1, -1))
-#         Df = matrix(Df)
-#         if z is None:
-#             return f, Df
-#         y11 = 2 * (-3 * np.power(y5, 2) + (2 + 2 * t) * y5 - t) * y5 * (1 - y5)
-#         y12 = np.reshape(y11, (1, -1))
-#         y13 = np.reshape(y0, (3, -1))
-#         y14 = y13 * y12
-#         H = y14 @ y13.T
-#         H = matrix(H) * z[0]
-#         return f, Df, H
-#
-#     sol = solvers.cp(F)
-#     # sol = solvers.cp(F, G=G, h=h, A=A, b=b)
-#
-#     return np.array(sol['x'].T)
-
-def obj_fun(x, t, w, n):
-    w = np.reshape(w, (n, 1, 1))
-
-    # forward pass
-    y0 = x * 100
-    y1 = y0 * w
-    y2 = np.sum(y1, axis=0)
-    y3 = np.exp(y2)
-    y4 = np.sum(y3, axis=1)[:, None]
-    y5 = y3 / y4
-    y6 = y5 - t
-    y7 = np.power(y6, 2)
-    f = np.sum(y7[:]) / 1000
-
-    y8 = 2 * y6 * y5 * (1 - y5) / 1000 * t
-    y9 = y8[None, :, :]
-    y10 = y9 * y0
-    Df = np.sum(np.sum(y10, axis=2), axis=1)
-    Df = np.reshape(Df, (-1, 1))
-    return f, Df
-
-
-def get_merge_weight(x, t):
-    x = x.astype(dtype=np.float64)
-    t = t.astype(dtype=np.float64)
-    n = x.shape[0]
-
-    def min_obj(w):
-        w = np.reshape(w, (-1, 1, 1))
-        y0 = x * 100
-        y1 = y0 * w
-        y2 = np.sum(y1, axis=0)
-        y3 = np.exp(y2)
-        y4 = np.sum(y3, axis=1)[:, None]
-        y5 = y3 / y4
-        y6 = (y5 - t) / 10000
-        y7 = np.power(y6, 2)
-        f = np.sum(y7[:])
-        return f
-
-    def obj_der(w):
-        w = np.reshape(w, (-1, 1, 1))
-        y0 = x * 100
-        y1 = y0 * w
-        y2 = np.sum(y1, axis=0)
-        y3 = np.exp(y2)
-        y4 = np.sum(y3, axis=1)[:, None]
-        y5 = y3 / y4
-        y6 = y5 - t
-
-        y8 = 2 * y6 * y5 * (1 - y5) / 10000
-        y9 = y8[None, :, :]
-        y10 = y9 * y0
-        df = np.sum(np.sum(y10, axis=2), axis=1)
-        df = np.reshape(df, (-1,))
-
-        return df
-
-    def obj_hess(w):
-        w = np.reshape(w, (-1, 1, 1))
-        y0 = x * 100
-        y1 = y0 * w
-        y2 = np.sum(y1, axis=0)
-        y3 = np.exp(y2)
-        y4 = np.sum(y3, axis=1)[:, None]
-        y5 = y3 / y4
-
-        y11 = 2 * (-3 * np.power(y5, 2) + (2 + 2 * t) * y5 - t) * y5 * (1 - y5) / 10000
-        y12 = np.reshape(y11, (1, -1))
-        y13 = np.reshape(y0, (3, -1))
-        y14 = y13 * y12
-        H = y14 @ y13.T
-        return H
-
-    w0 = np.ones((n,), dtype=np.float64) / n
-    res = minimize(min_obj, w0, method='trust-exact', jac=obj_der, hess=obj_hess,
-                   options={'gtol': 1e-6, 'disp': True})
-    best_w = res.x
-    return best_w
 
 
 @DATASETS.register_module()
@@ -935,11 +804,46 @@ class WTIMCDataset(Dataset):
             pre_data = softmax(pre_data, axis=1)
             pre_data = pre_data[None, :, :]
             pre_matrix.append(pre_data)
+
         pre_matrix = np.concatenate(pre_matrix, axis=0)
-        w = get_merge_weight(pre_matrix, self.targets)
+        pre_max_index = np.argmax(pre_matrix, axis=2)
+        pre_max_index = np.sum(pre_max_index, axis=0)
+        gt_max_index = np.argmax(self.targets, axis=1)*len(pre_matrix)
+        no_zero_index = np.nonzero((pre_max_index - gt_max_index))[0]
+
+        bad_pre_matrix = pre_matrix[:, no_zero_index[:], :]
+        targets = self.targets[no_zero_index[:], :]
+
+        #
+        optimization_start_time = time.time()
+        w = get_merge_weight_by_optimization(bad_pre_matrix, targets)
+        optimization_time = time.time() - optimization_start_time
         merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results_dict), -1)))
         merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
         eval_results = self._evaluate_mod(merge_matrix, prefix='merge/')
+
+
+        ## This part of code is only for the ablation study about HCGDNN, which should be commented in the usual way.
+        print('\n====================================================================================\n')
+        print('time:%f, accuracy:%f'.format(optimization_time, eval_results['merge/snr_mean_all']))
+        print('\n=====================================================================================\n')
+        search_step_list = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+        for search_step in search_step_list:
+            search_weight_list = get_merge_weight_by_search(len(results_dict), search_step)
+            cur_max_accuracy = 0
+            search_start_time = 0
+            for search_weight in search_weight_list:
+                search_weight = np.array(search_weight)
+                search_weight = np.reshape(search_weight, (1, -1))
+                merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results_dict), -1)))
+                merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
+                tmp_eval_results = self._evaluate_mod(merge_matrix, prefix='tmp/')
+                if cur_max_accuracy > tmp_eval_results['tmp/snr_mean_all']:
+                    cur_max_accuracy = tmp_eval_results['tmp/snr_mean_all']
+            search_time = time.time() - search_start_time
+            print('\n====================================================================================\n')
+            print('time:%f, accuracy:%f'.format(search_time, cur_max_accuracy))
+            print('\n====================================================================================\n')
 
         return eval_results
 
@@ -965,7 +869,7 @@ class WTIMCDataset(Dataset):
                     format_results[key_str], prefix=key_str + '/')
                 eval_results.update(sub_eval_results)
 
-            if self.merge_res:
+            if self.merge_res and len(format_results)>1:
                 merge_results = self._process_merge(format_results)
                 eval_results.update(merge_results)
             # format_results.pop('snr', None)
@@ -994,22 +898,27 @@ class WTIMCDataset(Dataset):
             'The length of results is not equal to the dataset len: {} != {}'.
                 format(len(results), len(self)))
 
-        def format_out_single(results, save_path):
-            results = [result.reshape(1, -1) for result in results]
-            results = np.concatenate(results, axis=0)
-            results = np.reshape(results, (len(self), -1))
-            np.save(save_path, results)
+        def format_out_single(res, file_path):
+            res = [result.reshape(1, -1) for result in res]
+            res = np.concatenate(res, axis=0)
+            res = np.reshape(res, (len(self), -1))
+            np.save(file_path, res)
 
         if isinstance(results[0], dict):
-            format_results = {key_str: [] for key_str in results[0].keys()}
+            format_results = {key_str: [] for key_str in results[0]}
             for item in results:
-                for key_str in item.keys():
+                for key_str in item:
                     format_results[key_str].append(item[key_str])
 
             for key_str in format_results.keys():
                 sub_results = format_results[key_str]
                 save_path = os.path.join(out_dir, key_str + '.npy')
                 format_out_single(sub_results, save_path)
+
+            if self.merge_res and len(format_results)>1:
+                save_path = os.path.join(out_dir, 'pre.npy')
+                merge_results = self._process_merge(format_results)
+                format_out_single(merge_results, save_path)
         else:
             save_path = os.path.join(out_dir, 'pre.npy')
             format_out_single(results, save_path)

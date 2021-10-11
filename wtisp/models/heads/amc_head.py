@@ -206,7 +206,7 @@ class MLHead(BaseHead):
         x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
         merge_pre = self.classifier_head[3](x)
 
-        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -248,7 +248,7 @@ class MLHeadNoWeight(BaseHead):
         x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
         merge_pre = self.classifier_head[3](x)
 
-        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -290,7 +290,7 @@ class FMLHeadNoWeight(BaseHead):
         x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
         merge_pre = self.classifier_head[3](x)
 
-        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -457,7 +457,7 @@ class FMLHead(BaseHead):
         x = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
         merge_pre = self.classifier_head[3](x)
 
-        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge_pre=merge_pre)
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, pre=merge_pre)
 
 
 @HEADS.register_module()
@@ -507,7 +507,7 @@ class FMLAUXHead(BaseHead):
         x_ = dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre)
         merge_pre = self.classifier_head[3](x_)
 
-        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, merge=merge_pre, inter_pre=x[3],
+        return dict(snr_pre=snr_pre, low_pre=low_pre, high_pre=high_pre, pre=merge_pre, inter_pre=x[3],
                     intra_pre=x[3])
 
 

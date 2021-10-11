@@ -6,10 +6,10 @@ from ...common.utils import outs2result
 
 
 @TASKS.register_module()
-class HCLDNN(BaseAMC):
+class HCGDNN(BaseAMC):
 
     def __init__(self, backbone, classifier_head, channel_mode=False, train_cfg=None, test_cfg=None):
-        super(HCLDNN, self).__init__()
+        super(HCGDNN, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
         self.channel_mode= channel_mode
@@ -30,7 +30,7 @@ class HCLDNN(BaseAMC):
             pre_trained (str, optional): Path to pre-trained weights.
                 Defaults to None.
         """
-        super(HCLDNN, self).init_weights(pre_trained)
+        super(HCGDNN, self).init_weights(pre_trained)
         self.backbone.init_weights(pre_trained=pre_trained)
 
         self.classifier_head.init_weights()
