@@ -469,6 +469,7 @@ class DictAction(Action):
 def filter_config(cfg, is_regeneration=False, mode='test'):
     configs = []
     train_configs = dict()
+    no_test_configs = dict()
     config_legend_map = dict()
     config_method_map = dict()
 
@@ -527,24 +528,26 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         if osp.isdir(osp.join(cfg.log_dir, config)):
             format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
             json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
-            npy_paths = glob.glob(osp.join(format_out_dir, '*.npy'))
-            if not is_regeneration:
-                if (len(json_paths) == 1) and ((len(npy_paths) == 1) or (len(npy_paths) == 4)) and (
-                        not is_regeneration):
-                    continue
-        if 'feature_based' in config:
-            train_configs[config] = -1
-        else:
-            print(config)
-            best_epoch = get_the_best_checkpoint(
-                cfg.log_dir, config)
-            if best_epoch > 0:
-                train_configs[config] = best_epoch
+            if 'feature_based' in config:
+                train_configs[config] = -1
+            else:
+                best_epoch = get_the_best_checkpoint(
+                    cfg.log_dir, config)
+                if best_epoch > 0:
+                    train_configs[config] = best_epoch
+            if len(json_paths) != 1:
+                no_test_configs[config] = train_configs[config]
 
-    no_train_configs = list(set(configs) - set(train_configs.keys()))
+    if is_regeneration:
+        no_train_configs = list(set(configs))
+    else:
+        no_train_configs = list(set(configs) - set(train_configs.keys()))
+
+    if is_regeneration:
+        no_test_configs = train_configs
 
     if mode is 'test':
-        return train_configs
+        return no_test_configs
     elif mode is 'train':
         return no_train_configs
     elif mode is 'summary':

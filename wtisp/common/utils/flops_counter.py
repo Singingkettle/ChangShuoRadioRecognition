@@ -84,6 +84,8 @@ def get_model_complexity_info(model,
     flops_model.start_flops_count()
 
     def generate_input_tensor(shape):
+        if shape is None:
+            return None
         try:
             data = torch.ones(()).new_empty(
                 (1, *shape),

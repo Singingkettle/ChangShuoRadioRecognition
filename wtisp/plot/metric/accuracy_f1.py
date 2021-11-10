@@ -199,18 +199,19 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     plt.close(fig)
 
 
-def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_config, reorder=True):
+def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_config, reorder=False):
     if reorder:
         modulation_f1s = reorder_results(modulation_f1s)
 
     CLASSES = modulation_f1s[0]['CLASSES']
+    print(CLASSES)
     theta = radar_factory(len(CLASSES), frame='polygon')
     fig, ax = plt.subplots(figsize=(8, 8), nrows=1, ncols=1, subplot_kw=dict(projection='radar'))
     fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9)
 
     f1s_list = []
     legend_list = []
-    ax.set_rgrids([0.2, 0.4, 0.6, 0.8, 1.0])
+    color_dict = dict(CNN='red', BiGRU1='green', BiGRU2='blue')
     for i, modulation_f1 in enumerate(modulation_f1s):
         f1s = modulation_f1['f1s']
         average_f1 = modulation_f1['average_f1']
@@ -218,14 +219,19 @@ def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_con
         legend_name = method_name + ' [{:.3f}]'.format(average_f1)
         f1s_list.append(f1s)
         legend_list.append(legend_name)
-        ax.plot(theta, f1s, color=legend_config[legend[method_name]]['color'])
-        ax.fill(theta, f1s, facecolor=legend_config[legend[method_name]]['color'], alpha=0.25)
-    ax.set_varlabels(CLASSES)
+        if method_name in color_dict:
+            ax.plot(theta, f1s, color=color_dict[method_name])
+            ax.fill(theta, f1s, facecolor=color_dict[method_name], alpha=0.25)
+        else:
+            ax.plot(theta, f1s, color=legend_config[legend[method_name]]['color'], linewidth=0.1)
+            ax.fill(theta, f1s, facecolor=legend_config[legend[method_name]]['color'], alpha=0.25)
+    ax.set_rgrids([0.2, 0.4, 0.6, 0.8, 1.0], angle=-45, fontsize=18)
+    ax.set_thetagrids(np.degrees(theta), CLASSES, fontsize=18)
     leg = ax.legend(legend_list, loc='upper center', bbox_to_anchor=(0.5, -0.05),
-                    prop={'size': 10, 'weight': 'bold'}, handletextpad=0.2,
-                    markerscale=20, ncol=len(legend_list), columnspacing=0.2)
+                    prop={'size': 18, 'weight': 'bold'}, handletextpad=0.2,
+                    markerscale=20, ncol=4, columnspacing=0.2)
     leg.get_frame().set_edgecolor('black')
-    ax.set_title('Modulation-F1 Score Radar Chart', fontsize=18, fontweight='bold')
+    ax.set_title('Modulation-F1 Score Radar Chart', fontsize=24, fontweight='bold')
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
     plt.close(fig)

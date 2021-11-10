@@ -45,18 +45,51 @@ legend = {
     'Fast MLDNN-FL-CM-CN-EP': 42,
     'Fast MLDNN-CE-CM-CN-EP': 43,
     'HCGDNN': 44,
-    'HCGDNN-CNN': 45,
-    'HCGDNN-GRU1': 46,
-    'HCGDNN-GRU2': 47,
+    'CNN': 45,
+    'BiGRU1': 46,
+    'BiGRU2': 47,
     'HCGDNN-CG1': 48,
     'HCGDNN-CG2': 49,
+    'HCGDNN-G1G2': 50,
 }
+
+scatter = [
+    'FM',
+    'AM-SSB-SC',
+    'AM-DSB-SC',
+    'AM-SSB-WC',
+    'AM-DSB-WC',
+    'AM-DSB',
+    'AM-SSB',
+    'WBFM',
+    '8PSK',
+    'BPSK',
+    'CPFSK',
+    'GFSK',
+    '4PAM',
+    '16QAM',
+    '64QAM',
+    'QPSK',
+    '32PSK',
+    '16ASK',
+    '32QAM',
+    'GMSK',
+    'OQPSK',
+    '4ASK',
+    '16PSK',
+    '64APSK',
+    '128QAM',
+    '64QAM',
+    '256QAM',
+    'OOK',
+]
 
 plot = dict(
     type='CommonPlot',
     log_dir=log_dir,
-    config='hcgdnn_hcgnetv2_100_288_lr-0.00044-step-800_deepsig_iq_201610A',
+    config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
     legend=legend,
+    scatter=scatter,
 
     # Set the configs about confusion maps
     confusion_map=[
@@ -65,7 +98,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_201610A.pdf',
             method=dict(
-                config='hcgdnn_hcgnetv2_100_288_lr-0.00044-step-800_deepsig_iq_201610A',
+                config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
                 name='HCGDNN',
             ),
         ),
@@ -83,36 +116,36 @@ plot = dict(
                 # CNN
                 dict(
                     config='hcgdnn_abl_cnn_deepsig_iq_201610A',
-                    name='HCGDNN-CNN',
+                    name='CNN',
                 ),
                 # GRU1
                 dict(
                     config='hcgdnn_abl_gru1_deepsig_iq_201610A',
-                    name='HCGDNN-GRU1',
+                    name='BiGRU1',
                 ),
                 # GRU2
                 dict(
                     config='hcgdnn_abl_gru2_deepsig_iq_201610A',
-                    name='HCGDNN-GRU2',
+                    name='BiGRU2',
                 ),
-                # CNN+GRU1
+                # CNN+GRU1+NO-Share
                 dict(
-                    config='hcgdnn_abl_cg1_deepsig_iq_201610A',
+                    config='hcgdnn_abl_cg1_no_share_deepsig_iq_201610A',
                     name='HCGDNN-CG1',
                 ),
-                # CNN+GRU2
+                # CNN+GRU2+NO-Share
                 dict(
-                    config='hcgdnn_abl_cg2_deepsig_iq_201610A',
+                    config='hcgdnn_abl_cg2_no_share_deepsig_iq_201610A',
                     name='HCGDNN-CG2',
                 ),
-                # GRU1+GRU2
+                # GRU1+GRU2+NO-Share
                 dict(
-                    config='hcgdnn_abl_g1G2_deepsig_iq_201610A',
+                    config='hcgdnn_abl_g1g2_no_share_deepsig_iq_201610A',
                     name='HCGDNN-G1G2',
                 ),
-                # Final Version
+                # Final Version+NO-Share
                 dict(
-                    config='hcgdnn_hcgnetv2_100_288_lr-0.00044-step-800_deepsig_iq_201610A',
+                    config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
                     name='HCGDNN',
                 ),
             ],
@@ -128,12 +161,12 @@ plot = dict(
                 # CNN
                 dict(
                     config='hcgdnn_abl_cnn_deepsig_iq_201610A',
-                    name='HCGDNN-CNN',
+                    name='CNN',
                 ),
                 # GRU1
                 dict(
                     config='hcgdnn_abl_gru1_deepsig_iq_201610A',
-                    name='HCGDNN-GRU1',
+                    name='BiGRU1',
                 ),
             ],
         ),
@@ -147,12 +180,12 @@ plot = dict(
                 # CNN
                 dict(
                     config='hcgdnn_abl_cnn_deepsig_iq_201610A',
-                    name='HCGDNN-CNN',
+                    name='CNN',
                 ),
                 # GRU2
                 dict(
                     config='hcgdnn_abl_gru2_deepsig_iq_201610A',
-                    name='HCGDNN-GRU2',
+                    name='BiGRU2',
                 ),
             ],
         ),
@@ -166,12 +199,12 @@ plot = dict(
                 # GRU1
                 dict(
                     config='hcgdnn_abl_gru1_deepsig_iq_201610A',
-                    name='HCGDNN-GRU1',
+                    name='BiGRU1',
                 ),
                 # GRU2
                 dict(
                     config='hcgdnn_abl_gru2_deepsig_iq_201610A',
-                    name='HCGDNN-GRU2',
+                    name='BiGRU2',
                 ),
             ],
         ),
@@ -185,7 +218,7 @@ plot = dict(
             method=[
                 # deepsig 201610A compare with I/Q A/P
                 dict(
-                    config='hcgdnn_hcgnetv2_100_288_lr-0.00044-step-800_deepsig_iq_201610A',
+                    config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
                     name='HCGDNN',
                 ),
                 dict(
@@ -241,6 +274,23 @@ plot = dict(
                 ),
             ],
         ),
+        # # deepsig 201801A
+        # dict(
+        #     type='AccuracyF1Plot',
+        #     name='deepsig_201801A.pdf',
+        #     legend=legend,
+        #     log_dir=log_dir,
+        #     method=[
+        #         dict(
+        #             config='hcgdnn_lr-0.00100_deepsig_iq_201801A',
+        #             name='HCGDNN',
+        #         ),
+        #         dict(
+        #             config='hcgdnn_lr-0.00150_deepsig_iq_201801A',
+        #             name='HCGDNN',
+        #         ),
+        #     ],
+        # ),
     ],
     flops=dict(
         type='GetFlops',
@@ -248,9 +298,9 @@ plot = dict(
         method=[
             # Fast MLDNN
             dict(
-                config='hcgdnn_hcgnetv2_100_288_lr-0.00044-step-800_deepsig_iq_201610A',
+                config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
                 name='HCGDNN',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+                input_shape=[(2, 1, 128), None, None],
             ),
             dict(
                 config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',

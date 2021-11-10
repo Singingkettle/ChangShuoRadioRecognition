@@ -5,11 +5,12 @@ from .ghm_loss import GHMC
 from .logistic_loss import LogisticLoss, InfoNCELoss
 from .mse_loss import MSELoss, mse_loss
 from .nll_loss import NLLLoss, nll
+from .kldiv_loss import KLDIVLoss, kldiv
 from .utils import reduce_loss, weight_reduce_loss, weighted_loss
 
 __all__ = [
     'MSELoss', 'mse_loss', 'CrossEntropyLoss', 'cross_entropy',
     'NLLLoss', 'nll', 'reduce_loss',
     'weight_reduce_loss', 'weighted_loss', 'FocalLoss', 'sigmoid_focal_loss',
-    'ContrastiveLoss', 'GHMC', 'InfoNCELoss'
+    'ContrastiveLoss', 'GHMC', 'InfoNCELoss', 'KLDIVLoss', 'kldiv'
 ]

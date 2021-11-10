@@ -23,10 +23,11 @@ from .rilcldnn import RILCLDNN
 from .sei import BaseSEI
 from .separator import BaseSeparator
 from .tcnn import TCNN
+from .dtn import DTN
 
 __all__ = [
     'BaseSeparator', 'BaseAMC', 'TCNN', 'CLDNN', 'CNN2', 'CNN3', 'CNN4',
     'CRNN', 'DensCNN', 'DSCLDNN', 'MLCLDNN', 'MLDSCLDNN', 'ResCNN', 'RILCLDNN',
     'CTDNN', 'MLDNN', 'HCGDNN', 'FMLDNN', 'HardEasy', 'CNNCO', 'BaseSEI', 'MBRFI',
-    'ResCLDNN', 'MCT'
+    'ResCLDNN', 'MCT', 'DTN'
 ]

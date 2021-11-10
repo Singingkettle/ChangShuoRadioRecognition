@@ -1,4 +1,5 @@
 from .amc_data import WTIMCDataset
+from .amc_online import WTIMCOnlineDataset
 from .amc_snr import WTISNRDataset
 from .aug_amc import AUGMCDataset
 from .builder import DATASETS, build_dataset, build_dataloader
@@ -14,5 +15,5 @@ from .slot_data import SlotDataset
 __all__ = [
     'DATASETS', 'build_dataset', 'build_dataloader', 'WTIMCDataset', 'AUGMCDataset',
     'WTISNRDataset', 'WTIRILDataset', 'ClassBalancedDataset', 'ConcatDataset', 'RepeatDataset',
-    'FBDataset', 'WTISEIDataset', 'SlotDataset', 'SlotDatasetV2', 'SEICEMEEDataset'
+    'FBDataset', 'WTISEIDataset', 'SlotDataset', 'SlotDatasetV2', 'SEICEMEEDataset', 'WTIMCOnlineDataset'
 ]

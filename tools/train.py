@@ -143,6 +143,7 @@ def main():
 
     if hasattr(datasets[0], 'CLASSES'):
         model.CLASSES = datasets[0].CLASSES
+        meta['CLASSES'] = datasets[0].CLASSES
 
     train_task(model, datasets, cfg, distributed=distributed, validate=(not args.no_validate),
                timestamp=timestamp, meta=meta)

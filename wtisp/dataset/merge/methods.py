@@ -123,10 +123,6 @@ def get_merge_weight_by_optimization(x, t):
 
         return H
 
-    # w0 = np.ones((m,), dtype=np.float64)/m
-    # res = minimize(min_obj, w0, method='trust-exact', jac=obj_der, hess=obj_hess,
-    #                options={'gtol': 1e-6, 'disp': True})
-
     w0 = np.zeros((m,), dtype=np.float64)
     w0[-1] = 1
 

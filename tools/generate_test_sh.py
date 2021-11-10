@@ -9,7 +9,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='WTISignalProcessing Generate Test.sh File')
     parser.add_argument('config', help='plot config file path')
-    parser.add_argument('--is_regeneration', default=False, type=bool, help='is retest')
+    parser.add_argument('--is_regeneration', default=True, type=bool, help='is retest')
     args = parser.parse_args()
     return args
 
@@ -30,6 +30,8 @@ def main():
     with open(test_sh_name, 'w') as f:
         method_index = 0
         for config, epoch in train_configs.items():
+            if epoch == 0:
+                continue
             if epoch == -1:
                 python_sh = 'python tools/test_fb.py'
             else:
@@ -47,7 +49,7 @@ def main():
 
             if epoch == -1:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
-                          '--format-out ' + format_out_sh + '\n\n\n'
+                          '--format_out ' + format_out_sh + '\n\n\n'
             else:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
                           '--format-out ' + format_out_sh + ' --launcher pytorch\n\n\n'

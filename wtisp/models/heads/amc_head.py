@@ -525,7 +525,7 @@ class FAMCAUXHead(BaseHead):
         if aux_head is None:
             dict(
                 type='IntraOrthogonalHead',
-                in_features=in_features,  # keep the same as snr head
+                in_features=out_features,  # keep the same as snr head
                 batch_size=batch_size,  # keep the same as samples_per_gpu
                 num_classes=num_classes,
                 mm='inner_product',

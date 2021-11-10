@@ -6,10 +6,10 @@ from ...common.utils import outs2result
 
 
 @TASKS.register_module()
-class HCGDNN(BaseAMC):
+class MCT(BaseAMC):
 
     def __init__(self, backbone, classifier_head, channel_mode=False, train_cfg=None, test_cfg=None):
-        super(HCGDNN, self).__init__()
+        super(MCT, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
         self.channel_mode = channel_mode
@@ -30,7 +30,7 @@ class HCGDNN(BaseAMC):
             pre_trained (str, optional): Path to pre-trained weights.
                 Defaults to None.
         """
-        super(HCGDNN, self).init_weights(pre_trained)
+        super(MCT, self).init_weights(pre_trained)
         self.backbone.init_weights(pre_trained=pre_trained)
 
         self.classifier_head.init_weights()
@@ -96,5 +96,5 @@ class HCGDNN(BaseAMC):
             else:
                 x = torch.cat((iqs, aps), dim=2)
         x = self.extract_feat(x)
-        outs = self.classifier_head(x, vis_fea=self.vis_fea)
+        outs = self.classifier_head(x, vis_fea=self.vis_fea, mode='test')
         return outs

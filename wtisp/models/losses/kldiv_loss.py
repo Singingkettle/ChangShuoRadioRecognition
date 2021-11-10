@@ -1,3 +1,13 @@
+#!/usr/bin/python3
+# -*- coding:utf-8 -*-
+"""
+Project: wtisignalprocessing
+File: kldiv_loss.py
+Author: Citybuster
+Time: 2021/10/28 21:45
+Email: chagshuo@bupt.edu.cn
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,12 +16,11 @@ from .utils import weight_reduce_loss
 from ..builder import LOSSES
 
 
-def nll(pred,
-        label,
-        weight=None,
-        reduction='mean',
-        avg_factor=None,
-        class_weight=None):
+def kldiv(pred,
+          label,
+          weight=None,
+          reduction='mean',
+          avg_factor=None):
     """Calculate the negative log likelihood loss.
 
     Args:
@@ -28,8 +37,8 @@ def nll(pred,
         torch.Tensor: The calculated loss
     """
     # element-wise losses
-    label = label.view(-1)
-    loss = F.nll_loss(pred, label, weight=class_weight, reduction='none')
+    pred = F.log_softmax(pred, dim=1)
+    loss = F.kl_div(pred, label, reduction='none')
 
     # apply weights and do the reduction
     if weight is not None:
@@ -41,36 +50,32 @@ def nll(pred,
 
 
 @LOSSES.register_module()
-class NLLLoss(nn.Module):
+class KLDIVLoss(nn.Module):
 
     def __init__(self,
                  multi_label=False,
                  reduction='mean',
-                 class_weight=None,
                  loss_weight=1.0):
         """NLLLoss.
 
         Args:
-            multi_label (bool, optional): Whether the input data has multilabel. 
+            multi_label (bool, optional): Whether the input data has multilabel.
             Defaults to False.
             reduction (str, optional): . Defaults to 'mean'.
                 Options are "none", "mean" and "sum".
-            class_weight (list[float], optional): Weight of each class.
-                Defaults to None.
             loss_weight (float, optional): Weight of the loss. Defaults to 1.0.
         """
-        super(NLLLoss, self).__init__()
+        super(KLDIVLoss, self).__init__()
         self.multi_label = multi_label
         self.reduction = reduction
         self.loss_weight = loss_weight
-        self.class_weight = class_weight
 
         if self.multi_label:
             # TODO: support multi_label prediction
             # self.cls_criterion = multilabel_cross_entropy
             pass
         else:
-            self.cls_criterion = nll
+            self.cls_criterion = kldiv
 
     def forward(self,
                 cls_score,
@@ -95,15 +100,10 @@ class NLLLoss(nn.Module):
         assert reduction_override in (None, 'none', 'mean', 'sum')
         reduction = (
             reduction_override if reduction_override else self.reduction)
-        if self.class_weight is not None:
-            class_weight = cls_score.new_tensor(self.class_weight)
-        else:
-            class_weight = None
         loss_cls = self.loss_weight * self.cls_criterion(
             cls_score,
             label,
             weight,
-            class_weight=class_weight,
             reduction=reduction,
             avg_factor=avg_factor)
         return loss_cls

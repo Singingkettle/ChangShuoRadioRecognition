@@ -15,8 +15,8 @@ class LegendConfig:
             'magenta', 'palevioletred', 'gold', 'fuchsia', 'lawngreen', 'blueviolet', 'peru', 'peachpuff',
             'rosybrown', 'darkkhaki', 'tan'
         ]
-        random.Random(10).shuffle(self.colors)
-
+        random.Random(1).shuffle(self.colors)
+        self.colors = self.colors * num_methods
         self.linestyles = ['-', '--', '-.', ':'] * num_methods
         self.markers = [
                            '.', 'o', 'v', '^', '<', '>',

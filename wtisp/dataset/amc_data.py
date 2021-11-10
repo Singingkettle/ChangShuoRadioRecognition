@@ -166,7 +166,7 @@ class WTIMCDataset(Dataset):
 
         #
         if self.use_teacher_label:
-            self.teacher_labels = self._generate_teacher_labels()
+            self.teacher_labels = self._load_teacher_labels()
 
         # set group flag for the sampler
         if not self.test_mode:
@@ -284,9 +284,9 @@ class WTIMCDataset(Dataset):
             for class_index in labels:
                 self.mix_mod_labels[idx, class_index] = 1
 
-    def _generate_teacher_labels(self):
-        data_dict = pickle.load(open(os.path.join(self.data_root, self.teacher_config['filename']), 'rb'))
-        teacher_labels = data_dict[self.teacher_config['lambda_val']]
+    def _load_teacher_labels(self):
+        teacher_labels = np.load(
+            os.path.join(self.teacher_config['filename'], 'format_out_for_distillation/pre.npy'))
 
         return teacher_labels.astype(dtype=np.float32)
 
@@ -618,7 +618,7 @@ class WTIMCDataset(Dataset):
                 conf, title='Mean of all snr Confusion matrix', labels=self.CLASSES)
         return eval_results
 
-    def _evaluate_mod(self, results, prefix=''):
+    def _evaluate_mod(self, results, prefix='', return_f1=False):
         confusion_matrix = np.zeros((len(self.SNRS), len(
             self.CLASSES), len(self.CLASSES)), dtype=np.float64)
 
@@ -655,7 +655,17 @@ class WTIMCDataset(Dataset):
         if self.confusion_plot:
             eval_results[prefix + 'snr_mean_all_conf_figure'] = self._plot_confusion_matrix(
                 conf, title='Mean of all snr Confusion matrix', labels=self.CLASSES)
-        return eval_results
+
+        if return_f1:
+            f1s = list()
+            for i in range(len(self.CLASSES)):
+                f1 = 2.0 * conf[i, i] / \
+                     (np.sum(conf[i, :]) + np.sum(conf[:, i]))
+                f1s.append(f1)
+            average_f1 = sum(f1s) / float(len(self.CLASSES))
+            return eval_results, average_f1
+        else:
+            return eval_results
 
     def _evaluate_mod_mix(self, results, prefix=''):
 
@@ -818,30 +828,37 @@ class WTIMCDataset(Dataset):
         optimization_start_time = time.time()
         w = get_merge_weight_by_optimization(bad_pre_matrix, targets)
         optimization_time = time.time() - optimization_start_time
+        print(w)
         merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results_dict), -1)))
         merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
-        eval_results = self._evaluate_mod(merge_matrix, prefix='final/')
+        eval_results, eval_f1 = self._evaluate_mod(merge_matrix, prefix='final/', return_f1=True)
 
         ## This part of code is only for the ablation study about HCGDNN, which should be commented in the usual way.
         print('\n====================================================================================\n')
-        print('time:{:f}, accuracy:{:f}'.format(optimization_time, eval_results['final/snr_mean_all']))
+        print(
+            'time:{:f}, accuracy:{:f}, f1:{:f}'.format(optimization_time, eval_results['final/snr_mean_all'], eval_f1))
         print('\n=====================================================================================\n')
-        search_step_list = [0.1, 0.01]
+        search_step_list = [0.2, 0.1, 0.01]
         for search_step in search_step_list:
             search_start_time = time.time()
             search_weight_list = get_merge_weight_by_search(len(results_dict), search_step)
             cur_max_accuracy = 0
+            cur_f1 = 0
+            cur_search_weight = None
             for search_weight in search_weight_list:
                 search_weight = np.array(search_weight)
                 search_weight = np.reshape(search_weight, (1, -1))
                 tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results_dict), -1)))
                 tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, len(self.CLASSES)))
-                tmp_eval_results = self._evaluate_mod(tmp_merge_matrix, prefix='tmp/')
+                tmp_eval_results, tmp_f1 = self._evaluate_mod(tmp_merge_matrix, prefix='tmp/', return_f1=True)
                 if cur_max_accuracy < tmp_eval_results['tmp/snr_mean_all']:
                     cur_max_accuracy = tmp_eval_results['tmp/snr_mean_all']
+                    cur_f1 = tmp_f1
+                    cur_search_weight = search_weight
+            print(cur_search_weight)
             search_time = time.time() - search_start_time
             print('\n====================================================================================\n')
-            print('time:{:f}, accuracy:{:f}'.format(search_time, cur_max_accuracy))
+            print('time:{:f}, accuracy:{:f}, f1:{:f}'.format(search_time, cur_max_accuracy, cur_f1))
             print('\n====================================================================================\n')
 
         return eval_results, merge_matrix
