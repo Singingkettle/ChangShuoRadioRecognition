@@ -18,11 +18,11 @@ import torch
 import zmq
 from torch.utils.tensorboard import SummaryWriter
 
-from wtisp.common.utils import Config, fuse_conv_bn
+from wtisp.common.utils import Config, fuse_conv_bn, mkdir_or_exist
 from wtisp.dataset import build_dataset
 from wtisp.dataset.online import Transform
 from wtisp.models import build_task
-from wtisp.runner import (load_checkpoint)
+from wtisp.runner import load_checkpoint
 
 _IS_SIG_UP = False
 
@@ -94,6 +94,8 @@ def main():
     else:
         # use config filename as default work_dir if cfg.work_dir is None
         log_dir = osp.join('./online_performance_dirs', osp.splitext(osp.basename(args.config))[0])
+    log_dir = osp.join(log_dir, 'tf_logs')
+    mkdir_or_exist(log_dir)
 
     # safely exit
     signal.signal(signal.SIGINT, sigint_handler)

@@ -48,7 +48,8 @@ class LogisticLoss(nn.Module):
         Returns:
             torch.Tensor: The calculated loss
         """
-        x = torch.log(1 + torch.exp(-1 * torch.multiply(inner_product, label) / self.temperature))
+        x = -1 * torch.multiply(inner_product, label) * self.temperature
+        x = torch.log(1 + torch.exp(x))
         x = torch.multiply(x, weight)  # (N, C)
         x = torch.sum(x, dim=1)  # (N,)
         loss_logistic = self.loss_weight * weight_reduce_loss(x, reduction=self.reduction)
@@ -76,19 +77,20 @@ class InfoNCELoss(nn.Module):
         self.temperature = temperature
         self.loss_weight = loss_weight
 
-    def forward(self, inner_product, label):
+    def forward(self, inner_product, label, weight):
         """Forward function.
 
         Args:
             inner_product (torch.Tensor): distance.
             label (torch.Tensor): 0 (self-inner_product which should be ignored), -1, or 1
+            weight (torch.Tensor): 0 (self-inner_product which should be ignored) or
+                frac{1}{2N^+}, frac{1}{2N^-}
         Returns:
             torch.Tensor: The calculated loss
         """
-        x = -1 * F.log_softmax(inner_product / self.temperature, dim=1)
-        x = torch.multiply(x, label)
-        weight = torch.mean(label, dim=1)
-        x = torch.multiply(x, weight[:, None])
+        x = torch.multiply(inner_product * self.temperature, label)
+        x = -1 * F.log_softmax(x, dim=1)
+        x = torch.multiply(x, weight)  # (N, C)
         x = torch.sum(x, dim=1)  # (N,)
-        loss_logistic = self.loss_weight * weight_reduce_loss(x, reduction=self.reduction)
-        return loss_logistic
+        loss = self.loss_weight * weight_reduce_loss(x, reduction=self.reduction)
+        return loss

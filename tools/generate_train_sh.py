@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--group_num', default=24, type=int, help='number of configs in one train.sh file')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('--multi_gpu', default=True, action='store_true',
-                        help='the dir to save logs and models')
+                        help='use parallel training')
     args = parser.parse_args()
     return args
 

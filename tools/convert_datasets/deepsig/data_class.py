@@ -59,8 +59,9 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
     if not osp.isdir(ap_dir):
         os.makedirs(ap_dir)
     ap_path = osp.join(ap_dir, item['filename'])
-    amplitude = np.sqrt(np.sum(np.power(item['data'], 2), axis=0))
-    phase = np.arctan(item['data'][0, :] / (item['data'][1, :] + np.finfo(np.float64).eps))
+    data = item['data'][0, :] + 1j*item['data'][1, :]
+    amplitude = np.abs(data)
+    phase = np.angle(data)
     ap_data = np.vstack((amplitude, phase))
     np.save(ap_path, ap_data)
 

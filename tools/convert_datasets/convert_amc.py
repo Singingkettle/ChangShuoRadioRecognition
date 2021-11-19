@@ -4,8 +4,7 @@ import argparse
 
 from deepsig.data_class import DeepSigA, DeepSigB, DeepSigC, DeepSigD
 
-# _DATA_VERSION = ['201604C', '201610A', '201610B', '201801A']
-_DATA_VERSION = ['201801A']
+_DATA_VERSION = ['201604C', '201610A', '201610B', '201801A']
 
 _DEEPSIG_CLASSES = {
     '201604C': DeepSigA,
