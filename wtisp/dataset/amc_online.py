@@ -12,6 +12,7 @@ from .merge import get_merge_weight_by_optimization
 from ..common.fileio import dump as IODump
 from ..common.fileio import load as IOLoad
 
+
 def generate_targets(ann_file):
     annos = IOLoad(ann_file)
     anno_data = annos['data']

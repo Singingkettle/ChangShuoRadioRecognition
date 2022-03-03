@@ -32,6 +32,11 @@ e. Install MATLAB Engine API for Python following
 the [official instructions](https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html)
 , e.g.
 
+```shell
+cd "matlabroot/extern/engines/python"
+python setup.py install
+```
+
 f. Install build requirements and then install WTISignalProcesssing.
 
 ```shell
@@ -48,16 +53,9 @@ sudo apt-get install ttf-mscorefonts-installer
 rm -rf ~/.cache/matplotlib
 ```
 
-h. Install machine learning package
+h. Install tsnecuda, following the [link](https://github.com/CannyLab/tsne-cuda). Conda binaries are available for
+Python 3.6, 3.7 and 3.8 on CUDA 10.1 and 10.2. To install tsne-cuda with conda, run
 
 ```shell
-pip3 install -U scikit-learn
+conda install -c CannyLab -c pytorch tsnecuda
 ```
-
-i. Install cvx package
-
-```shell
-pip3 install cvxopt
-```
-
-j. Install tsnecuda, following the [link](https://github.com/CannyLab/tsne-cuda)

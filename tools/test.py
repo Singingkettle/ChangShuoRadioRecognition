@@ -54,13 +54,10 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print('Command Line Args:', args)
 
     cfg = Config.fromfile(args.config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
-    print(cfg.pretty_text)
-
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True

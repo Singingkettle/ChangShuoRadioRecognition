@@ -104,8 +104,8 @@ def collect_results_cpu(result_part, size, tmpdir=None):
         dist.broadcast(dir_tensor, 0)
         tmpdir = dir_tensor.cpu().numpy().tobytes().decode().rstrip()
     else:
-        if not osp.isdir(tmpdir):
-            os.makedirs(tmpdir)
+        dir_name = osp.expanduser(tmpdir)
+        os.makedirs(dir_name, mode=0o777, exist_ok=True)
     # dump the part result to the dir
     dump(result_part, osp.join(tmpdir, f'part_{rank}.pkl'))
     dist.barrier()

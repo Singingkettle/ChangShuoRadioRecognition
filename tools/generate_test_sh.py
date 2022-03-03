@@ -9,7 +9,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='WTISignalProcessing Generate Test.sh File')
     parser.add_argument('config', help='plot config file path')
-    parser.add_argument('--is_regeneration', default=True, type=bool, help='is retest')
+    parser.add_argument('--is_regeneration', default=False, type=bool, help='is retest')
     args = parser.parse_args()
     return args
 
@@ -52,7 +52,7 @@ def main():
                           '--format_out ' + format_out_sh + '\n\n\n'
             else:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
-                          '--format-out ' + format_out_sh + ' --launcher pytorch\n\n\n'
+                          '--format_out ' + format_out_sh + ' --launcher pytorch\n\n\n'
             start_info = 'echo \"Start Test: {}\"\n'.format(config_sh)
             f.write(start_info)
             f.write(test_sh)

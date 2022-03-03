@@ -56,3 +56,11 @@ class CRNN(BaseAMC):
             results_list.append(result)
 
         return results_list
+
+    def forward_dummy(self, iqs, aps, cos):
+        if self.is_iq:
+            x = self.extract_feat(iqs)
+        else:
+            x = self.extract_feat(aps)
+        outs = self.classifier_head(x)
+        return outs

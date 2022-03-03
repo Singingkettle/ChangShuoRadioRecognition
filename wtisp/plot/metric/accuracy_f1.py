@@ -20,7 +20,10 @@ def get_new_fig(fn, fig_size=None):
 
 
 def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
-    fig, ax = get_new_fig('Curve', [8, 8])
+    # Other
+    # fig, ax = get_new_fig('Curve', [8, 10])
+    # HCGDNN
+    fig, ax = get_new_fig('Curve', [8, 10])
     SNRS = snr_accuracies[0]['SNRS']
     xs = np.array([i for i in range(len(SNRS))]) / (len(SNRS) - 1)
     xs_str = ['%9d' % i for i in SNRS]
@@ -35,6 +38,7 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
     ax.set_ylim(0, 1)
 
     max_list = []
+    snr_accuracies = sorted(snr_accuracies, key=lambda d: d['average_accuracy'], reverse=True)
     for i, snr_accuracy in enumerate(snr_accuracies):
         accs = snr_accuracy['accs']
         average_accuracy = snr_accuracy['average_accuracy']
@@ -42,14 +46,14 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
 
         ys = np.array(accs)
         max_list.append(accs)
-        legend_name = method_name + ' [{:.3f}]'.format(average_accuracy)
+        legend_name = method_name + ' [{:.4f}]'.format(average_accuracy)
 
         ax.plot(
-            xs, ys, label=legend_name, linewidth=1,
+            xs, ys, label=legend_name, linewidth=0.5,
             color=legend_config[legend[method_name]]['color'],
             linestyle=legend_config[legend[method_name]]['linestyle'],
             marker=legend_config[legend[method_name]]['marker'],
-            markersize=5,
+            markersize=3,
         )
 
     # big_indexes = []
@@ -72,7 +76,16 @@ def plot_snr_accuracy_curve(snr_accuracies, legend, save_path, legend_config):
     #             p_str = p_str + '&%.3f' % p
     #     # print(p_str + '\\\\')
 
-    leg = ax.legend(loc='lower right', prop={'size': 10, 'weight': 'bold'})
+    ## MLDNN
+    # leg = ax.legend(loc='lower right', prop={'size': 10, 'weight': 'bold'})
+
+    ## ZhangRuiYun
+    # leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
+    #                 prop={'size': 13, 'weight': 'bold'}, fancybox=True, ncol=3)
+
+    ## HCGDNN
+    leg = ax.legend(loc='lower right', prop={'size': 14, 'weight': 'bold'})
+
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('SNRs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Accuracy', fontsize=18, fontweight='bold')
@@ -111,7 +124,10 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     if reorder:
         modulation_f1s = reorder_results(modulation_f1s)
 
-    fig, ax = get_new_fig('Curve', [8, 8])
+    # Other
+    # fig, ax = get_new_fig('Curve', [8, 10])
+    # HCGDNN
+    fig, ax = get_new_fig('Curve', [8, 10])
     CLASSES = modulation_f1s[0]['CLASSES']
     xs = np.array([i for i in range(len(CLASSES))]) / (len(CLASSES) - 1)
     xs_str = ['%9s' % i for i in CLASSES]
@@ -126,6 +142,7 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     ax.set_ylim(0, 1)
 
     max_list = []
+    modulation_f1s = sorted(modulation_f1s, key=lambda d: d['average_f1'], reverse=True)
     for i, modulation_f1 in enumerate(modulation_f1s):
         f1s = modulation_f1['f1s']
         average_f1 = modulation_f1['average_f1']
@@ -134,14 +151,14 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
         ys = np.array(f1s)
         max_list.append(f1s)
 
-        legend_name = method_name + ' [{:.3f}]'.format(average_f1)
+        legend_name = method_name + ' [{:.4f}]'.format(average_f1)
 
         ax.plot(
-            xs, ys, label=legend_name, linewidth=1,
+            xs, ys, label=legend_name, linewidth=0.5,
             color=legend_config[legend[method_name]]['color'],
             linestyle=legend_config[legend[method_name]]['linestyle'],
             marker=legend_config[legend[method_name]]['marker'],
-            markersize=5,
+            markersize=3,
         )
 
     # big_indexes = []
@@ -164,7 +181,16 @@ def plot_modulation_f1_curve(modulation_f1s, legend, save_path, legend_config, r
     #             p_str = p_str + '&%.3f' % p
     #     print(p_str + '\\\\')
 
-    leg = ax.legend(loc='lower left', prop={'size': 10, 'weight': 'bold'})
+    ## MLDNN
+    # leg = ax.legend(loc='lower left', prop={'size': 10, 'weight': 'bold'})
+
+    ## ZhangRuiYun
+    # leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
+    #                 prop={'size': 13, 'weight': 'bold'}, fancybox=True, ncol=3)
+
+    ## HCGDNN
+    leg = ax.legend(loc='lower left', prop={'size': 14, 'weight': 'bold'})
+
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Modulations', fontsize=18, fontweight='bold')
     ax.set_ylabel('F1 Score', fontsize=18, fontweight='bold')
@@ -239,7 +265,7 @@ def plot_modulation_f1_radar_chart(modulation_f1s, legend, save_path, legend_con
 
 @ACCURACYF1S.register_module()
 class AccuracyF1Plot(object):
-    def __init__(self, log_dir, name, legend, method, analyze_self_with_multi_prediction=False, legend_config=None):
+    def __init__(self, log_dir, name, legend, method, extra_pre=None, legend_config=None):
         self.log_dir = log_dir
         self.name = name
         self.legend = legend
@@ -247,7 +273,7 @@ class AccuracyF1Plot(object):
         self.legend_config = legend_config
         self.SNRS = None
         self.CLASSES = None
-        self.snr_accuracies, self.modulation_f1s = load_method(self, is_self=analyze_self_with_multi_prediction)
+        self.snr_accuracies, self.modulation_f1s = load_method(self, extra_pre=extra_pre)
 
     def plot(self, save_dir):
         save_path = os.path.join(save_dir, 'snr_accuracy_' + self.name)

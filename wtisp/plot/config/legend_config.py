@@ -5,17 +5,20 @@ import numpy as np
 
 
 class LegendConfig:
-    def __init__(self, num_methods):
+    def __init__(self, num_methods, seed=None):
         self.colors = [
-            'black', 'red', 'saddlebrown', 'orange', 'green', 'darkslategray',
-            'dodgerblue', 'blue', 'purple', 'pink', 'cyan', 'brown', 'olive', 'springgreen',
-            'indigo', 'deeppink', 'navy', 'sienna', 'yellow', 'gray', 'darkgreen', 'mediumslateblue',
+            'black', 'red', 'blue',  'green', 'saddlebrown', 'darkslategray',
+            'dodgerblue', 'purple', 'cyan', 'brown', 'olive', 'springgreen',
+            'indigo', 'deeppink', 'navy', 'sienna', 'gray', 'darkgreen', 'mediumslateblue',
             'cornflowerblue', 'darkolivegreen', 'steelblue', 'darkviolet', 'darkgoldenrod', 'cadetblue',
             'grey', 'indianred', 'tomato', 'palegreen', 'seagreen', 'deepskyblue', 'slategray', 'royalblue',
             'magenta', 'palevioletred', 'gold', 'fuchsia', 'lawngreen', 'blueviolet', 'peru', 'peachpuff',
             'rosybrown', 'darkkhaki', 'tan'
         ]
-        random.Random(1).shuffle(self.colors)
+        # if seed is None:
+        #     random.Random(34).shuffle(self.colors)
+        # else:
+        #     random.Random(2).shuffle(self.colors)
         self.colors = self.colors * num_methods
         self.linestyles = ['-', '--', '-.', ':'] * num_methods
         self.markers = [

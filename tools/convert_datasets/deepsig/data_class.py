@@ -59,7 +59,7 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
     if not osp.isdir(ap_dir):
         os.makedirs(ap_dir)
     ap_path = osp.join(ap_dir, item['filename'])
-    data = item['data'][0, :] + 1j*item['data'][1, :]
+    data = item['data'][0, :] + 1j * item['data'][1, :]
     amplitude = np.abs(data)
     phase = np.angle(data)
     ap_data = np.vstack((amplitude, phase))
@@ -145,10 +145,8 @@ class DeepSigBase(object):
                         np.abs(item[0, :])) + np.finfo(np.float64).eps
                     imag_scale = np.max(
                         np.abs(item[1, :])) + np.finfo(np.float64).eps
-                    if (not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'iq', filename))) or (
-                            not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'ap', filename))):
-                        dataset.append({'filename': filename, 'data': item,
-                                        'real_scale': real_scale, 'imag_scale': imag_scale})
+                    dataset.append({'filename': filename, 'data': item,
+                                    'real_scale': real_scale, 'imag_scale': imag_scale})
                 item_index += item_num
 
         return dataset, train_annotations, val_annotations, test_annotations, mods_dict, snrs_dict
@@ -156,6 +154,12 @@ class DeepSigBase(object):
     def generate(self):
         try:
             dataset, train_annotations, val_annotations, test_annotations, mods_dict, snrs_dict = self.preprocess_original_data()
+
+            update_mods_dict = dict()
+            if hasattr(self, 'mod2mod'):
+                for mod in mods_dict:
+                    update_mods_dict[self.mod2mod[mod]] = mods_dict[mod]
+                mods_dict = update_mods_dict
 
             sequence_data_dir = osp.join(self.data_dir, 'sequence_data')
             constellation_data_dir = osp.join(
@@ -206,18 +210,27 @@ class DeepSigA(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigA, self).__init__(root_dir, version, data_ratios)
         self.data_name = '2016.04C.multisnr.pkl'
+        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
+                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
+                        "WBFM": "WBFM"}
 
 
 class DeepSigB(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigB, self).__init__(root_dir, version, data_ratios)
         self.data_name = 'RML2016.10a_dict.pkl'
+        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
+                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
+                        "WBFM": "WBFM"}
 
 
 class DeepSigC(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigC, self).__init__(root_dir, version, data_ratios)
         self.data_name = 'RML2016.10b.dat'
+        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
+                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
+                        "WBFM": "WBFM"}
 
 
 class DeepSigD(DeepSigBase):

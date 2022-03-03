@@ -31,6 +31,7 @@ model = dict(
         num_slot=9,
         num_filter=3,
         slot_size=32,
+        stn_net_name='v0',
     ),
     classifier_head=dict(
         type='DSAMCHead',

@@ -23,8 +23,8 @@ def get_new_fig(fn, fig_size=None):
 
 def plot_train_curve(log_infos, legend, save_path, legend_config):
     fig, ax = get_new_fig('Training Curve', [8, 8])
-    ax.set_xlim(0, 400)
-    ax.set_ylim(0, 3)
+    ax.set_xlim(1, 100)
+    ax.set_ylim(0.8, 4.5)
     for i, log_info in enumerate(log_infos):
         log_dict = log_info['log_dict']
         method_name = log_info['name']
@@ -34,14 +34,13 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
         for j, metric in enumerate(train_metrics):
             xs = []
             ys = []
-            num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1]
             for epoch in epochs:
                 iters = log_dict[epoch]['iter']
                 if log_dict[epoch]['mode'][-1] == 'val':
                     iters = iters[:-1]
-                if epoch % 5 == 0:
-                    xs.append(epoch)
-                    ys.append(log_dict[epoch][metric][len(iters) - 1])
+                # if epoch % 10 == 0:
+                xs.append(epoch)
+                ys.append(log_dict[epoch][metric][len(iters) - 1])
             xs = np.array(xs)
             ys = np.array(ys)
             if legend_suffix[j] is not None:
@@ -50,14 +49,14 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
                 legend_name = method_name
 
             ax.plot(
-                xs, ys, label=legend_name, linewidth=1,
+                xs, ys, label=legend_name, linewidth=0.6,
                 color=legend_config[legend[legend_name]]['color'],
-                linestyle=legend_config[legend[legend_name]]['linestyle'],
-                marker=legend_config[legend[legend_name]]['marker'],
-                markersize=5,
+                # linestyle=legend_config[legend[legend_name]]['linestyle'],
+                # marker=legend_config[legend[legend_name]]['marker'],
+                # markersize=5,
             )
 
-    leg = ax.legend(loc='upper right', prop={'size': 10, 'weight': 'bold'})
+    leg = ax.legend(loc='upper right', prop={'size': 14, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Epochs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Loss', fontsize=18, fontweight='bold')
@@ -67,24 +66,24 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
     ax.set_axisbelow(True)
 
     # Turn on the minor TICKS, which are required for the minor GRID
-    ax.minorticks_on()
-
-    # Customize the major grid
-    ax.grid(b=True, which='major', linestyle='-',
-            linewidth='0.5', color='black', alpha=0.2)
-    # # Customize the minor grid
-    # ax.grid(b=True, which='minor', linestyle=':',
-    #         linewidth='0.5', color='black', alpha=0.5)
-
-    plt.tick_params(which='minor', bottom=False,
-                    top=False, left=False, right=False)
-    plt.tick_params(which='major', bottom=True,
-                    top=False, left=True, right=False)
-
-    ax.tick_params(which='minor', bottom=False,
-                   top=False, left=False, right=False)
-    ax.tick_params(which='major', bottom=True,
-                   top=False, left=True, right=False)
+    # ax.minorticks_on()
+    #
+    # # Customize the major grid
+    # ax.grid(b=True, which='major', linestyle='-',
+    #         linewidth='0.5', color='black', alpha=0.2)
+    # # # Customize the minor grid
+    # # ax.grid(b=True, which='minor', linestyle=':',
+    # #         linewidth='0.5', color='black', alpha=0.5)
+    #
+    # plt.tick_params(which='minor', bottom=False,
+    #                 top=False, left=False, right=False)
+    # plt.tick_params(which='major', bottom=True,
+    #                 top=False, left=True, right=False)
+    #
+    # ax.tick_params(which='minor', bottom=False,
+    #                top=False, left=False, right=False)
+    # ax.tick_params(which='major', bottom=True,
+    #                top=False, left=True, right=False)
 
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
@@ -93,8 +92,8 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
 
 def plot_test_curve(log_infos, legend, save_path, legend_config):
     fig, ax = get_new_fig('Test Curve', [8, 8])
-    ax.set_xlim(0, 400)
-    ax.set_ylim(0, 1)
+    ax.set_xlim(10, 100)
+    ax.set_ylim(0.2, 0.5)
     for i, log_info in enumerate(log_infos):
         log_dict = log_info['log_dict']
         method_name = log_info['name']
@@ -104,12 +103,10 @@ def plot_test_curve(log_infos, legend, save_path, legend_config):
         for j, metric in enumerate(test_metrics):
             xs = []
             ys = []
-            num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1]
             for epoch in epochs:
                 if log_dict[epoch]['mode'][-1] == 'val':
-                    if epoch % 10 == 0:
-                        xs.append(epoch)
-                        ys.append(log_dict[epoch][metric])
+                    xs.append(epoch)
+                    ys.append(log_dict[epoch][metric])
             xs = np.array(xs)
             ys = np.array(ys)
             if legend_suffix[j] is not None:
@@ -118,41 +115,41 @@ def plot_test_curve(log_infos, legend, save_path, legend_config):
                 legend_name = method_name
 
             ax.plot(
-                xs, ys, label=legend_name, linewidth=1,
+                xs, ys, label=legend_name, linewidth=0.6,
                 color=legend_config[legend[legend_name]]['color'],
-                linestyle=legend_config[legend[legend_name]]['linestyle'],
-                marker=legend_config[legend[legend_name]]['marker'],
-                markersize=5,
+                # linestyle=legend_config[legend[legend_name]]['linestyle'],
+                # marker=legend_config[legend[legend_name]]['marker'],
+                # markersize=5,
             )
 
-    leg = ax.legend(loc='lower right', prop={'size': 10, 'weight': 'bold'})
+    leg = ax.legend(loc='upper left', prop={'size': 14, 'weight': 'bold'})
     leg.get_frame().set_edgecolor('black')
     ax.set_xlabel('Epochs', fontsize=18, fontweight='bold')
     ax.set_ylabel('Accuracy', fontsize=18, fontweight='bold')
-    ax.set_title('Test Curve', fontsize=18, fontweight='bold')
+    ax.set_title('Validation Curve', fontsize=18, fontweight='bold')
 
     # Don't allow the axis to be on top of your data
     ax.set_axisbelow(True)
 
     # Turn on the minor TICKS, which are required for the minor GRID
-    ax.minorticks_on()
-
-    # Customize the major grid
-    ax.grid(b=True, which='major', linestyle='-',
-            linewidth='0.5', color='black', alpha=0.2)
-    # # Customize the minor grid
-    # ax.grid(b=True, which='minor', linestyle=':',
-    #         linewidth='0.5', color='black', alpha=0.5)
-
-    plt.tick_params(which='minor', bottom=False,
-                    top=False, left=False, right=False)
-    plt.tick_params(which='major', bottom=True,
-                    top=False, left=True, right=False)
-
-    ax.tick_params(which='minor', bottom=False,
-                   top=False, left=False, right=False)
-    ax.tick_params(which='major', bottom=True,
-                   top=False, left=True, right=False)
+    # ax.minorticks_on()
+    #
+    # # Customize the major grid
+    # ax.grid(b=True, which='major', linestyle='-',
+    #         linewidth='0.5', color='black', alpha=0.2)
+    # # # Customize the minor grid
+    # # ax.grid(b=True, which='minor', linestyle=':',
+    # #         linewidth='0.5', color='black', alpha=0.5)
+    #
+    # plt.tick_params(which='minor', bottom=False,
+    #                 top=False, left=False, right=False)
+    # plt.tick_params(which='major', bottom=True,
+    #                 top=False, left=True, right=False)
+    #
+    # ax.tick_params(which='minor', bottom=False,
+    #                top=False, left=False, right=False)
+    # ax.tick_params(which='major', bottom=True,
+    #                top=False, left=True, right=False)
 
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
@@ -188,24 +185,24 @@ class LossAccuracyPlot(object):
             for method_config in method:
                 json_info = self.find_json_log(**method_config)
                 self.log_infos.append(json_info)
+        elif isinstance(method, dict):
+            json_info = self.find_json_log(**method)
+            self.log_infos.append(json_info)
         else:
             raise ValueError('The variable of method must be list!')
 
-    def find_json_log(self, config, name, has_snr_classifier=False):
+    def find_json_log(self, config, name, train_metrics=None, test_metrics=None, legend_suffix=None):
+        if legend_suffix is None:
+            legend_suffix = [None]
+        if test_metrics is None:
+            test_metrics = ['final']
+        if train_metrics is None:
+            train_metrics = ['loss']
         json_paths = glob.glob(os.path.join(
             self.log_dir, config, '*.json'))
-        # assume that the last json file is right version
+        # Assume that the last json file is right version
         json_paths = sorted(json_paths)
         log_dict = load_json_log(json_paths[-1])
-        if has_snr_classifier:
-            train_metrics = ['loss_high', 'loss_low', 'loss_merge', 'loss_snr']
-            test_metrics = ['merge/snr_mean_all',
-                            'high/snr_mean_all', 'low/snr_mean_all', 'snr/snr_acc']
-            legend_suffix = [None, 'High', 'Low', 'SNR']
-        else:
-            train_metrics = ['loss_cls']
-            test_metrics = ['common/snr_mean_all']
-            legend_suffix = [None]
 
         return dict(log_dict=log_dict, name=name, train_metrics=train_metrics, test_metrics=test_metrics,
                     legend_suffix=legend_suffix)

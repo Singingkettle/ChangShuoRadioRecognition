@@ -1,8 +1,13 @@
+import os
 import os.path as osp
+import pickle
+import zlib
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.data import Dataset
+from tqdm import tqdm
 
 from .builder import DATASETS
 from ..common.fileio import dump as IODump
@@ -32,12 +37,12 @@ class SlotDataset(Dataset):
                 ]
 
                 mods:{
-                    'BPSK': 0, 
+                    'BPSK': 0,
                     ...
                 }
 
                 snrs:{
-                    -10: 0, 
+                    -10: 0,
                     ...
                 }
 
@@ -49,9 +54,9 @@ class SlotDataset(Dataset):
 
     Args:
         ann_file (str): Annotation file path.
-        filter_config (int, optional): the idx to decide which kind of constellation data 
+        filter_config (int, optional): the idx to decide which kind of constellation data
         should be used. Default is 0.
-        data_root (str, optional): Data root for ``ann_file``, ``In-phase/Quadrature data``, 
+        data_root (str, optional): Data root for ``ann_file``, ``In-phase/Quadrature data``,
         ``Amplitude/Phase data``, ``constellation data``.
         confusion_plot (bool, optional): If plot the confusion matrix
         multi_label (bool, optional): If set true, the input signal is the multi_label of different signals with
@@ -63,9 +68,17 @@ class SlotDataset(Dataset):
     CLASSES = None
     SNRS = None
 
-    def __init__(self, ann_file, data_root=None, confusion_plot=False,
-                 test_mode=False, snr_threshold=-6, use_snr_label=False,
-                 item_weights=[0.1, 0.9], is_seq=False, channel_mode=False):
+    def __init__(self,
+                 ann_file,
+                 data_root=None,
+                 confusion_plot=False,
+                 test_mode=False,
+                 snr_threshold=-6,
+                 use_snr_label=False,
+                 item_weights=[0.1, 0.9],
+                 is_seq=False,
+                 use_ap=False,
+                 channel_mode=False):
 
         self.ann_file = ann_file
         self.data_root = data_root
@@ -75,6 +88,7 @@ class SlotDataset(Dataset):
         self.use_snr_label = use_snr_label
         self.item_weights = item_weights
         self.is_seq = is_seq
+        self.use_ap = use_ap
         self.channel_mode = channel_mode
 
         if self.data_root is not None:
@@ -84,10 +98,14 @@ class SlotDataset(Dataset):
         # load annotations
         self.data_infos, self.mods_dict, self.snrs_dict = self.load_annotations(
             self.ann_file)
-        self.index_class_dict = {index: mod for mod,
-                                                index in self.mods_dict.items()}
-        self.index_snr_dict = {index: float(snr)
-                               for snr, index in self.snrs_dict.items()}
+        self.index_class_dict = {
+            index: mod
+            for mod, index in self.mods_dict.items()
+        }
+        self.index_snr_dict = {
+            index: float(snr)
+            for snr, index in self.snrs_dict.items()
+        }
 
         self.CLASSES = [''] * len(self.index_class_dict)
         self.SNRS = [0.0] * len(self.index_snr_dict)
@@ -101,6 +119,42 @@ class SlotDataset(Dataset):
         if not self.test_mode:
             self._set_group_flag()
 
+        # load data
+        if self.test_mode:
+            cache_data_path = os.path.join(self.data_root, 'test.pkl')
+        else:
+            cache_data_path = os.path.join(self.data_root, 'train.pkl')
+        if os.path.isfile(cache_data_path):
+            self.cache_data = pickle.load(open(cache_data_path, 'rb'))
+        else:
+            self.cache_data = []
+            for idx in tqdm(range(len(self))):
+                item_info = self.data_infos[idx]
+
+                file_name = item_info['filename']
+                data = {}
+                item_path = osp.join(self.data_root, 'data', file_name)
+                item = np.load(item_path)
+                if self.is_seq:
+                    item = np.reshape(item, (2, -1))
+                    item = item[:, 10000:10128]
+                    iq_item = item.astype(np.float32)
+                    ap_item = item[0, :] + 1j * item[1, :]
+                    amplitude = np.abs(ap_item)
+                    phase = np.angle(ap_item)
+                    ap_item = np.vstack((amplitude, phase))
+                    data['iqs'] = iq_item
+                    data['aps'] = ap_item
+                else:
+                    item = item.astype(np.int16)
+                    item = zlib.compress(item.tostring())
+                    data['cos'] = item
+                self.cache_data.append(data)
+            pickle.dump(self.cache_data, open(cache_data_path, 'wb'))
+            if self.is_seq and (not self.use_ap):
+                for item in self.cache_data:
+                    del item['aps']
+
     def _set_group_flag(self):
         """Set flag according to the mean value (ms) of signal data snrs.
 
@@ -109,8 +163,8 @@ class SlotDataset(Dataset):
         self.flag = np.zeros(len(self), dtype=np.uint8)
 
     def _generate_mod_labels(self):
-        self.mix_mod_labels = np.zeros(
-            (len(self), len(self.CLASSES)), dtype=np.float32)
+        self.mix_mod_labels = np.zeros((len(self), len(self.CLASSES)),
+                                       dtype=np.float32)
         for idx in range(len(self)):
             ann = self.get_ann_info(idx)
             labels = ann['mod_labels']
@@ -167,7 +221,8 @@ class SlotDataset(Dataset):
             snr_labels = self.data_infos[idx]['ann']['snr_labels']
             low_weight = self.data_infos[idx]['ann']['low_weight']
             high_weight = self.data_infos[idx]['ann']['high_weight']
-            return self.__parse_ann_info(mod_labels, snrs, snr_labels, low_weight, high_weight)
+            return self.__parse_ann_info(mod_labels, snrs, snr_labels,
+                                         low_weight, high_weight)
         else:
             return self._parse_ann_info(mod_labels, snrs)
 
@@ -199,7 +254,8 @@ class SlotDataset(Dataset):
 
         return ann
 
-    def __parse_ann_info(self, mod_labels, snrs, snr_labels, low_weight, high_weight):
+    def __parse_ann_info(self, mod_labels, snrs, snr_labels, low_weight,
+                         high_weight):
         """Parse labels and snrs annotation
 
         Args:
@@ -217,10 +273,33 @@ class SlotDataset(Dataset):
         low_weight = np.array(low_weight, dtype=np.float32)
         high_weight = np.array(high_weight, dtype=np.float32)
 
-        ann = dict(mod_labels=mod_labels, snrs=snrs, snr_labels=snr_labels,
-                   low_weight=low_weight, high_weight=high_weight)
+        ann = dict(mod_labels=mod_labels,
+                   snrs=snrs,
+                   snr_labels=snr_labels,
+                   low_weight=low_weight,
+                   high_weight=high_weight)
 
         return ann
+
+    def load_compress_data(self, idx, item_info, data_type):
+        data = self.cache_data[idx][data_type]
+        item = deepcopy(data)
+        if self.is_seq:
+            item = item.astype(np.float32)
+            if self.channel_mode:
+                item = np.reshape(item, (2, 1, -1))
+            else:
+                item = np.reshape(item, (1, 2, -1))
+        else:
+            try:
+                item = np.frombuffer(zlib.decompress(item), dtype=np.int16).reshape([8, 128, 128])
+                item = item.astype(np.float32)
+            except:
+                file_name = item_info['filename']
+                item_path = osp.join(self.data_root, 'data', file_name)
+                item = np.load(item_path)
+                item = item.astype(np.float32)
+        return item
 
     def prepare_train_data(self, idx):
         """Get training data.
@@ -234,23 +313,13 @@ class SlotDataset(Dataset):
 
         item_info = self.data_infos[idx]
 
-        file_name = item_info['filename']
-
         data = {}
-
-        item_path = osp.join(self.data_root, 'data', file_name)
-        item = np.load(item_path)
-        item = item.astype(np.float32)
         if self.is_seq:
-            if self.channel_mode:
-                item = np.reshape(item, (2, 1, -1))
-            else:
-                item = np.reshape(item, (1, 2, -1))
-
-            data['iqs'] = item
+            data['iqs'] = self.load_compress_data(idx, item_info, 'iqs')
+            if self.use_ap:
+                data['aps'] = self.load_compress_data(idx, item_info, 'aps')
         else:
-            data['cos'] = item
-
+            data['cos'] = self.load_compress_data(idx, item_info, 'cos')
         ann = self.get_ann_info(idx)
         data['mod_labels'] = ann['mod_labels']
         if self.use_snr_label:
@@ -270,27 +339,21 @@ class SlotDataset(Dataset):
             dict: Testing data and annotation
         """
         item_info = self.data_infos[idx]
-
-        file_name = item_info['filename']
-
         data = {}
-
-        item_path = osp.join(self.data_root, 'data', file_name)
-        item = np.load(item_path)
-        item = item.astype(np.float32)
         if self.is_seq:
-            if self.channel_mode:
-                item = np.reshape(item, (2, 1, -1))
-            else:
-                item = np.reshape(item, (1, 2, -1))
-
-            data['iqs'] = item
+            data['iqs'] = self.load_compress_data(idx, item_info, 'iqs')
+            if self.use_ap:
+                data['aps'] = self.load_compress_data(idx, item_info, 'aps')
         else:
-            data['cos'] = item
+            data['cos'] = self.load_compress_data(idx, item_info, 'cos')
 
         return data
 
-    def _plot_confusion_matrix(self, cm, title='Confusion matrix', cmap=plt.cm.Blues, labels=[]):
+    def _plot_confusion_matrix(self,
+                               cm,
+                               title='Confusion matrix',
+                               cmap=plt.cm.Blues,
+                               labels=[]):
         fig = plt.figure()
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
         plt.title(title)
@@ -305,8 +368,9 @@ class SlotDataset(Dataset):
         return fig
 
     def _evaluate(self, results, prefix=''):
-        confusion_matrix = np.zeros((len(self.SNRS), len(
-            self.CLASSES), len(self.CLASSES)), dtype=np.float64)
+        confusion_matrix = np.zeros(
+            (len(self.SNRS), len(self.CLASSES), len(self.CLASSES)),
+            dtype=np.float64)
 
         for idx in range(len(self)):
             ann = self.get_ann_info(idx)
@@ -317,9 +381,10 @@ class SlotDataset(Dataset):
                 confusion_matrix[self.snrs_dict['{:.3f}'.format(snrs[0])],
                                  labels[0], predict_class_index] += 1
             else:
-                raise ValueError('Please check your dataset, the size of snrs and labels are both 1 for any item. '
-                                 'However, the current item with the idx {:d} has the snrs size {:d} and the '
-                                 'labels size {:d}'.format(idx, snrs.size, labels.size))
+                raise ValueError(
+                    'Please check your dataset, the size of snrs and labels are both 1 for any item. '
+                    'However, the current item with the idx {:d} has the snrs size {:d} and the '
+                    'labels size {:d}'.format(idx, snrs.size, labels.size))
 
         confusion_matrix = confusion_matrix / \
                            np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2)
@@ -332,15 +397,22 @@ class SlotDataset(Dataset):
             eval_results[prefix +
                          'snr_{:.3f}'.format(snr)] = 1.0 * cor / (cor + ncor)
             if self.confusion_plot:
-                eval_results[prefix + 'snr_{:.3f}_conf_figure'.format(snr)] = self._plot_confusion_matrix(
-                    conf, title='Confusion matrix (SNR={:.3f})'.format(snr), labels=self.CLASSES)
+                eval_results[prefix + 'snr_{:.3f}_conf_figure'.format(
+                    snr)] = self._plot_confusion_matrix(
+                    conf,
+                    title='Confusion matrix (SNR={:.3f})'.format(snr),
+                    labels=self.CLASSES)
         conf = np.sum(confusion_matrix, axis=0) / len(self.SNRS)
         cor = np.sum(np.diag(conf))
         ncor = np.sum(conf) - cor
         eval_results[prefix + 'snr_mean_all'] = 1.0 * cor / (cor + ncor)
         if self.confusion_plot:
-            eval_results[prefix + 'snr_mean_all_conf_figure'] = self._plot_confusion_matrix(
-                conf, title='Mean of all snr Confusion matrix', labels=self.CLASSES)
+            eval_results[
+                prefix +
+                'snr_mean_all_conf_figure'] = self._plot_confusion_matrix(
+                conf,
+                title='Mean of all snr Confusion matrix',
+                labels=self.CLASSES)
         return eval_results
 
     def format_out(self, out_dir, results):
@@ -356,20 +428,26 @@ class SlotDataset(Dataset):
             'The length of results is not equal to the dataset len: {} != {}'.
                 format(len(results), len(self)))
 
-        json_results = []
-        for idx in range(len(self)):
-            data = dict()
-            item_info = self.data_infos[idx]
-            file_name = item_info['filename']
-            data[file_name] = dict()
-            data[file_name]['label'] = results[idx]
-            json_results.append(data)
+        results = [result.reshape(1, len(self.CLASSES)) for result in results]
+        results = np.concatenate(results, axis=0)
+        results = np.reshape(results, (len(self), -1))
+        save_path = os.path.join(out_dir, 'pre.npy')
+        np.save(save_path, results)
 
-        IODump(json_results, osp.join(out_dir, 'res.json'))
+        json_results = dict(CLASSES=self.CLASSES,
+                            SNRS=self.SNRS,
+                            mods_dict=self.mods_dict,
+                            snrs_dict=self.snrs_dict,
+                            ANN=[])
+        for idx in range(len(self)):
+            ann = self.get_ann_info(idx)
+            json_results['ANN'].append(ann)
+
+        IODump(json_results, osp.join(out_dir, 'ann.json'))
 
     def _evaluate_snr(self, results, prefix):
-        confusion_matrix = np.zeros(
-            (len(self.SNRS), len(self.item_weights)), dtype=np.float64)
+        confusion_matrix = np.zeros((len(self.SNRS), len(self.item_weights)),
+                                    dtype=np.float64)
 
         for idx in range(len(self)):
             ann = self.get_ann_info(idx)
@@ -383,17 +461,19 @@ class SlotDataset(Dataset):
                 else:
                     confusion_matrix[row_index, 1] += 1
             else:
-                raise ValueError('Please check your dataset, the size of snrs and labels are both 1 for any item. '
-                                 'However, the current item with the idx {:d} has the snrs size {:d} and the '
-                                 'labels size {:d}'.format(idx, snrs.size, labels.size))
+                raise ValueError(
+                    'Please check your dataset, the size of snrs and labels are both 1 for any item. '
+                    'However, the current item with the idx {:d} has the snrs size {:d} and the '
+                    'labels size {:d}'.format(idx, snrs.size, labels.size))
 
         confusion_matrix = confusion_matrix / \
                            np.expand_dims(np.sum(confusion_matrix, axis=1), axis=1)
 
         eval_results = dict()
         for snr_index, snr in enumerate(self.SNRS):
-            eval_results[prefix + 'snr_{:.3f}_acc'.format(
-                snr)] = confusion_matrix[snr_index, 0]
+            eval_results[prefix +
+                         'snr_{:.3f}_acc'.format(snr)] = confusion_matrix[
+                snr_index, 0]
         conf = np.sum(confusion_matrix, axis=0) / len(self.SNRS)
         eval_results[prefix + 'snr_acc'] = conf[0]
 
@@ -402,15 +482,17 @@ class SlotDataset(Dataset):
     def process_single_head(self, results, prefix=''):
 
         if 'snr' in prefix:
-            results = [result.reshape(1, len(self.item_weights))
-                       for result in results]
+            results = [
+                result.reshape(1, len(self.item_weights)) for result in results
+            ]
             results = np.concatenate(results, axis=0)
             results = np.reshape(results, (len(self), -1))
             eval_results = self._evaluate_snr(results, prefix=prefix)
             return eval_results
         else:
-            results = [result.reshape(1, len(self.CLASSES))
-                       for result in results]
+            results = [
+                result.reshape(1, len(self.CLASSES)) for result in results
+            ]
             results = np.concatenate(results, axis=0)
             results = np.reshape(results, (len(self), -1))
 

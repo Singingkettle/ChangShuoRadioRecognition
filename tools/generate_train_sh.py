@@ -11,10 +11,12 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='WTISignalProcessing Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
-    parser.add_argument('--scripts_dir', help='dir to save the train.sh files')
-    parser.add_argument('--group_num', default=24, type=int, help='number of configs in one train.sh file')
-    parser.add_argument('--work_dir', help='the dir to save logs and models')
-    parser.add_argument('--multi_gpu', default=True, action='store_true',
+    parser.add_argument('--scripts-dir', help='dir to save the train.sh files')
+    parser.add_argument('--group-num', default=8, type=int, help='number of configs in one train.sh file')
+    parser.add_argument('--work-dir', help='the dir to save logs and models')
+    parser.add_argument('--multi-gpu', default=False, action='store_true',
+                        help='use parallel training')
+    parser.add_argument('--is-regeneration', default=False, action='store_true',
                         help='use parallel training')
     args = parser.parse_args()
     return args
@@ -36,7 +38,7 @@ def main():
     # create work_dir
     mkdir_or_exist(osp.abspath(scripts_dir))
 
-    no_train_configs = filter_config(cfg, mode='train')
+    no_train_configs = filter_config(cfg, is_regeneration=args.is_regeneration, mode='train')
 
     base_master_port = 29647
 

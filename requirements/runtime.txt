@@ -13,3 +13,5 @@ seaborn
 regex;sys_platform=='win32'
 yapf
 pyzmq
+cvxopt
+scikit-learn

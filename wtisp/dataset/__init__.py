@@ -9,11 +9,11 @@ from .fb_data import FBDataset
 from .ril_data import WTIRILDataset
 from .sei_cemee import SEICEMEEDataset
 from .sei_data import WTISEIDataset
-from .slot2_data import SlotDatasetV2
 from .slot_data import SlotDataset
+from .fb_slot_data import FBSlotDataset
 
 __all__ = [
     'DATASETS', 'build_dataset', 'build_dataloader', 'WTIMCDataset', 'AUGMCDataset',
     'WTISNRDataset', 'WTIRILDataset', 'ClassBalancedDataset', 'ConcatDataset', 'RepeatDataset',
-    'FBDataset', 'WTISEIDataset', 'SlotDataset', 'SlotDatasetV2', 'SEICEMEEDataset', 'WTIMCOnlineDataset'
+    'FBDataset', 'WTISEIDataset', 'SlotDataset', 'SEICEMEEDataset', 'WTIMCOnlineDataset', 'FBSlotDataset'
 ]

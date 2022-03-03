@@ -112,34 +112,39 @@ def load_method_final(obj_pointer):
     return snr_accuracies, modulation_f1s
 
 
-def load_method_self(obj_pointer):
+def load_method_self(obj_pointer, extra_pre):
     snr_accuracies = list()
     modulation_f1s = list()
-
-    assert len(obj_pointer.method) == 1, 'Only analyze self with multi groups predictions'
 
     for method in obj_pointer.method:
         config = method['config']
         name = method['name']
 
         format_out_dir = os.path.join(obj_pointer.log_dir, config, 'format_out')
-        pre_files = glob.glob(os.path.join(format_out_dir, '*pre.npy'))
+        pre_files = [os.path.join(format_out_dir, 'pre.npy')]
+        for file_prefix in extra_pre:
+            pre_files.append(os.path.join(format_out_dir, file_prefix + '_pre.npy'))
         for pre_file in pre_files:
-            results = np.load(pre_file)
-            pre_name = os.path.basename(pre_file)
-            pre_prefix = pre_name.split('_')[0]
+            if os.path.isfile(pre_file):
+                results = np.load(pre_file)
+                pre_name = os.path.basename(pre_file)
+                if '_' in pre_name:
+                    pre_prefix = pre_name.split('_')[0]
+                    snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results,
+                                                                   name + '-' + pre_prefix)
+                else:
+                    snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results,
+                                                                   name)
 
-            snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results,
-                                                           name + '-' + pre_prefix)
-            snr_accuracies.append(snr_accuracy)
-            modulation_f1s.append(modulation_f1)
+                snr_accuracies.append(snr_accuracy)
+                modulation_f1s.append(modulation_f1)
 
     return snr_accuracies, modulation_f1s
 
 
-def load_method(obj_pointer, is_self=False):
-    if is_self:
-        return load_method_self(obj_pointer)
+def load_method(obj_pointer, extra_pre=None):
+    if extra_pre is not None:
+        return load_method_self(obj_pointer, extra_pre)
     else:
         return load_method_final(obj_pointer)
 

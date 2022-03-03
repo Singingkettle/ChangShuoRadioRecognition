@@ -75,7 +75,7 @@ def main():
             num_data += 1
             file_name = '{:0>12d}.npy'.format(num_data)
             iq_path = osp.join(args.data_root, 'Online', 'iq', file_name)
-            split_data = data[:, split_index*128:(split_index+1)*128]
+            split_data = data[:, split_index * 128:(split_index + 1) * 128]
             np.save(iq_path, split_data)
 
             modulation_count[true_modulation] += 1

@@ -15,6 +15,7 @@ from .fmlnet import (FMLNetV1, FMLNetV2, FMLNetV3, FMLNetV4, FMLNetV5, FMLNetV6,
 from .googlenet_co import GoogleNetCO
 from .hcgnet import (HCGNetV1, HCGNetV2, HCGNetV3, HCGNetV4, HCGNetV5, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
                      HCGNetCG1, HCGNetCG2, HCGNetG1G2)
+from .mcbldn import (ScdnNet, McbldnNet)
 from .mctnet import MCTNetV1, MCTNetV2
 from .mlclnet import MLCLNet
 from .mlnet import (MLNetV1, MLNetV2, MLNetV3, MLNetV4, MLNetV5,
@@ -56,5 +57,6 @@ __all__ = [
     'CEMEENet', 'MCTNetV1', 'MCTNetV2',
     'HCGNetV3', 'HCGNetV2', 'HCGNetV4', 'HCGNetV5',
     'HCGNetCNN', 'HCGNetGRU1', 'HCGNetGRU2',
-    'HCGNetCG1', 'HCGNetCG2', 'HCGNetG1G2'
+    'HCGNetCG1', 'HCGNetCG2', 'HCGNetG1G2',
+    'ScdnNet', 'McbldnNet'
 ]

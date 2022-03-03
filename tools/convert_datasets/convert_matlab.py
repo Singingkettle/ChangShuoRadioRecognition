@@ -12,7 +12,6 @@ import argparse
 
 from matlab.data_class import MatlabData
 
-# _DATA_VERSION = ['201604C', '201610A', '201610B', '201801A']
 _DATA_VERSION = ['202107A']
 
 

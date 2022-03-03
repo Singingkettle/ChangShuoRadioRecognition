@@ -77,7 +77,6 @@ def get_model_complexity_info(model,
             return those in a float number format.
     """
     assert type(input_shape) is list
-    assert len(input_shape[0]) >= 1
     assert isinstance(model, nn.Module)
     flops_model = add_flops_counting_methods(model)
     flops_model.eval()
@@ -582,8 +581,11 @@ def batch_counter_hook(module, input, output):
     batch_size = 1
     if len(input) > 0:
         # Can have multiple inputs, getting the first one
-        input = input[0]
-        batch_size = len(input)
+        batch_size = 0
+        for input_modal in input:
+            if input_modal is not None:
+                batch_size = len(input_modal)
+                break
     else:
         pass
         print('Warning! No positional inputs found for a module, '
