@@ -1,3 +1,4 @@
+import copy
 import json
 import multiprocessing
 import os
@@ -40,10 +41,39 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     sys.stdout.flush()
 
 
-def generate_json(data, mods, snrs, filters):
-    res = {'data': data, 'mods': mods, 'snrs': snrs, 'filters': filters}
+def generate_annotation(mod_to_label, snr_to_label, filter_config):
+    label_to_mod = {label: mod for mod, label in mod_to_label.items()}
+    label_to_snr = {label: snr for snr, label in snr_to_label.items()}
+    annotations = {'filter_config': filter_config, 'item_filename': [],
+                   'item_mod_label': [], 'item_snr_label': [], 'item_snr_index': [],
+                   'item_snr_value': [], 'label_to_mode': label_to_mod, 'label_to_snr': label_to_snr,
+                   'mod_to_label': mod_to_label, 'snr_to_label': snr_to_label, 'snr_to_index': snr_to_label,
+                   }
 
-    return res
+    return annotations
+
+
+def update_annotation(annotation, filename, snr, mod):
+    mod_to_label = annotation['mod_to_label']
+    snr_to_label = annotation['snr_to_label']
+    snr_to_index = annotation['snr_to_index']
+
+    annotation['item_snr_value'].append(snr)
+    annotation['item_filename'].append(filename)
+    annotation['item_mod_label'].append(mod_to_label[mod])
+    annotation['item_snr_label'].append(snr_to_label['{:d}'.format(snr)])
+    annotation['item_snr_index'].append(snr_to_index['{:d}'.format(snr)])
+
+    return annotation
+
+
+def combine_two_annotation(annotation1, annotation2):
+    combine_annotation = copy.deepcopy(annotation1)
+    update_list = ['item_snr_value', 'item_filename', 'item_mod_label', 'item_snr_label', 'item_snr_index']
+    for key_name in update_list:
+        combine_annotation[key_name].extend(annotation2[key_name])
+
+    return combine_annotation
 
 
 def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_dir):
@@ -103,13 +133,20 @@ class DeepSigBase(object):
 
         dataset = []
         item_index = 0
-        train_annotations = []
-        val_annotations = []
-        test_annotations = []
-        mods_dict = {mod.decode('UTF-8'): index for index,
-                                                    mod in enumerate(mods)}
-        snrs_dict = {'{:.3f}'.format(
-            snr): index for index, snr in enumerate(snrs)}
+
+        mod_to_label = {mod.decode('UTF-8'): index for index, mod in enumerate(mods)}
+        update_mods_dict = dict()
+        if hasattr(self, 'mod2mod'):
+            for mod in mod_to_label:
+                update_mods_dict[self.mod2mod[mod]] = mod_to_label[mod]
+            mod_to_label = update_mods_dict
+
+        snr_to_label = {'{:d}'.format(snr): index for index, snr in enumerate(snrs)}
+        filter_config = [[0.02, 0.02], [0.05, 0.05]]
+
+        test_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
+        train_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
+        validation_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
 
         random.seed(0)
 
@@ -119,28 +156,25 @@ class DeepSigBase(object):
                 item_indices = [i for i in range(item_num)]
                 random.shuffle(item_indices)
 
-                train_indices = item_indices[:int(
-                    self.data_ratios[0] * item_num)]
-                val_indices = item_indices[int(
-                    self.data_ratios[0] * item_num):(int(sum(self.data_ratios[:2]) * item_num))]
-                test_indices = item_indices[(
-                                                int(sum(self.data_ratios[:2]) * item_num)):]
+                if hasattr(self, 'mod2mod'):
+                    mod_ = self.mod2mod[mod]
+                else:
+                    mod_ = mod
+
+                train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
+                test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
 
                 for sub_item_index in item_indices:
                     item = data[(mod, snr)][sub_item_index, :, :]
                     item = item.astype(np.float64)
                     filename = '{:0>12d}.npy'.format(item_index + sub_item_index)
 
-                    ann_info = {'labels': [mods_dict[mod.decode('UTF-8')]],
-                                'snrs': [float(snr)]}
-
-                    annotation_item = {'filename': filename, 'ann': ann_info}
                     if sub_item_index in train_indices:
-                        train_annotations.append(annotation_item)
+                        train_annotation = update_annotation(train_annotation, filename, snr, mod_)
                     elif sub_item_index in test_indices:
-                        test_annotations.append(annotation_item)
+                        test_annotation = update_annotation(test_annotation, filename, snr, mod_)
                     else:
-                        val_annotations.append(annotation_item)
+                        validation_annotation = update_annotation(validation_annotation, filename, snr, mod_)
                     real_scale = np.max(
                         np.abs(item[0, :])) + np.finfo(np.float64).eps
                     imag_scale = np.max(
@@ -149,17 +183,13 @@ class DeepSigBase(object):
                                     'real_scale': real_scale, 'imag_scale': imag_scale})
                 item_index += item_num
 
-        return dataset, train_annotations, val_annotations, test_annotations, mods_dict, snrs_dict
+        return dataset, train_annotation, validation_annotation, test_annotation
 
     def generate(self):
         try:
-            dataset, train_annotations, val_annotations, test_annotations, mods_dict, snrs_dict = self.preprocess_original_data()
+            dataset, train_annotation, validation_annotation, test_annotation = self.preprocess_original_data()
 
-            update_mods_dict = dict()
-            if hasattr(self, 'mod2mod'):
-                for mod in mods_dict:
-                    update_mods_dict[self.mod2mod[mod]] = mods_dict[mod]
-                mods_dict = update_mods_dict
+            train_and_validation_annotation = combine_two_annotation(train_annotation, validation_annotation)
 
             sequence_data_dir = osp.join(self.data_dir, 'sequence_data')
             constellation_data_dir = osp.join(
@@ -181,24 +211,18 @@ class DeepSigBase(object):
                     print_progress(i, num_items, prefix='Convert {}-{}'.format(self.name, self.version), suffix='Done ',
                                    bar_length=40)
 
-            train_data = generate_json(
-                train_annotations, mods_dict, snrs_dict, self.filters)
-            val_data = generate_json(
-                val_annotations, mods_dict, snrs_dict, self.filters)
-            test_data = generate_json(
-                test_annotations, mods_dict, snrs_dict, self.filters)
-            train_and_val_data = generate_json(
-                train_annotations + val_annotations, mods_dict, snrs_dict, self.filters)
-
-            print(
-                'Save train, val, test annotation json for the data set {}-{}'.format(self.name, self.version))
-            json.dump(train_data, open(self.data_dir + '/{}.json'.format('train'), 'w'),
+            print('Save train, val, test annotation json for the data set {}-{}'.format(self.name, self.version))
+            json.dump(train_annotation,
+                      open(self.data_dir + '/{}.json'.format('train'), 'w'),
                       indent=4, sort_keys=True)
-            json.dump(val_data, open(self.data_dir + '/{}.json'.format('val'), 'w'),
+            json.dump(validation_annotation,
+                      open(self.data_dir + '/{}.json'.format('validation'), 'w'),
                       indent=4, sort_keys=True)
-            json.dump(test_data, open(self.data_dir + '/{}.json'.format('test'), 'w'),
+            json.dump(test_annotation,
+                      open(self.data_dir + '/{}.json'.format('test'), 'w'),
                       indent=4, sort_keys=True)
-            json.dump(train_and_val_data, open(self.data_dir + '/{}.json'.format('train_and_val'), 'w'),
+            json.dump(train_and_validation_annotation,
+                      open(self.data_dir + '/{}.json'.format('train_and_validation'), 'w'),
                       indent=4, sort_keys=True)
         except Exception as e:
             print('Error Message is: {}'.format(e))
@@ -287,44 +311,40 @@ class DeepSigD(DeepSigBase):
             data_map[key_str].append(item_index)
 
         dataset = []
-        train_annotations = []
-        val_annotations = []
-        test_annotations = []
 
-        mods_dict = {mod: index for index, mod in enumerate(DeepSigD.MODS)}
-        snrs = []
+        mod_to_label = {mod: index for index, mod in enumerate(DeepSigD.MODS)}
+        snrs = [snr for snr in range(-20, 32, 2)]
+        snr_to_label = {'{:d}'.format(snr): index for snr, index in enumerate(snrs)}
+        filter_config = [[0.02, 0.02], [0.05, 0.05]]
+
+        test_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
+        train_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
+        validation_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
+
         random.seed(0)
         for tuple_key in data_map.keys():
             item_num = len(data_map[tuple_key])
             item_indices = [i for i in data_map[tuple_key]]
             random.shuffle(item_indices)
 
-            train_indices = item_indices[:int(
-                self.data_ratios[0] * item_num)]
-            val_indices = item_indices[int(
-                self.data_ratios[0] * item_num):(int(sum(self.data_ratios[:2]) * item_num))]
-            test_indices = item_indices[(
-                                            int(sum(self.data_ratios[:2]) * item_num)):]
+            train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
+            test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
             for item_index in data_map[tuple_key]:
                 item = sequence_data[item_index, :, :]
                 item = item.astype(np.float64)
 
                 filename = '{:0>12d}.npy'.format(item_index)
-
-                ann_info = {}
                 mod_index = np.argmax(data_mods[item_index, :])
-                ann_info['labels'] = [int(mod_index)]
 
-                ann_info['snrs'] = [float(data_snrs[item_index, 0])]
-                snrs.append(float(data_snrs[item_index, 0]))
-
-                annotation_item = {'filename': filename, 'ann': ann_info}
                 if item_index in train_indices:
-                    train_annotations.append(annotation_item)
+                    train_annotation = update_annotation(train_annotation, filename,
+                                                         float(data_snrs[item_index, 0]), self.MODS[mod_index])
                 elif item_index in test_indices:
-                    test_annotations.append(annotation_item)
+                    test_annotation = update_annotation(test_annotation, filename,
+                                                        float(data_snrs[item_index, 0]), self.MODS[mod_index])
                 else:
-                    val_annotations.append(annotation_item)
+                    validation_annotation = update_annotation(validation_annotation, filename,
+                                                              float(data_snrs[item_index, 0]), self.MODS[mod_index])
 
                 real_scale = np.max(
                     np.abs(item[0, :])) + np.finfo(np.float64).eps
@@ -336,8 +356,4 @@ class DeepSigD(DeepSigBase):
                     dataset.append({'filename': filename, 'data': item,
                                     'real_scale': real_scale, 'imag_scale': imag_scale})
 
-        snrs = sorted(list(set(snrs)))
-        snrs_dict = {'{:.3f}'.format(
-            snr): index for index, snr in enumerate(snrs)}
-
-        return dataset, train_annotations, val_annotations, test_annotations, mods_dict, snrs_dict
+        return dataset, train_annotation, validation_annotation, test_annotation
