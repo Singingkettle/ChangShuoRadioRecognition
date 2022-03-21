@@ -31,25 +31,15 @@ Supported Automatic Modulation Classification methods:
   . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
 - [x] [CLDNN](config/cldnn)
   . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [CLDNN2](config/crdnn). "Provided as Baseline in MLDNN"
-- [x] [CGDNN2](config/crdnn). "Provided as Baseline in MLDNN"
-- [x] [CTDNN](config/ctdnn). "Provided as Baseline in MLDNN"
+- [x] [alexnetco](config/alexnetco). "Provided as Baseline in MLDNN"
+- [x] [googlenetco](config/googlenetco). "Provided as Baseline in MLDNN"
+- [x] [resnetco](config/resnetco). "Provided as Baseline in MLDNN"
+- [x] [vggnetco](config/vggnetco). "Provided as Baseline in MLDNN"
+- [x] [CLDNN2](config/cldnn2). "Provided as Baseline in MLDNN"
+- [x] [CGDNN2](config/cgdnn2). "Provided as Baseline in MLDNN"
 - [x] [MLDNN](config/mldnn). "New proposed by Shuo Chang"
-- [x] [MLCLDNN](config/mlcldnn). "New proposed by Shuo Chang"
-- [x] [MLDSCLDNN](config/mldscldnn). "New proposed by Shuo Chang"
 - [x] [HCGDNN](config/hcgdnn). "New proposed by Shuo Chang"
 - [X] [FMLDNN](config/fmldnn). 'New proposed by Shuo Chang'
-- [x] [STN-CNN2](config/stncnn2)
-  . ["Radio Transformer Networks Attention Models for Learning to Synchronize in Wireless Systems"](https://ieeexplore.ieee.org/document/7869126/)
-  -->
-
-Supported Signal Separation methods:
-
-- [x] [TanhNet](configs/tcnn). "Provided as Baseline"
-
-Supported Radio Interference Location
-
-- [x] [RILCNN](configs/rilcnn). "Provided as Baseline"
 
 ## Installation
 
