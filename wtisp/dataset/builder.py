@@ -11,6 +11,32 @@ from ..runner import get_dist_info
 
 DATASETS = Registry('dataset')
 PIPELINES = Registry('pipeline')
+AUGMENTS = Registry('augment')
+EVALUATES = Registry('evaluate')
+MERGES = Registry('merge')
+SAVES = Registry('save')
+
+
+def build(cfg, registry, default_args=None):
+    """Build a module.
+
+    Args:
+        cfg (dict, list[dict]): The config of modules, is either a dict
+            or a list of configs.
+        registry (:obj:`Registry`): A registry the module belongs to.
+        default_args (dict, optional): Default arguments to build the module.
+            Defaults to None.
+
+    Returns:
+        plots: A list of plot handle.
+    """
+    if isinstance(cfg, list):
+        plots = [
+            build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
+        ]
+        return plots
+    else:
+        return build_from_cfg(cfg, registry, default_args)
 
 
 def build_dataset(cfg, default_args=None):
@@ -18,6 +44,23 @@ def build_dataset(cfg, default_args=None):
 
     return dataset
 
+
+def build_augment(cfg, default_args=None):
+    augment = build(cfg, AUGMENTS, default_args)
+
+    return augment
+
+
+def build_evaluate(cfg, default_args=None):
+    evaluate = build(cfg, EVALUATES, default_args)
+
+    return evaluate
+
+
+def build_save(cfg, default_args=None):
+    save = build(cfg, SAVES, default_args)
+
+    return save
 
 def build_dataloader(dataset,
                      samples_per_gpu,

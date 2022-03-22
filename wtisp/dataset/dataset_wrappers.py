@@ -5,7 +5,7 @@ from collections import defaultdict
 import numpy as np
 from torch.utils.data.dataset import ConcatDataset as _ConcatDataset
 
-from .amc_data import WTIMCDataset
+from .custom import CustomDataset
 from .builder import DATASETS
 from ..common import print_log
 
@@ -29,7 +29,7 @@ class ConcatDataset(_ConcatDataset):
         self.CLASSES = datasets[0].CLASSES
         self.separate_eval = separate_eval
         if not separate_eval:
-            if any([isinstance(ds, WTIMCDataset) for ds in datasets]):
+            if any([isinstance(ds, CustomDataset) for ds in datasets]):
                 raise NotImplementedError(
                     'Evaluating concatenated WTIMCDataset as a whole is not'
                     ' supported! Please set "separate_eval=True"')

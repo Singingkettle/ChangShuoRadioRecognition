@@ -8,7 +8,6 @@ Time: 2021/5/31 21:45
 Email: chagshuo@bupt.edu.cn
 """
 import copy
-import glob
 import os
 
 import numpy as np
@@ -39,80 +38,34 @@ def load_annotation(ann_file):
     return SNRS, CLASSES, mods_dict, snrs_dict, ann_info
 
 
-def load_single_file(obj_pointer, format_out_dir, results, name):
-    SNRS, CLASSES, mods_dict, snrs_dict, ann_info = load_annotation(os.path.join(format_out_dir, 'ann.json'))
-    if obj_pointer.SNRS is None or obj_pointer.CLASSES is None:
-        obj_pointer.SNRS = SNRS
-        obj_pointer.CLASSES = CLASSES
-
-    if (obj_pointer.SNRS == SNRS) and (obj_pointer.CLASSES == CLASSES):
-        confusion_matrix = np.zeros(
-            (len(SNRS), len(CLASSES), len(CLASSES)), dtype=np.float64)
-
-        for idx in range(len(ann_info)):
-            ann = ann_info[idx]
-            snrs = ann['snrs']
-            labels = ann['mod_labels']
-            if len(snrs) == 1 and len(labels) == 1:
-                predict_class_index = int(
-                    np.argmax(results[idx, :]))
-                confusion_matrix[snrs_dict['{:.3f}'.format(
-                    snrs[0])], labels[0], predict_class_index] += 1
-            else:
-                raise ValueError(
-                    'Please check your dataset, the size of snrs and labels are both 1 for any item. '
-                    'However, the current item with the idx {:d} has the snrs size {:d} and the '
-                    'labels size {:d}'.format(idx, snrs.size, labels.size))
-
-        accs = list()
-        for snr_index, snr in enumerate(SNRS):
-            conf = confusion_matrix[snr_index, :, :]
-            cor = np.sum(np.diag(conf))
-            ncor = np.sum(conf) - cor
-            accs.append(1.0 * cor / (cor + ncor))
-
-        conf = np.sum(confusion_matrix, axis=0)
+def get_classification_accuracy_and_f1_for_plot(prediction_name, confusion_matrix, SNRS, CLASSES):
+    accs = list()
+    for snr_index, snr in enumerate(SNRS):
+        conf = confusion_matrix[snr_index, :, :]
         cor = np.sum(np.diag(conf))
         ncor = np.sum(conf) - cor
-        average_accuracy = 1.0 * cor / (cor + ncor)
+        accs.append(1.0 * cor / (cor + ncor))
 
-        snr_accuracy = dict(
-            accs=accs, average_accuracy=average_accuracy, name=name, SNRS=SNRS)
+    conf = np.sum(confusion_matrix, axis=0)
+    cor = np.sum(np.diag(conf))
+    ncor = np.sum(conf) - cor
+    average_accuracy = 1.0 * cor / (cor + ncor)
 
-        f1s = list()
-        for i in range(len(CLASSES)):
-            f1 = 2.0 * conf[i, i] / \
-                 (np.sum(conf[i, :]) + np.sum(conf[:, i]))
-            f1s.append(f1)
-        average_f1 = sum(f1s) / float(len(CLASSES))
-        modulation_f1 = dict(
-            f1s=f1s, average_f1=average_f1, name=name, CLASSES=CLASSES)
-    else:
-        raise ValueError(
-            'Please check your input methods. They should be evaluated '
-            'in the same dataset with the same configuration.')
+    snr_accuracy = dict(
+        accs=accs, average_accuracy=average_accuracy, name=prediction_name, SNRS=SNRS)
+
+    f1s = list()
+    for i in range(len(CLASSES)):
+        f1 = 2.0 * conf[i, i] / (np.sum(conf[i, :]) + np.sum(conf[:, i]))
+        f1s.append(f1)
+    average_f1 = sum(f1s) / float(len(CLASSES))
+    modulation_f1 = dict(
+        f1s=f1s, average_f1=average_f1, name=prediction_name, CLASSES=CLASSES)
 
     return snr_accuracy, modulation_f1
 
 
-def load_method_final(obj_pointer):
-    snr_accuracies = list()
-    modulation_f1s = list()
-    for method in obj_pointer.method:
-        config = method['config']
-        name = method['name']
-
-        format_out_dir = os.path.join(obj_pointer.log_dir, config, 'format_out')
-        results = np.load(os.path.join(format_out_dir, 'pre.npy'))
-
-        snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results, name)
-        snr_accuracies.append(snr_accuracy)
-        modulation_f1s.append(modulation_f1)
-
-    return snr_accuracies, modulation_f1s
-
-
-def load_method_self(obj_pointer, extra_pre):
+def load_method(obj_pointer, extra_predictions=None):
     snr_accuracies = list()
     modulation_f1s = list()
 
@@ -121,32 +74,25 @@ def load_method_self(obj_pointer, extra_pre):
         name = method['name']
 
         format_out_dir = os.path.join(obj_pointer.log_dir, config, 'format_out')
-        pre_files = [os.path.join(format_out_dir, 'pre.npy')]
-        for file_prefix in extra_pre:
-            pre_files.append(os.path.join(format_out_dir, file_prefix + '_pre.npy'))
+        pre_files = [os.path.join(format_out_dir, name + '.pkl')]
+        if extra_predictions is not None:
+            for extra_prediction in extra_predictions:
+                pre_files.append(os.path.join(format_out_dir, extra_prediction + '.pkl'))
         for pre_file in pre_files:
             if os.path.isfile(pre_file):
-                results = np.load(pre_file)
-                pre_name = os.path.basename(pre_file)
-                if '_' in pre_name:
-                    pre_prefix = pre_name.split('_')[0]
-                    snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results,
-                                                                   name + '-' + pre_prefix)
-                else:
-                    snr_accuracy, modulation_f1 = load_single_file(obj_pointer, format_out_dir, results,
-                                                                   name)
+                save_res = IOLoad(pre_file)
+                confusion_matrix = save_res['cm']
+                CLASSES = save_res['cl']
+                SNRS = save_res['sn']
+                prediction_name = os.path.basename(pre_file)
+                snr_accuracy, modulation_f1 = get_classification_accuracy_and_f1_for_plot(prediction_name,
+                                                                                          confusion_matrix, SNRS,
+                                                                                          CLASSES)
 
                 snr_accuracies.append(snr_accuracy)
                 modulation_f1s.append(modulation_f1)
 
     return snr_accuracies, modulation_f1s
-
-
-def load_method(obj_pointer, extra_pre=None):
-    if extra_pre is not None:
-        return load_method_self(obj_pointer, extra_pre)
-    else:
-        return load_method_final(obj_pointer)
 
 
 def reorder_results(f1s):

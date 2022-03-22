@@ -4,8 +4,9 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
-from .pipelines import Compose
+from .pipeline import Compose
 from ..common.fileio import load as IOLoad
+
 
 @DATASETS.register_module()
 class CustomDataset(Dataset):

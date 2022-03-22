@@ -1,7 +1,11 @@
-from .amc import (get_classification_accuracy_f1, EvaluateSingleModulationPrediction, EvaluateSNRPrediction,
-                  EvaluateMultiModulationPrediction)
+from .amc import (EvaluateSingleModulationPrediction,
+                  EvaluateMultiModulationPrediction,
+                  EvaluateSNRPrediction,
+                  EvaluateOnlineSingleModulationPrediction)
 
 __all__ = [
-    'get_classification_accuracy_f1', 'EvaluateSNRPrediction', 'EvaluateSingleModulationPrediction',
-    'EvaluateMultiModulationPrediction'
+    'EvaluateSingleModulationPrediction',
+    'EvaluateMultiModulationPrediction',
+    'EvaluateSNRPrediction',
+    'EvaluateOnlineSingleModulationPrediction'
 ]

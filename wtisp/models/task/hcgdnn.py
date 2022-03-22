@@ -15,6 +15,7 @@ class HCGDNN(BaseAMC):
         self.channel_mode = channel_mode
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+        self.method_name = 'HCGDNN'
         if 'vis_fea' in self.test_cfg:
             self.vis_fea = self.test_cfg['vis_fea']
         else:
@@ -75,12 +76,17 @@ class HCGDNN(BaseAMC):
             for idx in range(batch_size):
                 item = dict()
                 for key_str in keys:
-                    item[key_str] = outs2result(outs[key_str][idx, :])
+                    if key_str is 'final':
+                        method_name = self.method_name
+                    else:
+                        method_name = self.method_name + '-' + key_str
+                    item[method_name] = outs2result(outs[key_str][idx, :])
                 results_list.append(item)
         else:
             results_list = []
             for idx in range(outs.shape[0]):
                 result = outs2result(outs[idx, :])
+                result = {self.method_name: result}
                 results_list.append(result)
 
         return results_list

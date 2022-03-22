@@ -1,24 +1,24 @@
-from ..builder import LABELS
+from ..builder import AUGMENTS
 
 
-@LABELS.register_module()
+@AUGMENTS.register_module()
 class MLDNNSNRLabel:
     def __init__(self, snr_threshold=0, item_weights=None):
         self.snr_threshold = snr_threshold
         self.item_weights = item_weights
 
     def augment(self, data_infos):
-        item_snr_label = data_infos['item_snr_label']
+        item_snr_value = data_infos['item_snr_value']
         low_weights = []
         high_weights = []
-        for item_index, item in enumerate(item_snr_label):
+        for item_index, item in enumerate(item_snr_value):
             if item >= self.snr_threshold:
-                item_snr_label[item_index] = 0
+                item_snr_value[item_index] = 0
                 if self.item_weights is not None:
                     low_weights.append(self.item_weights[0])
                     high_weights.append(self.item_weights[1])
             else:
-                item_snr_label[item_index] = 1
+                item_snr_value[item_index] = 1
                 if self.item_weights is not None:
                     low_weights.append(self.item_weights[1])
                     high_weights.append(self.item_weights[0])

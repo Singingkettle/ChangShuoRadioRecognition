@@ -5,7 +5,7 @@ from .utils import format_results
 
 
 @DATASETS.register_module()
-class DeepSigDataset(CustomDataset):
+class OnlineDataset(CustomDataset):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.
@@ -18,7 +18,7 @@ class DeepSigDataset(CustomDataset):
 
     def __init__(self, ann_file, pipeline, data_root=None, test_mode=False,
                  augment=None, evaluate=None, save=None):
-        super(DeepSigDataset, self).__init__(ann_file, pipeline, data_root, test_mode)
+        super(OnlineDataset, self).__init__(ann_file, pipeline, data_root, test_mode)
         if augment is None:
             self.augment = None
         else:
@@ -37,13 +37,18 @@ class DeepSigDataset(CustomDataset):
 
     def load_annotations(self, ann_file):
         data_infos = IOLoad(ann_file)
-        # there is a bug when using json package to save the dict var, where its key is int
-        # after saving, the int key will be transferred as string
-        # please refer to: https://stackoverflow.com/questions/1450957/pythons-json-module-converts-int-dictionary-keys-to-strings
+        data_infos['mod_to_label'] = data_infos['mods']
         label_to_mod = {int(key): value for key, value in data_infos['label_to_mod'].items()}
-        label_to_snr = {int(key): value for key, value in data_infos['label_to_snr'].items()}
         data_infos['label_to_mod'] = label_to_mod
-        data_infos['label_to_snr'] = label_to_snr
+
+        data_infos['item_filename'] = []
+        data_infos['item_mod_label'] = []
+        for item in data_infos['data']:
+            data_infos['item_filename'].append(item['filename'])
+            data_infos['item_mod_label'].append(data_infos['mod_to_label'][item['labels']])
+
+        data_infos.pop('mods', None)
+        data_infos.pop('data', None)
 
         return data_infos
 
@@ -53,30 +58,21 @@ class DeepSigDataset(CustomDataset):
     def extract_CLASSES_SNRS(self, data_infos):
 
         label_to_mod = data_infos['label_to_mod']
-        label_to_snr = data_infos['label_to_snr']
         CLASSES = [''] * len(label_to_mod)
-        SNRS = [0] * len(label_to_snr)
 
         for label in label_to_mod:
             CLASSES[label] = label_to_mod[label]
-        for label in label_to_snr:
-            SNRS[label] = label_to_snr[label]
 
-        return CLASSES, SNRS
+        return CLASSES
 
     def get_ann_info(self, idx):
         results = dict()
         results['item_mod_label'] = self.data_infos['item_mod_label'][idx]
-        results['item_snr_label'] = self.data_infos['item_snr_label'][idx]
-        results['item_snr_value'] = self.data_infos['item_snr_value'][idx]
-        results['item_snr_index'] = self.data_infos['item_snr_index'][idx]
         return results
 
     def pre_pipeline(self, results):
         results['data_root'] = self.data_root
-        results['iq_folder'] = 'sequence_data/iq'
-        results['ap_folder'] = 'sequence_data/ap'
-        results['co_folder'] = 'constellation_data'
+        results['iq_folder'] = 'iq'
 
         return results
 

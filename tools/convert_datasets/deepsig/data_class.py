@@ -71,7 +71,7 @@ def combine_two_annotation(annotation1, annotation2):
     combine_annotation = copy.deepcopy(annotation1)
     update_list = ['item_snr_value', 'item_filename', 'item_mod_label', 'item_snr_label', 'item_snr_index']
     for key_name in update_list:
-        combine_annotation[key_name].extend(annotation2[key_name])
+        combine_annotation[key_name].extend(copy.deepcopy(annotation2[key_name]))
 
     return combine_annotation
 
@@ -150,38 +150,44 @@ class DeepSigBase(object):
 
         random.seed(0)
 
+        mods_snrs = []
         for mod in mods:
             for snr in snrs:
-                item_num = data[(mod, snr)].shape[0]
-                item_indices = [i for i in range(item_num)]
-                random.shuffle(item_indices)
+                mods_snrs.append({'mod': mod, 'snr': snr})
 
-                if hasattr(self, 'mod2mod'):
-                    mod_ = self.mod2mod[mod]
+        for item in tqdm(mods_snrs):
+            mod = item['mod']
+            snr = item['snr']
+            item_num = data[(mod, snr)].shape[0]
+            item_indices = [i for i in range(item_num)]
+            random.shuffle(item_indices)
+
+            if hasattr(self, 'mod2mod'):
+                mod_ = self.mod2mod[mod.decode('UTF-8')]
+            else:
+                mod_ = mod.decode('UTF-8')
+
+            train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
+            test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
+
+            for sub_item_index in item_indices:
+                item = data[(mod, snr)][sub_item_index, :, :]
+                item = item.astype(np.float64)
+                filename = '{:0>12d}.npy'.format(item_index + sub_item_index)
+
+                if sub_item_index in train_indices:
+                    train_annotation = update_annotation(train_annotation, filename, snr, mod_)
+                elif sub_item_index in test_indices:
+                    test_annotation = update_annotation(test_annotation, filename, snr, mod_)
                 else:
-                    mod_ = mod
-
-                train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
-                test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
-
-                for sub_item_index in item_indices:
-                    item = data[(mod, snr)][sub_item_index, :, :]
-                    item = item.astype(np.float64)
-                    filename = '{:0>12d}.npy'.format(item_index + sub_item_index)
-
-                    if sub_item_index in train_indices:
-                        train_annotation = update_annotation(train_annotation, filename, snr, mod_)
-                    elif sub_item_index in test_indices:
-                        test_annotation = update_annotation(test_annotation, filename, snr, mod_)
-                    else:
-                        validation_annotation = update_annotation(validation_annotation, filename, snr, mod_)
-                    real_scale = np.max(
-                        np.abs(item[0, :])) + np.finfo(np.float64).eps
-                    imag_scale = np.max(
-                        np.abs(item[1, :])) + np.finfo(np.float64).eps
-                    dataset.append({'filename': filename, 'data': item,
-                                    'real_scale': real_scale, 'imag_scale': imag_scale})
-                item_index += item_num
+                    validation_annotation = update_annotation(validation_annotation, filename, snr, mod_)
+                real_scale = np.max(
+                    np.abs(item[0, :])) + np.finfo(np.float64).eps
+                imag_scale = np.max(
+                    np.abs(item[1, :])) + np.finfo(np.float64).eps
+                dataset.append({'filename': filename, 'data': item,
+                                'real_scale': real_scale, 'imag_scale': imag_scale})
+            item_index += item_num
 
         return dataset, train_annotation, validation_annotation, test_annotation
 
@@ -211,7 +217,7 @@ class DeepSigBase(object):
                     print_progress(i, num_items, prefix='Convert {}-{}'.format(self.name, self.version), suffix='Done ',
                                    bar_length=40)
 
-            print('Save train, val, test annotation json for the data set {}-{}'.format(self.name, self.version))
+            print('\nSave train, val, test annotation json for the data set {}-{}'.format(self.name, self.version))
             json.dump(train_annotation,
                       open(self.data_dir + '/{}.json'.format('train'), 'w'),
                       indent=4, sort_keys=True)
@@ -314,7 +320,7 @@ class DeepSigD(DeepSigBase):
 
         mod_to_label = {mod: index for index, mod in enumerate(DeepSigD.MODS)}
         snrs = [snr for snr in range(-20, 32, 2)]
-        snr_to_label = {'{:d}'.format(snr): index for snr, index in enumerate(snrs)}
+        snr_to_label = {'{:d}'.format(snr): index for index, snr in enumerate(snrs)}
         filter_config = [[0.02, 0.02], [0.05, 0.05]]
 
         test_annotation = generate_annotation(mod_to_label, snr_to_label, filter_config)
@@ -338,18 +344,16 @@ class DeepSigD(DeepSigBase):
 
                 if item_index in train_indices:
                     train_annotation = update_annotation(train_annotation, filename,
-                                                         float(data_snrs[item_index, 0]), self.MODS[mod_index])
+                                                         int(data_snrs[item_index, 0]), self.MODS[mod_index])
                 elif item_index in test_indices:
                     test_annotation = update_annotation(test_annotation, filename,
-                                                        float(data_snrs[item_index, 0]), self.MODS[mod_index])
+                                                        int(data_snrs[item_index, 0]), self.MODS[mod_index])
                 else:
                     validation_annotation = update_annotation(validation_annotation, filename,
-                                                              float(data_snrs[item_index, 0]), self.MODS[mod_index])
+                                                              int(data_snrs[item_index, 0]), self.MODS[mod_index])
 
-                real_scale = np.max(
-                    np.abs(item[0, :])) + np.finfo(np.float64).eps
-                imag_scale = np.max(
-                    np.abs(item[1, :])) + np.finfo(np.float64).eps
+                real_scale = np.max(np.abs(item[0, :])) + np.finfo(np.float64).eps
+                imag_scale = np.max(np.abs(item[1, :])) + np.finfo(np.float64).eps
 
                 if (not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'iq', filename))) or (
                         not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'ap', filename))):

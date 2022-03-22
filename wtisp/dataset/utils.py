@@ -2,7 +2,7 @@ import numpy as np
 
 
 def generate_targets(gts, class_num):
-    targets = np.zeros((gts, class_num), dtype=np.float64)
+    targets = np.zeros((len(gts), class_num), dtype=np.float64)
     for item_index, gt in enumerate(gts):
         targets[item_index, gt] = 1
 
@@ -41,9 +41,8 @@ def get_confusion_matrix(snr_num, class_num, snr_info, prs, gts):
     return confusion_matrix
 
 
-def get_classification_accuracy_f1(snr_num, class_num, snr_index, snr_info,
-                                   prs, gts, prefix='', return_f1=False):
-    """Calculate the accuracy and f1 with different snr and average snr.
+def get_classification_accuracy_for_evaluation(snr_num, class_num, snr_index, snr_info, prs, gts, prefix=''):
+    """Calculate the accuracy with different snr and average snr for evaluation.
     Args:
         snr_num: number of values about snr.
         class_num: size of classification set.
@@ -51,13 +50,11 @@ def get_classification_accuracy_f1(snr_num, class_num, snr_index, snr_info,
         snr_info: snr index of every test item, where low snr index stands for the low snr value.
         prs: all items' test results with the shape of [N, K].
         gts: all items' true labels with the shape of [N,].
-        prefix: the prefix name to log the accuracy and f1 results.
-        return_f1: whether calculate the f1 score or not.
+        prefix: the prefix name to log the accuracy results.
     """
     confusion_matrix = get_confusion_matrix(snr_num, class_num, snr_info, prs, gts)
 
-    confusion_matrix = confusion_matrix / \
-                       np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2)
+    confusion_matrix = confusion_matrix / np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2)
 
     eval_results = dict()
     for snr in snr_index:
@@ -71,13 +68,23 @@ def get_classification_accuracy_f1(snr_num, class_num, snr_index, snr_info,
     ncor = np.sum(conf) - cor
     eval_results[prefix + 'snr_mean_all'] = 1.0 * cor / (cor + ncor)
 
-    if return_f1:
-        f1s = list()
-        for i in range(class_num):
-            f1 = 2.0 * conf[i, i] / \
-                 (np.sum(conf[i, :]) + np.sum(conf[:, i]))
-            f1s.append(f1)
-        average_f1 = sum(f1s) / float(class_num)
-        return eval_results, average_f1
-    else:
-        return eval_results
+    return eval_results
+
+def get_online_confusion_matrix(class_num, prs, gts):
+    confusion_matrix = np.zeros((class_num, class_num), dtype=np.float64)
+
+    for idx in range(prs.shape[0]):
+        predict_label = int(np.argmax(prs[idx, :]))
+        confusion_matrix[gts[idx], predict_label,] += 1
+
+    return confusion_matrix
+
+def get_online_classification_accuracy_for_evaluation(class_num, prs, gts, prefix=''):
+    confusion_matrix = get_online_confusion_matrix(class_num, prs, gts)
+
+    cor = np.sum(np.diag(confusion_matrix))
+    ncor = np.sum(confusion_matrix) - cor
+    eval_results = dict()
+    eval_results[prefix + 'snr_mean_all'] = 1.0 * cor / (cor + ncor)
+
+    return eval_results

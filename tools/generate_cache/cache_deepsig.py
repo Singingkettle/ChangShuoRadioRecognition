@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from wtisp.common.fileio import load as IOLoad
 
-_DATA_VERSION = ['201610A', '201801A', '201604C', '201610B']
+_DATA_VERSION = ['201801A', '201610A', '201604C', '201610B']
 
 
 def parse_args():
@@ -61,7 +61,7 @@ def run(dataset_folder, json_file):
     for key in cache_data:
         cache_name = key.split('/')[-1]
         cache_file_path = osp.join(cache_dir, mode + '_' + cache_name + '.pkl')
-        pickle.dump(cache_data[key], open(cache_file_path, 'wb'))
+        pickle.dump(cache_data[key], open(cache_file_path, 'wb'), protocol=4)
 
 
 def main():
@@ -70,13 +70,13 @@ def main():
         dataset_folder = osp.join(args.data_root, version)
         print(dataset_folder)
         # cache val data
-        run(dataset_folder, 'val.json')
+        run(dataset_folder, 'validation.json')
         # cache test data
         run(dataset_folder, 'test.json')
         # cache train data
         run(dataset_folder, 'train.json')
         # cache train_and_val data
-        run(dataset_folder, 'train_and_val.json')
+        run(dataset_folder, 'train_and_validation.json')
 
 
 
