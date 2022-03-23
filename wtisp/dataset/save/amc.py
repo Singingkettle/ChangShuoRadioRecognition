@@ -7,31 +7,7 @@ from ...common.utils import build_from_cfg
 
 
 @SAVES.register_module()
-class SaveSingleModulationPrediction:
-    def __init__(self, prediction_name=None):
-        self.prediction_name = prediction_name
-
-    def __call__(self, out_dir, results, data_infos, CLASSES, SNRS):
-        snr_to_index = data_infos['snr_to_index']
-        item_snr_index = data_infos['item_snr_index']
-        snr_num = len(snr_to_index)
-        mod_label_num = len(data_infos['mod_to_label'])
-        item_mod_label = data_infos['item_mod_label']
-        if self.prediction_name is None:
-            assert len(
-                results) == 1, 'There are multi-group amc results, please use the EvaluateMultiModulationPrediction'
-            self.prediction_name, results = results.popitem()
-            results = reshape_results(results, mod_label_num)
-        else:
-            results = reshape_results(results[self.prediction_name], mod_label_num)
-        confusion_matrix = get_confusion_matrix(snr_num, mod_label_num, item_snr_index, results, item_mod_label)
-        save_res = dict(pre=results, cm=confusion_matrix, cl=CLASSES, sn=SNRS)
-        save_path = osp.join(out_dir, self.prediction_name + '.pkl')
-        pickle.dump(save_res, open(save_path, 'wb'))
-
-
-@SAVES.register_module()
-class SaveMultiModulationPrediction:
+class SaveModulationPrediction:
     def __init__(self, prediction_names=None, merge=None):
         self.prediction_names = prediction_names
         if merge:
@@ -54,9 +30,9 @@ class SaveMultiModulationPrediction:
                 if results[pr_name][0] is None:
                     final_method_name = pr_name
                     _, _ = results.popitem(pr_name, None)
-                    selected_results = results
                     is_not_merge = False
                     break
+            selected_results = results
             if is_not_merge:
                 self.merge = None
         else:

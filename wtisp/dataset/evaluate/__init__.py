@@ -1,11 +1,10 @@
-from .amc import (EvaluateSingleModulationPrediction,
-                  EvaluateMultiModulationPrediction,
+from .amc import (
+                  EvaluateModulationPrediction,
                   EvaluateSNRPrediction,
-                  EvaluateOnlineSingleModulationPrediction)
+                  EvaluateOnlineModulationPrediction)
 
 __all__ = [
-    'EvaluateSingleModulationPrediction',
-    'EvaluateMultiModulationPrediction',
+    'EvaluateModulationPrediction',
     'EvaluateSNRPrediction',
-    'EvaluateOnlineSingleModulationPrediction'
+    'EvaluateOnlineModulationPrediction'
 ]

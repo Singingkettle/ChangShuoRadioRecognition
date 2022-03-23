@@ -1,8 +1,6 @@
-from .amc import (SaveSNRPrediction, SaveMultiModulationPrediction,
-                  SaveSingleModulationPrediction)
+from .amc import (SaveSNRPrediction, SaveModulationPrediction)
 
 __all__ = [
     'SaveSNRPrediction',
-    'SaveMultiModulationPrediction',
-    'SaveSingleModulationPrediction'
+    'SaveModulationPrediction',
 ]
