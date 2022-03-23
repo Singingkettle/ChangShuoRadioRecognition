@@ -26,7 +26,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
         ],
     ),
     test=dict(
@@ -39,7 +39,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
         ],
     ),
 )

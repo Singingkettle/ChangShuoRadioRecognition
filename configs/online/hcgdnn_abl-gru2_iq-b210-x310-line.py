@@ -27,7 +27,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_0.25m/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
         dict(
@@ -40,7 +40,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_1.2m/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
         dict(
@@ -53,7 +53,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_3m/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
         dict(
@@ -66,7 +66,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_line/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
         dict(
@@ -79,7 +79,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_line/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
         dict(
@@ -92,7 +92,7 @@ data = dict(
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line/Online',
             evaluate=[
-                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+                dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
             ],
         ),
     ],
@@ -106,7 +106,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            dict(type='EvaluateOnlineModulationPrediction', prediction_name='HCGDNN')
         ],
     ),
 )
