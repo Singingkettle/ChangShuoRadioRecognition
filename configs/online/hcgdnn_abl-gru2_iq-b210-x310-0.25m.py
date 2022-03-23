@@ -3,13 +3,13 @@ _base_ = '../_base_/default_runtime.py'
 dataset_type = 'OnlineDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_0.25m/Online'
 data = dict(
-    samples_per_gpu=640,
+    samples_per_gpu=3200,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
         ann_file='train.json',
         pipeline=[
-            dict(type='LoadIQFromFile', data_root=data_root, to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='ChannelMode'),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['iqs', 'mod_labels'])
@@ -20,9 +20,8 @@ data = dict(
         type=dataset_type,
         ann_file='val.json',
         pipeline=[
-            dict(type='LoadIQFromFile', data_root=data_root, to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='ChannelMode'),
-            dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['iqs'])
         ],
         data_root=data_root,
@@ -34,9 +33,8 @@ data = dict(
         type=dataset_type,
         ann_file='val.json',
         pipeline=[
-            dict(type='LoadIQFromFile', data_root=data_root, to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='ChannelMode'),
-            dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['iqs'])
         ],
         data_root=data_root,
@@ -70,13 +68,10 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-total_epochs = 1600
+total_epochs = 400
 
 # Optimizer
-optimizer = dict(type='Adam', lr=0.00044)
+optimizer = dict(type='Adam', lr=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
-lr_config = dict(
-    policy='step',
-    gamma=0.3,
-    step=[800])
+lr_config = dict(policy='fixed')

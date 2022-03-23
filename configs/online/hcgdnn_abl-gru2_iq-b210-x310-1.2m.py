@@ -1,7 +1,7 @@
 _base_ = '../_base_/default_runtime.py'
 
 dataset_type = 'OnlineDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_1.2m/Online'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_1.2m/Online'
 data = dict(
     samples_per_gpu=3200,
     workers_per_gpu=4,

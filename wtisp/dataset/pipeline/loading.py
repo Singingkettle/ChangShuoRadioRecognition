@@ -14,7 +14,7 @@ class LoadIQFromFile:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        file_path = osp.join(results['data_root'], results['iq_folder'], results['item_filename'])
+        file_path = osp.join(results['data_root'], results['iq_folder'], results['filename'])
         iq = np.load(file_path)
         if self.to_float32:
             iq = iq.astype(np.float32)
@@ -37,7 +37,7 @@ class LoadAPFromFile:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        file_path = osp.join(results['data_root'], results['ap_folder'], results['item_filename'])
+        file_path = osp.join(results['data_root'], results['ap_folder'], results['filename'])
         ap = np.load(file_path)
         if self.to_float32:
             ap = ap.astype(np.float32)
@@ -62,7 +62,7 @@ class LoadConstellationFromFile:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        file_path = osp.join(results['data_root'], results['co_folder'], self.filter_config, results['item_filename'])
+        file_path = osp.join(results['data_root'], results['co_folder'], self.filter_config, results['filename'])
         co = np.load(file_path)
         if self.to_float32:
             co = co.astype(np.float32)
@@ -91,7 +91,7 @@ class LoadIQFromCache:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        idx = self.cache_data['lookup_table'][results['item_filename']]
+        idx = self.cache_data['lookup_table'][results['filename']]
         iq = self.cache_data['data'][idx]
         if self.to_float32:
             iq = iq.astype(np.float32)
@@ -121,7 +121,7 @@ class LoadAPFromCache:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        idx = self.cache_data['lookup_table'][results['item_filename']]
+        idx = self.cache_data['lookup_table'][results['filename']]
         ap = self.cache_data['data'][idx]
         if self.to_float32:
             ap = ap.astype(np.float32)
@@ -151,7 +151,7 @@ class LoadConstellationFromCache:
         self.to_float32 = to_float32
 
     def __call__(self, results):
-        idx = self.cache_data['lookup_table'][results['item_filename']]
+        idx = self.cache_data['lookup_table'][results['filename']]
         co = self.cache_data['data'][idx]
         co = zlib.decompress(co)
         co = np.frombuffer(co, dtype=self.cache_data['dtype']).reshape(self.cache_data['shape'])
@@ -178,14 +178,16 @@ class LoadAnnotations:
         self.with_snr = with_snr
 
     def __call__(self, results):
-        results['mod_labels'] = np.array(results['item_mod_label'], dtype=np.int64)
-        results['snr_labels'] = np.array(results['item_snr_label'], dtype=np.int64)
+        if self.with_mode:
+            results['mod_labels'] = np.array(results['item_mod_label'], dtype=np.int64)
+        if self.with_snr:
+            results['snr_labels'] = np.array(results['item_snr_label'], dtype=np.int64)
 
         return results
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(with_mod={self.with_bbox}, '
-        repr_str += f'with_snr={self.with_label})'
+        repr_str += f'(with_mod={self.with_mode}, '
+        repr_str += f'with_snr={self.with_snr})'
 
         return repr_str

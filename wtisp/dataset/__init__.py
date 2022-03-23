@@ -1,9 +1,8 @@
 from .augment import *
 from .builder import (AUGMENTS, EVALUATES, DATASETS, SAVES, build_augment, build_evaluate, build_dataset,
                       build_dataloader, build_save)
-from .custom import CustomDataset
-from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
-                               RepeatDataset)
+from .custom import CustomAMCDataset
+from .dataset_wrappers import ConcatAMCDataset
 from .deepsig import DeepSigDataset
 from .evaluate import *
 from .online import OnlineDataset
@@ -19,10 +18,8 @@ __all__ = [
     'build_dataset',
     'build_dataloader',
     'build_save',
-    'CustomDataset',
-    'ClassBalancedDataset',
-    'ConcatDataset',
-    'RepeatDataset',
+    'CustomAMCDataset',
+    'ConcatAMCDataset',
     'DeepSigDataset',
     'OnlineDataset'
 ]

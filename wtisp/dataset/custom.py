@@ -9,7 +9,7 @@ from ..common.fileio import load as IOLoad
 
 
 @DATASETS.register_module()
-class CustomDataset(Dataset):
+class CustomAMCDataset(Dataset):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.

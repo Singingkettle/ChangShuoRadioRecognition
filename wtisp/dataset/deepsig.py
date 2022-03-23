@@ -1,11 +1,11 @@
 from .builder import DATASETS, build_augment, build_evaluate, build_save
-from .custom import CustomDataset
+from .custom import CustomAMCDataset
 from ..common.fileio import load as IOLoad
 from .utils import format_results
 
 
 @DATASETS.register_module()
-class DeepSigDataset(CustomDataset):
+class DeepSigDataset(CustomAMCDataset):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.

@@ -164,6 +164,8 @@ class GridSearch:
         self.grid_step = grid_step
 
     def __call__(self, results, data_infos, prediction_name):
+        if prediction_name is None:
+            return
         snr_to_index = data_infos['snr_to_index']
         item_snr_index = data_infos['item_snr_index']
         snr_num = len(snr_to_index)
@@ -197,6 +199,8 @@ class Optimization:
         self.method = method
 
     def __call__(self, results, data_infos, prediction_name):
+        if prediction_name is None:
+            return
         snr_to_index = data_infos['snr_to_index']
         item_snr_index = data_infos['item_snr_index']
         snr_num = len(snr_to_index)

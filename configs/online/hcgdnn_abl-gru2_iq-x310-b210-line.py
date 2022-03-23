@@ -1,30 +1,113 @@
 _base_ = '../_base_/default_runtime.py'
 
-dataset_type = 'WTIMCOnlineDataset'
-data_root = '/home/raolu/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line'
+dataset_type = 'OnlineDataset'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line/Online'
 data = dict(
-    samples_per_gpu=640,
+    samples_per_gpu=3200,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
-        data_root=data_root,
         ann_file='train.json',
-        channel_mode=True,
-        use_cache=True,
-    ),
-    val=dict(
-        type=dataset_type,
+        pipeline=[
+            dict(type='LoadIQFromFile', to_float32=True),
+            dict(type='ChannelMode'),
+            dict(type='LoadAnnotations'),
+            dict(type='Collect', keys=['iqs', 'mod_labels'])
+        ],
         data_root=data_root,
-        ann_file='val.json',
-        channel_mode=True,
-        use_cache=True,
     ),
+    val=[
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_0.25m/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_1.2m/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_3m/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_line/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_line/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+        dict(
+            type=dataset_type,
+            ann_file='val.json',
+            pipeline=[
+                dict(type='LoadIQFromFile', to_float32=True),
+                dict(type='ChannelMode'),
+                dict(type='Collect', keys=['iqs'])
+            ],
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line/Online',
+            evaluate=[
+                dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+            ],
+        ),
+    ],
     test=dict(
         type=dataset_type,
-        data_root=data_root,
         ann_file='val.json',
-        channel_mode=True,
-        use_cache=True,
+        pipeline=[
+            dict(type='LoadIQFromFile', to_float32=True),
+            dict(type='ChannelMode'),
+            dict(type='Collect', keys=['iqs'])
+        ],
+        data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
+        ],
     ),
 )
 
@@ -52,10 +135,10 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-total_epochs = 1600
+total_epochs = 400
 
 # Optimizer
-optimizer = dict(type='Adam', lr=0.00044)
+optimizer = dict(type='Adam', lr=0.00015)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(

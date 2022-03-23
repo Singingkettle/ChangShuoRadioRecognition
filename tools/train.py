@@ -144,6 +144,9 @@ def main():
     model = build_task(cfg.model, train_cfg=cfg.train_cfg,
                        test_cfg=cfg.test_cfg)
 
+    # log network structure
+    logger.info(f'Network Structure:\n{model}')
+
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)

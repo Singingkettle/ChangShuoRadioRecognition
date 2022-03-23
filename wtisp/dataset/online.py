@@ -1,11 +1,11 @@
 from .builder import DATASETS, build_augment, build_evaluate, build_save
-from .custom import CustomDataset
+from .custom import CustomAMCDataset
 from ..common.fileio import load as IOLoad
 from .utils import format_results
 
 
 @DATASETS.register_module()
-class OnlineDataset(CustomDataset):
+class OnlineDataset(CustomAMCDataset):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.
@@ -33,19 +33,19 @@ class OnlineDataset(CustomDataset):
             self.save = None
         else:
             self.save = build_save(save)
-        self.CLASSES, self.SNRS = self.extract_CLASSES_SNRS(self.data_infos)
+        self.CLASSES = self.extract_CLASSES(self.data_infos)
 
     def load_annotations(self, ann_file):
         data_infos = IOLoad(ann_file)
         data_infos['mod_to_label'] = data_infos['mods']
-        label_to_mod = {int(key): value for key, value in data_infos['label_to_mod'].items()}
+        label_to_mod = {value: key for key, value in data_infos['mod_to_label'].items()}
         data_infos['label_to_mod'] = label_to_mod
 
         data_infos['item_filename'] = []
         data_infos['item_mod_label'] = []
         for item in data_infos['data']:
             data_infos['item_filename'].append(item['filename'])
-            data_infos['item_mod_label'].append(data_infos['mod_to_label'][item['labels']])
+            data_infos['item_mod_label'].append(data_infos['mod_to_label'][item['ann']['labels']])
 
         data_infos.pop('mods', None)
         data_infos.pop('data', None)
@@ -55,7 +55,7 @@ class OnlineDataset(CustomDataset):
     def __len__(self):
         return len(self.data_infos['item_filename'])
 
-    def extract_CLASSES_SNRS(self, data_infos):
+    def extract_CLASSES(self, data_infos):
 
         label_to_mod = data_infos['label_to_mod']
         CLASSES = [''] * len(label_to_mod)

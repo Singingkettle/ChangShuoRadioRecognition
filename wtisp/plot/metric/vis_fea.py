@@ -8,7 +8,6 @@ Time: 2021/8/22 16:34
 Email: chagshuo@bupt.edu.cn
 """
 
-# from ..builder import CONFUSIONS
 import copy
 import glob
 import os

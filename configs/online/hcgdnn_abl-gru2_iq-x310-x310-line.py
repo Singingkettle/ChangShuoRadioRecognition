@@ -1,7 +1,7 @@
 _base_ = '../_base_/default_runtime.py'
 
 dataset_type = 'OnlineDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_line/Online'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_line/Online'
 data = dict(
     samples_per_gpu=3200,
     workers_per_gpu=4,
@@ -25,7 +25,7 @@ data = dict(
                 dict(type='ChannelMode'),
                 dict(type='Collect', keys=['iqs'])
             ],
-            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_0.25m/Online',
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_0.25m/Online',
             evaluate=[
                 dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
             ],
@@ -38,7 +38,7 @@ data = dict(
                 dict(type='ChannelMode'),
                 dict(type='Collect', keys=['iqs'])
             ],
-            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_1.2m/Online',
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_1.2m/Online',
             evaluate=[
                 dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
             ],
@@ -51,7 +51,7 @@ data = dict(
                 dict(type='ChannelMode'),
                 dict(type='Collect', keys=['iqs'])
             ],
-            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_3m/Online',
+            data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_3m/Online',
             evaluate=[
                 dict(type='EvaluateOnlineSingleModulationPrediction', prediction_name='HCGDNN')
             ],
