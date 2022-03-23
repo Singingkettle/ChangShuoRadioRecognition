@@ -91,19 +91,16 @@ class EvaluateSNRPrediction:
         snr_label_num = len(data_infos['snr_to_label'])
         item_snr_label = data_infos['item_snr_label']
 
-        selected_pr_name = None
         if self.prediction_name is None:
             for pr_name in results:
                 if 'SNR' in pr_name:
-                    selected_pr_name = pr_name
-            if selected_pr_name is None:
+                    self.prediction_name = pr_name
+            if self.prediction_name is None:
                 raise ValueError('You should check your task code to make sure there is a group of SNR prediction!')
-        else:
-            selected_pr_name = self.prediction_name
-        results = reshape_results(results[selected_pr_name], snr_label_num)
+        results = reshape_results(results[self.prediction_name], snr_label_num)
         eval_results = get_classification_accuracy_for_evaluation(snr_num, snr_label_num, snr_to_index, item_snr_index,
                                                                   results, item_snr_label,
-                                                                  prefix=selected_pr_name + '/')
+                                                                  prefix=self.prediction_name + '/')
 
         return eval_results
 
