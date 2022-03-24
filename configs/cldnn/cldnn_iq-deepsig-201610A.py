@@ -41,7 +41,7 @@ data = dict(
             dict(type='EvaluateModulationPrediction', )
         ],
         save=[
-          dict(type='SaveModulationPrediction',)
+            dict(type='SaveModulationPrediction', )
         ],
     ),
 )
