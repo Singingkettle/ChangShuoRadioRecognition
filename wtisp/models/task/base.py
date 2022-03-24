@@ -9,30 +9,23 @@ import torch.nn as nn
 from ...common import get_root_logger, print_log
 
 
-class BaseAMC(nn.Module, metaclass=ABCMeta):
+class BaseDNN(nn.Module, metaclass=ABCMeta):
     """Base class for classifiers."""
 
     def __init__(self):
-        super(BaseAMC, self).__init__()
+        super(BaseDNN, self).__init__()
 
     @abstractmethod
-    def extract_feat(self, iqs, aps, cos):
+    def extract_feat(self, **kwargs):
         """Extract features from signal data."""
         pass
 
     @abstractmethod
-    def forward_train(self, iqs, aps, cos, **kwargs):
-        """
-        Args:
-            iqs (list[Tensor]): List of tensors of shape (1, 1, 2, W).
-            aps (list[Tensor]): List of tensors of shape (1, 1, 2, W).
-            cos (list[Tensor]): List of tensors of shape (1, 1, H, W).
-            kwargs (keyword arguments): Specific to concrete implementation.
-        """
+    def forward_train(self, **kwargs):
         pass
 
     @abstractmethod
-    def simple_test(self, iqs, asp, cos, **kwargs):
+    def simple_test(self, **kwargs):
         pass
 
     @abstractmethod
@@ -48,47 +41,17 @@ class BaseAMC(nn.Module, metaclass=ABCMeta):
             logger = get_root_logger()
             print_log(f'load model from: {pre_trained}', logger=logger)
 
-    def forward_test(self, iqs, aps, cos, **kwargs):
-        """
-        Args:
-            iqs (list[Tensor]): List of tensors of shape (1, 1, 2, W).
-            aps (list[Tensor]): List of tensors of shape (1, 1, 2, W).
-            cos (list[Tensor]): List of tensors of shape (1, 1, H, W).
-            kwargs (keyword arguments): Specific to concrete implementation.
-        """
-        return self.simple_test(iqs, aps, cos, **kwargs)
+    def forward_test(self, **kwargs):
+        return self.simple_test(**kwargs)
 
-    def forward(self, iqs=None, aps=None, cos=None, return_loss=True, **kwargs):
+    def forward(self, return_loss=True, **kwargs):
         """Calls either :func:`forward_train` or :func:`forward_test` depending
         on whether ``return_loss`` is ``True``.
         """
         if return_loss:
-            if isinstance(iqs, dict):
-                if 'iqs' not in iqs:
-                    iqs['iqs'] = None
-                if 'aps' not in iqs:
-                    iqs['aps'] = None
-                if 'cos' not in iqs:
-                    iqs['cos'] = None
-                result = self.forward_train(**iqs, **kwargs)
-                result = namedtuple('loss', result.keys())(*result.values())
-                return result
-            else:
-                return self.forward_train(iqs, aps, cos, **kwargs)
+            return self.forward_train(**kwargs)
         else:
-            if isinstance(iqs, dict):
-                if 'iqs' not in iqs:
-                    iqs['iqs'] = None
-                if 'aps' not in iqs:
-                    iqs['aps'] = None
-                if 'cos' not in iqs:
-                    iqs['cos'] = None
-                result = self.forward_test(**iqs, **kwargs)
-                if isinstance(result, dict):
-                    result = namedtuple('loss', result.keys())(*result.values())
-                return result
-            else:
-                return self.forward_test(iqs, aps, cos, **kwargs)
+            return self.forward_test(**kwargs)
 
     def _parse_losses(self, losses):
         """Parse the raw outputs (losses) of the network.
