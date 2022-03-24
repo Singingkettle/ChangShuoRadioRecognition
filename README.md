@@ -22,7 +22,6 @@ Supported Automatic Modulation Classification methods:
   . ["Convolutional Radio Modulation Recognition Networks"](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
 - [x] [CNN3](configs/cnn3). "Provided as Baseline"
 - [x] [CNN4](config/cnn4). "Provided as Baseline"
-  . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
 - [x] [DS-CLDNN](configs/ds_cldnn)
   . ["Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure"](https://ieeexplore.ieee.org/document/9220797)
 - [x] [DensCNN](config/denscnn)
@@ -37,7 +36,7 @@ Supported Automatic Modulation Classification methods:
 - [x] [vggnetco](config/vggnetco). "Provided as Baseline in MLDNN"
 - [x] [CLDNN2](config/cldnn2). "Provided as Baseline in MLDNN"
 - [x] [CGDNN2](config/cgdnn2). "Provided as Baseline in MLDNN"
-- [x] [MLDNN](config/mldnn). "New proposed by Shuo Chang"
+- [x] [MLDNN](config/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9462447)
 - [x] [HCGDNN](config/hcgdnn). "New proposed by Shuo Chang"
 - [X] [FMLDNN](config/fmldnn). 'New proposed by Shuo Chang'
 
