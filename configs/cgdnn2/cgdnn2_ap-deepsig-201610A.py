@@ -1,21 +1,25 @@
 _base_ = [
-    '../_base_/datasets/slot_iq_data.py',
-    '../_base_/default_runtime.py']
+    '../_base_/datasets/ap-deepsig-201610A.py',
+    '../_base_/default_runtime.py'
+]
 
 # Model
 model = dict(
-    type='CNN3',
+    type='DNN',
+    method_name='CGDNN2',
     backbone=dict(
-        type='CNNNet',
-        depth=2,
+        type='CRNet',
         in_channels=1,
-        out_indices=(1,),
+        cnn_depth=3,
+        rnn_depth=2,
+        input_size=80,
+        out_indices=(2,),
+        rnn_mode='GRU',
     ),
     classifier_head=dict(
-        type='AMCHead',
-        num_classes=8,
-        in_features=10560,
-        out_features=256,
+        type='DSAMCHead',
+        num_classes=11,
+        in_features=50,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1.0,
@@ -29,7 +33,7 @@ test_cfg = dict()
 total_epochs = 400
 
 # Optimizer
-optimizer = dict(type='Adam')
+optimizer = dict(type='Adam', lr=0.001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='fixed')
