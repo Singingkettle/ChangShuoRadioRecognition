@@ -1,27 +1,14 @@
 import os
 import os.path as osp
-import pickle
 import time
-import zlib
 from glob import glob
-import matplotlib.pyplot as plt
-import numpy as np
-import zmq
-from scipy.special import softmax
-from torch.utils.data import Dataset
-from tqdm import tqdm
-from wtisp.common.fileio import dump as IODump
-from wtisp.common.fileio import load as IOLoad
-from wtisp.dataset.merge import get_merge_weight_by_search, get_merge_weight_by_optimization
-from wtisp.dataset.amc_data import WTIMCDataset
-from wtisp.apis import set_random_seed, train_task
-from wtisp.common import get_root_logger, collect_env
-from wtisp.common.fileio import del_files
-from wtisp.common.utils import DictAction, Config, mkdir_or_exist
-from wtisp.dataset import build_dataset
-from wtisp.models import build_task
-from wtisp.runner import init_dist, get_dist_info
 
+import numpy as np
+from scipy.special import softmax
+
+from wtisp.common.utils import Config
+from wtisp.dataset import build_dataset
+from wtisp.dataset.merge import get_merge_weight_by_search, get_merge_weight_by_optimization
 
 
 def merge(results_dict, dataset, save_dir):
@@ -93,7 +80,7 @@ configs = ['hcgdnn_abl_cg1_no_share_deepsig_iq_201610A',
 work_dir = '/home/citybuster/Data/SignalProcessing/Workdir_Old'
 for config in configs:
     print(config)
-    cfg = Config.fromfile(config+'.py')
+    cfg = Config.fromfile(config + '.py')
     cfg.data.test['use_cache'] = False
     dataset = build_dataset(cfg.data.test)
     # Get all results
@@ -112,5 +99,3 @@ for config in configs:
             continue
 
     merge(results_dict, dataset, format_out_dir)
-
-
