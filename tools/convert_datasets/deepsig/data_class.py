@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from .constellation import Constellation
+from wtisp.dataset.utils import Constellation
 
 CPU_COUNT = multiprocessing.cpu_count()
 
@@ -46,7 +46,7 @@ def generate_annotation(mod_to_label, snr_to_label, filter_config):
     label_to_snr = {label: snr for snr, label in snr_to_label.items()}
     annotations = {'filter_config': filter_config, 'item_filename': [],
                    'item_mod_label': [], 'item_snr_label': [], 'item_snr_index': [],
-                   'item_snr_value': [], 'label_to_mode': label_to_mod, 'label_to_snr': label_to_snr,
+                   'item_snr_value': [], 'label_to_mod': label_to_mod, 'label_to_snr': label_to_snr,
                    'mod_to_label': mod_to_label, 'snr_to_label': snr_to_label, 'snr_to_index': snr_to_label,
                    }
 
