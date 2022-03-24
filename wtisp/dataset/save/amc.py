@@ -29,7 +29,7 @@ class SaveModulationPrediction:
             for pr_name in results:
                 if results[pr_name][0] is None:
                     final_method_name = pr_name
-                    _, _ = results.popitem(pr_name, None)
+                    results.pop(pr_name, None)
                     is_not_merge = False
                     break
             selected_results = results

@@ -5,6 +5,7 @@ import zlib
 import numpy as np
 
 from ..builder import PIPELINES
+from ..utils import Constellation
 
 
 @PIPELINES.register_module()
@@ -75,6 +76,40 @@ class LoadConstellationFromFile:
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('
                     f'filter_config={self.filter_config},'
+                    f'to_float32={self.to_float32}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadConstellationFromIQFile:
+    def __init__(self,
+                 filter_size=None,
+                 filter_stride=None,
+                 to_float32=False):
+        if filter_size is None:
+            filter_size = [0.02]
+        if filter_stride is None:
+            filter_stride = [0.02]
+        self.convert_tool = Constellation(filter_size, filter_stride)
+        self.to_float32 = to_float32
+
+    def __call__(self, results):
+        file_path = osp.join(results['data_root'], results['iq_folder'], results['filename'])
+        iq = np.load(file_path)
+        co, _ = self.convert_tool.generate_by_filter(iq)
+        co = co[0]
+        if self.to_float32:
+            co = co.astype(np.float32)
+
+        # make the iq as a three-dimensional tensor [1, 2, L]
+        co = np.expand_dims(co, axis=0)
+        results['cos'] = co
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'filter_size={self.filter_size},'
+                    f'filter_stride={self.filter_stride},'
                     f'to_float32={self.to_float32}, )')
         return repr_str
 
@@ -167,6 +202,46 @@ class LoadConstellationFromCache:
         repr_str = (f'{self.__class__.__name__}('
                     f'data_root={self.data_root},'
                     f'filename={self.filename},'
+                    f'to_float32={self.to_float32}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadConstellationFromIQCache:
+    def __init__(self,
+                 data_root,
+                 filename,
+                 filter_size=None,
+                 filter_stride=None,
+                 to_float32=False):
+        if filter_size is None:
+            filter_size = [0.02]
+        if filter_stride is None:
+            filter_stride = [0.02]
+        self.data_root = data_root
+        self.filename = filename
+        self.cache_data = pickle.load(open(osp.join(data_root, 'cache', filename), 'rb'))
+        self.convert_tool = Constellation(filter_size, filter_stride)
+        self.to_float32 = to_float32
+
+    def __call__(self, results):
+        idx = self.cache_data['lookup_table'][results['filename']]
+        iq = self.cache_data['data'][idx]
+        co = self.convert_tool.generate_by_filter(iq)
+        if self.to_float32:
+            co = co.astype(np.float32)
+
+        # make the iq as a three-dimensional tensor [1, 2, L]
+        co = np.expand_dims(co, axis=0)
+        results['cos'] = co
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'data_root={self.data_root},'
+                    f'filename={self.filename},'
+                    f'filter_size={self.filter_size},'
+                    f'filter_stride={self.filter_stride},'
                     f'to_float32={self.to_float32}, )')
         return repr_str
 

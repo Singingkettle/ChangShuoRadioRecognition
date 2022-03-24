@@ -7,6 +7,7 @@ from .deepsig import DeepSigDataset
 from .evaluate import *
 from .online import OnlineDataset
 from .save import *
+from .utils import *
 
 __all__ = [
     'AUGMENTS',

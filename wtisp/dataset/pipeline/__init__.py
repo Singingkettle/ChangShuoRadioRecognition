@@ -1,7 +1,8 @@
 from .compose import Compose
 from .formating import Collect
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
-                      LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache, LoadAnnotations)
+                      LoadConstellationFromIQFile, LoadAPFromCache, LoadIQFromCache,
+                      LoadConstellationFromCache, LoadConstellationFromIQCache, LoadAnnotations)
 from .transforms import ChannelMode, NormalizeAP, NormalizeIQ, NormalizeConstellation
 
 __all__ = [
@@ -10,9 +11,11 @@ __all__ = [
     'LoadAPFromFile',
     'LoadIQFromFile',
     'LoadConstellationFromFile',
+    'LoadConstellationFromIQFile',
     'LoadAPFromCache',
     'LoadIQFromCache',
     'LoadConstellationFromCache',
+    'LoadConstellationFromIQCache',
     'LoadAnnotations',
     'ChannelMode',
     'NormalizeAP',
