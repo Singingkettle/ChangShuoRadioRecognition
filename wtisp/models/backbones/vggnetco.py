@@ -53,8 +53,8 @@ class VGGNetCO(nn.Module):
                     nn.init.normal_(m.weight, 0, 0.01)
                     nn.init.constant_(m.bias, 0)
 
-    def forward(self, x):
-        x = self.features(x)
+    def forward(self, cos):
+        x = self.features(cos)
         x = self.avg_pool(x)
 
         return x

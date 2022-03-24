@@ -137,7 +137,13 @@ class CRNet(nn.Module):
             self.cnn_net.init_weights()
             self.rnn_net.init_weights()
 
-    def forward(self, x):
+    def forward(self, iqs=None, aps=None):
+        if iqs:
+            x = iqs
+        elif aps:
+            x = aps
+        else:
+            raise ValueError('Either input iq sequence or ap sequence!')
         x = self.cnn_net(x)
         x = torch.squeeze(x, dim=2)
         x = torch.transpose(x, 1, 2)

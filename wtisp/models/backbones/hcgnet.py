@@ -561,8 +561,8 @@ class HCGNetGRU2(nn.Module):
                         elif 'bias_hh' in name:
                             nn.init.zeros_(param)
 
-    def forward(self, x):
-        c_fea = self.conv_net(x)
+    def forward(self, iqs):
+        c_fea = self.conv_net(iqs)
         if self.has_avg_pool:
             c_fea = self.avg_pool_layer(c_fea)
 

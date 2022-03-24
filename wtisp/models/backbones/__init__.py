@@ -1,4 +1,4 @@
-from .alexnet_co import AlexNetCO
+from .alexnetco import AlexNetCO
 from .cemee import CEMEENet
 from .cnnnet import CNNNet, ResNet, DensNet
 from .cobonet import CoBoNet
@@ -12,7 +12,7 @@ from .fmlnet import (FMLNetV1, FMLNetV2, FMLNetV3, FMLNetV4, FMLNetV5, FMLNetV6,
                      FMLNetV26, FMLNetV27, FMLNetV28, FMLNetV29, FMLNetV30, FMLNetV31, FMLNetV32, FMLNetV33,
                      FMLNetV34, FMLNetV35, FMLNetV36, FMLNetV37, FMLNetV38, FMLNetV39, FMLNetV40, FMLNetV41,
                      FMLNetV42, FMLNetV43, FMLNetV44, FMLNetV45, FMLNetV46, FMLNetV47, FMLNetV48, FMLNetV49)
-from .googlenet_co import GoogleNetCO
+from .googlenetco import GoogleNetCO
 from .hcgnet import (HCGNetV1, HCGNetV2, HCGNetV3, HCGNetV4, HCGNetV5, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
                      HCGNetCG1, HCGNetCG2, HCGNetG1G2)
 from .mcbldn import (ScdnNet, McbldnNet)
@@ -22,9 +22,9 @@ from .mlnet import (MLNetV1, MLNetV2, MLNetV3, MLNetV4, MLNetV5,
                     MLNetV6, MLNetV7, MLNetV8, MLNetV9, MLNetV10,
                     MLNetV11, MLNetV12)
 from .resclnet import ResCLNetV1
-from .resnet_co import ResNetCO
+from .resnetco import ResNetCO
 from .tanhnet import TanhNet
-from .vggnet_co import VGGNetCO
+from .vggnetco import VGGNetCO
 
 __all__ = [
     'CNNNet', 'ResNet', 'DensNet',
