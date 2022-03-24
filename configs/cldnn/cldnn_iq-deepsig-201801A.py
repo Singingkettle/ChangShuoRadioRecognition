@@ -5,7 +5,7 @@ _base_ = [
 
 # Model
 model = dict(
-    type='CRNN',
+    type='DNN',
     is_iq=True,
     backbone=dict(
         type='CRNet',

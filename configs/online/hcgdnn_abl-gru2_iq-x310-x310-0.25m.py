@@ -48,7 +48,8 @@ in_size = 100
 out_size = 288
 # Model
 model = dict(
-    type='HCGDNN',
+    type='DNN',
+    method_name='HCGDNN-GRU2',
     backbone=dict(
         type='HCGNetGRU2',
         input_size=in_size,

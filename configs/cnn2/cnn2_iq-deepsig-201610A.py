@@ -1,26 +1,23 @@
 _base_ = [
-    '../_base_/datasets/ap-deepsig-201610A.py',
+    '../_base_/datasets/iq-deepsig-201610A.py',
     '../_base_/default_runtime.py'
 ]
 
 # Model
 model = dict(
     type='DNN',
-    is_iq=True,
+    method_name='CNN2',
     backbone=dict(
-        type='CRNet',
+        type='CNNNet',
+        depth=2,
         in_channels=1,
-        cnn_depth=4,
-        rnn_depth=1,
-        input_size=80,
-        out_indices=(3,),
-        rnn_mode='LSTM',
+        out_indices=(1,),
     ),
     classifier_head=dict(
         type='AMCHead',
         num_classes=11,
-        in_features=50,
-        out_features=128,
+        in_features=10560,
+        out_features=256,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1.0,
