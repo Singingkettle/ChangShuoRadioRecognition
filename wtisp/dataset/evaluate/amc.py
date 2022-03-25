@@ -119,7 +119,7 @@ class EvaluateOnlineModulationPrediction:
             sub_results = reshape_results(selected_results[pr_name], mod_label_num)
             sub_eval_results = get_online_classification_accuracy_for_evaluation(mod_label_num, sub_results,
                                                                                  item_mod_label,
-                                                                                 prefix=self.prediction_name + '/')
+                                                                                 prefix=pr_name + '/')
             eval_results.update(sub_eval_results)
 
         return eval_results
