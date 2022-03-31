@@ -12,7 +12,7 @@ from wtisp.apis import set_random_seed, train_task
 from wtisp.common import get_root_logger, collect_env
 from wtisp.common.fileio import del_files
 from wtisp.common.utils import DictAction, Config, mkdir_or_exist
-from wtisp.dataset import build_dataset
+from wtisp.datasets import build_dataset
 from wtisp.models import build_task
 from wtisp.runner import init_dist, get_dist_info
 

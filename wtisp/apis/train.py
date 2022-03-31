@@ -6,7 +6,7 @@ import torch
 from ..common import get_root_logger
 from ..common.parallel import MMDataParallel, MMDistributedDataParallel
 from ..common.utils import build_from_cfg
-from ..dataset import build_dataloader, build_dataset
+from ..datasets import build_dataloader, build_dataset
 from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner,
                       Fp16OptimizerHook, OptimizerHook, build_optimizer, EvalHook, DistEvalHook)
 
@@ -95,7 +95,7 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
         val_dataloader = build_dataloader(
             val_dataset,
             samples_per_gpu=cfg.data.samples_per_gpu,
-            workers_per_gpu=cfg.data.workers_per_gpu,
+            workers_per_gpu=1,
             dist=distributed,
             shuffle=False)
         eval_cfg = cfg.get('evaluation', {})

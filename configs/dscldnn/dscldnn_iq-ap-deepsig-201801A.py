@@ -1,8 +1,8 @@
 _base_ = [
-    '../_base_/datasets/iq-ap-deepsig-201801A.py',
+    './data_iq-ap-deepsig-201801A.py',
+    '../_base_/schedules/schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
-
 
 model = dict(
     type='DNN',
@@ -18,7 +18,7 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='DSAMCHead',
+        type='DSCLDNNHead',
         num_classes=24,
         in_features=2500,
         loss_cls=dict(
@@ -31,9 +31,4 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-total_epochs = 400
-# optimizer
-optimizer = dict(type='Adam', lr=0.001)
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='fixed')
+

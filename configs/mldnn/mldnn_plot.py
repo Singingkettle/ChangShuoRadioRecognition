@@ -1,132 +1,53 @@
 log_dir = '/home/citybuster/Data/SignalProcessing/Workdir'
 legend = {
-    'MLDNN': 0,
-    'CLDNN-IQ': 1,
-    'CLDNN-AP': 2,
-    'CNN2-IQ': 3,
-    'CNN2-AP': 4,
-    'CNN3-IQ': 5,
-    'CNN3-AP': 6,
-    'CNN4-IQ': 7,
-    'CNN4-AP': 8,
-    'DensCNN-IQ': 9,
-    'DensCNN-AP': 10,
-    'ResCNN-IQ': 11,
-    'ResCNN-AP': 12,
-    'CGDNN2-IQ': 13,
-    'CGDNN2-AP': 14,
-    'CLDNN2-IQ': 15,
-    'CLDNN2-AP': 16,
-    'MLDNN-GRU': 20,
-    'MLDNN-Last': 21,
-    'MLDNN-Add': 22,
-    'MLDNN-Att': 23,
-    'MLDNN-Gradient': 24,
-    'MLDNN-High': 25,
-    'MLDNN-Low': 26,
-    'DSCLDNN': 27,
-    'MLDNN-IQ': 17,
-    'MLDNN-AP': 18,
-    'MLDNN-SNR': 19,
-    'MLDNN-CNN': 28,
-    'VGGNet-CO': 29,
-    'AlexNet-CO': 30,
-    'ResNet-CO': 31,
-    'GoogleNet-CO': 32,
-    'SVM-FB': 33,
-    'DecisionTree-FB': 34,
+    'AlexNet-CO': 0,
+    'CGDNN2-IQ': 1,
+    'CGDNN2-AP': 2,
+    'CLDNN-IQ': 3,
+    'CLDNN-AP': 4,
+    'CLDNN2-IQ': 5,
+    'CLDNN2-AP': 6,
+    'CNN2-IQ': 7,
+    'CNN3-IQ': 8,
+    'CNN3-AP': 9,
+    'CNN4-IQ': 10,
+    'DecisionTree-FB': 11,
+    'DensCNN-IQ': 12,
+    'DSCLDNN': 13,
+    'GoogleNet-CO': 14,
+    'MLDNN': 15,
+    'MLDNN-V3': 16,
+    'MLDNN-V4': 17,
+    'MLDNN-V5': 18,
+    'MLDNN-V6': 19,
+    'MLDNN-V7': 20,
+    'MLDNN-V8': 21,
+    'MLDNN-V9': 22,
+    'ResCNN-IQ': 23,
+    'ResNet-CO': 24,
+    'SVM-FB': 25,
+    'VGGNet-CO': 26,
 }
 
 plot = dict(
     type='CommonPlot',
     log_dir=log_dir,
-    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+    config='mldnn_iq-ap-deepsig-201610A',
     legend=legend,
     # Set the configs about confusion maps
     confusion_map=[
         dict(
             type='ConfusionMap',
             log_dir=log_dir,
-            name='confusion_map_mldnn_201610A.pdf',
+            name='confusion-map_mldnn-201610A.pdf',
             method=dict(
-                config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
-                has_snr_classifier=True,
+                config='mldnn_iq-ap-deepsig-201610A',
                 name='MLDNN',
-            ),
-        ),
-        dict(
-            type='ConfusionMap',
-            log_dir=log_dir,
-            name='confusion_map_mldnn_201801A.pdf',
-            method=dict(
-                config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
-                has_snr_classifier=True,
-                name='MLDNN',
-            ),
-        ),
-        dict(
-            type='ConfusionMap',
-            log_dir=log_dir,
-            name='confusion_map_vggnet-co_201610A.pdf',
-            method=dict(
-                config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
-                name='VGGNet-CO',
             ),
         ),
     ],
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
-
-        # Motivations
-        dict(
-            type='AccuracyF1Plot',
-            name='cldnn_iq-ap.pdf',
-            legend=legend,
-            log_dir=log_dir,
-            method=[
-                dict(
-                    config='cldnn_deepsig_iq_201610A',
-                    name='CLDNN-IQ',
-                ),
-                dict(
-                    config='cldnn_deepsig_ap_201610A',
-                    name='CLDNN-AP',
-                ),
-            ],
-        ),
-        dict(
-            type='AccuracyF1Plot',
-            name='cgdnn2_iq-ap.pdf',
-            legend=legend,
-            log_dir=log_dir,
-            method=[
-                dict(
-                    config='crdnn_gru_ap_deepsig_201610A',
-                    name='CGDNN2-AP',
-                ),
-                dict(
-                    config='crdnn_gru_iq_deepsig_201610A',
-                    name='CGDNN2-IQ',
-                ),
-            ],
-        ),
-        dict(
-            type='AccuracyF1Plot',
-            name='cldnn2_iq-ap.pdf',
-            legend=legend,
-            log_dir=log_dir,
-            method=[
-                dict(
-                    config='crdnn_lstm_ap_deepsig_201610A',
-                    name='CLDNN2-AP',
-                ),
-                dict(
-                    config='crdnn_lstm_iq_deepsig_201610A',
-                    name='CLDNN2-IQ',
-                ),
-            ],
-        ),
-
         # Ablation Study by an incremental way
 
         dict(
@@ -135,60 +56,55 @@ plot = dict(
             legend=legend,
             log_dir=log_dir,
             method=[
-                # data, iq, ap
+                # V1, A/P
                 dict(
-                    config='cnn3_deepsig_iq_201610A',
-                    name='CNN3-IQ',
+                    config='cnn3_ap-deepsig-201610A',
+                    name='CNN3-AP',  # MLDNN-V1
                 ),
+                # V2, I/Q
                 dict(
-                    config='cnn3_deepsig_ap_201610A',
-                    name='CNN3-AP',
+                    config='cnn3_iq-deepsig-201610A',
+                    name='CNN3-IQ',  # MLDNN-V2
                 ),
-                # iq+ap, with MLHead
+                # V3
                 dict(
-                    config='mldnn_mlnetv12_640_0.0004_0.5_deepsig_201610A',
-                    name='MLDNN-CNN',
-                    has_snr_classifier=True,
+                    config='mldnn_abl-mtlh_iq-ap-deepsig-201610A',
+                    name='MLDNN-V3',
                 ),
-                # with BiGRU
+                # V4
                 dict(
-                    config='mldnn_mlnetv3_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-Last',
-                    has_snr_classifier=True,
+                    config='mldnn_abl-bigru-mtlh_iq-ap-deepsig_201610A',
+                    name='MLDNN-V4',
                 ),
-                # with SAFN
+                # V5
                 dict(
-                    config='mldnn_mlnetv11_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-Gradient',
-                    has_snr_classifier=True,
+                    config='mldnn_abl-bigru-safn-mtlh_iq-ap-deepsig_201610A_abl',
+                    name='MLDNN-V5',
                 ),
-                # without gradient pollution
+                # V6
                 dict(
-                    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+                    config='mldnn_abl-gru-safn-gradient-truncation-mtlh_iq-ap-deepsig-201610A',
+                    name='MLDNN-V6',
+                ),
+                # V7
+                dict(
+                    config='mldnn_abl-bigru-attention-gradient-truncation-mtlh_iq-ap-deepsig-201610A',
+                    name='MLDNN-V7',
+                ),
+                # V8
+                dict(
+                    config='mldnn_abl-bigru-last-gradient-truncation-mtlh_iq-ap-deepsig-201610A',
+                    name='MLDNN-V8',
+                ),
+                # V9
+                dict(
+                    config='mldnn_abl-bigru-add-gradient-truncation-mtlh_iq-ap-deepsig-201610A',
+                    name='MLDNN-V9',
+                ),
+                # MLDNN
+                dict(
+                    config='mldnn_iq-ap-deepsig-201610A',
                     name='MLDNN',
-                    has_snr_classifier=True,
-                ),
-
-                # Other
-                dict(
-                    config='mldnn_mlnetv9_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-GRU',
-                    has_snr_classifier=True,
-                ),
-                dict(
-                    config='mldnn_mlnetv3_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-Last',
-                    has_snr_classifier=True,
-                ),
-                dict(
-                    config='mldnn_mlnetv4_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-Add',
-                    has_snr_classifier=True,
-                ),
-                dict(
-                    config='mldnn_mlnetv10_640_0.0004_0.5_deepsig_201610A_abl',
-                    name='MLDNN-Att',
-                    has_snr_classifier=True,
                 ),
             ],
         ),
@@ -201,28 +117,27 @@ plot = dict(
             log_dir=log_dir,
             method=[
                 dict(
-                    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+                    config='mldnn_iq-ap-deepsig-201610A',
                     name='MLDNN',
-                    has_snr_classifier=True,
                 ),
                 dict(
-                    config='dscldnn_deepsig_201610A',
+                    config='dscldnn_iq-ap-deepsig-201610A',
                     name='DSCLDNN',
                 ),
                 dict(
-                    config='rescnn_deepsig_iq_201610A',
+                    config='rescnn_iq-deepsig-201610A',
                     name='ResCNN-IQ',
                 ),
                 dict(
-                    config='cldnn_deepsig_iq_201610A',
+                    config='cldnn_iq-deepsig-201610A',
                     name='CLDNN-IQ',
                 ),
                 dict(
-                    config='cnn4_deepsig_iq_201610A',
+                    config='cnn4_iq-deepsig-201610A',
                     name='CNN4-IQ',
                 ),
                 dict(
-                    config='denscnn_deepsig_iq_201610A',
+                    config='denscnn_iq-deepsig-201610A',
                     name='DensCNN-IQ',
                 ),
             ],
@@ -235,71 +150,69 @@ plot = dict(
             log_dir=log_dir,
             method=[
                 dict(
-                    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+                    config='mldnn_iq-ap-deepsig-201610A',
                     name='MLDNN',
-                    has_snr_classifier=True,
                 ),
                 dict(
-                    config='mldnn_alexnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='alexnet_co-deepsig-201610A',
                     name='AlexNet-CO',
                 ),
                 dict(
-                    config='mldnn_googlenetco_640_0.0004_0.5_deepsig_201610A',
+                    config='googlenet_co-deepsig-201610A',
                     name='GoogleNet-CO',
                 ),
                 dict(
-                    config='mldnn_resnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='resnet_co-deepsig-201610A',
                     name='ResNet-CO',
                 ),
                 dict(
-                    config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='vggnet_co-deepsig-201610A',
                     name='VGGNet-CO',
                 ),
                 dict(
-                    config='mldnn_cul_dt_feature_based',
+                    config='svm_feature-based_cumulants-deepsig-201610A',
                     name='SVM-FB',
                 ),
                 dict(
-                    config='mldnn_cul_svm_feature_based',
+                    config='decisiontree_feature-based_cumulants-deepsig-201610A',
                     name='DecisionTree-FB',
                 ),
             ],
         ),
 
         # deepsig 201801A compare with I/Q A/P
-        dict(
-            type='AccuracyF1Plot',
-            name='deepsig_201801A_iq_ap.pdf',
-            legend=legend,
-            log_dir=log_dir,
-            method=[
-                dict(
-                    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
-                    name='MLDNN',
-                    has_snr_classifier=True,
-                ),
-                dict(
-                    config='dscldnn_deepsig_201801A',
-                    name='DSCLDNN',
-                ),
-                dict(
-                    config='rescnn_deepsig_iq_201801A',
-                    name='ResCNN-IQ',
-                ),
-                dict(
-                    config='cldnn_deepsig_iq_201801A',
-                    name='CLDNN-IQ',
-                ),
-                dict(
-                    config='cnn4_deepsig_iq_201801A',
-                    name='CNN4-IQ',
-                ),
-                dict(
-                    config='denscnn_deepsig_iq_201801A',
-                    name='DensCNN-IQ',
-                ),
-            ],
-        ),
+        # dict(
+        #     type='AccuracyF1Plot',
+        #     name='deepsig_201801A_iq_ap.pdf',
+        #     legend=legend,
+        #     log_dir=log_dir,
+        #     method=[
+        #         dict(
+        #             config='mldnn_iq-ap-deepsig-201801A',
+        #             name='MLDNN',
+        #         ),
+        #         dict(
+        #             config='dscldnn_iq-ap-deepsig-201801A',
+        #             name='DSCLDNN',
+        #         ),
+        #         dict(
+        #             config='rescnn_iq-deepsig-201801A',
+        #             name='ResCNN-IQ',
+        #         ),
+        #         dict(
+        #             config='cldnn_iq-deepsig-201801A',
+        #             name='CLDNN-IQ',
+        #         ),
+        #         dict(
+        #             config='cnn4_iq-deepsig-201801A',
+        #             name='CNN4-IQ',
+        #         ),
+        #         dict(
+        #             config='denscnn_iq-deepsig-201801A',
+        #             name='DensCNN-IQ',
+        #         ),
+        #     ],
+        # ),
     ],
     summary=dict(
         type='ModulationSummary',

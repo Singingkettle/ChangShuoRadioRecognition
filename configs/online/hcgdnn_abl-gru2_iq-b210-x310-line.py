@@ -136,7 +136,7 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-total_epochs = 400
+
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.00015)

@@ -2,5 +2,3 @@
 -r requirements/docs.txt
 -r requirements/runtime.txt
 -r requirements/tests.txt
-joblib~=1.0.0
-scikit-learn~=0.24.0

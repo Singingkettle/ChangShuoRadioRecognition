@@ -3,11 +3,11 @@ import os
 import os.path as osp
 
 import torch
+from wtisp.dataset import build_dataloader, build_dataset
 
 from wtisp.apis import multi_gpu_test, single_gpu_test
 from wtisp.common.parallel import MMDataParallel, MMDistributedDataParallel
 from wtisp.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, get_the_best_checkpoint
-from wtisp.dataset import build_dataloader, build_dataset
 from wtisp.models import build_task
 from wtisp.runner import (get_dist_info, init_dist, load_checkpoint)
 

@@ -51,23 +51,23 @@ def main():
 
     gpu_index = 0
     for config in no_train_configs:
-        if args.multi_gpu:
-            python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} --master_port={} tools/train.py'.format(
-                gpu_num, base_master_port + method_index)
-        else:
-            python_sh = 'nohup python tools/train.py'
         config_sh = ' ./configs/{}/{}'.format(config.split('_')[0], config + '.py')
-
-        work_dir_sh = ' --work_dir {}'.format(args.work_dir)
-        if args.multi_gpu:
-            end_sh = ' --seed 0 --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
-        else:
-            end_sh = ' --gpu-ids {} --seed 0 > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
-
         start_info = 'echo \"Start Train: {}\"\n\n'.format(config_sh)
-        train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh
+        work_dir_sh = ' --work_dir {}'.format(args.work_dir)
+        if 'feature-based' in config:
+            python_sh = 'python tools/train_fb.py'
+            end_sh = ' > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
+        else:
+            if args.multi_gpu:
+                python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} ' \
+                            '--master_port={} tools/train.py'.format(gpu_num, base_master_port + method_index)
+                end_sh = ' --seed 0 --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
+            else:
+                python_sh = 'nohup python tools/train.py'
+                end_sh = ' --gpu-ids {} --seed 0 > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
         method_index += 1
         count_index += 1
+        train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh
         if count_index >= args.group_num:
             with open(os.path.join(scripts_dir, 'train_{:02d}.sh'.format(group_index)), 'w') as f:
                 f.write(train_sh)

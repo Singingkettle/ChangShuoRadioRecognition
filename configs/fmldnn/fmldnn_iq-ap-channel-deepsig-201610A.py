@@ -1,4 +1,5 @@
 _base_ = [
+    './schedule.py',
     '../_base_/default_runtime.py',
     './data_iq-ap-channel-deepsig-201610A.py'
 ]
@@ -44,16 +45,6 @@ model = dict(
 
 train_cfg = dict()
 test_cfg = dict(vis_fea=True)
-
-total_epochs = 600
-# optimizer
-optimizer = dict(type='Adam', lr=0.00069)
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(
-    policy='step',
-    gamma=0.3,
-    step=[300, 500])
 
 # for flops calculation
 input_shape = [(2, 1, 128), (2, 1, 128), (1, 128, 128)]

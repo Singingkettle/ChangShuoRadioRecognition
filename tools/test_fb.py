@@ -1,7 +1,9 @@
 import argparse
 
+import numpy as np
+
 from wtisp.common.utils import Config, mkdir_or_exist
-from wtisp.dataset import build_dataset
+from wtisp.datasets import build_dataset
 from wtisp.models import build_fb
 
 
@@ -40,7 +42,13 @@ def main():
     cfg.model['mode'] = 'test'
     model = build_fb(cfg.model)
 
-    outputs = model(dataset.data)
+    data = []
+    for idx in range(len(dataset)):
+        data.append(dataset[idx][cfg.x])
+
+    data = np.concatenate(data)
+
+    outputs = model(data)
     mkdir_or_exist(cfg.format_out)
     dataset.format_out(cfg.format_out, outputs)
     print(dataset.evaluate(outputs))

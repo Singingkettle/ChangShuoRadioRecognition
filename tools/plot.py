@@ -1,7 +1,7 @@
 import argparse
 
 from wtisp.common.utils import Config, filter_config
-from wtisp.plot import build_plot
+from wtisp.plots import build_plot
 
 
 def parse_args():

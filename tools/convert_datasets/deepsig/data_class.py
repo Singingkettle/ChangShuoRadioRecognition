@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from wtisp.dataset.utils import Constellation
+from wtisp.datasets.utils import Constellation
 
 CPU_COUNT = multiprocessing.cpu_count()
 
@@ -122,7 +122,8 @@ class DeepSigBase(object):
         self.test_num = 0
         self.data_ratios = data_ratios
         self.data_name = ''
-        self.filters = Constellation.get_filters()
+        co = Constellation()
+        self.filters = co.get_filters()
 
     def preprocess_original_data(self):
         print('Start converting data {}-{}'.format(self.name, self.version))
@@ -265,31 +266,35 @@ class DeepSigC(DeepSigBase):
 
 class DeepSigD(DeepSigBase):
     # The details of MODS are inferred from the paper 'Over-the-Air Deep Learning Based Radio Signal Classification',
-    # which are verified by signal constellation
-    MODS = ['32PSK',
-            '16APSK',
-            '32QAM',
-            'FM',
-            'GMSK',
-            '32APSK',
-            'OQPSK',
+    # which are verified by signal constellation. The class.txt is wrong.
+    # also in these links, the same issue is mentioned
+    # https://github.com/radioML/dataset/issues/25
+    # https://blog.csdn.net/weixin_40692714/article/details/120434505
+    # https://blog.csdn.net/weixin_43663595/article/details/112580100
+    MODS = ['OOK',
+            '4ASK',
             '8ASK',
             'BPSK',
-            '8PSK',
-            'AM-SSB-SC',
-            '4ASK',
-            '16PSK',
-            '64APSK',
-            '128QAM',
-            '128APSK',
-            'AM-DSB-SC',
-            'AM-SSB-WC',
-            '64QAM',
             'QPSK',
+            '8PSK',
+            '16PSK',
+            '32PSK',
+            '16APSK',
+            '32APSK',
+            '64APSK',
+            '128APSK',
+            '16QAM',
+            '32QAM',
+            '64QAM',
+            '128QAM',
             '256QAM',
+            'AM-SSB-WC',
+            'AM-SSB-SC',
             'AM-DSB-WC',
-            'OOK',
-            '16QAM']
+            'AM-DSB-SC',
+            'FM',
+            'GMSK',
+            'OQPSK']
 
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigD, self).__init__(root_dir, version, data_ratios)
@@ -355,9 +360,7 @@ class DeepSigD(DeepSigBase):
                 real_scale = np.max(np.abs(item[0, :])) + np.finfo(np.float64).eps
                 imag_scale = np.max(np.abs(item[1, :])) + np.finfo(np.float64).eps
 
-                if (not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'iq', filename))) or (
-                        not osp.isfile(osp.join(self.data_dir, 'sequence_data', 'ap', filename))):
-                    dataset.append({'filename': filename, 'data': item,
-                                    'real_scale': real_scale, 'imag_scale': imag_scale})
+                dataset.append({'filename': filename, 'data': item,
+                                'real_scale': real_scale, 'imag_scale': imag_scale})
 
         return dataset, train_annotation, validation_annotation, test_annotation

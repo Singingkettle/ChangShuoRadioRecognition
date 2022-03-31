@@ -11,6 +11,7 @@ Email: chagshuo@bupt.edu.cn
 import argparse
 import os.path as osp
 import signal
+import struct
 import sys
 
 import numpy as np
@@ -19,8 +20,7 @@ import zmq
 from torch.utils.tensorboard import SummaryWriter
 
 from wtisp.common.utils import Config, fuse_conv_bn, mkdir_or_exist
-from wtisp.dataset import build_dataset
-from wtisp.dataset.online import Transform
+from wtisp.datasets import build_dataset
 from wtisp.models import build_task
 from wtisp.runner import load_checkpoint
 
@@ -45,6 +45,12 @@ def parse_args():
     args = parser.parse_args()
 
     return args
+
+
+def data_normalization(a):
+    a = (a - np.expand_dims(np.min(a, axis=1), axis=1)) / np.expand_dims((np.max(a, axis=1) - np.min(a, axis=1)),
+                                                                         axis=1)
+    return a
 
 
 def sigint_handler(signum, frame):
@@ -82,7 +88,6 @@ def main():
     else:
         model.CLASSES = dataset.CLASSES
 
-    transform = Transform(dataset)
     if torch.cuda.is_available():
         model.cuda()
     model.eval()
@@ -104,41 +109,41 @@ def main():
 
     log_writer = SummaryWriter(log_dir)
     context = zmq.Context()
-    socket = context.socket(zmq.SUB)
-    tcp_address = 'tcp://10.128.221.28:28570'
-    socket.connect(tcp_address)
-    socket.setsockopt_string(zmq.SUBSCRIBE, '')
+    socket = context.socket(zmq.REP)
+    tcp_address = 'tcp://*:5555'
+    socket.bind(tcp_address)
 
     true_modulation_info = dict()
     pred_modulation_info = dict()
 
+    frame_id = 1
     while True:
         message = socket.recv()
-        message_list = message.split(b'-')
-        frame_id = message_list[0].decode('utf-8')
-        true_modulation = message_list[1].decode('utf-8')
-        start_point = len(message_list[0]) + len(message_list[1]) + 2
-        data = message[start_point:]
-        data = np.frombuffer(data, dtype=np.float32).reshape(2, -1)
-        data = transform(data)
+        data = struct.unpack('<2048d', message)
+        data = [data[::2], data[1::2]]
+        data = np.concatenate(data, axis=0)
+        data = data_normalization(data)
+        data = np.expand_dims(data, axis=0)
+        data = np.reshape(data, (2, 1, -1))
+        data = torch.from_numpy(data)
+        data = data.to("cuda")
         with torch.no_grad():
             res = model.simple_test(**data)[0]
-        res = res['gru2_pre']
         index = np.argmax(res)
+        socket.send_string('{:d}'.format(index))
         predict_modulation = model.CLASSES[index]
-        print('frame id: {}, predict modulation: {}, true modulation: {}'.format(frame_id, predict_modulation,
-                                                                                 true_modulation))
-        if true_modulation in true_modulation_info:
-            true_modulation_info[true_modulation] += 1
-        else:
-            true_modulation_info[true_modulation] = 1
-            pred_modulation_info[true_modulation] = 0
-
-        if predict_modulation is true_modulation:
-            pred_modulation_info[true_modulation] += 1
-
-        dynamic_accuracy = pred_modulation_info[true_modulation] / true_modulation_info[true_modulation]
-        log_writer.add_scalar(true_modulation, dynamic_accuracy, true_modulation_info[true_modulation])
+        print('frame id: {}, predict modulation: {}'.format(frame_id, predict_modulation))
+        # if true_modulation in true_modulation_info:
+        #     true_modulation_info[true_modulation] += 1
+        # else:
+        #     true_modulation_info[true_modulation] = 1
+        #     pred_modulation_info[true_modulation] = 0
+        #
+        # if predict_modulation is true_modulation:
+        #     pred_modulation_info[true_modulation] += 1
+        #
+        # dynamic_accuracy = pred_modulation_info[true_modulation] / true_modulation_info[true_modulation]
+        # log_writer.add_scalar(true_modulation, dynamic_accuracy, true_modulation_info[true_modulation])
 
         if _IS_SIG_UP:
             print('Exit online evaluation!!!')

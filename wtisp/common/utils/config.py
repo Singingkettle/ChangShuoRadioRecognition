@@ -478,7 +478,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         if c in configs:
             if config_legend_map[c] is not m['name']:
                 raise ValueError(
-                    'The config {} sis assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
+                    'The config {} is assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
         else:
             configs.append(c)
             config_legend_map[c] = m['name']
@@ -524,23 +524,22 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         else:
             raise ValueError('The snr_modulation must be list or dict!')
 
-    for config in configs:
-        if osp.isdir(osp.join(cfg.log_dir, config)):
-            format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
-            json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
-            if 'feature_based' in config:
-                train_configs[config] = -1
-            else:
-                best_epoch = get_the_best_checkpoint(
-                    cfg.log_dir, config)
-                if best_epoch > 0:
-                    train_configs[config] = best_epoch
-            if len(json_paths) != 1:
-                no_test_configs[config] = train_configs[config]
-
     if is_regeneration:
         no_train_configs = list(set(configs))
     else:
+        for config in configs:
+            if osp.isdir(osp.join(cfg.log_dir, config)):
+                format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
+                json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
+                if 'feature-based' in config:
+                    train_configs[config] = -1
+                else:
+                    best_epoch = get_the_best_checkpoint(
+                        cfg.log_dir, config)
+                    if best_epoch > 0:
+                        train_configs[config] = best_epoch
+                if len(json_paths) != 1:
+                    no_test_configs[config] = train_configs[config]
         no_train_configs = list(set(configs) - set(train_configs.keys()))
 
     if is_regeneration:

@@ -1,12 +1,13 @@
 _base_ = [
-    'cldnn_ap-deepsig-201610A.py',
-    '../_base_/datasets/iq-deepsig-201801A.py'
+    '../_base_/datasets/iq-deepsig-201801A.py',
+    '../_base_/schedules/schedule_1x.py',
+    '../_base_/default_runtime.py'
 ]
 
 # Model
 model = dict(
     type='DNN',
-    is_iq=True,
+    method_name='CLDNN-IQ',
     backbone=dict(
         type='CRNet',
         in_channels=1,
@@ -28,3 +29,7 @@ model = dict(
         ),
     ),
 )
+
+train_cfg = dict()
+test_cfg = dict()
+

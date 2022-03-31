@@ -1,47 +1,34 @@
 _base_ = [
-    'cldnn_ap-deepsig-201610A.py',
+    '../_base_/datasets/iq-deepsig-201610A.py',
+    '../_base_/schedules/schedule_1x.py',
+    '../_base_/default_runtime.py'
 ]
 
-dataset_type = 'DeepSigDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
-data = dict(
-    samples_per_gpu=1024,
-    workers_per_gpu=2,
-    train=dict(
-        type=dataset_type,
-        ann_file='train_and_validation.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadAnnotations'),
-            dict(type='Collect', keys=['iqs', 'mod_labels'])
-        ],
-        data_root=data_root,
+# Model
+model = dict(
+    type='DNN',
+    method_name='CLDNN-IQ',
+    backbone=dict(
+        type='CRNet',
+        in_channels=1,
+        cnn_depth=4,
+        rnn_depth=1,
+        input_size=80,
+        out_indices=(3,),
+        rnn_mode='LSTM',
     ),
-    val=dict(
-        type=dataset_type,
-        ann_file='test.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['iqs'])
-        ],
-        data_root=data_root,
-        evaluate=[
-            dict(type='EvaluateModulationPrediction', )
-        ],
-    ),
-    test=dict(
-        type=dataset_type,
-        ann_file='test.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['iqs'])
-        ],
-        data_root=data_root,
-        evaluate=[
-            dict(type='EvaluateModulationPrediction', )
-        ],
-        save=[
-            dict(type='SaveModulationPrediction', )
-        ],
+    classifier_head=dict(
+        type='AMCHead',
+        num_classes=11,
+        in_features=50,
+        out_features=128,
+        loss_cls=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1.0,
+        ),
     ),
 )
+
+train_cfg = dict()
+test_cfg = dict()
+

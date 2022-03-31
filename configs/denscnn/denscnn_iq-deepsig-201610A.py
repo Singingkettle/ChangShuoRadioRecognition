@@ -1,14 +1,15 @@
 _base_ = [
     '../_base_/datasets/iq-deepsig-201610A.py',
+    '../_base_/schedules/schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
 
 # model
 model = dict(
     type='DNN',
-    method_name='DensCNN',
+    method_name='DensCNN-IQ',
     backbone=dict(
-        type='DensNet',
+        type='DensCNN',
     ),
     classifier_head=dict(
         type='AMCHead',
@@ -25,9 +26,4 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-total_epochs = 400
-# optimizer
-optimizer = dict(type='Adam')
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='fixed')
+

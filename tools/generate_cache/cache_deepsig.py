@@ -30,7 +30,7 @@ def run(dataset_folder, json_file):
                   'constellation_data/filter_size_0.020_stride_0.020': {'data': [], 'shape': None, 'dtype': None},
                   'constellation_data/filter_size_0.050_stride_0.050': {'data': [], 'shape': None, 'dtype': None},
                   }
-    filename_index =  dict()
+    filename_index = dict()
     idx = 0
     for item_filename in tqdm(annotation['item_filename']):
         for key in cache_data:
@@ -77,7 +77,6 @@ def main():
         run(dataset_folder, 'train.json')
         # cache train_and_val data
         run(dataset_folder, 'train_and_validation.json')
-
 
 
 if __name__ == '__main__':

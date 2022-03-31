@@ -1,0 +1,35 @@
+_base_ = [
+    '../_base_/datasets/co-deepsig-201610A.py',
+    '../_base_/schedules/schedule_1x.py',
+    '../_base_/default_runtime.py',
+]
+
+# Model
+model = dict(
+    type='DNN',
+    method_name='ResNet-CO',
+    backbone=dict(
+        type='ResNet'
+    ),
+    classifier_head=dict(
+        type='AMCHead',
+        num_classes=11,
+        in_features=2048,
+        out_features=256,
+        loss_cls=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        )
+    )
+)
+
+train_cfg = dict()
+test_cfg = dict()
+
+
+
+# optimizer
+optimizer = dict(type='Adam', lr=0.00001)
+optimizer_config = dict(grad_clip=None)
+# learning policy
+lr_config = dict(policy='fixed')

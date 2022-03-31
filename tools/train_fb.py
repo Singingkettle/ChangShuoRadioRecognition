@@ -3,9 +3,11 @@ import os
 import os.path as osp
 import time
 
+import numpy as np
+
 from wtisp.common import get_root_logger, collect_env
 from wtisp.common.utils import Config, mkdir_or_exist
-from wtisp.dataset import build_dataset
+from wtisp.datasets import build_dataset
 from wtisp.models import build_fb
 
 
@@ -69,8 +71,17 @@ def main():
     if hasattr(dataset, 'CLASSES'):
         model.CLASSES = dataset.CLASSES
 
+    data = []
+    label = []
+    for idx in range(len(dataset)):
+        data.append(dataset[idx][cfg.x])
+        label.append(dataset[idx][cfg.y])
+
+    data = np.concatenate(data)
+    label = np.array(label)
+
     # Train
-    model(dataset.data, dataset.label)
+    model(data, label)
 
 
 if __name__ == '__main__':
