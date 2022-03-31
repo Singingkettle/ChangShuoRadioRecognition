@@ -12,6 +12,7 @@ model = dict(
         dropout_rate=0.5,
         use_GRU=True,
         is_BIGRU=True,
+        fusion_method=''
     ),
     classifier_head=dict(
         type='MLDNNHead',
@@ -20,7 +21,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=2,
-                in_features=12700,
+                in_features=12200,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -31,7 +32,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=12700,
+                in_features=12200,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -42,7 +43,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=12700,
+                in_features=12200,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',

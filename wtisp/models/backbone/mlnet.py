@@ -27,7 +27,7 @@ class SELayer(nn.Module):
 
 
 class SingleBranch(nn.Module):
-    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=True, is_BIGRU=True, fusion_method='safn'):
+    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=True, is_BIGRU=False, fusion_method='safn'):
         super(SingleBranch, self).__init__()
         self.dropout_rate = dropout_rate
         self.avg_pool = avg_pool
@@ -92,10 +92,11 @@ class SingleBranch(nn.Module):
                 x, _ = self.gru_net(c_x)
                 return x[:, -1, :]
             else:
-                x = x.view(x.shape[0], -1)
+                x, _ = self.gru_net(c_x)
+                x = x.reshape(x.shape[0], -1)
                 return x
         else:
-            x = x.view(x.shape[0], -1)
+            x = x.reshape(x.shape[0], -1)
             return x
 
 
