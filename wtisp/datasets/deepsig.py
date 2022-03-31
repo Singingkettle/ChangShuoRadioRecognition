@@ -25,6 +25,9 @@ class DeepSigDataset(CustomAMCDataset):
             self.augment = build_augment(augment)
             for process in self.augment:
                 self.data_infos = process(self.data_infos)
+                # set group flag for the sampler
+                if not self.test_mode:
+                    self._set_group_flag()
         if evaluate is None:
             self.eval = None
         else:

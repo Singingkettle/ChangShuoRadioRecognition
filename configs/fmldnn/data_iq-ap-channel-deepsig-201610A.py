@@ -6,6 +6,9 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
+        augment=[
+            dict(type='FilterBySNR', low_snr=-10),
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAPFromCache', data_root=data_root, filename='train_and_validation_ap.pkl', to_float32=True),
@@ -18,6 +21,9 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
+        augment=[
+            dict(type='FilterBySNR', low_snr=-10),
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
@@ -32,6 +38,9 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
+        augment=[
+            dict(type='FilterBySNR', low_snr=-10),
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),

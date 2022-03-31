@@ -7,7 +7,8 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         augment=[
-            dict(type='MLDNNSNRLabel')
+            dict(type='FilterBySNR', low_snr=-10),
+            dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
@@ -21,7 +22,8 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='MLDNNSNRLabel')
+            dict(type='FilterBySNR', low_snr=-10),
+            dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
@@ -38,7 +40,8 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='MLDNNSNRLabel')
+            dict(type='FilterBySNR', low_snr=-10),
+            dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
