@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from wtisp.datasets.utils import Constellation
 
+_Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()
 
 
@@ -99,7 +100,7 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
     item_data = item['data']
     item_data[0, :] = item_data[0, :] / item['real_scale']
     item_data[1, :] = item_data[1, :] / item['imag_scale']
-    constellations, filters = Constellation.generate_by_filter(item_data)
+    constellations, filters = _Constellation.generate_by_filter(item_data)
 
     for constellation, param in zip(constellations, filters):
         constellation_dir = osp.join(constellation_data_dir,

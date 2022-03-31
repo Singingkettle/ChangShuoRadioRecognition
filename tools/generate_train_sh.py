@@ -12,7 +12,7 @@ def parse_args():
         description='WTISignalProcessing Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
     parser.add_argument('--scripts-dir', help='dir to save the train.sh files')
-    parser.add_argument('--group-num', default=8, type=int, help='number of configs in one train.sh file')
+    parser.add_argument('--group-num', default=16, type=int, help='number of configs in one train.sh file')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--multi-gpu', default=False, action='store_true',
                         help='use parallel training')
@@ -63,8 +63,8 @@ def main():
                             '--master_port={} tools/train.py'.format(gpu_num, base_master_port + method_index)
                 end_sh = ' --seed 0 --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
             else:
-                python_sh = 'nohup python tools/train.py'
-                end_sh = ' --gpu-ids {} --seed 0 > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
+                python_sh = 'export CUDA_VISIBLE_DEVICES={} \nnohup python tools/train.py'.format(gpu_index)
+                end_sh = ' --seed 0 > /dev/null 2>&1 &\n\n\n\n'
         method_index += 1
         count_index += 1
         train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh

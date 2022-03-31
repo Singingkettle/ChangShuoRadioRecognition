@@ -64,13 +64,13 @@ class DNN(BaseDNN):
                     if 'Final' is not key_str:
                         method_name = self.method_name + '-' + key_str
                     else:
-                        method_name = self.method_name
+                        method_name = 'Final'
                     item[method_name] = outs2result(outs[key_str][idx, :])
                 results_list.append(item)
         else:
             for idx in range(outs.shape[0]):
                 result = outs2result(outs[idx, :])
-                result = {self.method_name: result}
+                result = {'Final': result}
                 results_list.append(result)
         return results_list
 

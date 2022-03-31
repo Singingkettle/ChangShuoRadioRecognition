@@ -45,7 +45,6 @@ class EvaluateModulationPrediction:
 @EVALUATES.register_module()
 class EvaluateModulationPredictionOfHCGDNN:
     def __init__(self, merge=None):
-        self.method_name = 'HCGDNN'
         if self.merge is not None:
             self.merge = build_from_cfg(merge, MERGES)
         else:
@@ -53,7 +52,7 @@ class EvaluateModulationPredictionOfHCGDNN:
             raise ValueError('You should give a fusion strategy for HCGDNN model!')
 
     def __call__(self, results, data_infos):
-        results = self.merge(results, data_infos, self.method_name)
+        results = self.merge(results, data_infos, 'Final')
         eval_results = generate_amc_eval_results(results, data_infos)
         return eval_results
 

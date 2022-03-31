@@ -11,6 +11,7 @@ model = dict(
         type='MLNet',
         dropout_rate=0.5,
         use_GRU=True,
+        is_BIGRU=False,
         fusion_method='safn',
         gradient_truncation=True,
     ),
@@ -64,7 +65,6 @@ model = dict(
 
 train_cfg = dict()
 test_cfg = dict()
-
 
 # optimizer
 optimizer = dict(type='Adam', lr=0.0004)

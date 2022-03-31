@@ -7,8 +7,13 @@ _base_ = [
 model = dict(
     type='MLDNN',
     backbone=dict(
-        type='MLNetV5',
+        type='MLNet',
         avg_pool=(1, 8),
+        dropout_rate=0.5,
+        use_GRU=True,
+        is_BIGRU=True,
+        fusion_method='safn',
+        gradient_truncation=True,
     ),
     classifier_head=dict(
         type='MLHeadNoWeight',

@@ -18,7 +18,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=2,
-                in_features=80 * 127,
+                in_features=9760,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -29,7 +29,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=80 * 127,
+                in_features=9760,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -40,7 +40,7 @@ model = dict(
             dict(
                 type='AMCHead',
                 num_classes=11,
-                in_features=80 * 127,
+                in_features=9760,
                 out_features=256,
                 loss_cls=dict(
                     type='CrossEntropyLoss',

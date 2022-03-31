@@ -76,7 +76,7 @@ def load_amc_evaluation_results(obj_pointer):
         name = method['name']
 
         format_out_dir = os.path.join(obj_pointer.log_dir, config, 'format_out')
-        pre_files = [os.path.join(format_out_dir, name + '.pkl')]
+        pre_files = [os.path.join(format_out_dir, 'Final.pkl')]
         if 'extra_predictions' in method:
             for extra_prediction in method['extra_predictions']:
                 pre_files.append(os.path.join(format_out_dir, extra_prediction + '.pkl'))
@@ -84,6 +84,8 @@ def load_amc_evaluation_results(obj_pointer):
             if os.path.isfile(pre_file):
                 save_res = IOLoad(pre_file)
                 prediction_name = os.path.basename(pre_file)
+                if prediction_name is 'Final':
+                    prediction_name = name
                 save_res['method_name'] = prediction_name
                 amc_results.append(save_res)
 

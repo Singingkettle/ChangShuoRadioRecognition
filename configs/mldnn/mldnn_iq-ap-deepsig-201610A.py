@@ -10,6 +10,10 @@ model = dict(
     backbone=dict(
         type='MLNet',
         dropout_rate=0.5,
+        use_GRU=True,
+        is_BIGRU=True,
+        fusion_method='safn',
+        gradient_truncation=True,
     ),
     classifier_head=dict(
         type='MLHeadNoWeight',

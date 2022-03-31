@@ -27,7 +27,7 @@ class SELayer(nn.Module):
 
 
 class SingleBranch(nn.Module):
-    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=True, is_BIGRU=False, fusion_method='safn'):
+    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=False, is_BIGRU=False, fusion_method=''):
         super(SingleBranch, self).__init__()
         self.dropout_rate = dropout_rate
         self.avg_pool = avg_pool
@@ -103,8 +103,8 @@ class SingleBranch(nn.Module):
 @BACKBONES.register_module()
 class MLNet(nn.Module):
 
-    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=True,
-                 is_BIGRU=True, fusion_method='safn', gradient_truncation=False):
+    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=False,
+                 is_BIGRU=False, fusion_method='', gradient_truncation=False):
         super(MLNet, self).__init__()
         self.iq_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method)
         self.ap_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method)

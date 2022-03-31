@@ -20,6 +20,9 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
+        augment=[
+            dict(type='MLDNNSNRLabel')
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
@@ -34,6 +37,9 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
+        augment=[
+            dict(type='MLDNNSNRLabel')
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
