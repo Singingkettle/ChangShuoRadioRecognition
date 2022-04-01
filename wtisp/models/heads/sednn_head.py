@@ -8,4 +8,7 @@ from ..builder import HEADS, build_head, build_loss
 class SEDNNHead(BaseHead):
     def __init__(self, head, num_snr, snr_head):
         super(SEDNNHead, self).__init__()
+        self.num_str = num_snr
+        self.a = a
+
 

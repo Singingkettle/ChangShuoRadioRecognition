@@ -16,7 +16,7 @@ model = dict(
         gradient_truncation=True,
     ),
     classifier_head=dict(
-        type='MLHeadNoWeight',
+        type='MLDNNHead',
         heads=[
             # Snr Head
             dict(

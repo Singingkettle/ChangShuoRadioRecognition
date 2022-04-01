@@ -33,5 +33,5 @@ class SVM(object):
             label = []
             for item in tqdm(data):
                 item = np.reshape(item, (1, -1))
-                label.append({self.method_name: self.svm.predict(item)})
+                label.append({'Final': self.svm.predict(item)})
             return label

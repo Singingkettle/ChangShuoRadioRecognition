@@ -35,7 +35,7 @@ class Tree(object):
             label = []
             for item in tqdm(data):
                 item = np.reshape(item, (1, -1))
-                label.append({self.method_name: self.tree.predict(item)})
+                label.append({'Final': self.tree.predict(item)})
             return label
         else:
             return None

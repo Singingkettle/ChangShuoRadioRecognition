@@ -55,7 +55,7 @@ def main():
         start_info = 'echo \"Start Train: {}\"\n\n'.format(config_sh)
         work_dir_sh = ' --work_dir {}'.format(args.work_dir)
         if 'feature-based' in config:
-            python_sh = 'python tools/train_fb.py'
+            python_sh = 'nohup python tools/train_fb.py'
             end_sh = ' > /dev/null 2>&1 &\n\n\n\n'.format(gpu_index)
         else:
             if args.multi_gpu:

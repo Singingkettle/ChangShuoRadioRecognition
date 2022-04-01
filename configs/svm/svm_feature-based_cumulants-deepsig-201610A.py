@@ -13,7 +13,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
-            dict(tyep='Cumulants'),
+            dict(type='Cumulants'),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['cls', 'mod_labels'])
         ],
@@ -27,7 +27,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(tyep='Cumulants'),
+            dict(type='Cumulants'),
             dict(type='Collect', keys=['cls'])
         ],
         data_root=data_root,
@@ -43,7 +43,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(tyep='Cumulants'),
+            dict(type='Cumulants'),
             dict(type='Collect', keys=['iqs'])
         ],
         data_root=data_root,
