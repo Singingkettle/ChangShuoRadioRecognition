@@ -1,7 +1,7 @@
 _base_ = [
     './schedule.py',
     '../_base_/default_runtime.py',
-    './data_iq-ap-channel-deepsig-201610A.py'
+    '../_base_/datasets/iq-ap-channel-deepsig-201610A.py'
 ]
 
 in_features = 100

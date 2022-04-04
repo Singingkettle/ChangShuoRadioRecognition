@@ -1,7 +1,7 @@
 _base_ = [
     '../_base_/datasets/co-deepsig-201801A.py',
     '../_base_/schedules/schedule_1x.py',
-    '../_base_/default_runtime.py'
+    '../_base_/default_runtime.py',
 ]
 
 # Model
@@ -25,8 +25,6 @@ model = dict(
 
 train_cfg = dict()
 test_cfg = dict()
-
-
 
 # optimizer
 optimizer = dict(type='Adam', lr=0.00001)

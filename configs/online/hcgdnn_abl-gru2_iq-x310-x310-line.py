@@ -136,8 +136,6 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-
-
 # Optimizer
 optimizer = dict(type='Adam', lr=0.00015)
 optimizer_config = dict(grad_clip=None)

@@ -27,7 +27,6 @@ model = dict(
 train_cfg = dict()
 test_cfg = dict()
 
-
 # optimizer
 optimizer = dict(type='Adam')
 optimizer_config = dict(grad_clip=None)

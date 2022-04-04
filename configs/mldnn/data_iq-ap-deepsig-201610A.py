@@ -7,7 +7,6 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-10),
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
@@ -22,7 +21,6 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-10),
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
@@ -40,7 +38,6 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-10),
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[

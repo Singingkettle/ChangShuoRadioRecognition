@@ -1,14 +1,11 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 data = dict(
-    samples_per_gpu=1024,
+    samples_per_gpu=640,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-        augment=[
-            dict(type='FilterBySNR', low_snr=-10),
-        ],
         pipeline=[
             dict(type='LoadAPFromCache', data_root=data_root, filename='train_and_validation_ap.pkl', to_float32=True),
             dict(type='LoadAnnotations'),
@@ -19,9 +16,7 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
-            dict(type='FilterBySNR', low_snr=-10),
-        ],
+
         pipeline=[
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
             dict(type='Collect', keys=['aps'])
@@ -34,9 +29,7 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
-            dict(type='FilterBySNR', low_snr=-10),
-        ],
+
         pipeline=[
             dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
             dict(type='Collect', keys=['aps'])
