@@ -48,8 +48,47 @@ plot = dict(
     ],
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
-        # Ablation Study by an incremental way
+        # Motivation Verification
+        dict(
+            type='AccuracyF1Plot',
+            name='ablation_data.pdf',
+            legend=legend,
+            log_dir=log_dir,
+            method=[
+                # CLDNN AP
+                dict(
+                    config='cldnn_ap-deepsig-201610A',
+                    name='CLDNN-AP',
+                ),
+                # CLDNN IQ
+                dict(
+                    config='cldnn_iq-deepsig-201610A',
+                    name='CLDNN-IQ',
+                ),
+                # CGDNN2 AP
+                dict(
+                    config='cgdnn2_ap-deepsig-201610A',
+                    name='CGDNN2-AP',
+                ),
+                # CGDNN2 IQ
+                dict(
+                    config='cgdnn2_iq-deepsig-201610A',
+                    name='CGDNN2-IQ',
+                ),
+                # CLDNN2 AP
+                dict(
+                    config='cldnn2_ap-deepsig-201610A',
+                    name='CLDNN2-AP',
+                ),
+                # CLDNN2 IQ
+                dict(
+                    config='cldnn2_iq-deepsig-201610A',
+                    name='CLDNN2-IQ',
+                ),
+            ]
+        ),
 
+        # Ablation Study by an incremental way
         dict(
             type='AccuracyF1Plot',
             name='ablation_data.pdf',

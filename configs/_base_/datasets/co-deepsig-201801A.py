@@ -6,7 +6,6 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='train_and_validation_filter_size_0.020_stride_0.020.pkl', to_float32=True),
@@ -18,7 +17,6 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='test_filter_size_0.020_stride_0.020.pkl', to_float32=True),
@@ -32,7 +30,6 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='test_filter_size_0.020_stride_0.020.pkl', to_float32=True),

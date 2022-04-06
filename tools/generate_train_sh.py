@@ -49,6 +49,17 @@ def main():
     gpu_num = torch.cuda.device_count()
     no_train_configs = sorted(no_train_configs)
 
+    fb_no_train_configs = []
+    dl_no_train_configs = []
+    for no_train_config in no_train_configs:
+        if 'feature-based' in no_train_config:
+            fb_no_train_configs.append(no_train_config)
+        else:
+            dl_no_train_configs.append(no_train_config)
+
+    no_train_configs = dl_no_train_configs
+    no_train_configs.extend(fb_no_train_configs)
+
     gpu_index = 0
     for config in no_train_configs:
         config_sh = ' ./configs/{}/{}'.format(config.split('_')[0], config + '.py')
@@ -61,10 +72,10 @@ def main():
             if args.multi_gpu:
                 python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} ' \
                             '--master_port={} tools/train.py'.format(gpu_num, base_master_port + method_index)
-                end_sh = ' --seed 0 --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
+                end_sh = ' --seed 0 --deterministic --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
             else:
                 python_sh = 'export CUDA_VISIBLE_DEVICES={} \nnohup python tools/train.py'.format(gpu_index)
-                end_sh = ' --seed 0 > /dev/null 2>&1 &\n\n\n\n'
+                end_sh = ' --seed 0 --deterministic > /dev/null 2>&1 &\n\n\n\n'
         method_index += 1
         count_index += 1
         train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh

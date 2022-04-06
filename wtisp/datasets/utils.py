@@ -55,7 +55,7 @@ def get_classification_accuracy_for_evaluation(snr_num, class_num, snr_index, sn
     confusion_matrix = get_confusion_matrix(snr_num, class_num, snr_info, prs, gts)
 
     confusion_matrix = confusion_matrix / (
-                np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2) + np.finfo(np.float64).eps)
+            np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2) + np.finfo(np.float64).eps)
 
     eval_results = dict()
     for snr in snr_index:

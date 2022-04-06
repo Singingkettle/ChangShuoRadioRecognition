@@ -8,15 +8,24 @@ from ..builder import PIPELINES
 from ..utils import Constellation
 
 
+def normalize_iq_or_ap(x):
+    x = (x - np.mean(x, axis=1).reshape(2, 1)) / np.std(x, axis=1).reshape(2, 1)
+    return x
+
+
 @PIPELINES.register_module()
 class LoadIQFromFile:
     def __init__(self,
-                 to_float32=False):
+                 to_float32=False,
+                 to_norm=False):
         self.to_float32 = to_float32
+        self.to_norm = to_norm
 
     def __call__(self, results):
         file_path = osp.join(results['data_root'], results['iq_folder'], results['filename'])
         iq = np.load(file_path)
+        if self.to_norm:
+            iq = normalize_iq_or_ap(iq)
         if self.to_float32:
             iq = iq.astype(np.float32)
 
@@ -34,12 +43,16 @@ class LoadIQFromFile:
 @PIPELINES.register_module()
 class LoadAPFromFile:
     def __init__(self,
-                 to_float32=False):
+                 to_float32=False,
+                 to_norm=False):
         self.to_float32 = to_float32
+        self.to_norm = to_norm
 
     def __call__(self, results):
         file_path = osp.join(results['data_root'], results['ap_folder'], results['filename'])
         ap = np.load(file_path)
+        if self.to_norm:
+            ap = normalize_iq_or_ap(ap)
         if self.to_float32:
             ap = ap.astype(np.float32)
 
@@ -119,15 +132,19 @@ class LoadIQFromCache:
     def __init__(self,
                  data_root,
                  filename,
-                 to_float32=False):
+                 to_float32=False,
+                 to_norm=False):
         self.data_root = data_root
         self.filename = filename
         self.cache_data = pickle.load(open(osp.join(data_root, 'cache', filename), 'rb'))
         self.to_float32 = to_float32
+        self.to_norm = to_norm
 
     def __call__(self, results):
         idx = self.cache_data['lookup_table'][results['filename']]
         iq = self.cache_data['data'][idx]
+        if self.to_norm:
+            iq = normalize_iq_or_ap(iq)
         if self.to_float32:
             iq = iq.astype(np.float32)
 
@@ -149,15 +166,19 @@ class LoadAPFromCache:
     def __init__(self,
                  data_root,
                  filename,
-                 to_float32=False):
+                 to_float32=False,
+                 to_norm=False):
         self.data_root = data_root
         self.filename = filename
         self.cache_data = pickle.load(open(osp.join(data_root, 'cache', filename), 'rb'))
         self.to_float32 = to_float32
+        self.to_norm = to_norm
 
     def __call__(self, results):
         idx = self.cache_data['lookup_table'][results['filename']]
         ap = self.cache_data['data'][idx]
+        if self.to_norm:
+            ap = normalize_iq_or_ap(ap)
         if self.to_float32:
             ap = ap.astype(np.float32)
 

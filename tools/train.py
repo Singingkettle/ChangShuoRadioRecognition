@@ -8,7 +8,7 @@ import warnings
 import torch
 
 from wtisp import __version__
-from wtisp.apis import set_random_seed, train_task
+from wtisp.apis import init_random_seed, set_random_seed, train_task
 from wtisp.common import get_root_logger, collect_env
 from wtisp.common.fileio import del_files
 from wtisp.common.utils import DictAction, Config, mkdir_or_exist
@@ -131,12 +131,10 @@ def main():
     logger.info(f'Config:\n{cfg.pretty_text}')
 
     # set random seeds
-    if hasattr(cfg, 'seed'):
-        args.seed = cfg.seed
-    if args.seed is not None:
-        logger.info(f'Set random seed to {args.seed}, '
-                    f'deterministic: {args.deterministic}')
-        set_random_seed(args.seed, deterministic=args.deterministic)
+    seed = init_random_seed(args.seed)
+    logger.info(f'Set random seed to {seed}, '
+                f'deterministic: {args.deterministic}')
+    set_random_seed(seed, deterministic=args.deterministic)
     cfg.seed = args.seed
     meta['seed'] = args.seed
     meta['exp_name'] = osp.basename(args.config)

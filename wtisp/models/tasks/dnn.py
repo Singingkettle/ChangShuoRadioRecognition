@@ -1,5 +1,3 @@
-import copy
-
 from .base import BaseDNN
 from ..builder import TASKS, build_backbone, build_head
 from ...common.utils import outs2result
