@@ -6,7 +6,8 @@ _base_ = [
 
 # model
 model = dict(
-    type='DensCNN-IQ',
+    type='DNN',
+    method_name='DensCNN-IQ',
     backbone=dict(
         type='DensCNN',
         avg_pool=(1, 8),
@@ -22,6 +23,3 @@ model = dict(
         ),
     ),
 )
-
-train_cfg = dict()
-test_cfg = dict()

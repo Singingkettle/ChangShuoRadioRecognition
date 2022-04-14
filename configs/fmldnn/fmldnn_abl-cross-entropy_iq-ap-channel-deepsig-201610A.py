@@ -27,8 +27,6 @@ model = dict(
         ),
     ),
 )
-train_cfg = dict()
-test_cfg = dict()
 
 # for flops calculation
 input_shape = [(2, 1, 128), (2, 1, 128), (1, 128, 128)]

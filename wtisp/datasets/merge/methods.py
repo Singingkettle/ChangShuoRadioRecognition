@@ -222,9 +222,6 @@ class Optimization:
         merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results), -1)))
         merge_matrix = np.reshape(merge_matrix, (-1, mod_label_num))
 
-        eval_results = get_classification_accuracy_for_evaluation(snr_num, mod_label_num, snr_to_index,
-                                                                  item_snr_index, merge_matrix,
-                                                                  item_mod_label,
-                                                                  prefix=prediction_name + '/')
+        results[prediction_name] = merge_matrix
 
-        return eval_results
+        return results

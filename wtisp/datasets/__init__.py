@@ -5,6 +5,7 @@ from .custom import CustomAMCDataset
 from .dataset_wrappers import ConcatAMCDataset
 from .deepsig import DeepSigDataset
 from .evaluate import *
+from .merge import *
 from .online import OnlineDataset
 from .save import *
 from .utils import *

@@ -31,8 +31,10 @@ class DSCLDNNHead(BaseHead):
         loss_cls = self.loss_cls(x, mod_labels, weight=weight)
         return dict(loss_cls=loss_cls)
 
-    def forward(self, x, **kwargs):
+    def forward(self, x, vis_fea=False):
         x = x.reshape(-1, self.in_features)
         pre = self.classifier(x)
-
-        return pre
+        if vis_fea:
+            return dict(fea=x, Final=pre)
+        else:
+            return pre

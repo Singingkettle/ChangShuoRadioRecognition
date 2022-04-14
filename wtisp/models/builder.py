@@ -51,6 +51,6 @@ def build_loss(cfg):
     return build(cfg, LOSSES)
 
 
-def build_task(cfg, train_cfg=None, test_cfg=None):
+def build_task(cfg):
     """Build task"""
-    return build(cfg, TASKS, dict(train_cfg=train_cfg, test_cfg=test_cfg))
+    return build(cfg, TASKS)

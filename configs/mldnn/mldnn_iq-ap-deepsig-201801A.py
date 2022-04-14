@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/default_runtime.py',
-    '../_base_/schedules/schedule_1x.py',
+    './schedule.py',
     './data_iq-ap-deepsig-201801A.py'
 ]
 
@@ -62,11 +62,3 @@ model = dict(
         ]
     ),
 )
-train_cfg = dict()
-test_cfg = dict()
-
-# optimizer
-optimizer = dict(type='Adam', lr=0.0004)
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='fixed')

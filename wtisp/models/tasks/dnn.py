@@ -6,12 +6,11 @@ from ...common.utils import outs2result
 @TASKS.register_module()
 class DNN(BaseDNN):
 
-    def __init__(self, backbone, classifier_head, train_cfg=None, test_cfg=None, method_name=None):
+    def __init__(self, backbone, classifier_head, vis_fea=False, method_name=None):
         super(DNN, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
-        self.train_cfg = train_cfg
-        self.test_cfg = test_cfg
+        self.vis_fea = vis_fea
         if method_name is None:
             raise ValueError('You should give a method name when using this task class!')
         else:
@@ -50,7 +49,7 @@ class DNN(BaseDNN):
 
     def simple_test(self, **kwargs):
         x = self.extract_feat(**kwargs)
-        outs = self.classifier_head(x)
+        outs = self.classifier_head(x, self.vis_fea)
 
         results_list = []
         if isinstance(outs, dict):
@@ -59,11 +58,11 @@ class DNN(BaseDNN):
             for idx in range(batch_size):
                 item = dict()
                 for key_str in keys:
-                    if 'Final' is not key_str:
-                        method_name = self.method_name + '-' + key_str
+                    if 'Final' is not key_str or 'fea' in key_str:
+                        save_name = self.method_name + '-' + key_str
                     else:
-                        method_name = 'Final'
-                    item[method_name] = outs2result(outs[key_str][idx, :])
+                        save_name = 'Final'
+                    item[save_name] = outs2result(outs[key_str][idx, :])
                 results_list.append(item)
         else:
             for idx in range(outs.shape[0]):

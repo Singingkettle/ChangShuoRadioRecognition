@@ -77,7 +77,7 @@ class MLDNNHead(BaseHead):
 
         return losses
 
-    def forward(self, x):
+    def forward(self, x, vis_fea=False):
         SNR = self.classifier_head[0](x[0])
         Low = self.classifier_head[1](x[1])
         High = self.classifier_head[2](x[2])

@@ -42,8 +42,7 @@ class SaveModulationPrediction:
 @SAVES.register_module()
 class SaveModulationPredictionOfHCGDNN:
     def __init__(self, merge=None):
-        self.method_name = 'HCGDNN'
-        if self.merge is not None:
+        if merge is not None:
             self.merge = build_from_cfg(merge, MERGES)
         else:
             self.merge = None

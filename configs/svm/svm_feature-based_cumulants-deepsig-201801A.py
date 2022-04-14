@@ -8,7 +8,6 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
             dict(type='Cumulants'),
@@ -20,7 +19,6 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='Cumulants'),
@@ -34,7 +32,6 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='Cumulants'),

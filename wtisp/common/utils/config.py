@@ -580,16 +580,7 @@ def get_the_best_checkpoint(log_dir, config):
         log_dict = load_json_log(json_paths[-1])
 
         epochs = list(log_dict.keys())
-        final_metric = 'final/snr_mean_all'
-        for epoch in epochs:
-            if log_dict[epoch]['mode'][-1] == 'val':
-                if 'common/snr_mean_all' in log_dict[epoch]:
-                    final_metric = 'common/snr_mean_all'
-                elif 'merge/snr_mean_all' in log_dict[epoch]:
-                    final_metric = 'merge/snr_mean_all'
-                else:
-                    final_metric = 'final/snr_mean_all'
-                break
+        final_metric = 'Final/snr_mean_all'
 
         accuracy = 0
         best_epoch = 0

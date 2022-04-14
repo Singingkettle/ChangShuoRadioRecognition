@@ -68,9 +68,6 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
-    ## TODO: set the vis_fea value in a more elegant way
-    cfg.test_cfg['vis_fea'] = False
-
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -139,8 +136,7 @@ def main():
     meta['seed'] = args.seed
     meta['exp_name'] = osp.basename(args.config)
 
-    model = build_task(cfg.model, train_cfg=cfg.train_cfg,
-                       test_cfg=cfg.test_cfg)
+    model = build_task(cfg.model)
 
     # log network structure
     logger.info(f'Network Structure:\n{model}')

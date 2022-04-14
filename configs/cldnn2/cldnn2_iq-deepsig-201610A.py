@@ -18,7 +18,7 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='DSAMCHead',
+        type='DSCLDNNHead',
         num_classes=11,
         in_features=50,
         loss_cls=dict(
@@ -27,6 +27,3 @@ model = dict(
         ),
     ),
 )
-
-train_cfg = dict()
-test_cfg = dict()

@@ -45,7 +45,7 @@ class EvaluateModulationPrediction:
 @EVALUATES.register_module()
 class EvaluateModulationPredictionOfHCGDNN:
     def __init__(self, merge=None):
-        if self.merge is not None:
+        if merge is not None:
             self.merge = build_from_cfg(merge, MERGES)
         else:
             self.merge = None

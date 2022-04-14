@@ -36,7 +36,8 @@ class LoadIQFromFile:
 
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('
-                    f'to_float32={self.to_float32}, )')
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
         return repr_str
 
 
@@ -63,7 +64,8 @@ class LoadAPFromFile:
 
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('
-                    f'to_float32={self.to_float32}, )')
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
         return repr_str
 
 
@@ -157,7 +159,8 @@ class LoadIQFromCache:
         repr_str = (f'{self.__class__.__name__}('
                     f'data_root={self.data_root},'
                     f'filename={self.filename},'
-                    f'to_float32={self.to_float32}, )')
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
         return repr_str
 
 
@@ -191,7 +194,8 @@ class LoadAPFromCache:
         repr_str = (f'{self.__class__.__name__}('
                     f'data_root={self.data_root},'
                     f'filename={self.filename},'
-                    f'to_float32={self.to_float32}, )')
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
         return repr_str
 
 
