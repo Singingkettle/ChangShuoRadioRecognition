@@ -20,7 +20,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True, to_norm=True),
+            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
             dict(type='Collect', keys=['iqs', 'aps'])
         ],
         data_root=data_root,
@@ -33,7 +33,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True, to_norm=True),
+            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
             dict(type='Collect', keys=['iqs', 'aps'])
         ],
         data_root=data_root,

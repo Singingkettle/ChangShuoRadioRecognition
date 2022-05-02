@@ -2,6 +2,7 @@ import os.path as osp
 import pickle
 import zlib
 
+import h5py
 import numpy as np
 
 from ..builder import PIPELINES
@@ -232,6 +233,82 @@ class LoadConstellationFromCache:
 
 
 @PIPELINES.register_module()
+class LoadIQFromHDF5:
+    def __init__(self,
+                 data_root,
+                 filename,
+                 to_float32=False,
+                 to_norm=False):
+        self.data_root = data_root
+        self.filename = filename
+        hf = h5py.File(osp.join(data_root, 'hdf5', filename), 'r')
+        self.hdf5_data = hf['iq']
+        self.lookup_table = pickle.load(
+            open(osp.join(data_root, 'hdf5', osp.basename(filename).split('.')[0] + '.pkl'), 'rb'))
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+
+    def __call__(self, results):
+        idx = self.lookup_table[results['filename']]
+        iq = self.hdf5_data[idx, :, :]
+        if self.to_norm:
+            iq = normalize_iq_or_ap(iq)
+        if self.to_float32:
+            iq = iq.astype(np.float32)
+
+        # make the iq as a three-dimensional tensor [1, 2, L]
+        iq = np.expand_dims(iq, axis=0)
+        results['iqs'] = iq
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'data_root={self.data_root},'
+                    f'filename={self.filename},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadAPFromHDF5:
+    def __init__(self,
+                 data_root,
+                 filename,
+                 to_float32=False,
+                 to_norm=False):
+        self.data_root = data_root
+        self.filename = filename
+        hf = h5py.File(osp.join(data_root, 'hdf5', filename), 'r')
+        self.hdf5_data = hf['ap']
+        self.lookup_table = pickle.load(
+            open(osp.join(data_root, 'hdf5', osp.basename(filename).split('.')[0] + '.pkl'), 'rb'))
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+
+    def __call__(self, results):
+        idx = self.lookup_table[results['filename']]
+        ap = self.hdf5_data[idx, :, :]
+        if self.to_norm:
+            ap = normalize_iq_or_ap(ap)
+        if self.to_float32:
+            ap = ap.astype(np.float32)
+
+        # make the iq as a three-dimensional tensor [1, 2, L]
+        ap = np.expand_dims(ap, axis=0)
+        results['aps'] = ap
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'data_root={self.data_root},'
+                    f'filename={self.filename},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
 class LoadConstellationFromIQCache:
     def __init__(self,
                  data_root,
@@ -268,6 +345,35 @@ class LoadConstellationFromIQCache:
                     f'filter_size={self.filter_size},'
                     f'filter_stride={self.filter_stride},'
                     f'to_float32={self.to_float32}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadAPFromIQ:
+    def __init__(self,
+                 to_float32=False,
+                 to_norm=False):
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+
+    def __call__(self, results):
+        iq = results['iqs']
+        iq = iq[0, :, :]
+        amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
+        phase = np.arctan(iq[0, :]/(iq[1, :] + np.finfo(np.float32).eps))
+        ap = np.vstack((amplitude, phase))
+
+        # make the iq as a three-dimensional tensor [1, 2, L]
+        ap = np.expand_dims(ap, axis=0)
+        results['aps'] = ap
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'data_root={self.data_root},'
+                    f'filename={self.filename},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
         return repr_str
 
 

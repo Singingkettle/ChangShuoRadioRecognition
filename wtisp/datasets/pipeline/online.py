@@ -1,11 +1,6 @@
-import os.path as osp
-import pickle
-import zlib
-
 import numpy as np
 
 from ..builder import PIPELINES
-from ..utils import Constellation
 
 
 @PIPELINES.register_module()
@@ -13,6 +8,7 @@ class GeneratePSDFromIQ:
     """
     Estimate power spectral density using a periodogram from IQ data
     """
+
     def __init__(self,
                  to_float32=False,
                  to_norm=False):
@@ -21,16 +17,13 @@ class GeneratePSDFromIQ:
 
     def __call__(self, results):
         iqs = results['iqs']
-        iqs = iqs[0, :] + 1j*iqs[1, :]
+        iqs = iqs[0, :] + 1j * iqs[1, :]
         N = iqs.shape[0]
         xdft = np.fft.fft(iqs)
-        psdx = 1/(2*np.pi*N)*np.power(np.abs(xdft), 2)
-        freq = np.arange(0, 2.0, 2.0/N)
+        psdx = 1 / (2 * np.pi * N) * np.power(np.abs(xdft), 2)
+        psd = 10 * np.log10(psdx)
 
-
-
-
-
+        results['psds'] = psd
 
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('

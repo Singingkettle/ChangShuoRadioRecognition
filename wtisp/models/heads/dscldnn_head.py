@@ -28,8 +28,8 @@ class DSCLDNNHead(BaseHead):
                 nn.init.constant_(m.bias, 0)
 
     def loss(self, x, mod_labels=None, weight=None, **kwargs):
-        loss_cls = self.loss_cls(x, mod_labels, weight=weight)
-        return dict(loss_cls=loss_cls)
+        loss_Final = self.loss_cls(x, mod_labels, weight=weight)
+        return dict(loss_Final=loss_Final)
 
     def forward(self, x, vis_fea=False):
         x = x.reshape(-1, self.in_features)

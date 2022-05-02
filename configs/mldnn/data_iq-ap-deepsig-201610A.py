@@ -11,7 +11,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='train_and_validation_ap.pkl', to_float32=True),
+            dict(type='LoadAPFromIQ'),
             dict(type='LoadAnnotations', with_snr=True),
             dict(type='Collect', keys=['iqs', 'aps', 'mod_labels', 'snr_labels'])
         ],
@@ -25,7 +25,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['iqs', 'aps'])
         ],
         data_root=data_root,
@@ -42,7 +42,7 @@ data = dict(
         ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['iqs', 'aps'])
         ],
         data_root=data_root,

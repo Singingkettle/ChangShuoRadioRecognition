@@ -20,20 +20,8 @@ legend = {
 plot = dict(
     type='CommonPlot',
     log_dir=log_dir,
-    config='sednn_iq-channel-snr-[-8,20]-deepsig-201801A',
+    config='sednn_iq-channel-snr-[-8,30]-deepsig-201801A',
     legend=legend,
-    # Set the configs about confusion maps
-    confusion_map=[
-        dict(
-            type='ConfusionMap',
-            log_dir=log_dir,
-            name='confusion-map_mldnn-201801A.pdf',
-            method=dict(
-                config='sednn_iq-ap-snr-[-8,20]-deepsig-201801A',
-                name='SEDNN',
-            ),
-        ),
-    ],
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
         # deepsig 201801A compare with I/Q A/P
@@ -44,35 +32,35 @@ plot = dict(
             log_dir=log_dir,
             method=[
                 dict(
-                    config='mldnn_iq-ap-snr-[-8,20]-deepsig-201801A',
+                    config='mldnn_iq-ap-snr-[-8,30]-deepsig-201801A',
                     name='MLDNN',
                 ),
                 dict(
-                    config='dscldnn_iq-ap-snr-[-8,20]-deepsig-201801A',
+                    config='dscldnn_iq-ap-snr-[-8,30]-deepsig-201801A',
                     name='DSCLDNN',
                 ),
                 dict(
-                    config='rescnn_iq-snr-[-8,20]-deepsig-201801A',
+                    config='rescnn_iq-snr-[-8,30]-deepsig-201801A',
                     name='ResCNN-IQ',
                 ),
                 dict(
-                    config='cldnn_iq-snr-[-8,20]-deepsig-201801A',
+                    config='cldnn_iq-snr-[-8,30]-deepsig-201801A',
                     name='CLDNN-IQ',
                 ),
                 dict(
-                    config='cnn4_iq-snr-[-8,20]-deepsig-201801A',
+                    config='cnn4_iq-snr-[-8,30]-deepsig-201801A',
                     name='CNN4-IQ',
                 ),
                 dict(
-                    config='denscnn_iq-snr-[-8,20]-deepsig-201801A',
+                    config='denscnn_iq-snr-[-8,30]-deepsig-201801A',
                     name='DensCNN-IQ',
                 ),
                 dict(
-                    config='fmldnn_iq-ap-channel-snr-[-8,20]-deepsig-201801A',
+                    config='fmldnn_iq-ap-channel-snr-[-8,30]-deepsig-201801A',
                     name='FMLDNN',
                 ),
                 dict(
-                    config='hcgdnn_iq-channel-snr-[-8,20]-deepsig-201801A',
+                    config='hcgdnn_iq-channel-snr-[-8,30]-deepsig-201801A',
                     name='HCGDNN',
                 ),
             ],
@@ -85,31 +73,31 @@ plot = dict(
             log_dir=log_dir,
             method=[
                 dict(
-                    config='mldnn_iq-ap-snr-[-8,20]-deepsig-201801A',
+                    config='mldnn_iq-ap-snr-[-8,30]-deepsig-201801A',
                     name='MLDNN',
                 ),
                 dict(
-                    config='alexnet_co-snr-[-8,20]-deepsig-201801A',
+                    config='alexnet_co-snr-[-8,30]-deepsig-201801A',
                     name='AlexNet-CO',
                 ),
                 dict(
-                    config='googlenet_co-snr-[-8,20]-deepsig-201801A',
+                    config='googlenet_co-snr-[-8,30]-deepsig-201801A',
                     name='GoogleNet-CO',
                 ),
                 dict(
-                    config='resnet_co-snr-[-8,20]-deepsig-201801A',
+                    config='resnet_co-snr-[-8,30]-deepsig-201801A',
                     name='ResNet-CO',
                 ),
                 dict(
-                    config='vggnet_co-snr-[-8,20]-deepsig-201801A',
+                    config='vggnet_co-snr-[-8,30]-deepsig-201801A',
                     name='VGGNet-CO',
                 ),
                 dict(
-                    config='svm_feature-based_cumulants-snr-[-8,20]-deepsig-201801A',
+                    config='svm_feature-based_cumulants-snr-[-8,30]-deepsig-201801A',
                     name='SVM-FB',
                 ),
                 dict(
-                    config='decisiontree_feature-based_cumulants-snr-[-8,20]-deepsig-201801A',
+                    config='decisiontree_feature-based_cumulants-snr-[-8,30]-deepsig-201801A',
                     name='DecisionTree-FB',
                 ),
             ],

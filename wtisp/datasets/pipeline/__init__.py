@@ -2,8 +2,10 @@ from .compose import Compose
 from .features import Cumulants
 from .formating import Collect
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
-                      LoadConstellationFromIQFile, LoadAPFromCache, LoadIQFromCache,
-                      LoadConstellationFromCache, LoadConstellationFromIQCache, LoadAnnotations)
+                      LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
+                      LoadAPFromHDF5, LoadIQFromHDF5,
+                      LoadConstellationFromIQFile, LoadConstellationFromIQCache, LoadAPFromIQ,
+                      LoadAnnotations)
 from .transforms import ChannelMode, NormalizeAP, NormalizeIQ, NormalizeConstellation
 
 __all__ = [
@@ -13,11 +15,14 @@ __all__ = [
     'LoadAPFromFile',
     'LoadIQFromFile',
     'LoadConstellationFromFile',
-    'LoadConstellationFromIQFile',
     'LoadAPFromCache',
     'LoadIQFromCache',
     'LoadConstellationFromCache',
+    'LoadAPFromHDF5',
+    'LoadIQFromHDF5',
+    'LoadConstellationFromIQFile',
     'LoadConstellationFromIQCache',
+    'LoadAPFromIQ',
     'LoadAnnotations',
     'ChannelMode',
     'NormalizeAP',

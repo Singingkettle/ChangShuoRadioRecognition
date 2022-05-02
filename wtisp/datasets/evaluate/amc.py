@@ -17,6 +17,8 @@ def generate_amc_eval_results(results, data_infos):
     for pr_name in results:
         if 'SNR' in pr_name:
             continue
+        if 'fea' in pr_name:
+            continue
         sub_results = reshape_results(results[pr_name], mod_label_num)
         sub_eval_results = get_classification_accuracy_for_evaluation(snr_num, mod_label_num, snr_to_index,
                                                                       item_snr_index, sub_results, item_mod_label,

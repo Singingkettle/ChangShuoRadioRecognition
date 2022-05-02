@@ -1,4 +1,4 @@
-total_epochs = 800
+total_epochs = 1600
 # optimizer
 optimizer = dict(type='Adam', lr=0.00069)
 optimizer_config = dict(grad_clip=None)

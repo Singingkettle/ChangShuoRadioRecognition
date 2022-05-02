@@ -1,15 +1,15 @@
 _base_ = [
-    '../_base_/datasets/iq-snr-[-8,20]-deepsig-201801A.py',
-    '../_base_/schedules/schedule_1x.py',
+    '../_base_/datasets/iq-snr-[-8,30]-deepsig-201801A.py',
+    '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
 # model
 model = dict(
     type='DNN',
-    method_name='ResCNN-IQ',
+    method_name='DensCNN-IQ',
     backbone=dict(
-        type='ResCNN',
+        type='DensCNN',
         avg_pool=(1, 8),
     ),
     classifier_head=dict(
@@ -23,9 +23,3 @@ model = dict(
         ),
     ),
 )
-
-# optimizer
-optimizer = dict(type='Adam')
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='fixed')

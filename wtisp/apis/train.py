@@ -130,7 +130,7 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
         val_dataloader = build_dataloader(
             val_dataset,
             samples_per_gpu=cfg.data.samples_per_gpu,
-            workers_per_gpu=1,
+            workers_per_gpu=0,
             dist=distributed,
             shuffle=False)
         eval_cfg = cfg.get('evaluation', {})

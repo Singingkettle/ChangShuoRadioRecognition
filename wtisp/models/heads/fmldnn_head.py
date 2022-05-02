@@ -52,15 +52,12 @@ class FMLDNNHead(BaseHead):
                 nn.init.constant_(m.bias, 0)
 
     def loss(self, x, mod_labels=None, weight=None, **kwargs):
-        loss_cls = self.loss_cls(x['pre'], mod_labels, weight=weight)
+        loss_cls = self.loss_cls(x['Final'], mod_labels, weight=weight)
         loss_aux = self.aux_head.loss(x['fea'], mod_labels)
-        return dict(loss_cls=loss_cls, loss_aux=loss_aux['loss_intra_orthogonal'])
+        return dict(loss_Final=loss_cls, loss_AUX=loss_aux['loss_intra_orthogonal'])
 
     def forward(self, x, vis_fea=False):
         x = x.reshape(-1, self.in_features)
         fea = self.fea(x)
-        pre = self.pre(fea)
-        if vis_fea:
-            return dict(fea=fea, pre=pre)
-        else:
-            return pre
+        Final = self.pre(fea)
+        return dict(fea=fea, Final=Final)

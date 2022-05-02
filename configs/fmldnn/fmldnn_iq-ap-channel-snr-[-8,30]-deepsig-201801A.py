@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/default_runtime.py',
-    '../_base_/datasets/iq-ap-channel-snr-[-8,30]-deepsig-2010801A.py'
+    './data_iq-ap-channel-snr-[-8,30]-deepsig-201801A.py'
 ]
 
 in_features = 100
@@ -21,7 +21,7 @@ model = dict(
         in_features=100,
         out_features=256,
         num_classes=num_classes,
-        batch_size=640,
+        batch_size=80,
         loss_cls=dict(
             type='FocalLoss',
             loss_weight=1,
@@ -30,8 +30,8 @@ model = dict(
         aux_head=dict(
             type='IntraOrthogonalHead',
             in_features=256,
-            batch_size=640,
-            num_classes=11,
+            batch_size=80,
+            num_classes=num_classes,
             mm='cosine',
             is_abs=False,
             loss_aux=dict(

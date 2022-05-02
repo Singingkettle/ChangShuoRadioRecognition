@@ -1,13 +1,13 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201801A'
 data = dict(
-    samples_per_gpu=320,
+    samples_per_gpu=80,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-8, high_snr=20),
+            dict(type='FilterBySNR', low_snr=-8, high_snr=30),
         ],
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
@@ -21,7 +21,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-8, high_snr=20),
+            dict(type='FilterBySNR', low_snr=-8, high_snr=30),
         ],
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
@@ -37,7 +37,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         augment=[
-            dict(type='FilterBySNR', low_snr=-8, high_snr=20),
+            dict(type='FilterBySNR', low_snr=-8, high_snr=30),
         ],
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,

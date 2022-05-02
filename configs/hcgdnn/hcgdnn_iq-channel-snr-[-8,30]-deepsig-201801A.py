@@ -1,7 +1,6 @@
 _base_ = [
-    './schedule.py',
-    './data_iq-channel-snr-[-8,30]-deepsig-201610A.py',
     '../_base_/default_runtime.py',
+    '../_base_/datasets/iq-channel-snr-[-8,30]-deepsig-201801A.py',
 ]
 
 in_size = 100
@@ -29,3 +28,13 @@ model = dict(
         ),
     ),
 )
+
+
+total_epochs = 1600
+
+# Optimizer
+optimizer = dict(type='Adam', lr=0.001)
+optimizer_config = dict(grad_clip=None)
+# learning policy
+# learning policy
+lr_config = dict(policy='fixed')

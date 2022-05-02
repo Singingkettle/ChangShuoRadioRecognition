@@ -25,8 +25,8 @@ class MergeAMCHead(BaseHead):
         pass
 
     def loss(self, x, mod_labels=None, weight=None, **kwargs):
-        loss_cls = self.loss_cls(x, mod_labels, weight=weight)
-        return dict(loss_cls=loss_cls)
+        loss_Final = self.loss_cls(x, mod_labels, weight=weight)
+        return dict(loss_Final=loss_Final)
 
     def forward(self, x):
         SNR_p = self.softmax(x['SNR'])
@@ -70,10 +70,10 @@ class MLDNNHead(BaseHead):
         Final_loss = self.classifier_head[3].loss(
             x['Final'], mod_labels=mod_labels)
 
-        losses['loss_SNR'] = snr_loss['loss_cls']
-        losses['loss_Low'] = low_loss['loss_cls']
-        losses['loss_High'] = high_loss['loss_cls']
-        losses['loss_Final'] = Final_loss['loss_cls']
+        losses['loss_SNR'] = snr_loss['loss_Final']
+        losses['loss_Low'] = low_loss['loss_Final']
+        losses['loss_High'] = high_loss['loss_Final']
+        losses['loss_Final'] = Final_loss['loss_Final']
 
         return losses
 

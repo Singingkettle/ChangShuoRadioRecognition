@@ -1,20 +1,20 @@
 _base_ = [
-    '../_base_/datasets/co-snr-[-8,20]-deepsig-201801A.py',
-    '../_base_/schedules/schedule_1x.py',
-    '../_base_/default_runtime.py',
+    '../_base_/datasets/co-snr-[-8,30]-deepsig-201801A.py',
+    '../_base_/schedules/schedule.py',
+    '../_base_/default_runtime.py'
 ]
 
 # Model
 model = dict(
     type='DNN',
-    method_name='ResNet-CO',
+    method_name='AlexNet-CO',
     backbone=dict(
-        type='ResNet'
+        type='AlexNet'
     ),
     classifier_head=dict(
         type='AMCHead',
         num_classes=24,
-        in_features=2048,
+        in_features=256,
         out_features=256,
         loss_cls=dict(
             type='CrossEntropyLoss',
@@ -23,10 +23,10 @@ model = dict(
     )
 )
 
-total_epochs = 400
+total_epochs = 1600
 
 # optimizer
-optimizer = dict(type='Adam', lr=0.00001)
+optimizer = dict(type='Adam', lr=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='fixed')

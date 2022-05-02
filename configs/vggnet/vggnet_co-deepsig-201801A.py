@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/datasets/co-deepsig-201801A.py',
-    '../_base_/schedules/schedule_1x.py',
+    '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
@@ -23,7 +23,7 @@ model = dict(
     )
 )
 
-total_epochs = 400
+total_epochs = 1600
 
 # optimizer
 optimizer = dict(type='Adam', lr=0.00001)

@@ -1,5 +1,5 @@
 from .amc_head import AMCHead
-from .auxiliary_head import InterOrthogonalHead, IntraOrthogonalHead, IntraOrthogonalHeadV2
+from .auxiliary_head import InterOrthogonalHead, IntraOrthogonalHead
 from .base_head import BaseHead
 from .dscldnn_head import DSCLDNNHead
 from .fmldnn_head import FMLDNNHead
@@ -12,7 +12,6 @@ __all__ = [
     'AMCHead',
     'InterOrthogonalHead',
     'IntraOrthogonalHead',
-    'IntraOrthogonalHeadV2',
     'DSCLDNNHead',
     'FMLDNNHead',
     'HCGDNNHead',

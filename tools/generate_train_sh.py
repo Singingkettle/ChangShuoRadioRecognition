@@ -12,7 +12,7 @@ def parse_args():
         description='WTISignalProcessing Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
     parser.add_argument('--scripts-dir', help='dir to save the train.sh files')
-    parser.add_argument('--group-num', default=16, type=int, help='number of configs in one train.sh file')
+    parser.add_argument('--group-num', default=4, type=int, help='number of configs in one train.sh file')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--multi-gpu', default=False, action='store_true',
                         help='use parallel training')
@@ -76,8 +76,12 @@ def main():
             else:
                 python_sh = 'export CUDA_VISIBLE_DEVICES={} \nnohup python tools/train.py'.format(gpu_index)
                 end_sh = ' --seed 0 --deterministic > /dev/null 2>&1 &\n\n\n\n'
-        method_index += 1
-        count_index += 1
+            method_index += 1
+            count_index += 1
+            if not args.multi_gpu:
+                gpu_index += 1
+                if gpu_index >= gpu_num:
+                    gpu_index = 0
         train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh
         if count_index >= args.group_num:
             with open(os.path.join(scripts_dir, 'train_{:02d}.sh'.format(group_index)), 'w') as f:
@@ -85,10 +89,6 @@ def main():
             train_sh = ''
             count_index = 0
             group_index += 1
-        if not args.multi_gpu:
-            gpu_index += 1
-            if gpu_index >= gpu_num:
-                gpu_index = 0
 
     if train_sh is not '':
         with open(os.path.join(scripts_dir, 'train_{:02d}.sh'.format(group_index)), 'w') as f:

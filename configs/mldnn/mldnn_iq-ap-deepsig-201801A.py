@@ -5,7 +5,8 @@ _base_ = [
 ]
 
 model = dict(
-    type='MLDNN',
+    type='DNN',
+    method_name='MLDNN',
     backbone=dict(
         type='MLNet',
         avg_pool=(1, 8),
@@ -16,7 +17,7 @@ model = dict(
         gradient_truncation=True,
     ),
     classifier_head=dict(
-        type='MLHeadNoWeight',
+        type='MLDNNHead',
         heads=[
             # Snr Head
             dict(

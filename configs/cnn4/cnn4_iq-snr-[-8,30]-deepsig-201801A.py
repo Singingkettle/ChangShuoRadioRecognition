@@ -1,27 +1,24 @@
 _base_ = [
-    '../_base_/datasets/iq-snr-[-8,20]-deepsig-201801A.py',
-    '../_base_/schedules/schedule_1x.py',
+    '../_base_/datasets/iq-snr-[-8,30]-deepsig-201801A.py',
+    '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
 # Model
 model = dict(
     type='DNN',
-    method_name='CLDNN-IQ',
+    method_name='CNN4-IQ',
     backbone=dict(
-        type='CRNet',
+        type='CNNNet',
+        depth=4,
         in_channels=1,
-        cnn_depth=4,
-        rnn_depth=1,
-        input_size=80,
         out_indices=(3,),
         avg_pool=(1, 8),
-        rnn_mode='LSTM',
     ),
     classifier_head=dict(
         type='AMCHead',
         num_classes=24,
-        in_features=50,
+        in_features=10240,
         out_features=128,
         loss_cls=dict(
             type='CrossEntropyLoss',
@@ -29,6 +26,3 @@ model = dict(
         ),
     ),
 )
-
-# optimizer
-optimizer = dict(type='Adam', lr=0.0001)

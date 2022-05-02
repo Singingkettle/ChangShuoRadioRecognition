@@ -1,11 +1,12 @@
 _base_ = [
     '../_base_/default_runtime.py',
     './schedule.py',
-    './data_iq-ap-snr-[-8,20]-deepsig-201801A.py'
+    './data_iq-ap-snr-[-8,30]-deepsig-201801A.py'
 ]
 
 model = dict(
-    type='MLDNN',
+    type='DNN',
+    method_name='MLDNN',
     backbone=dict(
         type='MLNet',
         avg_pool=(1, 8),
@@ -16,7 +17,7 @@ model = dict(
         gradient_truncation=True,
     ),
     classifier_head=dict(
-        type='MLHeadNoWeight',
+        type='MLDNNHead',
         heads=[
             # Snr Head
             dict(
