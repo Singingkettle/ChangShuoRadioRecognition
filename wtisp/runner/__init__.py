@@ -29,7 +29,7 @@ from .optimizer import (OPTIMIZER_BUILDERS, OPTIMIZERS,
                         DefaultOptimizerConstructor, build_optimizer,
                         build_optimizer_constructor)
 from .priority import Priority, get_priority
-from .utils import get_host_info, get_time_str, obj_from_dict, set_random_seed
+from .utils import (get_host_info, get_time_str, obj_from_dict, set_random_seed, find_latest_checkpoint)
 
 __all__ = [
     'BaseRunner',
@@ -80,4 +80,6 @@ __all__ = [
     'RUNNERS',
     'allreduce_grads',
     'allreduce_params',
-    'LossScaler']
+    'LossScaler',
+    'find_latest_checkpoint',
+]

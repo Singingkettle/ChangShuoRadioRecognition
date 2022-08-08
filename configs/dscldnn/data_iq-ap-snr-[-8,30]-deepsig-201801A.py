@@ -12,6 +12,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromHDF5', data_root=data_root, filename='train_and_validation_iq.h5', to_float32=True),
             dict(type='LoadAPFromIQ'),
+            dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['iqs', 'aps', 'mod_labels'])
         ],
         data_root=data_root,

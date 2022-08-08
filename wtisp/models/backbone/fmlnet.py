@@ -3,30 +3,9 @@ import logging
 import torch
 import torch.nn as nn
 
+from .mlnet import SELayer
 from ..builder import BACKBONES
 from ...runner import load_checkpoint
-
-
-class SELayer(nn.Module):
-    def __init__(self, in_channels, reduction=16):
-        super(SELayer, self).__init__()
-        if in_channels < reduction:
-            nhid = 2
-        else:
-            nhid = in_channels // reduction
-        self.avg_pool = nn.AdaptiveAvgPool1d(1)
-        self.fc = nn.Sequential(
-            nn.Linear(in_channels, nhid, bias=False),
-            nn.ReLU(inplace=True),
-            nn.Linear(nhid, in_channels, bias=False),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        b, c, _ = x.size()
-        y = self.avg_pool(x).view(b, c)
-        y = self.fc(y).view(b, c, 1)
-        return y
 
 
 @BACKBONES.register_module()

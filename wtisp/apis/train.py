@@ -10,7 +10,7 @@ from ..common.utils import build_from_cfg
 from ..datasets import build_dataloader, build_dataset
 from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner,
                       Fp16OptimizerHook, OptimizerHook, build_optimizer,
-                      EvalHook, DistEvalHook, get_dist_info)
+                      EvalHook, DistEvalHook, get_dist_info, find_latest_checkpoint)
 
 
 def init_random_seed(seed=None, device='cuda'):
@@ -151,7 +151,11 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
             hook = build_from_cfg(hook_cfg, HOOKS)
             runner.register_hook(hook, priority=priority)
 
-    if cfg.resume_from:
+    if cfg.resume_from is None and cfg.get('auto_resume'):
+        resume_from = find_latest_checkpoint(cfg.work_dir)
+        cfg.resume_from = resume_from
+
+    if cfg.resume_from is not None:
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)

@@ -23,7 +23,7 @@ model = dict(
     )
 )
 
-total_epochs = 100
+total_epochs = 1600
 
 # optimizer
 optimizer = dict(type='Adam', lr=0.00002)

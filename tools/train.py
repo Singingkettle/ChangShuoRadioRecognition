@@ -23,6 +23,10 @@ def parse_args():
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs, models and results')
     parser.add_argument('--resume-from', help='the checkpoint file to resume from')
+    parser.add_argument(
+        '--auto-resume',
+        action='store_true',
+        help='resume from the latest checkpoint automatically')
     parser.add_argument('--no-validate', action='store_true',
                         help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()

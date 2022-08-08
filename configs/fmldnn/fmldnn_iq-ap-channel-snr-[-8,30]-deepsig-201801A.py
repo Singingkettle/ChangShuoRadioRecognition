@@ -44,7 +44,7 @@ model = dict(
 )
 
 
-total_epochs = 2000
+total_epochs = 1600
 # optimizer
 optimizer = dict(type='AdamW', lr=0.00015)
 optimizer_config = dict(grad_clip=dict(max_norm=25, norm_type=2))

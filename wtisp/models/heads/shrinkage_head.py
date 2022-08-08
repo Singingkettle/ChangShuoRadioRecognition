@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 """
 Project: wtisignalprocessing
-File: auxiliary_head.py
+File: shrinkage_head.py
 Author: Citybuster
 Time: 2021/5/31 19:15
 Email: chagshuo@bupt.edu.cn
@@ -51,46 +51,10 @@ _BMMFUNCTIONS = dict(inner_product=_bmm_inner_product, cosine=_bmm_cosine_simila
 
 
 @HEADS.register_module()
-class InterOrthogonalHead(BaseHead):
-    def __init__(self, num_bases, batch_size, expansion=1,
-                 bmm='inner_product', loss_aux=None, is_abs=False):
-        super(InterOrthogonalHead, self).__init__()
-        self.num_bases = num_bases
-        self.batch_size = batch_size
-        self.expansion = expansion
-        if bmm in _BMMFUNCTIONS:
-            self.bmm_f = _BMMFUNCTIONS[bmm]
-        else:
-            raise ValueError('Unknown bmm mode {}!!!'.format(bmm))
-        self.is_abs = is_abs
-        self.loss_inter_orthogonal = build_loss(loss_aux)
-        self.weight_scalar = 1 / (self.batch_size * self.num_bases * (self.num_bases - 1))
-        self.indices = [num_bases * i + i for i in range(num_bases)]
-
-    def init_weights(self):
-        pass
-
-    def loss(self, x, **kwargs):
-        indices = x.new_tensor(self.indices).long()
-        inter_inner_products = self.bmm_f(x, x)
-        x = inter_inner_products.view(self.batch_size, -1)
-        x = x * self.expansion
-        if self.is_abs:
-            x = torch.abs(x)
-
-        label = -1 * x.new_ones((self.batch_size, self.num_bases * self.num_bases))
-        weight = x.new_full((self.batch_size, self.num_bases * self.num_bases), self.weight_scalar)
-        label.index_fill_(1, indices, 0)
-        weight.index_fill_(1, indices, 0)
-        loss_inter_orthogonal = self.loss_inter_orthogonal(x, label, weight)
-        return dict(loss_inter_orthogonal=loss_inter_orthogonal)
-
-
-@HEADS.register_module()
-class IntraOrthogonalHead(BaseHead):
+class ShrinkageHead(BaseHead):
     def __init__(self, in_features, batch_size, num_classes, expansion=1,
                  mm='inner_product', loss_aux=None, is_abs=False):
-        super(IntraOrthogonalHead, self).__init__()
+        super(ShrinkageHead, self).__init__()
         self.in_features = in_features
         self.batch_size = batch_size
         self.num_classes = num_classes
@@ -101,7 +65,7 @@ class IntraOrthogonalHead(BaseHead):
         else:
             raise ValueError('Unknown mm mode {}!!!'.format(mm))
         self.is_abs = is_abs
-        self.loss_inter_orthogonal = build_loss(loss_aux)
+        self.loss_shrinkage = build_loss(loss_aux)
 
     def init_weights(self):
         pass
@@ -119,15 +83,7 @@ class IntraOrthogonalHead(BaseHead):
         label[torch.arange(self.batch_size), mod_labels[:]] = 1
         label = torch.mm(label, torch.transpose(label, 0, 1))
 
-        num_pos = torch.count_nonzero(label) - self.batch_size
-        num_neg = self.batch_size * self.batch_size - num_pos - self.batch_size
-        weight = label / (2 * num_pos)
-        weight[label == 0] = 1 / (2 * num_neg)
-        weight[torch.arange(self.batch_size), torch.arange(self.batch_size)] = 0
-
         label[label == 0] = -1
         label[torch.arange(self.batch_size), torch.arange(self.batch_size)] = 0
-        loss_intra_orthogonal = self.loss_inter_orthogonal(x, label, weight)
-        return dict(loss_intra_orthogonal=loss_intra_orthogonal)
-
-
+        loss_shrinkage = self.loss_shrinkage(x, label)
+        return dict(loss_shrinkage=loss_shrinkage)

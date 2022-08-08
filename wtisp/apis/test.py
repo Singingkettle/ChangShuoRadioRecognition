@@ -67,7 +67,8 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False, dropout_a
     prog_bar = None
     if rank == 0:
         prog_bar = ProgressBar(len(dataset))
-    time.sleep(2)  # This line can prevent deadlock problem in some cases.
+    time.sleep(2)
+    dist.barrier()
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, **data)

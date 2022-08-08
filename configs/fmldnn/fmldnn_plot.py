@@ -80,7 +80,7 @@ scatter = [
 plot = dict(
     type='CommonPlot',
     log_dir=log_dir,
-    config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
+    config='fmldnn_iq-ap-channel-deepsig-201610A',
     legend=legend,
     scatter=scatter,
     # Set the configs about confusion maps
@@ -90,7 +90,7 @@ plot = dict(
             log_dir=log_dir,
             name='confusion_map_201610A.pdf',
             method=dict(
-                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
+                config='fmldnn_iq-ap-channel-deepsig-201610A',
                 name='Fast MLDNN',
             ),
         ),
@@ -99,280 +99,220 @@ plot = dict(
     # Set the configs about snr accuracy and modulation F1 score
     snr_modulation=[
         # Ablation Study by an incremental way
-        dict(
-            type='AccuracyF1Plot',
-            name='ablation_data.pdf',
-            legend=legend,
-            log_dir=log_dir,
-            method=[
-                # CE
-                dict(
-                    config='fmldnn_fmlnetv46_abl-h_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-CE',
-                ),
-                # CE + CM
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-CE-CM',
-                ),
-                # FL + CM
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c-f_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-FL-CM',
-                ),
-                # FL + CM + EP
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c-f-a_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-FL-CM-EP',
-                ),
-
-                # CE + CM + CN
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-CE-CM-CN',
-                ),
-                # FL + CM + CN
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-FL-CM-CN',
-                ),
-                # FL + CM + CN + EP
-                dict(
-                    config='fmldnn_fmlnetv46_abl-c-s-a_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN-CE-CM-CN-EP',
-                ),
-            ],
-        ),
+        # dict(
+        #     type='AccuracyF1Plot',
+        #     name='ablation_data.pdf',
+        #     legend=legend,
+        #     log_dir=log_dir,
+        #     method=[
+        #         # CE
+        #         dict(
+        #             config='fmldnn_abl-cross-entropy_iq-ap-deepsig-201610A',
+        #             name='Fast MLDNN-CE',
+        #         ),
+        #         # CE + CM
+        #         dict(
+        #             config='fmldnn_abl-cross-entropy_iq-ap-channel-deepsig-201610A',
+        #             name='Fast MLDNN-CE-CM',
+        #         ),
+        #         # FL + CM
+        #         dict(
+        #             config='fmldnn_abl-focal_iq-ap-channel-deepsig-201610A',
+        #             name='Fast MLDNN-FL-CM',
+        #         ),
+        #         # FL + CM + EP
+        #         dict(
+        #             config='fmldnn_fmlnetv46_abl-c-f-a_single-gpu_deepsig_201610A',
+        #             name='Fast MLDNN-FL-CM-EP',
+        #         ),
+        #
+        #         # CE + CM + CN
+        #         dict(
+        #             config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
+        #             name='Fast MLDNN-CE-CM-CN',
+        #         ),
+        #         # FL + CM + CN
+        #         dict(
+        #             config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
+        #             name='Fast MLDNN-FL-CM-CN',
+        #         ),
+        #         # FL + CM + CN + EP
+        #         dict(
+        #             config='fmldnn_fmlnetv46_abl-c-s-a_single-gpu_deepsig_201610A',
+        #             name='Fast MLDNN-CE-CM-CN-EP',
+        #         ),
+        #     ],
+        # ),
 
         # deepsig 201610A
+        # deepsig 201610A compare with I/Q A/P
         dict(
             type='AccuracyF1Plot',
-            name='deepsig_201610A.pdf',
+            name='deepsig_201610A_iq_ap.pdf',
             legend=legend,
             log_dir=log_dir,
             method=[
-                # deepsig 201610A compare with I/Q A/P
                 dict(
-                    config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
-                    name='Fast MLDNN',
-                ),
-                dict(
-                    config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+                    config='mldnn_iq-ap-deepsig-201610A',
                     name='MLDNN',
-                    has_snr_classifier=True,
                 ),
                 dict(
-                    config='dscldnn_deepsig_201610A',
+                    config='dscldnn_iq-ap-deepsig-201610A',
                     name='DSCLDNN',
                 ),
                 dict(
-                    config='rescnn_deepsig_iq_201610A',
+                    config='rescnn_iq-deepsig-201610A',
                     name='ResCNN-IQ',
                 ),
                 dict(
-                    config='cldnn_deepsig_iq_201610A',
+                    config='cldnn_iq-deepsig-201610A',
                     name='CLDNN-IQ',
                 ),
                 dict(
-                    config='cnn4_deepsig_iq_201610A',
+                    config='cnn4_iq-deepsig-201610A',
                     name='CNN4-IQ',
                 ),
                 dict(
-                    config='denscnn_deepsig_iq_201610A',
+                    config='denscnn_iq-deepsig-201610A',
                     name='DensCNN-IQ',
                 ),
-
-                # deepsig 201601A compare with constellation and fb
+            ],
+        ),
+        # deepsig 201601A compare with constellation and fb
+        dict(
+            type='AccuracyF1Plot',
+            name='deepsig_201610A_co_fb.pdf',
+            legend=legend,
+            log_dir=log_dir,
+            method=[
                 dict(
-                    config='mldnn_alexnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='mldnn_iq-ap-deepsig-201610A',
+                    name='MLDNN',
+                ),
+                dict(
+                    config='alexnet_co-deepsig-201610A',
                     name='AlexNet-CO',
                 ),
                 dict(
-                    config='mldnn_googlenetco_640_0.0004_0.5_deepsig_201610A',
+                    config='googlenet_co-deepsig-201610A',
                     name='GoogleNet-CO',
                 ),
                 dict(
-                    config='mldnn_resnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='resnet_co-deepsig-201610A',
                     name='ResNet-CO',
                 ),
                 dict(
-                    config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201610A',
+                    config='vggnet_co-deepsig-201610A',
                     name='VGGNet-CO',
                 ),
                 dict(
-                    config='mldnn_cul_dt_feature_based',
+                    config='svm_feature-based_cumulants-deepsig-201610A',
                     name='SVM-FB',
                 ),
                 dict(
-                    config='mldnn_cul_svm_feature_based',
+                    config='decisiontree_feature-based_cumulants-deepsig-201610A',
                     name='DecisionTree-FB',
                 ),
             ],
         ),
-
-        # # deepsig 201801A
-        # dict(
-        #     type='AccuracyF1Plot',
-        #     name='deepsig_201801A_iq_ap.pdf',
-        #     legend=legend,
-        #     log_dir=log_dir,
-        #     method=[
-        #         # deepsig 201801A compare with I/Q A/P
-        #         # dict(
-        #         #     config='fmldnn_deepsig_201810A',
-        #         #     name='Fast MLDNN',
-        #         # ),
-        #         dict(
-        #             config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201801A',
-        #             name='MLDNN',
-        #             has_snr_classifier=True,
-        #         ),
-        #         dict(
-        #             config='dscldnn_deepsig_201801A',
-        #             name='DSCLDNN',
-        #         ),
-        #         dict(
-        #             config='rescnn_deepsig_iq_201801A',
-        #             name='ResCNN-IQ',
-        #         ),
-        #         dict(
-        #             config='cldnn_deepsig_iq_201801A',
-        #             name='CLDNN-IQ',
-        #         ),
-        #         dict(
-        #             config='cnn4_deepsig_iq_201801A',
-        #             name='CNN4-IQ',
-        #         ),
-        #         dict(
-        #             config='denscnn_deepsig_iq_201801A',
-        #             name='DensCNN-IQ',
-        #         ),
-        #
-        #         # deepsig 201810A compare with constellation and fb
-        #         dict(
-        #             config='mldnn_alexnetco_640_0.0004_0.5_deepsig_201801A',
-        #             name='AlexNet-CO',
-        #         ),
-        #         dict(
-        #             config='mldnn_googlenetco_640_0.0004_0.5_deepsig_201801A',
-        #             name='GoogleNet-CO',
-        #         ),
-        #         dict(
-        #             config='mldnn_resnetco_640_0.0004_0.5_deepsig_201801A',
-        #             name='ResNet-CO',
-        #         ),
-        #         dict(
-        #             config='mldnn_vggnetco_640_0.0004_0.5_deepsig_201801A',
-        #             name='VGGNet-CO',
-        #         ),
-        #         dict(
-        #             config='mldnn_cul_dt_feature_based_deepsig_201801A',
-        #             name='SVM-FB',
-        #         ),
-        #         dict(
-        #             config='mldnn_cul_svm_feature_based_deepsig_201801A',
-        #             name='DecisionTree-FB',
-        #         ),
-        #     ],
-        # ),
     ],
-    summary=dict(
-        type='ModulationSummary',
-        name='.md',
-        log_dir=log_dir,
-        dataset=[
-            '201610A',
-            # '201801A',
-        ],
-    ),
-    vis_fea=[
-        dict(
-            type='VisFea',
-            log_dir=log_dir,
-            name='vis_fea_201610A.pdf',
-            method=dict(
-                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
-                name='Fast MLDNN',
-            ),
-        ),
-        dict(
-            type='VisFea',
-            log_dir=log_dir,
-            name='ce_cm_cn_vis_fea_201610A.pdf',
-            method=dict(
-                config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-CE-CM-CN',
-            ),
-        ),
-        dict(
-            type='VisFea',
-            log_dir=log_dir,
-            name='fl_cm_cn_vis_fea_201610A.pdf',
-            method=dict(
-                config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-FL-CM-CN',
-            ),
-        )
-    ],
+    # summary=dict(
+    #     type='ModulationSummary',
+    #     name='.md',
+    #     log_dir=log_dir,
+    #     dataset=[
+    #         '201610A',
+    #         # '201801A',
+    #     ],
+    # ),
+    # vis_fea=[
+    #     dict(
+    #         type='VisFea',
+    #         log_dir=log_dir,
+    #         name='vis_fea_201610A.pdf',
+    #         method=dict(
+    #             config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN',
+    #         ),
+    #     ),
+    #     dict(
+    #         type='VisFea',
+    #         log_dir=log_dir,
+    #         name='ce_cm_cn_vis_fea_201610A.pdf',
+    #         method=dict(
+    #             config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-CE-CM-CN',
+    #         ),
+    #     ),
+    #     dict(
+    #         type='VisFea',
+    #         log_dir=log_dir,
+    #         name='fl_cm_cn_vis_fea_201610A.pdf',
+    #         method=dict(
+    #             config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-FL-CM-CN',
+    #         ),
+    #     )
+    # ],
 
-    flops=dict(
-        type='GetFlops',
-        log_dir=log_dir,
-        method=[
-            # CE
-            dict(
-                config='fmldnn_fmlnetv46_abl-h_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-CE',
-                input_shape=[(1, 2, 128), (1, 2, 128), (1, 128, 128)],
-            ),
-            # CE + CM
-            dict(
-                config='fmldnn_fmlnetv46_abl-c_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-CE-CM',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            # FL + CM
-            dict(
-                config='fmldnn_fmlnetv46_abl-c-f_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-FL-CM',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            # FL + CM + EP
-            dict(
-                config='fmldnn_fmlnetv46_abl-c-f-a_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-FL-CM-EP',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-
-            # CE + CM + CN
-            dict(
-                config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-CE-CM-CN',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            # FL + CM + CN
-            dict(
-                config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-FL-CM-CN',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            # FL + CM + CN + EP
-            dict(
-                config='fmldnn_fmlnetv46_abl-c-s-a_single-gpu_deepsig_201610A',
-                name='Fast MLDNN-CE-CM-CN-EP',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            # Fast MLDNN
-            dict(
-                config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
-                name='Fast MLDNN',
-                input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
-            ),
-            dict(
-                config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
-                name='MLDNN',
-                input_shape=[(1, 2, 128), (1, 2, 128), (1, 128, 128)],
-            ),
-        ]
-    )
+    # flops=dict(
+    #     type='GetFlops',
+    #     log_dir=log_dir,
+    #     method=[
+    #         # CE
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-h_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-CE',
+    #             input_shape=[(1, 2, 128), (1, 2, 128), (1, 128, 128)],
+    #         ),
+    #         # CE + CM
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-CE-CM',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         # FL + CM
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c-f_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-FL-CM',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         # FL + CM + EP
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c-f-a_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-FL-CM-EP',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #
+    #         # CE + CM + CN
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c-s_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-CE-CM-CN',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         # FL + CM + CN
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c-f-s_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-FL-CM-CN',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         # FL + CM + CN + EP
+    #         dict(
+    #             config='fmldnn_fmlnetv46_abl-c-s-a_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN-CE-CM-CN-EP',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         # Fast MLDNN
+    #         dict(
+    #             config='fmldnn_fmlnetv46-no-sa-ia-channel-spatial-attention_famcauxhead-focal-0.004-800_batchsize-640_lr-0.00069-0.3-300-500_dp-0.5_single-gpu_deepsig_201610A',
+    #             name='Fast MLDNN',
+    #             input_shape=[(2, 1, 128), (2, 1, 128), (1, 128, 128)],
+    #         ),
+    #         dict(
+    #             config='mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A',
+    #             name='MLDNN',
+    #             input_shape=[(1, 2, 128), (1, 2, 128), (1, 128, 128)],
+    #         ),
+    #     ]
+    # )
 )

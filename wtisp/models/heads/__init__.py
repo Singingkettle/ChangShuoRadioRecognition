@@ -1,5 +1,5 @@
 from .amc_head import AMCHead
-from .auxiliary_head import InterOrthogonalHead, IntraOrthogonalHead
+from .shrinkage_head import ShrinkageHead
 from .base_head import BaseHead
 from .dscldnn_head import DSCLDNNHead
 from .fmldnn_head import FMLDNNHead
@@ -10,8 +10,7 @@ from .sednn_head import SEDNNHead
 __all__ = [
     'BaseHead',
     'AMCHead',
-    'InterOrthogonalHead',
-    'IntraOrthogonalHead',
+    'ShrinkageHead',
     'DSCLDNNHead',
     'FMLDNNHead',
     'HCGDNNHead',

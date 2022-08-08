@@ -23,7 +23,7 @@ Supported Automatic Modulation Classification methods:
 - [x] [CNN2](configs/cnn2)
   . ["Convolutional Radio Modulation Recognition Networks"](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
 - [x] [CNN3](configs/cnn3). "Provided as Baseline"
-- [x] [CNN4](config/cnn4). "Provided as Baseline"
+- [x] [CNN4](configs/cnn4). "Provided as Baseline"
 - [x] [DS-CLDNN](configs/dscldnn)
   . ["Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure"](https://ieeexplore.ieee.org/document/9220797)
 - [x] [DensCNN](configs/denscnn)
@@ -42,7 +42,7 @@ Supported Automatic Modulation Classification methods:
 - [x] [SVM](configs/svm). "Provided as Baseline in MLDNN"
 - [x] [MLDNN](configs/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation
   Classification**](https://ieeexplore.ieee.org/document/9462447)
-- [x] [HCGDNN](configs/hcgdnn). "New proposed by Shuo Chang"
+- [x] [HCGDNN](configs/hcgdnn). [**A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9764618)
 - [X] [FMLDNN](configs/fmldnn). 'New proposed by Shuo Chang'
 
 ## Installation
@@ -59,7 +59,7 @@ Please see [summary.md](docs/summary.md) for the benchmark results.
 
 ## Version Control
 
-For version control, we use the git. Pleease refer the [**This tutorial**](docs/git_tutorial.md)
+For version control, we use the git. Please refer [**This tutorial**](docs/git_tutorial.md)
 
 ## Citation
 
@@ -80,6 +80,15 @@ If you use this toolbox or benchmark in your research, please cite this project.
   year={2021},
   publisher={IEEE}
 }
+@ARTICLE{9764618,
+  author={Chang, Shuo and Zhang, Ruiyun and Ji, Kejia and Huang, Sai and Feng, Zhiyong},
+  journal={IEEE Transactions on Wireless Communications}, 
+  title={A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-1},
+  doi={10.1109/TWC.2022.3168884}}
 ```
 
 ## Acknowledgement
@@ -88,9 +97,6 @@ WTISP is an open source project that is contributed by ShuoChang. We appreciate 
 methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could
 serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their
 own new signal processing algorithms.
-
-**Thanks WTI!**  
-**Thanks 红の豚!**
 
 ![demo image](resources/pig.jfif)
 
