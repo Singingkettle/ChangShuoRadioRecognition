@@ -37,7 +37,7 @@ wtisignalprocessing
 
 ```
 
-The deepsig data have to be converted into the specified format using `tools/convert_datasets/comvert_amc.py`:
+The deepsig data have to be converted into the specified format using `tools/convert_datasets/comvert_deepsig.py`:
 
 ## Train a model
 
@@ -47,11 +47,11 @@ and `MMDataParallel` respectively.
 All outputs (log files and checkpoints) will be saved to the working directory, which is specified by `work_dir` in the
 config file.
 
-By default we evaluate the model on the validation set after each epoch, you can change the evaluation interval by
+By default, we evaluate the model on the validation set after each epoch, you can change the evaluation interval by
 adding the interval argument in the training config.
 
 ```python
-evaluation = dict(interval=12)  # This evaluate the model per 12 epoch.
+evaluation = dict(interval=12)  # The model is evaluated per 12 training epoch.
 ```
 
 **\*Important\***: The default learning rate in config files is for 8 GPUs. According to
@@ -79,7 +79,7 @@ Optional arguments are:
   which can be modified in the config file) epochs during the training. To disable this behavior, use `--no-validate`.
 - `--work-dir ${WORK_DIR}`: Override the working directory specified in the config file.
 - `--resume-from ${CHECKPOINT_FILE}`: Resume from a previous checkpoint file.
-- `--cfg-options 'Key=value'`: Overide some settings in the used config.
+- `--cfg-options 'Key=value'`: Override some settings in the used config.
 
 **Note**:
 

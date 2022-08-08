@@ -13,6 +13,7 @@ the [mmdetection](https://github.com/open-mmlab/mmdetection) and [mmcv](https://
   etc.
 
 ## Changelog
+v2.0.1 was released in 8/8/2022.
 
 v1.0.1 was released in 5/9/2020.
 
