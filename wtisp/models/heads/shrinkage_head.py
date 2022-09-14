@@ -73,7 +73,7 @@ class ShrinkageHead(BaseHead):
     def loss(self, x, mod_labels=None, **kwargs):
         x = x.view(self.batch_size, self.in_features)
         x = self.mm_f(x, x)
-        if self.mm is not 'cosine':
+        if self.mm != 'cosine':
             x = x - torch.max(x)
         x = x * self.expansion
         if self.is_abs:

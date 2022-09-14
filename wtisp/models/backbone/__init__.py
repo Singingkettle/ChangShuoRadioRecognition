@@ -8,6 +8,7 @@ from .hcgnet import (HCGNet, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
                      HCGNetCG1, HCGNetCG2, HCGNetG1G2)
 from .mlnet import MLNet
 from .resnet import ResNet
+from .tfnet import FDNet, TDNet
 from .vggnet import VGGNet
 
 __all__ = [
@@ -28,5 +29,6 @@ __all__ = [
     'HCGNetG1G2',
     'MLNet',
     'ResNet',
+    'FDNet', 'TDNet',
     'VGGNet',
 ]

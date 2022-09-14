@@ -22,16 +22,13 @@ from ...models import build_task
 
 @FLOPS.register_module()
 class GetFlops(object):
-    def __init__(self, log_dir, method):
-        self.log_dir = log_dir
+    def __init__(self, method, log_dir):
         self.method = method
+        self.log_dir = log_dir
 
     def _evaluate_model(self, cfg_path, name, input_shape):
         cfg = Config.fromfile(cfg_path)
-        model = build_task(
-            cfg.model,
-            train_cfg=cfg.get('train_cfg'),
-            test_cfg=cfg.get('test_cfg'))
+        model = build_task(cfg.model)
         if torch.cuda.is_available():
             model.cuda()
         model.eval()

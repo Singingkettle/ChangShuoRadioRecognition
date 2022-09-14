@@ -28,6 +28,3 @@ model = dict(
         ),
     ),
 )
-
-# optimizer
-optimizer = dict(type='Adam', lr=0.0002)

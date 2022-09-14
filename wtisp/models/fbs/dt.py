@@ -13,9 +13,9 @@ class Tree(object):
         self.model_path = model_path
         self.method_name = method_name
         self.mode = mode
-        if mode is 'train':
+        if mode == 'train':
             self.tree = tree.DecisionTreeClassifier(max_depth=max_depth)
-        elif mode is 'test':
+        elif mode == 'test':
             self.load_model()
         else:
             raise ValueError('Unknown mode: {}'.format(self.mode))
@@ -27,11 +27,11 @@ class Tree(object):
         joblib.dump(self.tree, self.model_path)
 
     def __call__(self, data, label=None):
-        if self.mode is 'train':
+        if self.mode == 'train':
             self.tree.fit(data, label)
             self.save_model()
             return True
-        elif self.mode is 'test':
+        elif self.mode == 'test':
             label = []
             for item in tqdm(data):
                 item = np.reshape(item, (1, -1))

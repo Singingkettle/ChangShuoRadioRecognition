@@ -1,11 +1,10 @@
 import glob
-import json
 import os
-from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .utils import load_json_log
 from ..builder import LOSSACCURACIES
 
 plt.rcParams["font.family"] = "Times New Roman"
@@ -64,27 +63,6 @@ def plot_train_curve(log_infos, legend, save_path, legend_config):
 
     # Don't allow the axis to be on top of your data
     ax.set_axisbelow(True)
-
-    # Turn on the minor TICKS, which are required for the minor GRID
-    # ax.minorticks_on()
-    #
-    # # Customize the major grid
-    # ax.grid(b=True, which='major', linestyle='-',
-    #         linewidth='0.5', color='black', alpha=0.2)
-    # # # Customize the minor grid
-    # # ax.grid(b=True, which='minor', linestyle=':',
-    # #         linewidth='0.5', color='black', alpha=0.5)
-    #
-    # plt.tick_params(which='minor', bottom=False,
-    #                 top=False, left=False, right=False)
-    # plt.tick_params(which='major', bottom=True,
-    #                 top=False, left=True, right=False)
-    #
-    # ax.tick_params(which='minor', bottom=False,
-    #                top=False, left=False, right=False)
-    # ax.tick_params(which='major', bottom=True,
-    #                top=False, left=True, right=False)
-
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
     plt.close()
@@ -130,63 +108,27 @@ def plot_test_curve(log_infos, legend, save_path, legend_config):
 
     # Don't allow the axis to be on top of your data
     ax.set_axisbelow(True)
-
-    # Turn on the minor TICKS, which are required for the minor GRID
-    # ax.minorticks_on()
-    #
-    # # Customize the major grid
-    # ax.grid(b=True, which='major', linestyle='-',
-    #         linewidth='0.5', color='black', alpha=0.2)
-    # # # Customize the minor grid
-    # # ax.grid(b=True, which='minor', linestyle=':',
-    # #         linewidth='0.5', color='black', alpha=0.5)
-    #
-    # plt.tick_params(which='minor', bottom=False,
-    #                 top=False, left=False, right=False)
-    # plt.tick_params(which='major', bottom=True,
-    #                 top=False, left=True, right=False)
-    #
-    # ax.tick_params(which='minor', bottom=False,
-    #                top=False, left=False, right=False)
-    # ax.tick_params(which='major', bottom=True,
-    #                top=False, left=True, right=False)
-
     plt.tight_layout()  # set layout slim
     plt.savefig(save_path, bbox_inches='tight')
     plt.close()
 
 
-def load_json_log(json_log):
-    log_dict = dict()
-    with open(json_log, 'r') as log_file:
-        for line in log_file:
-            log = json.loads(line.strip())
-            # skip lines without `epoch` field
-            if 'epoch' not in log:
-                continue
-            epoch = log.pop('epoch')
-            if epoch not in log_dict:
-                log_dict[epoch] = defaultdict(list)
-            for k, v in log.items():
-                log_dict[epoch][k].append(v)
-    return log_dict
-
-
 @LOSSACCURACIES.register_module()
 class LossAccuracyPlot(object):
-    def __init__(self, log_dir, name, legend, method, legend_config=None):
-        self.log_dir = log_dir
+    def __init__(self, name, method, log_dir, legend, legend_config=None):
         self.log_infos = []
         self.name = name
+        self.method = method
+        self.log_dir = log_dir
         self.legend = legend
         self.legend_config = legend_config
 
-        if isinstance(method, list):
-            for method_config in method:
+        if isinstance(self.method, list):
+            for method_config in self.method:
                 json_info = self.find_json_log(**method_config)
                 self.log_infos.append(json_info)
-        elif isinstance(method, dict):
-            json_info = self.find_json_log(**method)
+        elif isinstance(self.method, dict):
+            json_info = self.find_json_log(**self.method)
             self.log_infos.append(json_info)
         else:
             raise ValueError('The variable of method must be list!')

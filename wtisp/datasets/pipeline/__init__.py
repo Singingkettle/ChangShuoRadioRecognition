@@ -5,8 +5,9 @@ from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
                       LoadAPFromHDF5, LoadIQFromHDF5,
                       LoadConstellationFromIQFile, LoadConstellationFromIQCache, LoadAPFromIQ,
+                      LoadFTFromIQ,
                       LoadAnnotations)
-from .transforms import ChannelMode, NormalizeAP, NormalizeIQ, NormalizeConstellation
+from .transform import ChannelMode, NormalizeAP, NormalizeIQ, NormalizeConstellation
 
 __all__ = [
     'Compose',
@@ -23,6 +24,7 @@ __all__ = [
     'LoadConstellationFromIQFile',
     'LoadConstellationFromIQCache',
     'LoadAPFromIQ',
+    'LoadFTFromIQ',
     'LoadAnnotations',
     'ChannelMode',
     'NormalizeAP',

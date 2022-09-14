@@ -3,9 +3,9 @@
 ### Requirements
 
 - Ubuntu
-- Python 3.6+
-- PyTorch 1.7+
-- CUDA 10.2+
+- Python 3.8
+- PyTorch 1.12.1+
+- CUDA 11.6+
 - g++/gcc 5+
 
 ### Install WTISignalProcesssing
@@ -15,7 +15,7 @@ a. Upgrade version of g++/gcc to 5+ for building c++ files
 b. Create a conda virtual environment and activate it.
 
 ```shell
-conda create -n wtisignalprocessing python=3.7 -y
+conda create -n wtisignalprocessing python=3.8 -y
 conda activate wtisignalprocessing
 ```
 
@@ -53,9 +53,4 @@ sudo apt-get install ttf-mscorefonts-installer
 rm -rf ~/.cache/matplotlib
 ```
 
-h. Install tsnecuda, following the [link](https://github.com/CannyLab/tsne-cuda). Conda binaries are available for
-Python 3.6, 3.7 and 3.8 on CUDA 10.1 and 10.2. To install tsne-cuda with conda, run
-
-```shell
-conda install -c CannyLab -c pytorch tsnecuda
-```
+h. Install tsnecuda from source, following the [link](https://github.com/CannyLab/tsne-cuda). 

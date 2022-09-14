@@ -12,10 +12,10 @@ class RNNBasicBlock(nn.Module):
     def __init__(self, input_size, hidden_size, dropout_rate=None, rnn_mode='LSTM'):
         super(RNNBasicBlock, self).__init__()
         self.rnn_block = []
-        if rnn_mode is 'LSTM':
+        if rnn_mode == 'LSTM':
             rnn_layer = nn.LSTM(input_size=input_size,
                                 hidden_size=hidden_size, batch_first=True)
-        elif rnn_mode is 'GRU':
+        elif rnn_mode == 'GRU':
             rnn_layer = nn.GRU(input_size=input_size,
                                hidden_size=hidden_size, batch_first=True)
         else:

@@ -58,7 +58,7 @@ class DNN(BaseDNN):
             for idx in range(batch_size):
                 item = dict()
                 for key_str in keys:
-                    if 'Final' is not key_str or 'fea' in key_str:
+                    if key_str != 'Final' or 'fea' in key_str:
                         save_name = self.method_name + '-' + key_str
                     else:
                         save_name = 'Final'

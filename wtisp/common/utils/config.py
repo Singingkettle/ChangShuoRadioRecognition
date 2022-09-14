@@ -497,7 +497,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         else:
             raise ValueError('The confusion maps must be list or dict!')
 
-    if mode is 'train':
+    if mode == 'train':
         # Add config from train_test_curve
         if 'train_test_curve' in cfg.plot:
             if isinstance(cfg.plot['train_test_curve'], dict):
@@ -545,11 +545,11 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
     if is_regeneration:
         no_test_configs = train_configs
 
-    if mode is 'test':
+    if mode == 'test':
         return no_test_configs
-    elif mode is 'train':
+    elif mode == 'train':
         return no_train_configs
-    elif mode is 'summary':
+    elif mode == 'summary':
         return config_legend_map, config_method_map
     else:
         raise ValueError('Unknown mod {} for filtering config'.format(mode))

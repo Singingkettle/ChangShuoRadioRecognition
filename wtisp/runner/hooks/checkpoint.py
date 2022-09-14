@@ -1,5 +1,6 @@
 # Copyright (c) Open-MMLab. All rights reserved.
 import os
+import warnings
 
 from .hook import HOOKS, Hook
 from ..dist_utils import allreduce_params, master_only
@@ -29,6 +30,7 @@ class CheckpointHook(Hook):
     """
 
     def __init__(self,
+                 start=None,
                  interval=-1,
                  by_epoch=True,
                  save_optimizer=True,
@@ -36,6 +38,12 @@ class CheckpointHook(Hook):
                  max_keep_ckpts=-1,
                  sync_buffer=False,
                  **kwargs):
+        if start is not None and start < 0:
+            warnings.warn(
+                f'The evaluation start epoch {start} is smaller than 0, '
+                f'use 0 instead', UserWarning)
+            start = 0
+        self.start = start
         self.interval = interval
         self.by_epoch = by_epoch
         self.save_optimizer = save_optimizer
@@ -47,11 +55,11 @@ class CheckpointHook(Hook):
     def after_train_epoch(self, runner):
         if not self.by_epoch or not self.every_n_epochs(runner, self.interval):
             return
-
-        runner.logger.info(f'Saving checkpoint at {runner.epoch + 1} epochs')
-        if self.sync_buffer:
-            allreduce_params(runner.model.buffers())
-        self._save_checkpoint(runner)
+        if self.start is not None and runner.epoch >= self.start:
+            runner.logger.info(f'Saving checkpoint at {runner.epoch + 1} epochs')
+            if self.sync_buffer:
+                allreduce_params(runner.model.buffers())
+            self._save_checkpoint(runner)
 
     @master_only
     def _save_checkpoint(self, runner):
@@ -88,4 +96,5 @@ class CheckpointHook(Hook):
             f'Saving checkpoint at {runner.iter + 1} iterations')
         if self.sync_buffer:
             allreduce_params(runner.model.buffers())
-        self._save_checkpoint(runner)
+        if self.start is not None and runner.iter >= self.start:
+            self._save_checkpoint(runner)

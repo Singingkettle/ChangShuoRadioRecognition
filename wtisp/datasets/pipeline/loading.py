@@ -17,8 +17,10 @@ def normalize_iq_or_ap(x):
 @PIPELINES.register_module()
 class LoadIQFromFile:
     def __init__(self,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
+        self.is_squeeze = is_squeeze,
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -30,8 +32,9 @@ class LoadIQFromFile:
         if self.to_float32:
             iq = iq.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        iq = np.expand_dims(iq, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            iq = np.expand_dims(iq, axis=0)
         results['iqs'] = iq
         return results
 
@@ -45,8 +48,10 @@ class LoadIQFromFile:
 @PIPELINES.register_module()
 class LoadAPFromFile:
     def __init__(self,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -58,8 +63,9 @@ class LoadAPFromFile:
         if self.to_float32:
             ap = ap.astype(np.float32)
 
-        # make the ap as a three-dimensional tensor [1, 2, L]
-        ap = np.expand_dims(ap, axis=0)
+        if not self.is_squeeze:
+            # make the ap as a three-dimensional tensor [1, 2, L]
+            ap = np.expand_dims(ap, axis=0)
         results['aps'] = ap
         return results
 
@@ -135,11 +141,13 @@ class LoadIQFromCache:
     def __init__(self,
                  data_root,
                  filename,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
         self.data_root = data_root
         self.filename = filename
         self.cache_data = pickle.load(open(osp.join(data_root, 'cache', filename), 'rb'))
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -151,8 +159,9 @@ class LoadIQFromCache:
         if self.to_float32:
             iq = iq.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        iq = np.expand_dims(iq, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            iq = np.expand_dims(iq, axis=0)
         results['iqs'] = iq
         return results
 
@@ -170,11 +179,13 @@ class LoadAPFromCache:
     def __init__(self,
                  data_root,
                  filename,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
         self.data_root = data_root
         self.filename = filename
         self.cache_data = pickle.load(open(osp.join(data_root, 'cache', filename), 'rb'))
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -186,8 +197,9 @@ class LoadAPFromCache:
         if self.to_float32:
             ap = ap.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        ap = np.expand_dims(ap, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            ap = np.expand_dims(ap, axis=0)
         results['aps'] = ap
         return results
 
@@ -237,6 +249,7 @@ class LoadIQFromHDF5:
     def __init__(self,
                  data_root,
                  filename,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
         self.data_root = data_root
@@ -245,6 +258,7 @@ class LoadIQFromHDF5:
         self.hdf5_data = hf['iq']
         self.lookup_table = pickle.load(
             open(osp.join(data_root, 'hdf5', osp.basename(filename).split('.')[0] + '.pkl'), 'rb'))
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -256,8 +270,9 @@ class LoadIQFromHDF5:
         if self.to_float32:
             iq = iq.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        iq = np.expand_dims(iq, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            iq = np.expand_dims(iq, axis=0)
         results['iqs'] = iq
         return results
 
@@ -275,6 +290,7 @@ class LoadAPFromHDF5:
     def __init__(self,
                  data_root,
                  filename,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
         self.data_root = data_root
@@ -283,6 +299,7 @@ class LoadAPFromHDF5:
         self.hdf5_data = hf['ap']
         self.lookup_table = pickle.load(
             open(osp.join(data_root, 'hdf5', osp.basename(filename).split('.')[0] + '.pkl'), 'rb'))
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -294,8 +311,9 @@ class LoadAPFromHDF5:
         if self.to_float32:
             ap = ap.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        ap = np.expand_dims(ap, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            ap = np.expand_dims(ap, axis=0)
         results['aps'] = ap
         return results
 
@@ -351,8 +369,10 @@ class LoadConstellationFromIQCache:
 @PIPELINES.register_module()
 class LoadAPFromIQ:
     def __init__(self,
+                 is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
@@ -360,12 +380,51 @@ class LoadAPFromIQ:
         iq = results['iqs']
         iq = iq[0, :, :]
         amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
-        phase = np.arctan(iq[0, :]/(iq[1, :] + np.finfo(np.float32).eps))
+        phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
         ap = np.vstack((amplitude, phase))
+        if self.to_float32:
+            ap = ap.astype(np.float32)
 
-        # make the iq as a three-dimensional tensor [1, 2, L]
-        ap = np.expand_dims(ap, axis=0)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            ap = np.expand_dims(ap, axis=0)
         results['aps'] = ap
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'data_root={self.data_root},'
+                    f'filename={self.filename},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadFTFromIQ:
+    def __init__(self,
+                 is_squeeze=False,
+                 to_float32=False,
+                 to_norm=False):
+        self.is_squeeze = is_squeeze
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+
+    def __call__(self, results):
+        iq = results['iqs']
+        iq = iq[0, :, :]
+        iq = iq[0, :] + 1j * iq[1, :]
+        ft = np.fft.fft(iq)
+        amplitude = np.abs(ft)
+        phase = np.angle(ft)
+        ft = np.vstack((amplitude, phase))
+        if self.to_float32:
+            ft = ft.astype(np.float32)
+
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            ft = np.expand_dims(ft, axis=0)
+        results['fts'] = ft
         return results
 
     def __repr__(self):

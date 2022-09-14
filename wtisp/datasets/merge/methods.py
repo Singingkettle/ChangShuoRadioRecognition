@@ -201,11 +201,7 @@ class Optimization:
     def __call__(self, results, data_infos, prediction_name):
         if prediction_name is None:
             return
-        snr_to_index = data_infos['snr_to_index']
-        item_snr_index = data_infos['item_snr_index']
-        snr_num = len(snr_to_index)
         mod_label_num = len(data_infos['mod_to_label'])
-        item_mod_label = data_infos['item_mod_label']
         gts = data_infos['item_mod_label']
         pre_matrix = get_pre_matrix(results, mod_label_num)
         targets = generate_targets(gts, mod_label_num)

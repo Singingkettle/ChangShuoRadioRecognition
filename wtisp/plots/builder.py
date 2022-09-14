@@ -31,36 +31,38 @@ def build(cfg, registry, default_args=None):
         return build_from_cfg(cfg, registry, default_args)
 
 
-def build_flops(cfg):
-    """Build flops"""
-    return build(cfg, FLOPS)
-
-
-def build_vis_features(cfg, scatter_config=None):
-    """Build vis fea."""
-    return build(cfg, VISFEATURES, dict(scatter_config=scatter_config))
-
-
-def build_summary(cfg, config_legend_map=None, config_method_map=None):
-    """Build summary"""
-    return build(cfg, SUMMARIES, dict(config_legend_map=config_legend_map, config_method_map=config_method_map))
-
-
-def build_confusion_map(cfg):
+def build_confusion_map(cfg, log_dir):
     """Build confusion map."""
-    return build(cfg, CONFUSIONS)
+    return build(cfg, CONFUSIONS, dict(log_dir=log_dir))
 
 
-def build_loss_accuracy_plot(cfg, legend_config=None):
+def build_loss_accuracy_plot(cfg, log_dir, legend, legend_config):
     """Build train test curve."""
-    return build(cfg, LOSSACCURACIES, dict(legend_config=legend_config))
+    return build(cfg, LOSSACCURACIES, dict(log_dir=log_dir, legend=legend, legend_config=legend_config))
 
 
-def build_accuracy_f1_plot(cfg, legend_config=None):
+def build_accuracy_f1_plot(cfg, log_dir, legend, legend_config):
     """Build snr accuracy."""
-    return build(cfg, ACCURACYF1S, dict(legend_config=legend_config))
+    return build(cfg, ACCURACYF1S, dict(log_dir=log_dir, legend=legend, legend_config=legend_config))
 
 
-def build_plot(cfg, config_legend_map=None, config_method_map=None):
+def build_summary(cfg, log_dir, config_legend_map, config_method_map):
+    """Build summary"""
+    return build(cfg, SUMMARIES,
+                 dict(log_dir=log_dir, config_legend_map=config_legend_map, config_method_map=config_method_map))
+
+
+def build_vis_features(cfg, log_dir, scatter_config):
+    """Build vis fea."""
+    return build(cfg, VISFEATURES, dict(log_dir=log_dir, scatter_config=scatter_config))
+
+
+def build_flops(cfg, log_dir):
+    """Build flops"""
+    return build(cfg, FLOPS, dict(log_dir=log_dir))
+
+
+def build_plot(cfg, log_dir, legend, config_legend_map, config_method_map):
     """Build plot"""
-    return build(cfg, PLOTS, dict(config_legend_map=config_legend_map, config_method_map=config_method_map))
+    return build(cfg, PLOTS, dict(log_dir=log_dir, legend=legend, config_legend_map=config_legend_map,
+                                  config_method_map=config_method_map))

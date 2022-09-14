@@ -1,8 +1,8 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 data = dict(
-    samples_per_gpu=80,
-    workers_per_gpu=2,
+    samples_per_gpu=320,
+    workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',

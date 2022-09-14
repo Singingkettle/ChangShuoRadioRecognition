@@ -16,9 +16,10 @@ from ..builder import SUMMARIES
 
 @SUMMARIES.register_module()
 class ModulationSummary(object):
-    def __init__(self, log_dir, name, dataset=None, config_legend_map=None, config_method_map=None):
-        self.log_dir = log_dir
+    def __init__(self, name, dataset, log_dir, config_legend_map, config_method_map):
         self.name = name
+        self.dataset = dataset
+        self.log_dir = log_dir
         self.config_legend_map = config_legend_map
         self.config_method_map = config_method_map
         self.SNRS = None
@@ -26,7 +27,7 @@ class ModulationSummary(object):
         self.methods_dict = dict()
         for config in config_method_map.keys():
             dataset_name = '201610A'
-            for name in dataset:
+            for name in self.dataset:
                 if name in config:
                     dataset_name = name
                     break

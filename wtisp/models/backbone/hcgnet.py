@@ -9,20 +9,20 @@ from ...runner import load_checkpoint
 
 class _CNN(nn.Module):
 
-    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(_CNN, self).__init__()
         if has_stride:
             stride = 2
         else:
             stride = 1
         self.conv_net = nn.Sequential(
-            nn.Conv2d(2, 256, kernel_size=(1, 3), stride=(1, stride)),
+            nn.Conv2d(depth, 256, kernel_size=(1, 3), stride=(1, stride), bias=False),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-            nn.Conv2d(256, 256, kernel_size=(1, 3), stride=(1, stride)),
+            nn.Conv2d(256, 256, kernel_size=(1, 3), stride=(1, stride), bias=False),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-            nn.Conv2d(256, input_size, kernel_size=(1, 3), stride=(1, stride)),
+            nn.Conv2d(256, input_size, kernel_size=(1, 3), stride=(1, stride), bias=False),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
         )
@@ -46,13 +46,13 @@ class _CNN(nn.Module):
 @BACKBONES.register_module()
 class HCGNet(nn.Module):
 
-    def __init__(self, heads, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
+    def __init__(self, heads, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNet, self).__init__()
         self.heads = heads
         if len(heads) < 2:
             assert ValueError('The CHGNet must have multi heads!')
 
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(depth, input_size, avg_pool, has_stride, dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
@@ -64,9 +64,7 @@ class HCGNet(nn.Module):
         elif pre_trained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
                     for name, param in m.named_parameters():
                         if 'weight_ih' in name:
@@ -113,7 +111,7 @@ class HCGNetCNN(nn.Module):
 
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetCNN, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
 
     def init_weights(self, pre_trained=None):
         if isinstance(pre_trained, str):
@@ -122,9 +120,7 @@ class HCGNetCNN(nn.Module):
         elif pre_trained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -137,7 +133,7 @@ class HCGNetGRU1(nn.Module):
 
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetGRU1, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
@@ -147,9 +143,7 @@ class HCGNetGRU1(nn.Module):
         elif pre_trained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
                     for name, param in m.named_parameters():
                         if 'weight_ih' in name:
@@ -187,7 +181,7 @@ class HCGNetGRU2(nn.Module):
 
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetGRU2, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
@@ -199,9 +193,7 @@ class HCGNetGRU2(nn.Module):
         elif pre_trained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
                     for name, param in m.named_parameters():
                         if 'weight_ih' in name:
@@ -241,7 +233,7 @@ class HCGNetCG1(nn.Module):
 
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetCG1, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
 
     def init_weights(self, pre_trained=None):
@@ -251,9 +243,7 @@ class HCGNetCG1(nn.Module):
         elif pre_trained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
+                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
                     for name, param in m.named_parameters():
                         if 'weight_ih' in name:
@@ -290,7 +280,7 @@ class HCGNetCG1(nn.Module):
 class HCGNetCG2(nn.Module):
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetCG2, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
@@ -343,7 +333,7 @@ class HCGNetCG2(nn.Module):
 class HCGNetG1G2(nn.Module):
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetG1G2, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool, has_stride, dp)
+        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)

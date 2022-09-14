@@ -5,6 +5,7 @@ from .custom import CustomAMCDataset
 from .dataset_wrappers import ConcatAMCDataset
 from .deepsig import DeepSigDataset
 from .evaluate import *
+from .gbsense import GBSenseBasic, GBSenseAdvanced
 from .merge import *
 from .online import OnlineDataset
 from .save import *
@@ -23,5 +24,6 @@ __all__ = [
     'CustomAMCDataset',
     'ConcatAMCDataset',
     'DeepSigDataset',
+    'GBSenseBasic', 'GBSenseAdvanced',
     'OnlineDataset'
 ]

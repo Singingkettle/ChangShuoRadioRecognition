@@ -56,12 +56,12 @@ class SingleBranch(nn.Module):
                                   num_layers=2, dropout=self.dropout_rate,
                                   batch_first=True, bidirectional=self.is_BIGRU)
 
-            if self.fusion_method is 'safn':
+            if self.fusion_method == 'safn':
                 if avg_pool is not None:
                     self.fusion = SELayer(127)
                 else:
                     self.fusion = SELayer(122)
-            elif self.fusion_method is 'attention':
+            elif self.fusion_method == 'attention':
                 self.fusion = nn.Linear(100, 1)
 
     def forward(self, x):
@@ -72,23 +72,23 @@ class SingleBranch(nn.Module):
             x = torch.squeeze(x, dim=2)
             c_x = torch.transpose(x, 1, 2)
 
-            if 'safn' is self.fusion_method:
+            if 'safn' == self.fusion_method:
                 w = self.fusion(c_x)
                 x, _ = self.gru_net(c_x)
                 x = torch.mul(x, w)
                 x = torch.sum(x, dim=1)
                 return x
-            elif 'attention' is self.fusion_method:
+            elif 'attention' == self.fusion_method:
                 x, _ = self.gru_net(c_x)
                 w = self.fusion(x)
                 w = F.softmax(w, dim=1)
                 x = torch.mul(x, w)
                 x = torch.sum(x, dim=1)
                 return x
-            elif 'add' is self.fusion_method:
+            elif 'add' == self.fusion_method:
                 x, _ = self.gru_net(c_x)
                 return torch.add(x[:, 0, :], x[:, -1, :])
-            elif 'last' is self.fusion_method:
+            elif 'last' == self.fusion_method:
                 x, _ = self.gru_net(c_x)
                 return x[:, -1, :]
             else:

@@ -15,7 +15,7 @@ class SVM(object):
         self.mode = mode
         self.svm = svm.SVC(C=regularization, tol=0.005, verbose=3, max_iter=max_iter, decision_function_shape='ovo',
                            shrinking=0)
-        if mode is 'test':
+        if mode == 'test':
             self.load_model()
 
     def load_model(self):
@@ -25,7 +25,7 @@ class SVM(object):
         joblib.dump(self.svm, self.model_path)
 
     def __call__(self, data, label=None):
-        if self.mode is 'train':
+        if self.mode == 'train':
             self.svm.fit(data, label)
             self.save_model()
             return True

@@ -62,11 +62,11 @@ def plot_fea_distribution(fea, label_names, scatter_config, save_path, fig_size=
 
 @VISFEATURES.register_module()
 class VisFea(object):
-    def __init__(self, log_dir, name, method, scatter_config=None, reduction='tsne'):
-        self.log_dir = log_dir
+    def __init__(self, name, method, log_dir, scatter_config, tool='tsne'):
         self.name = name
         self.config = method['config']
-        self.reduction = reduction
+        self.log_dir = log_dir
+        self.tool = tool
         self.format_out_dir = os.path.join(self.log_dir, self.config, 'format_out')
         self.label_names = self._get_label_names()
         self.fea_dict = self._get_fea_from_file()
@@ -77,7 +77,7 @@ class VisFea(object):
         index_class_dict = {index: mod for mod, index in mods_dict.items()}
         label_names = []
         for ann in ann_info:
-            ## TODO: Support multi-label for single data
+            # TODO: Support multi-label for single data
             item = index_class_dict[ann['mod_labels'][0]]
             label_names.append(copy.copy(item))
 
@@ -89,7 +89,7 @@ class VisFea(object):
         if len(fea_files) > 0:
             for fea_file in fea_files:
                 fea = np.load(fea_file)
-                fea = getattr(self, self.reduction)(fea)
+                fea = getattr(self, self.tool)(fea)
                 fea = fea / (np.max(np.abs(fea)) + np.finfo(np.float64).eps) * 9.9
                 fea_name = os.path.basename(fea_file)
                 fea_name = fea_name.split('.')[0]

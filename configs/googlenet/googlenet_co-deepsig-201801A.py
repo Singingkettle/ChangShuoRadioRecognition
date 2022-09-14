@@ -26,7 +26,7 @@ model = dict(
 total_epochs = 100
 
 # optimizer
-optimizer = dict(type='Adam', lr=0.00002)
+optimizer = dict(type='Adam', lr=0.00001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='fixed')

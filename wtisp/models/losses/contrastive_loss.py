@@ -186,11 +186,11 @@ class ContrastiveLoss(nn.Module):
         self.contrastive = contrastive
         if contrastive is None:
             raise ValueError('You must set the type of contrastive to calculate the contrastive loss!')
-        elif contrastive['type'] is 'classic':
+        elif contrastive['type'] == 'classic':
             self.cls_criterion = contrastive_classic
-        elif contrastive['type'] is 'exp':
+        elif contrastive['type'] == 'exp':
             self.cls_criterion = contrastive_exp
-        elif contrastive['type'] is 'quadratic':
+        elif contrastive['type'] == 'quadratic':
             self.cls_criterion = contrastive_quadratic
         else:
             raise ValueError(

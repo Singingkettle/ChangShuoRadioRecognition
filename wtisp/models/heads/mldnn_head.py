@@ -16,7 +16,7 @@ class MergeAMCHead(BaseHead):
                 multi_label=False,
             )
         self.loss_cls = build_loss(loss_cls)
-        if loss_cls['type'] is 'NLLLoss':
+        if loss_cls['type'] == 'NLLLoss':
             self.with_log = True
         else:
             self.with_log = False
