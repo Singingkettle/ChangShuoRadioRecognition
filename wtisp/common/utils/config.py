@@ -16,6 +16,8 @@ from importlib import import_module
 from addict import Dict
 from yapf.yapflib.yapf_api import FormatCode
 
+from .path import glob
+
 if platform.system() == 'Windows':
     import regex as re
 else:
@@ -530,7 +532,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
         for config in configs:
             if osp.isdir(osp.join(cfg.log_dir, config)):
                 format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
-                json_paths = glob.glob(osp.join(format_out_dir, '*.json'))
+                json_paths = glob(format_out_dir, 'json')
                 if 'feature-based' in config:
                     train_configs[config] = -1
                 else:
@@ -538,8 +540,8 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
                         cfg.log_dir, config)
                     if best_epoch > 0:
                         train_configs[config] = best_epoch
-                if len(json_paths) != 1:
-                    no_test_configs[config] = train_configs[config]
+                        if len(json_paths) != 1:
+                            no_test_configs[config] = train_configs[config]
         no_train_configs = list(set(configs) - set(train_configs.keys()))
 
     if is_regeneration:
@@ -572,7 +574,7 @@ def load_json_log(json_log):
 
 
 def get_the_best_checkpoint(log_dir, config):
-    json_paths = glob.glob(os.path.join(log_dir, config, '*.json'))
+    json_paths = glob(os.path.join(log_dir, config), 'json')
 
     if len(json_paths) > 0:
         # assume that the last json file is right version

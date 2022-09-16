@@ -96,3 +96,13 @@ def find_vcs_root(path, markers=('.git',)):
             return cur
         prev, cur = cur, osp.split(cur)[0]
     return None
+
+
+def glob(target_dir, suffix):
+    target_paths = []
+    if os.path.isdir(target_dir):
+        for file in os.listdir(target_dir):
+            if file.endswith(f'{suffix}'):
+                target_paths.append(os.path.join(target_dir, file))
+
+    return target_paths

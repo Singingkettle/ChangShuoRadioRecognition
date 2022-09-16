@@ -7,7 +7,7 @@ from .misc import (check_prerequisites, concat_list, deprecated_api_warning,
                    is_tuple_of, iter_cast, list_cast, requires_executable,
                    requires_package, slice_list, tuple_cast, outs2result, TORCH_VERSION)
 from .path import (check_file_exist, fopen, is_filepath, mkdir_or_exist,
-                   scandir, symlink)
+                   scandir, symlink, glob)
 from .progressbar import (ProgressBar, track_iter_progress,
                           track_parallel_progress, track_progress)
 from .registry import build_from_cfg, Registry
@@ -20,7 +20,7 @@ __all__ = [
     'requires_package', 'slice_list', 'tuple_cast', 'outs2result', 'TORCH_VERSION', 'ProgressBar',
     'track_iter_progress', 'get_the_best_checkpoint',
     'track_parallel_progress', 'track_progress', 'build_from_cfg', 'Registry', 'Timer', 'TimerError', 'check_time',
-    'check_file_exist', 'fopen', 'is_filepath', 'mkdir_or_exist', 'scandir', 'symlink', 'ConfigDict', 'Config',
-    'DictAction', 'fuse_conv_bn', 'load_ext', 'get_model_complexity_info', 'filter_config',
-    'digit_version', 'get_git_hash'
+    'check_file_exist', 'fopen', 'is_filepath', 'mkdir_or_exist', 'scandir', 'symlink', 'glob',
+    'ConfigDict', 'Config', 'DictAction', 'fuse_conv_bn', 'load_ext', 'get_model_complexity_info', 'filter_config',
+    'digit_version', 'get_git_hash',
 ]

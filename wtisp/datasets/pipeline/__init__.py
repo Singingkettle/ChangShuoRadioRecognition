@@ -1,6 +1,6 @@
 from .compose import Compose
 from .features import Cumulants
-from .formating import Collect
+from .formating import Collect, RebaseModLabelBySNR
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
                       LoadAPFromHDF5, LoadIQFromHDF5,
@@ -13,6 +13,7 @@ __all__ = [
     'Compose',
     'Cumulants',
     'Collect',
+    'RebaseModLabelBySNR',
     'LoadAPFromFile',
     'LoadIQFromFile',
     'LoadConstellationFromFile',

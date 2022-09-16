@@ -9,7 +9,6 @@ Email: chagshuo@bupt.edu.cn
 """
 
 import copy
-import glob
 import os
 
 import matplotlib.pyplot as plt
@@ -19,6 +18,8 @@ from tsnecuda import TSNE
 
 from .utils import load_annotation
 from ..builder import VISFEATURES
+from ...common.utils import glob
+
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -84,7 +85,7 @@ class VisFea(object):
         return label_names
 
     def _get_fea_from_file(self):
-        fea_files = glob.glob(self.format_out_dir + '/*fea.npy')
+        fea_files = glob(self.format_out_dir, 'fea.npy')
         fea_dict = dict()
         if len(fea_files) > 0:
             for fea_file in fea_files:

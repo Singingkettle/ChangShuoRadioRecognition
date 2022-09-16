@@ -75,10 +75,10 @@ def main():
                 if args.multi_gpu:
                     python_sh = 'nohup python -m torch.distributed.launch --nproc_per_node={} ' \
                                 '--master_port={} tools/train.py'.format(gpu_num, base_master_port + method_index)
-                    end_sh = ' --seed 0 --deterministic --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
+                    end_sh = ' --auto-resume --seed 0 --deterministic --launcher pytorch > /dev/null 2>&1 &\n\n\n\n'
                 else:
                     python_sh = 'export CUDA_VISIBLE_DEVICES={} \nnohup python tools/train.py'.format(gpu_index)
-                    end_sh = ' --seed 0 --deterministic > /dev/null 2>&1 &\n\n\n\n'
+                    end_sh = ' --auto-resume --seed 0 --deterministic > /dev/null 2>&1 &\n\n\n\n'
                 method_index += 1
                 count_index += 1
                 if not args.multi_gpu:
@@ -107,7 +107,7 @@ def main():
             else:
                 python_sh = 'python -m torch.distributed.launch --nproc_per_node={} ' \
                             '--master_port={} tools/train.py'.format(gpu_num, base_master_port + method_index)
-                end_sh = ' --seed 0 --launcher pytorch \n\n\nsleep 15s\n\n\n'
+                end_sh = ' --auto-resume --seed 0 --launcher pytorch \n\n\nsleep 15s\n\n\n'
             method_index += 1
             train_sh = train_sh + start_info + python_sh + config_sh + work_dir_sh + end_sh
         with open(os.path.join(scripts_dir, 'train_2018.sh'), 'w') as f:

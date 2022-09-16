@@ -1,4 +1,3 @@
-import glob
 import os
 
 import matplotlib.pyplot as plt
@@ -6,6 +5,7 @@ import numpy as np
 
 from .utils import load_json_log
 from ..builder import LOSSACCURACIES
+from ...common.utils import glob
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -140,8 +140,7 @@ class LossAccuracyPlot(object):
             test_metrics = ['final']
         if train_metrics is None:
             train_metrics = ['loss']
-        json_paths = glob.glob(os.path.join(
-            self.log_dir, config, '*.json'))
+        json_paths = glob(os.path.join(self.log_dir, config), '.json')
         # Assume that the last json file is right version
         json_paths = sorted(json_paths)
         log_dict = load_json_log(json_paths[-1])

@@ -1,5 +1,4 @@
 # Copyright (c) Open-MMLab. All rights reserved.
-import glob
 import os
 import os.path as osp
 import random
@@ -13,7 +12,7 @@ import numpy as np
 import torch
 
 from .dist_utils import get_dist_info
-from ..common.utils import is_str
+from ..common.utils import is_str, glob
 
 
 def get_host_info():
@@ -105,7 +104,7 @@ def find_latest_checkpoint(path, suffix='pth'):
     if osp.exists(osp.join(path, f'latest.{suffix}')):
         return osp.join(path, f'latest.{suffix}')
 
-    checkpoints = glob.glob(osp.join(path, f'*.{suffix}'))
+    checkpoints = glob(path, suffix)
     if len(checkpoints) == 0:
         warnings.warn('There are no checkpoints in the path.')
         return None
