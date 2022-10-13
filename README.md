@@ -21,18 +21,13 @@ v1.0.1 was released in 5/9/2020.
 
 Supported Automatic Modulation Classification methods:
 
-- [x] [CNN2](configs/cnn2)
-  . ["Convolutional Radio Modulation Recognition Networks"](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
+- [x] [CNN2](configs/cnn2). ["Convolutional Radio Modulation Recognition Networks"](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
 - [x] [CNN3](configs/cnn3). "Provided as Baseline"
 - [x] [CNN4](configs/cnn4). "Provided as Baseline"
-- [x] [DS-CLDNN](configs/dscldnn)
-  . ["Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure"](https://ieeexplore.ieee.org/document/9220797)
-- [x] [DensCNN](configs/denscnn)
-  . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [ResCNN](configs/rescnn)
-  . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [CLDNN](configs/cldnn)
-  . ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
+- [x] [DS-CLDNN](configs/dscldnn). ["Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure"](https://ieeexplore.ieee.org/document/9220797)
+- [x] [DensCNN](configs/denscnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
+- [x] [ResCNN](configs/rescnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
+- [x] [CLDNN](configs/cldnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
 - [x] [AlexNet](configs/alexnet). "Provided as Baseline in MLDNN"
 - [x] [GoogleNet](configs/googlenet). "Provided as Baseline in MLDNN"
 - [x] [ResNet](configs/resnet). "Provided as Baseline in MLDNN"

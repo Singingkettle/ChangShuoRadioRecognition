@@ -5,39 +5,12 @@ see [install.md](install.md).
 
 ## Prepare datasets
 
-It is recommended to symlink the dataset root to `$WTISP/data`. If your folder structure is different, you may need to
-change the corresponding paths in config files.
+For different dataset, please refer:
 
-```
-wtisignalprocessing
-├── configs
-├── data
-│   ├── ModulationClassification
-│   │   ├── DeepSig
-│   │   │   ├── 201610A
-│   │   │   │   ├── train.json
-│   │   │   │   ├── val.json
-│   │   │   │   ├── test.json
-│   │   │   │   ├── sequence_data
-│   │   │   │   │   ├── iq
-│   │   │   │   │   ├── ap
-│   │   │   │   ├── constellation_data
-│   │   │   │   │   ├── filter_size_0.010_stride_0.005
-│   ├── SignalSeparation
-│   │   ├── WTISS
-│   │   │   ├── qpsk_16qam
-│   │   │   │   ├── complex
-│   │   │   │   │   ├── train_data.mat
-│   │   │   │   │   ├── val_data.mat
-│   │   │   │   │   ├── test_data.mat
-│   │   │   │   ├── real
-│   │   │   │   │   ├── train_data.mat
-│   │   │   │   │   ├── val_data.mat
-│   │   │   │   │   ├── test_data.mat
+- [DeepSig](./dataset/deepsig.md)
+- 
 
-```
 
-The deepsig data have to be converted into the specified format using `tools/convert_datasets/comvert_deepsig.py`:
 
 ## Train a model
 
@@ -54,13 +27,18 @@ adding the interval argument in the training config.
 evaluation = dict(interval=12)  # The model is evaluated per 12 training epoch.
 ```
 
-**\*Important\***: The default learning rate in config files is for 8 GPUs. According to
+**Important**: The default learning rate in config files is for 8 GPUs. According to
 the [Linear Scaling Rule](https://arxiv.org/abs/1706.02677), you need to set the learning rate proportional to the batch
 size if you use different GPUs or samples per GPU, e.g., lr=0.01 for 4 GPUs * 2 sample/gpu and lr=0.08 for 16 GPUs * 4
 sample/gpu.
 
 ### Train with a single GPU
 
+For example, when you want to train a DL AMC classifier using [CNN2](configs/cnn2) on [DeepSig 201610A dataset](https://www.deepsig.ai/datasets), you can run the command: 
+```shell
+python tools/train.py ./configs/cnn2/cnn2_iq-deepsig-201610A.py
+```
+The common style is:
 ```shell
 python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
