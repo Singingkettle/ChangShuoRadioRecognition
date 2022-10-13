@@ -6,12 +6,12 @@ import time
 import warnings
 
 import torch
+import torch.distributed as dist
 
 from wtisp import __version__
 from wtisp.apis import init_random_seed, set_random_seed, train_task
 from wtisp.common import get_root_logger, collect_env
-from wtisp.common.fileio import del_files
-from wtisp.common.utils import DictAction, Config, mkdir_or_exist
+from wtisp.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist
 from wtisp.datasets import build_dataset
 from wtisp.models import build_task
 from wtisp.runner import init_dist, get_dist_info
@@ -22,29 +22,25 @@ def parse_args():
         description='WTISignalProcessingTrain a model')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs, models and results')
-    parser.add_argument('--resume-from', help='the checkpoint file to resume from')
-    parser.add_argument(
-        '--auto-resume',
-        action='store_true',
-        help='resume from the latest checkpoint automatically')
-    parser.add_argument('--no-validate', action='store_true',
+    parser.add_argument('--resume_from', help='the checkpoint file to resume from')
+    parser.add_argument('--auto_resume', action='store_true', help='resume from the latest checkpoint automatically')
+    parser.add_argument('--no_validate', action='store_true',
                         help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()
     group_gpus.add_argument('--gpus', type=int,
                             help='number of gpus to use (only applicable to non-distributed training)')
-    group_gpus.add_argument('--gpu-ids', type=int, nargs='+',
+    group_gpus.add_argument('--gpu_ids', type=int, nargs='+',
                             help='ids of gpus to use (only applicable to non-distributed training)')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
+    parser.add_argument('--diff-seed', action='store_true',
+                        help='Whether or not set different seeds for different ranks')
     parser.add_argument('--deterministic', action='store_true',
                         help='whether to set deterministic options for CUDNN backend.')
-    parser.add_argument(
-        '--options',
-        nargs='+',
-        action=DictAction,
-        help='override some settings in the used config, the key-value pair '
-             'in xxx=yyy format will be merged into config file (deprecate), '
-             'change to --cfg-options instead.')
-    parser.add_argument('--cfg-options', nargs='+', action=DictAction,
+    parser.add_argument('--options', nargs='+', action=DictAction,
+                        help='override some settings in the used config, the key-value pair '
+                             'in xxx=yyy format will be merged into config file (deprecate), '
+                             'change to --cfg-options instead.')
+    parser.add_argument('--cfg_options', nargs='+', action=DictAction,
                         help='override some settings in the used config, '
                              'the key-value pair in xxx=yyy format will be merged into config file.')
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm', 'mpi'], default='none', help='job launcher')
@@ -55,10 +51,10 @@ def parse_args():
         os.environ['LOCAL_RANK'] = str(args.local_rank)
     if args.options and args.cfg_options:
         raise ValueError(
-            '--options and --cfg-options cannot be both '
-            'specified, --options is deprecated in favor of --cfg-options')
+            '--options and --cfg_options cannot be both '
+            'specified, --options is deprecated in favor of --cfg_options')
     if args.options:
-        warnings.warn('--options is deprecated in favor of --cfg-options')
+        warnings.warn('--options is deprecated in favor of --cfg_options')
         args.cfg_options = args.options
 
     return args
@@ -88,6 +84,7 @@ def main():
 
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
+    cfg.auto_resume = args.auto_resume
     if args.gpu_ids is not None:
         cfg.gpu_ids = args.gpu_ids
     else:
@@ -95,20 +92,24 @@ def main():
 
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
+        rank = 0
         distributed = False
-        if osp.isdir(cfg.work_dir) and (not cfg.resume_from):
-            del_files(cfg.work_dir)
     else:
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
-        # Delete the old saved log files and models
-        rank, _ = get_dist_info()
-        if rank == 0:
-            if osp.isdir(cfg.work_dir) and (not cfg.resume_from):
-                del_files(cfg.work_dir)
+        # re-set gpu_ids with distributed training mode
+        rank, world_size = get_dist_info()
+        cfg.gpu_ids = range(world_size)
 
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))
+
+    # If not reuse from history checkpoint and there
+    # are history checkpoint files, then remove the whole work_dir
+    if rank == 0:
+        if cfg.resume_from is None and not cfg.auto_resume:
+            redir_and_exist(cfg.work_dir)
+
     # dump config
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
 
@@ -131,8 +132,10 @@ def main():
     # log some basic info
     logger.info(f'Config:\n{cfg.pretty_text}')
 
+    # cfg.device = get_device()
     # set random seeds
     seed = init_random_seed(args.seed)
+    seed = seed + dist.get_rank() if args.diff_seed else seed
     logger.info(f'Set random seed to {seed}, '
                 f'deterministic: {args.deterministic}')
     set_random_seed(seed, deterministic=args.deterministic)

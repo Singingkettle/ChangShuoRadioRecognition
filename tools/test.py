@@ -21,12 +21,12 @@ def parse_args():
         type=str,
         help='the dir to save output result file in json format')
     parser.add_argument(
-        '--fuse-conv-bn',
+        '--fuse_conv_bn',
         action='store_true',
         help='Whether to fuse conv and bn, this will slightly increase'
              'the inference speed')
     parser.add_argument(
-        '--gpu-collect',
+        '--gpu_collect',
         action='store_true',
         help='whether to use gpu to collect results.')
     parser.add_argument(
@@ -34,7 +34,7 @@ def parse_args():
         help='tmp directory used for collecting results from multiple '
              'workers, available when gpu-collect is not specified')
     parser.add_argument(
-        '--cfg-options',
+        '--cfg_options',
         nargs='+',
         action=DictAction,
         help='override some settings in the used config, the key-value pair '

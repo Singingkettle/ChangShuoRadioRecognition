@@ -21,7 +21,7 @@ def main():
     print(cfg.pretty_text)
 
     config_legend_map, config_method_map = filter_config(cfg, mode='summary')
-    plot = build_plot(cfg.plot, cfg.log_dir, cfg.legend, config_legend_map, config_method_map)
+    plot = build_plot(cfg.plot, cfg.log_dir, cfg.legend, cfg.scatter, config_legend_map, config_method_map)
 
     plot.plot()
 
