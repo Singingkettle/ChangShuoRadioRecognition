@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 import os.path as osp
 
 import numpy as np
@@ -9,7 +10,7 @@ from ..common.fileio import load as IOLoad
 
 
 @DATASETS.register_module()
-class CustomAMCDataset(Dataset):
+class CustomAMCDataset(Dataset, metaclass=ABCMeta):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.

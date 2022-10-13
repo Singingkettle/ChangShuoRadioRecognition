@@ -573,24 +573,39 @@ def load_json_log(json_log):
     return log_dict
 
 
+def get_total_epoch(log_file):
+    with open(log_file, 'r') as f:
+        for line in f:
+            if 'total_epochs' in line:
+                line = line.strip()
+                total_epoch = int(line.replace('total_epochs = ', ''))
+                return total_epoch
+
+    return 0
+
+
 def get_the_best_checkpoint(log_dir, config):
     json_paths = glob(os.path.join(log_dir, config), 'json')
 
+    best_epoch = 0
     if len(json_paths) > 0:
-        # assume that the last json file is right version
         json_paths = sorted(json_paths)
-        log_dict = load_json_log(json_paths[-1])
-
-        epochs = list(log_dict.keys())
+        max_epoch = 0
         final_metric = 'Final/snr_mean_all'
+        total_epoch = get_total_epoch(json_paths[-1].replace('.json', ''))
+        merge_log = {i + 1: 0 for i in range(total_epoch)}
+        for json_path in json_paths:
+            log_dict = load_json_log(json_path)
+            epochs = list(log_dict.keys())
+            if len(epochs) == 0:
+                continue
+            if max(epochs) > max_epoch:
+                max_epoch = max(epochs)
+            for epoch in epochs:
+                if log_dict[epoch]['mode'][-1] == 'val':
+                    merge_log[epoch] = log_dict[epoch][final_metric][0]
+        best_epoch = max(merge_log, key=merge_log.get)
+        if total_epoch != max_epoch:
+            best_epoch = 0
 
-        accuracy = 0
-        best_epoch = 0
-        for epoch in epochs:
-            if log_dict[epoch]['mode'][-1] == 'val':
-                if log_dict[epoch][final_metric][0] > accuracy:
-                    accuracy = log_dict[epoch][final_metric][0]
-                    best_epoch = epoch
-    else:
-        best_epoch = 0
     return best_epoch

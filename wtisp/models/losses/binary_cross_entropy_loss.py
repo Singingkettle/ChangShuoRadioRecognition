@@ -28,8 +28,7 @@ def binary_cross_entropy(pred,
         torch.Tensor: The calculated loss
     """
     # element-wise losses
-    label = label
-    loss = F.binary_cross_entropy(torch.sigmoid(pred), label, weight=class_weight, reduction='none')
+    loss = F.binary_cross_entropy_with_logits(pred, label, weight=class_weight, reduction='none')
 
     # apply weights and do the reduction
     if weight is not None:
@@ -46,7 +45,8 @@ class BinaryCrossEntropyLoss(CrossEntropyLoss):
     def __init__(self,
                  reduction='mean',
                  class_weight=None,
-                 loss_weight=1.0):
+                 loss_weight=1.0,
+                 use_sample_and_class_weighted=False):
         """BinaryCrossEntropyLoss.
 
         Args:
@@ -62,4 +62,5 @@ class BinaryCrossEntropyLoss(CrossEntropyLoss):
         self.loss_weight = loss_weight
         self.class_weight = class_weight
 
+        self.use_sample_and_class_weighted = use_sample_and_class_weighted
         self.cls_criterion = binary_cross_entropy

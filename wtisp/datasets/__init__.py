@@ -2,10 +2,11 @@ from .augment import *
 from .builder import (AUGMENTS, EVALUATES, DATASETS, SAVES, build_augment, build_evaluate, build_dataset,
                       build_dataloader, build_save)
 from .custom import CustomAMCDataset
-from .dataset_wrappers import ConcatAMCDataset
+from .dataset_wrappers import ConcatDataset
 from .deepsig import DeepSigDataset
 from .evaluate import *
 from .gbsense import GBSenseBasic, GBSenseAdvanced
+from .wtisp import WTISPDataset
 from .merge import *
 from .online import OnlineDataset
 from .save import *
@@ -22,8 +23,9 @@ __all__ = [
     'build_dataloader',
     'build_save',
     'CustomAMCDataset',
-    'ConcatAMCDataset',
+    'ConcatDataset',
     'DeepSigDataset',
     'GBSenseBasic', 'GBSenseAdvanced',
+    'WTISPDataset',
     'OnlineDataset'
 ]

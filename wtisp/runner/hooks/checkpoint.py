@@ -40,8 +40,10 @@ class CheckpointHook(Hook):
                  **kwargs):
         if start is not None and start < 0:
             warnings.warn(
-                f'The evaluation start epoch {start} is smaller than 0, '
+                f'The save-checkpoint start epoch {start} is smaller than 0, '
                 f'use 0 instead', UserWarning)
+            start = 0
+        if start is None:
             start = 0
         self.start = start
         self.interval = interval
@@ -55,7 +57,7 @@ class CheckpointHook(Hook):
     def after_train_epoch(self, runner):
         if not self.by_epoch or not self.every_n_epochs(runner, self.interval):
             return
-        if self.start is not None and runner.epoch >= self.start:
+        if runner.epoch >= self.start:
             runner.logger.info(f'Saving checkpoint at {runner.epoch + 1} epochs')
             if self.sync_buffer:
                 allreduce_params(runner.model.buffers())

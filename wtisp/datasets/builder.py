@@ -40,11 +40,11 @@ def build(cfg, registry, default_args=None):
 
 
 def build_dataset(cfg, default_args=None):
-    from .dataset_wrappers import ConcatAMCDataset
+    from .dataset_wrappers import ConcatDataset
     if isinstance(cfg, (list, tuple)):
-        dataset = ConcatAMCDataset([build_dataset(c, default_args) for c in cfg])
-    elif cfg['type'] == 'ConcatAMCDataset':
-        dataset = ConcatAMCDataset(
+        dataset = ConcatDataset([build_dataset(c, default_args) for c in cfg])
+    elif cfg['type'] == 'ConcatDataset':
+        dataset = ConcatDataset(
             [build_dataset(c, default_args) for c in cfg['datasets']])
     else:
         dataset = build_from_cfg(cfg, DATASETS, default_args)

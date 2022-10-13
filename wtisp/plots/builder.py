@@ -62,7 +62,7 @@ def build_flops(cfg, log_dir):
     return build(cfg, FLOPS, dict(log_dir=log_dir))
 
 
-def build_plot(cfg, log_dir, legend, config_legend_map, config_method_map):
+def build_plot(cfg, log_dir, legend, scatter, config_legend_map, config_method_map):
     """Build plot"""
     return build(cfg, PLOTS, dict(log_dir=log_dir, legend=legend, config_legend_map=config_legend_map,
-                                  config_method_map=config_method_map))
+                                  config_method_map=config_method_map, scatter=scatter))

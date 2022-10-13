@@ -37,19 +37,19 @@ class DNN(BaseDNN):
         return x
 
     def forward_train(self, **kwargs):
-        labels = dict()
+        for_train = dict()
         for key_str in list(kwargs.keys()):
-            if 'labels' in key_str:
-                labels[key_str] = kwargs[key_str]
+            if 'labels' in key_str or 'weight' in key_str:
+                for_train[key_str] = kwargs[key_str]
                 kwargs.pop(key_str, None)
         x = self.extract_feat(**kwargs)
-        losses = self.classifier_head.forward_train(x, **labels)
+        losses = self.classifier_head.forward_train(x, **for_train)
 
         return losses
 
     def simple_test(self, **kwargs):
         x = self.extract_feat(**kwargs)
-        outs = self.classifier_head(x, self.vis_fea)
+        outs = self.classifier_head(x, self.vis_fea, True)
 
         results_list = []
         if isinstance(outs, dict):

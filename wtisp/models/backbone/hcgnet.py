@@ -145,29 +145,9 @@ class HCGNetGRU1(nn.Module):
                 if isinstance(m, nn.Conv2d):
                     nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
                 elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -195,29 +175,9 @@ class HCGNetGRU2(nn.Module):
                 if isinstance(m, nn.Conv2d):
                     nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
                 elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -245,29 +205,9 @@ class HCGNetCG1(nn.Module):
                 if isinstance(m, nn.Conv2d):
                     nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
                 elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
                 elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)

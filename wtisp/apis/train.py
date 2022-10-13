@@ -15,15 +15,12 @@ from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner,
 
 def init_random_seed(seed=None, device='cuda'):
     """Initialize random seed.
-
     If the seed is not set, the seed will be automatically randomized,
     and then broadcast to all processes to prevent some potential bugs.
-
     Args:
         seed (int, Optional): The seed. Default to None.
         device (str): The device where the seed will be put on.
             Default to 'cuda'.
-
     Returns:
         int: Seed to be used.
     """
@@ -34,7 +31,7 @@ def init_random_seed(seed=None, device='cuda'):
     # some potential bugs. Please refer to
     # https://github.com/open-mmlab/mmdetection/issues/6339
     rank, world_size = get_dist_info()
-    seed = np.random.randint(2 ** 31)
+    seed = np.random.randint(2**31)
     if world_size == 1:
         return seed
 
@@ -48,7 +45,6 @@ def init_random_seed(seed=None, device='cuda'):
 
 def set_random_seed(seed, deterministic=False):
     """Set random seed.
-
     Args:
         seed (int): Seed to be used.
         deterministic (bool): Whether to set the deterministic option for

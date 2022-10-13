@@ -6,7 +6,7 @@ from .fmldnn_head import FMLDNNHead
 from .hcgdnn_head import HCGDNNHead
 from .mldnn_head import MergeAMCHead, MLDNNHead
 from .sednn_head import SEDNNHead
-from .vis_head import VisHead
+from .mm_head import ASDHead, ASSHead
 
 __all__ = [
     'BaseHead',
@@ -18,5 +18,6 @@ __all__ = [
     'MergeAMCHead',
     'MLDNNHead',
     'SEDNNHead',
-    'VisHead'
+    'ASDHead',
+    'ASSHead'
 ]

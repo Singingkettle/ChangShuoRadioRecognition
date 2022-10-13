@@ -6,7 +6,7 @@ from ..common import print_log
 
 
 @DATASETS.register_module()
-class ConcatAMCDataset(_ConcatDataset):
+class ConcatDataset(_ConcatDataset):
     """A wrapper of concatenated dataset.
 
     Same as :obj:`torch.utils.data.dataset.ConcatDataset`, but
@@ -20,7 +20,7 @@ class ConcatAMCDataset(_ConcatDataset):
     """
 
     def __init__(self, datasets):
-        super(ConcatAMCDataset, self).__init__(datasets)
+        super(ConcatDataset, self).__init__(datasets)
         self.CLASSES = datasets[0].CLASSES
         if hasattr(datasets[0], 'flag'):
             flags = []

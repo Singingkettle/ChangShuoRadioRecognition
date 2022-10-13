@@ -91,7 +91,7 @@ class SEDNNHead(BaseHead):
 
         return losses
 
-    def forward(self, x, vis_fea=False):
+    def forward(self, x, vis_fea=False, is_test=False):
         x = torch.unsqueeze(x, dim=2)
         x = torch.unsqueeze(x, dim=3)
         SNR = self.snr_classifier(x)  # B * K1 * 1 * 1

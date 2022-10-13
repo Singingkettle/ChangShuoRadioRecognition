@@ -438,15 +438,18 @@ class LoadFTFromIQ:
 
 @PIPELINES.register_module()
 class LoadAnnotations:
-    def __init__(self, with_mod=True, with_snr=False):
+    def __init__(self, with_mod=True, with_snr=False, with_dev=False):
         self.with_mode = with_mod
         self.with_snr = with_snr
+        self.with_dev = with_dev
 
     def __call__(self, results):
         if self.with_mode:
             results['mod_labels'] = np.array(results['item_mod_label'], dtype=np.int64)
         if self.with_snr:
             results['snr_labels'] = np.array(results['item_snr_label'], dtype=np.int64)
+        if self.with_dev:
+            results['dev_labels'] = np.array(results['item_dev_label'], dtype=np.int64)
 
         return results
 

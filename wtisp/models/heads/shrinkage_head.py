@@ -53,7 +53,7 @@ _BMMFUNCTIONS = dict(inner_product=_bmm_inner_product, cosine=_bmm_cosine_simila
 @HEADS.register_module()
 class ShrinkageHead(BaseHead):
     def __init__(self, in_features, batch_size, num_classes, expansion=1,
-                 mm='inner_product', loss_aux=None, is_abs=False):
+                 mm='inner_product', loss_aux=None):
         super(ShrinkageHead, self).__init__()
         self.in_features = in_features
         self.batch_size = batch_size
@@ -64,7 +64,6 @@ class ShrinkageHead(BaseHead):
             self.mm_f = _MMFUNCTIONS[mm]
         else:
             raise ValueError('Unknown mm mode {}!!!'.format(mm))
-        self.is_abs = is_abs
         self.loss_shrinkage = build_loss(loss_aux)
 
     def init_weights(self):
@@ -73,17 +72,11 @@ class ShrinkageHead(BaseHead):
     def loss(self, x, mod_labels=None, **kwargs):
         x = x.view(self.batch_size, self.in_features)
         x = self.mm_f(x, x)
-        if self.mm != 'cosine':
-            x = x - torch.max(x)
         x = x * self.expansion
-        if self.is_abs:
-            x = torch.abs(x)
 
         label = x.new_full((self.batch_size, self.num_classes), 0)
         label[torch.arange(self.batch_size), mod_labels[:]] = 1
         label = torch.mm(label, torch.transpose(label, 0, 1))
-
-        label[label == 0] = -1
         label[torch.arange(self.batch_size), torch.arange(self.batch_size)] = 0
         loss_shrinkage = self.loss_shrinkage(x, label)
         return dict(loss_shrinkage=loss_shrinkage)

@@ -35,7 +35,7 @@ class HCGDNNHead(BaseHead):
 
         return loss
 
-    def forward(self, x, vis_fea=False):
+    def forward(self, x, vis_fea=False, is_test=False):
         outs = dict()
         for layer_name in self.heads:
             sub_outs = getattr(self, layer_name)(x[layer_name], vis_fea)

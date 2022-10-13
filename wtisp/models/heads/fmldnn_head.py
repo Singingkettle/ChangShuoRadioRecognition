@@ -56,7 +56,7 @@ class FMLDNNHead(BaseHead):
         loss_aux = self.aux_head.loss(x['fea'], mod_labels)
         return dict(loss_Final=loss_cls, loss_AUX=loss_aux['loss_shrinkage'])
 
-    def forward(self, x, vis_fea=False):
+    def forward(self, x, vis_fea=False, is_test=False):
         x = x.reshape(-1, self.in_features)
         fea = self.fea(x)
         Final = self.pre(fea)

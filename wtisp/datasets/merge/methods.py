@@ -14,7 +14,7 @@ from scipy.optimize import minimize, Bounds, LinearConstraint
 from scipy.special import softmax
 
 from ..builder import MERGES
-from ..utils import reshape_results, get_classification_accuracy_for_evaluation, generate_targets
+from ..utils import reshape_results, get_classification_accuracy_with_snr, generate_targets
 
 
 def get_pre_matrix(results, class_num):
@@ -182,7 +182,7 @@ class GridSearch:
                 search_weight = np.reshape(search_weight, (1, -1))
                 tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
                 tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, mod_label_num))
-                tmp_eval_results = get_classification_accuracy_for_evaluation(snr_num, mod_label_num, snr_to_index,
+                tmp_eval_results = get_classification_accuracy_with_snr(snr_num, mod_label_num, snr_to_index,
                                                                               item_snr_index, tmp_merge_matrix,
                                                                               item_mod_label,
                                                                               prefix=prediction_name + '/')

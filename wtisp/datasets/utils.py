@@ -41,7 +41,7 @@ def get_confusion_matrix(snr_num, class_num, snr_info, prs, gts):
     return confusion_matrix
 
 
-def get_classification_accuracy_for_evaluation(snr_num, class_num, snr_index, snr_info, prs, gts, prefix=''):
+def get_classification_accuracy_with_snr(snr_num, class_num, snr_index, snr_info, prs, gts, prefix=''):
     """Calculate the accuracy with different snr and average snr for evaluation.
     Args:
         snr_num: number of values about snr.
@@ -54,15 +54,21 @@ def get_classification_accuracy_for_evaluation(snr_num, class_num, snr_index, sn
     """
     confusion_matrix = get_confusion_matrix(snr_num, class_num, snr_info, prs, gts)
 
-    confusion_matrix = confusion_matrix / (
-            np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2) + np.finfo(np.float64).eps)
+    def _matrix_divide(a, b):
+        c = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
+        return c
+
+    confusion_matrix = _matrix_divide(confusion_matrix, np.expand_dims(np.sum(confusion_matrix, axis=2), axis=2))
 
     eval_results = dict()
     for snr in snr_index:
         conf = confusion_matrix[snr_index[snr], :, :]
         cor = np.sum(np.diag(conf))
         ncor = np.sum(conf) - cor
-        eval_results[prefix + 'snr_{}'.format(snr)] = 1.0 * cor / (cor + ncor)
+        if cor+ncor == 0.0:
+            eval_results[prefix + 'snr_{}'.format(snr)] = 0.0
+        else:
+            eval_results[prefix + 'snr_{}'.format(snr)] = 1.0 * cor/ (cor+ncor)
 
     conf = np.sum(confusion_matrix, axis=0) / snr_num
     cor = np.sum(np.diag(conf))

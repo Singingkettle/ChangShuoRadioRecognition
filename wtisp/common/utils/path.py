@@ -30,6 +30,16 @@ def mkdir_or_exist(dir_name, mode=0o777):
     os.makedirs(dir_name, mode=mode, exist_ok=True)
 
 
+def redir_and_exist(path_file):
+    ls = os.listdir(path_file)
+    for i in ls:
+        f_path = osp.join(path_file, i)
+        if osp.isdir(f_path):
+            redir_and_exist(f_path)
+        else:
+            os.remove(f_path)
+
+
 def symlink(src, dst, overwrite=True, **kwargs):
     if os.path.lexists(dst) and overwrite:
         os.remove(dst)
