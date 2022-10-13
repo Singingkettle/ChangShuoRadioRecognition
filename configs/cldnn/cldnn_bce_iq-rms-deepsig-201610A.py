@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/ap-deepsig-201610A.py',
+        '../_base_/datasets/deepsig/rebase_modulation_label_by_snr/iq-rms-deepsig-201610A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
@@ -7,8 +7,7 @@ _base_ = [
 # Model
 model = dict(
     type='DNN',
-    method_name='CLDNN-AP',
-    vis_fea=True,
+    method_name='CLDNN-IQ',
     backbone=dict(
         type='CRNet',
         in_channels=1,
@@ -19,12 +18,12 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='VisHead',
+        type='AMCHead',
         num_classes=11,
         in_features=50,
-        out_features=3,
+        out_features=128,
         loss_cls=dict(
-            type='CrossEntropyLoss',
+            type='BinaryCrossEntropyLoss',
             loss_weight=1.0,
         ),
     ),

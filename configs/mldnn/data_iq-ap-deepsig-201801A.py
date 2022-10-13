@@ -1,7 +1,7 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201801A'
 data = dict(
-    samples_per_gpu=80,
+    samples_per_gpu=320,
     workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
     train=dict(
         type=dataset_type,
@@ -30,7 +30,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateModulationPrediction'),
+            dict(type='EvaluateClassificationWithSNR'),
             dict(type='EvaluateSNRPrediction')
         ],
     ),
@@ -47,7 +47,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateModulationPrediction'),
+            dict(type='EvaluateClassificationWithSNR'),
             dict(type='EvaluateSNRPrediction')
         ],
         save=[

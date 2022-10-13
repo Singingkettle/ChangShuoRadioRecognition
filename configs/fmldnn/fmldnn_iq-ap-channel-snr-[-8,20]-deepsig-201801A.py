@@ -33,7 +33,7 @@ model = dict(
             batch_size=80,
             num_classes=num_classes,
             mm='cosine',
-            is_abs=False,
+
             loss_aux=dict(
                 type='InfoNCELoss',
                 loss_weight=0.4,

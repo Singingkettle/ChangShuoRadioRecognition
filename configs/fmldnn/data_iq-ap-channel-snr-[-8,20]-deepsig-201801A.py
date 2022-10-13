@@ -32,7 +32,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateModulationPrediction', )
+            dict(type='EvaluateClassificationWithSNR', )
         ],
     ),
     test=dict(
@@ -49,7 +49,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateModulationPrediction', )
+            dict(type='EvaluateClassificationWithSNR', )
         ],
         save=[
             dict(type='SaveModulationPrediction', )

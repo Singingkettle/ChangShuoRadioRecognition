@@ -1,3 +1,8 @@
+_base_ = [
+    '../_base_/plot/amc.py',
+]
+
+
 log_dir = '/home/citybuster/Data/SignalProcessing/Workdir_Old'
 legend = {
     'MLDNN': 0,
@@ -72,16 +77,16 @@ scatter = [
 
 plot = dict(
     type='CommonPlot',
-    log_dir=log_dir,
+
     config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
-    legend=legend,
-    scatter=scatter,
+
+
 
     # Set the configs about confusion maps
     confusion_map=[
         dict(
             type='ConfusionMap',
-            log_dir=log_dir,
+        
             name='confusion_map_201610A.pdf',
             method=dict(
                 config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
@@ -94,8 +99,8 @@ plot = dict(
     train_test_curve=[
         dict(
             type='LossAccuracyPlot',
-            log_dir=log_dir,
-            legend=legend,
+        
+        
             name='loss_accuracy_201610A.pdf',
             method=dict(
                 config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
@@ -114,8 +119,8 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='ablation_data.pdf',
-            legend=legend,
-            log_dir=log_dir,
+        
+        
             extra_pre=['0.3', '0.09', '0.027'],
             method=[
                 # CNN
@@ -160,8 +165,8 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='motivation_cg1_deepsig_201610A.pdf',
-            legend=legend,
-            log_dir=log_dir,
+        
+        
             method=[
                 # CNN
                 dict(
@@ -179,8 +184,8 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='motivation_cg2_deepsig_201610A.pdf',
-            legend=legend,
-            log_dir=log_dir,
+        
+        
             method=[
                 # CNN
                 dict(
@@ -198,8 +203,8 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='motivation_g1g2_deepsig_201610A.pdf',
-            legend=legend,
-            log_dir=log_dir,
+        
+        
             method=[
                 # GRU1
                 dict(
@@ -218,8 +223,8 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='deepsig_201610A.pdf',
-            legend=legend,
-            log_dir=log_dir,
+        
+        
             method=[
                 # deepsig 201610A compare with I/Q A/P
                 dict(
@@ -283,8 +288,8 @@ plot = dict(
         # dict(
         #     type='AccuracyF1Plot',
         #     name='deepsig_201801A.pdf',
-        #     legend=legend,
-        #     log_dir=log_dir,
+        # 
+        # 
         #     method=[
         #         dict(
         #             config='hcgdnn_lr-0.00100_deepsig_iq_201801A',
@@ -299,7 +304,6 @@ plot = dict(
     ],
     flops=dict(
         type='GetFlops',
-        log_dir=log_dir,
         method=[
             # HCGDNN
             dict(

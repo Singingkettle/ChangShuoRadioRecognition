@@ -33,7 +33,7 @@ model = dict(
             batch_size=640,
             num_classes=num_classes,
             mm='inner_product',
-            is_abs=False,
+
             loss_aux=dict(
                 type='LogisticLoss',
                 loss_weight=0.004,

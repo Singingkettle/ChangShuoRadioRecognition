@@ -17,7 +17,7 @@ model = dict(
         skip_connection=True
     ),
     classifier_head=dict(
-        type='FAMCAUXHead',
+        type='FMLDNNHead',
         in_features=100,
         out_features=256,
         num_classes=11,
@@ -28,14 +28,13 @@ model = dict(
             alpha=0.5
         ),
         aux_head=dict(
-            type='IntraOrthogonalHead',
+            type='ShrinkageHead',
             in_features=256,
-            batch_size=640,
+            batch_size=320,
             num_classes=11,
             mm='inner_product',
-            is_abs=False,
             loss_aux=dict(
-                type='LogisticLoss',
+                type='ShrinkageLoss',
                 loss_weight=0.004,
                 temperature=800,
             )
