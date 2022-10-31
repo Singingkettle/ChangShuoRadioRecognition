@@ -1,4 +1,4 @@
-from .builder import DATASETS, build_augment, build_evaluate, build_save
+from .builder import DATASETS, build_preprocess, build_evaluate, build_save
 from .custom import CustomAMCDataset
 from .utils import format_results
 from ..common.fileio import load as IOLoad
@@ -17,13 +17,13 @@ class OnlineDataset(CustomAMCDataset):
     SNRS = None
 
     def __init__(self, ann_file, pipeline, data_root=None, test_mode=False,
-                 augment=None, evaluate=None, save=None):
+                 preprocess=None, evaluate=None, save=None):
         super(OnlineDataset, self).__init__(ann_file, pipeline, data_root, test_mode)
-        if augment is None:
-            self.augment = None
+        if preprocess is None:
+            self.preprocess = None
         else:
-            self.augment = build_augment(augment)
-            for process in self.augment:
+            self.preprocess = build_preprocess(preprocess)
+            for process in self.preprocess:
                 self.data_infos = process(self.data_infos)
         if evaluate is None:
             self.eval = None

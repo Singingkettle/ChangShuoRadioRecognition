@@ -6,7 +6,7 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-        augment=[
+        preprocess=[
             dict(type='FilterBySNR', snr_set=[-8]),
         ],
         pipeline=[
@@ -20,7 +20,7 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
+        preprocess=[
             dict(type='FilterBySNR', snr_set=[-8]),
         ],
         pipeline=[
@@ -36,7 +36,7 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
+        preprocess=[
             dict(type='FilterBySNR', snr_set=[-8]),
         ],
         pipeline=[

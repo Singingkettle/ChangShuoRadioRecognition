@@ -173,3 +173,51 @@ class ASSHead(BaseHead):
             return dict(AMC=pre['Minor'], SEI=pre['Main'])
         else:
             return dict(AMC=pre['Main'], SEI=pre['Minor'])
+
+
+@HEADS.register_module()
+class CASHead(BaseHead):
+    def __init__(self, channel_cls_num, mod_cls_num, in_features=256, out_features=256,
+                 loss_channel=None, loss_amc=None, is_share=False):
+        super(CASHead, self).__init__()
+        self.channel_cls_num = channel_cls_num
+        self.mod_cls_num = mod_cls_num
+        self.classifier = MMHead(channel_cls_num, mod_cls_num, in_features, out_features, is_share)
+
+        if loss_channel is None:
+            loss_channel = dict(
+                type='CrossEntropyLoss',
+                multi_label=False,
+            )
+
+        if loss_amc is None:
+            loss_amc = dict(
+                type='CrossEntropyLoss',
+                multi_label=False,
+            )
+
+        self.loss_amc = build_loss(loss_amc)
+        self.loss_channel = build_loss(loss_channel)
+
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_in', nonlinearity='relu')
+                nn.init.constant_(m.bias, 0)
+
+    def loss(self, x, channel_labels=None, mod_labels=None,  mask_weight=None):
+        losses = dict()
+        mask_weight = mask_weight.view(-1)
+        amc = torch.reshape(x['AMC'], [-1, self.amc_cls_num])
+        channel_loss = self.loss_channel(x['Channel'], channel_labels)
+        amc_loss = self.loss_amc(amc, mod_labels, weight=mask_weight)
+
+        losses['loss_Channel'] = channel_loss
+        losses['loss_AMC'] = amc_loss
+
+        return losses
+
+    def forward(self, x, vis_fea=False, is_test=False):
+        pre = self.classifier(x)  # B * K1 * 1 * 1
+        return dict(AMC=pre['Minor'], Channel=pre['Main'])

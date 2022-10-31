@@ -2,11 +2,11 @@ dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 data = dict(
     samples_per_gpu=320,
-    workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
+    workers_per_gpu=10,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-        augment=[
+        preprocess=[
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
@@ -20,7 +20,7 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
+        preprocess=[
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
@@ -37,7 +37,7 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-        augment=[
+        preprocess=[
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[

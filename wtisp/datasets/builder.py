@@ -11,7 +11,7 @@ from ..runner import get_dist_info
 
 DATASETS = Registry('dataset')
 PIPELINES = Registry('pipeline')
-AUGMENTS = Registry('augment')
+PREPROCESSES = Registry('preprocess')
 EVALUATES = Registry('evaluate')
 MERGES = Registry('merge')
 SAVES = Registry('save')
@@ -52,10 +52,10 @@ def build_dataset(cfg, default_args=None):
     return dataset
 
 
-def build_augment(cfg, default_args=None):
-    augment = build(cfg, AUGMENTS, default_args)
+def build_preprocess(cfg, default_args=None):
+    preprocess = build(cfg, PREPROCESSES, default_args)
 
-    return augment
+    return preprocess
 
 
 def build_evaluate(cfg, default_args=None):

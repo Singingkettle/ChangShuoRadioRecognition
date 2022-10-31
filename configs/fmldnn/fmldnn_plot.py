@@ -4,7 +4,7 @@ _base_ = [
 
 plot = dict(
     type='CommonPlot',
-    config='fmldnn_iq-ap-channel-deepsig-201610A',
+    name='FMLDNN',
     # Set the configs about confusion maps
     confusion_map=[
         dict(

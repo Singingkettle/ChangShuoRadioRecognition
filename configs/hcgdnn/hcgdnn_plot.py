@@ -2,94 +2,16 @@ _base_ = [
     '../_base_/plot/amc.py',
 ]
 
-
-log_dir = '/home/citybuster/Data/SignalProcessing/Workdir_Old'
-legend = {
-    'MLDNN': 0,
-    'CLDNN': 1,
-    'CNN4': 2,
-    'DensCNN': 3,
-    'ResCNN': 4,
-    'CGDNN2': 5,
-    'CLDNN2': 6,
-    'DSCLDNN': 7,
-    'VGGNet': 8,
-    'AlexNet': 9,
-    'ResNet': 10,
-    'GoogleNet': 11,
-    'SVM': 12,
-    'DT': 13,
-    'HCGDNN': 14,
-    'HCGDNN-0.3': 15,
-    'HCGDNN-0.09': 16,
-    'HCGDNN-0.027': 17,
-    'V1': 18,
-    'V2': 19,
-    'V3': 20,
-    'V4': 21,
-    'V4-0.3': 22,
-    'V4-0.09': 23,
-    'V4-0.027': 24,
-    'V5': 25,
-    'V5-0.3': 26,
-    'V5-0.09': 27,
-    'V5-0.027': 28,
-    'V6': 29,
-    'V6-0.3': 30,
-    'V6-0.09': 31,
-    'V6-0.027': 32,
-    'HCGDNN-L1': 0,
-    'HCGDNN-L2': 1,
-    'HCGDNN-L3': 2,
-    'HCGDNN-L': 3,
-}
-
-scatter = [
-    'FM',
-    'AM-SSB-SC',
-    'AM-DSB-SC',
-    'AM-SSB-WC',
-    'AM-DSB-WC',
-    'AM-DSB',
-    'AM-SSB',
-    'WBFM',
-    '8PSK',
-    'BPSK',
-    'CPFSK',
-    'GFSK',
-    '4PAM',
-    '16QAM',
-    '64QAM',
-    'QPSK',
-    '32PSK',
-    '16ASK',
-    '32QAM',
-    'GMSK',
-    'OQPSK',
-    '4ASK',
-    '16PSK',
-    '64APSK',
-    '128QAM',
-    '64QAM',
-    '256QAM',
-    'OOK',
-]
-
 plot = dict(
     type='CommonPlot',
-
-    config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
-
-
-
+    config='hcgdnn_iq-channel-deepsig-201610A',
     # Set the configs about confusion maps
     confusion_map=[
         dict(
             type='ConfusionMap',
-        
-            name='confusion_map_201610A.pdf',
+            name='confusion-map_hcgdnn_deepsig-201610A.pdf',
             method=dict(
-                config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
+                config='hcgdnn_iq-channel-deepsig-201610A.py',
                 name='HCGDNN',
             ),
         ),
@@ -99,15 +21,13 @@ plot = dict(
     train_test_curve=[
         dict(
             type='LossAccuracyPlot',
-        
-        
             name='loss_accuracy_201610A.pdf',
             method=dict(
-                config='hcgdnn_abl_cg1g2_no_share_deepsig_iq_201610A',
+                config='hcgdnn_iq-channel-deepsig-201610A.py',
                 name='HCGDNN',
-                train_metrics=['cnn_loss', 'gru1_loss', 'gru2_loss', 'loss'],
-                test_metrics=['cnn_pre/snr_mean_all', 'gru1_pre/snr_mean_all',
-                              'gru2_pre/snr_mean_all', 'final/snr_mean_all'],
+                train_metrics=['loss_CNN', 'loss_GRU1', 'loss_GRU2', 'loss'],
+                test_metrics=['CNN/snr_mean_all', 'GRU1/snr_mean_all',
+                              'GRU2/snr_mean_all', 'Final/snr_mean_all'],
                 legend_suffix=['L1', 'L2', 'L3', 'L'],
             ),
         ),
@@ -119,13 +39,10 @@ plot = dict(
         dict(
             type='AccuracyF1Plot',
             name='ablation_data.pdf',
-        
-        
-            extra_pre=['0.3', '0.09', '0.027'],
             method=[
                 # CNN
                 dict(
-                    config='hcgdnn_abl_cnn_deepsig_iq_201610A',
+                    config='hcgdnn_abl-cnn_iq-channel-deepsig-201610A',
                     name='V1',
                 ),
                 # GRU1

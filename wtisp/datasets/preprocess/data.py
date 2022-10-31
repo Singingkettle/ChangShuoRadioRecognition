@@ -1,10 +1,10 @@
 import copy
 import math
 
-from ..builder import AUGMENTS
+from ..builder import PREPROCESSES
 
 
-@AUGMENTS.register_module()
+@PREPROCESSES.register_module()
 class FilterBySNR:
     def __init__(self, snr_set):
         self.snr_set = snr_set
@@ -44,7 +44,7 @@ class FilterBySNR:
         return data_infos
 
 
-@AUGMENTS.register_module()
+@PREPROCESSES.register_module()
 class SampleByRatio:
     def __init__(self, sample_ratio):
         self.sample_ratio = sample_ratio

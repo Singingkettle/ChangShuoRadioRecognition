@@ -1,7 +1,7 @@
-from ..builder import AUGMENTS
+from ..builder import PREPROCESSES
 
 
-@AUGMENTS.register_module()
+@PREPROCESSES.register_module()
 class MLDNNSNRLabel:
     def __init__(self, snr_threshold=0, item_weights=None):
         self.snr_threshold = snr_threshold
@@ -37,7 +37,7 @@ class MLDNNSNRLabel:
         return data_infos
 
 
-@AUGMENTS.register_module()
+@PREPROCESSES.register_module()
 class SEDNNSNRLabel:
     def __init__(self, num_str, weight=None):
         if weight is None:

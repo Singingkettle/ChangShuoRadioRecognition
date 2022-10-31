@@ -303,3 +303,94 @@ class GBSenseAdvanced2(GBSenseBasic):
             print('\n')
 
         return eval_results
+
+
+@DATASETS.register_module()
+class GBSenseAdvanced3(GBSenseBasic):
+
+    def prepare_train_data(self, idx):
+        x = self.X[idx, :, :]
+        x = (x - np.mean(x, axis=0).reshape(1, 16)) / np.std(x, axis=0).reshape(1, 16)
+        y = self.Y[idx, :]
+        channel_labels = np.zeros(24, dtype=np.float32)
+        mod_labels = np.zeros((2, 13), dtype=np.float32)
+        mask_weight = np.zeros(24, dtype=np.float32)
+        for i, val in enumerate(y):
+            if val > 0:
+                channel_labels[i] = 1
+                mod_labels[i, val] = 1
+                mask_weight[i] = 1
+
+        iqs = np.transpose(x)
+        iqs = np.expand_dims(iqs, axis=1)
+        iqs = iqs.astype(np.float32)
+
+        return dict(iqs=iqs, channel_labels=channel_labels, mod_labels=mod_labels, mask_weight=mask_weight)
+
+    def __getitem__(self, idx):
+
+        if self.test_mode:
+            data = self.prepare_test_data(idx)
+        else:
+            data = self.prepare_train_data(idx)
+
+        return data
+
+    def get_confusion_matrix(self, results):
+        confusion_matrix = np.zeros((24, len(self.CLASSES), len(self.CLASSES)), dtype=np.float64)
+        for idx in range(results.shape[0]):
+            predict_label = results[idx, :]
+            max_indices = np.argpartition(predict_label, -2)[-2:]
+            gt_label = self.Y[idx, :]
+            for index in max_indices:
+                c = index // 13
+                m = index % 13
+                confusion_matrix[c, gt_label[c] - 1, m] += 1
+
+        return confusion_matrix
+
+    def evaluate(self, results, logger=None):
+        results = format_results(results)
+        pre_matrix = []
+        for key_str in results:
+            pre_data = results[key_str]
+            pre_data = reshape_results(pre_data, len(self.CLASSES))
+            pre_data = expit(pre_data)
+            pre_data = pre_data[None, :, :]
+            pre_matrix.append(pre_data)
+
+        pre_matrix = np.concatenate(pre_matrix, axis=0)
+        search_weight_list = get_merge_weight_by_grid_search(len(results), self.grid_step)
+        cur_max_accuracy = 0
+        cur_search_weight = None
+        eval_results = dict()
+        for search_weight in search_weight_list:
+            search_weight = np.array(search_weight)
+            search_weight = np.reshape(search_weight, (1, -1))
+            tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
+            tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, len(self.CLASSES)))
+            confusion_matrix = self.get_confusion_matrix(tmp_merge_matrix)
+            conf = np.sum(confusion_matrix, axis=0) / 24
+            cor = np.sum(np.diag(conf))
+            ncor = np.sum(conf) - cor
+            tmp_accuracy = 1.0 * cor / (cor + ncor)
+            if cur_max_accuracy < tmp_accuracy:
+                cur_max_accuracy = tmp_accuracy
+                cur_search_weight = search_weight
+                for channel_index in range(24):
+                    conf = confusion_matrix[channel_index, :, :]
+                    cor = np.sum(np.diag(conf))
+                    ncor = np.sum(conf) - cor
+                    eval_results['channel_{:d}'.format(channel_index + 1)] = 1.0 * cor / (
+                            cor + ncor + np.finfo(np.float64).eps)
+
+                conf = np.sum(confusion_matrix, axis=0) / 24
+                cor = np.sum(np.diag(conf))
+                ncor = np.sum(conf) - cor
+                eval_results['channel_mean_all'] = 1.0 * cor / (cor + ncor + np.finfo(np.float64).eps)
+
+            print('The best search weight is:')
+            print(cur_search_weight)
+            print('\n')
+
+        return eval_results

@@ -1,6 +1,6 @@
-import gpustat
 import time
 
+import gpustat
 gpustats = gpustat.new_query()
 
 is_next = False
