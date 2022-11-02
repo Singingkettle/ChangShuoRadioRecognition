@@ -5,15 +5,15 @@ import time
 
 import numpy as np
 
-from wtisp.common import get_root_logger, collect_env
-from wtisp.common.utils import Config, mkdir_or_exist
-from wtisp.datasets import build_dataset
-from wtisp.models import build_fb
+from csrr.common import get_root_logger, collect_env
+from csrr.common.utils import Config, mkdir_or_exist
+from csrr.datasets import build_dataset
+from csrr.models import build_fb
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessingTrain a regression model')
+        description='ChangShuoRadioRecognitionTrain a regression model')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
 

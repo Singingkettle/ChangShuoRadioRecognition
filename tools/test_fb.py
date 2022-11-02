@@ -2,14 +2,14 @@ import argparse
 
 import numpy as np
 
-from wtisp.common.utils import Config, mkdir_or_exist
-from wtisp.datasets import build_dataset
-from wtisp.models import build_fb
+from csrr.common.utils import Config, mkdir_or_exist
+from csrr.datasets import build_dataset
+from csrr.models import build_fb
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing test (and eval) a model')
+        description='ChangShuoRadioRecognition test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('model', help='model file')
     parser.add_argument(

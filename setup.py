@@ -24,7 +24,7 @@ def readme():
     return content
 
 
-version_file = 'wtisp/version.py'
+version_file = 'csrr/version.py'
 
 
 def get_version():
@@ -146,7 +146,7 @@ def get_extensions():
     extensions = []
 
     if EXT_TYPE == 'pytorch':
-        ext_name = 'wtisp._ext'
+        ext_name = 'csrr._ext'
         from torch.utils.cpp_extension import CppExtension, CUDAExtension
 
         # prevent ninja from using too many resources
@@ -155,17 +155,17 @@ def get_extensions():
         extra_compile_args = {'cxx': []}
 
         if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
-            define_macros += [('WTISP_WITH_CUDA', None)]
-            cuda_args = os.getenv('WTISP_CUDA_ARGS')
+            define_macros += [('CSRR_WITH_CUDA', None)]
+            cuda_args = os.getenv('CSRR_CUDA_ARGS')
             extra_compile_args['nvcc'] = [cuda_args] if cuda_args else []
-            op_files = glob.glob('./wtisp/ops/csrc/pytorch/*')
+            op_files = glob.glob('csrr/ops/csrc/pytorch/*')
             extension = CUDAExtension
         else:
             print(f'Compiling {ext_name} without CUDA')
-            op_files = glob.glob('./wtisp/ops/csrc/pytorch/*.cpp')
+            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp')
             extension = CppExtension
 
-        include_path = os.path.abspath('./wtisp/ops/csrc')
+        include_path = os.path.abspath('csrr/ops/csrc')
         ext_ops = extension(
             name=ext_name,
             sources=op_files,
@@ -178,14 +178,14 @@ def get_extensions():
 
 
 setup(
-    name='wtisp',
+    name='csrr',
     version=get_version(),
-    description='WTILab WTISignalProcessing Toolbox',
+    description='ChangShuoRadioRecognition Toolbox',
     long_description=readme(),
     long_description_content_type='text/markdown',
     author='ShuoChang',
     author_email='changshuo@bupt.edu.cn',
-    keywords='signal seperation, deep learning, machine learning',
+    keywords='signal separation, deep learning, machine learning',
     url='https://github.com/Singingkettle/SignalSeperation',
     packages=find_packages(exclude=('configs', 'tools', 'demo')),
     include_package_data=True,

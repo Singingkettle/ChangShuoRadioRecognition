@@ -7,12 +7,12 @@ import numpy as np
 from cvxopt import solvers, matrix, spdiag, log, div, mul
 from scipy.special import softmax
 
-from wtisp.common.fileio import load as IOLoad
+from csrr.common.fileio import load as IOLoad
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing generate logits for knowledge distillation!')
+        description='ChangShuoRadioRecognition generate logits for knowledge distillation!')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument('-config', '--configs', nargs='+')
     parser.add_argument('--anno_dir', help='the dir to save annotations')

@@ -1,12 +1,12 @@
 import argparse
 
-from wtisp.common.utils import Config, filter_config
-from wtisp.plots import build_plot
+from csrr.common.utils import Config, filter_config
+from csrr.plots import build_plot
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing Plot Results')
+        description='ChangShuoRadioRecognition Plot Results')
     parser.add_argument('config', help='plot config file path')
     args = parser.parse_args()
     return args

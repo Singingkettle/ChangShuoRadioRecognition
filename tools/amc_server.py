@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 """
-Project: wtisignalprocessing
+Project: ChangShuoRadioRecognition
 File: amc_server.py
 Author: Citybuster
 Time: 2021/10/27 16:59
@@ -19,17 +19,17 @@ import torch
 import zmq
 from torch.utils.tensorboard import SummaryWriter
 
-from wtisp.common.utils import Config, fuse_conv_bn, mkdir_or_exist
-from wtisp.datasets import build_dataset
-from wtisp.models import build_task
-from wtisp.runner import load_checkpoint
+from csrr.common.utils import Config, fuse_conv_bn, mkdir_or_exist
+from csrr.datasets import build_dataset
+from csrr.models import build_task
+from csrr.runner import load_checkpoint
 
 _IS_SIG_UP = False
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing test (and eval) a model')
+        description='ChangShuoRadioRecognition test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('--log_dir', help='dir to save the log file for online performance results')

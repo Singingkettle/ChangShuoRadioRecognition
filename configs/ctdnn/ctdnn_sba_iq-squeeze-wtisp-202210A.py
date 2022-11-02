@@ -4,8 +4,8 @@ _base_ = [
 ]
 
 is_abs = False
-dataset_type = 'WTISPDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/SpecificEmitterIdentification/WTISP/202210A'
+dataset_type = 'CSRRDataset'
+data_root = '/home/citybuster/Data/SignalProcessing/SpecificEmitterIdentification/CSRR/202210A'
 data = dict(
     samples_per_gpu=320,
     workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,

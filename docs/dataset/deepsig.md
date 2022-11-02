@@ -1,8 +1,8 @@
-It is recommended to symlink the dataset root to `$WTISP/data`. If your folder structure is different, you may need to
+It is recommended to symlink the dataset root to `$CSRR/data`. If your folder structure is different, you may need to
 change the corresponding paths in config files.
 
 ```
-wtisignalprocessing
+ChangShuoRadioRecognition
 ├── configs
 ├── data
 │   ├── ModulationClassification
@@ -17,7 +17,7 @@ wtisignalprocessing
 │   │   │   │   ├── constellation_data
 │   │   │   │   │   ├── filter_size_0.010_stride_0.005
 │   ├── SignalSeparation
-│   │   ├── WTISS
+│   │   ├── CSRR
 │   │   │   ├── qpsk_16qam
 │   │   │   │   ├── complex
 │   │   │   │   │   ├── train_data.mat

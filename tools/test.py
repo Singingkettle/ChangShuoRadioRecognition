@@ -3,17 +3,17 @@ import os
 
 import torch
 
-from wtisp.apis import multi_gpu_test, single_gpu_test
-from wtisp.common.parallel import MMDataParallel, MMDistributedDataParallel
-from wtisp.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist
-from wtisp.datasets import build_dataloader, build_dataset
-from wtisp.models import build_task
-from wtisp.runner import (get_dist_info, init_dist, load_checkpoint)
+from csrr.apis import multi_gpu_test, single_gpu_test
+from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
+from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist
+from csrr.datasets import build_dataloader, build_dataset
+from csrr.models import build_task
+from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing test (and eval) a model')
+        description='ChangShuoRadioRecognition test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(

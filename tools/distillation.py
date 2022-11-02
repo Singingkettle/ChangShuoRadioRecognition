@@ -3,18 +3,18 @@ import os
 import os.path as osp
 
 import torch
-from wtisp.dataset import build_dataloader, build_dataset
+from csrr.dataset import build_dataloader, build_dataset
 
-from wtisp.apis import multi_gpu_test, single_gpu_test
-from wtisp.common.parallel import MMDataParallel, MMDistributedDataParallel
-from wtisp.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, get_the_best_checkpoint
-from wtisp.models import build_task
-from wtisp.runner import (get_dist_info, init_dist, load_checkpoint)
+from csrr.apis import multi_gpu_test, single_gpu_test
+from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
+from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, get_the_best_checkpoint
+from csrr.models import build_task
+from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing get distillation knowledge of a model')
+        description='ChangShuoRadioRecognition get distillation knowledge of a model')
     parser.add_argument('config', help='config file path to provide distillation knowledge')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument(

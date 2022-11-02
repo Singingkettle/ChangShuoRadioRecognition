@@ -4,12 +4,12 @@ import os.path as osp
 
 import torch
 
-from wtisp.common.utils import Config, mkdir_or_exist, filter_config
+from csrr.common.utils import Config, mkdir_or_exist, filter_config
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessing Generate Train.sh File')
+        description='ChangShuoRadioRecognition Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
     parser.add_argument('--scripts_dir', help='dir to save the train.sh files')
     parser.add_argument('--parallel', default=False, action='store_true',

@@ -1,6 +1,6 @@
 # Getting Started
 
-This page provides basic tutorials about the usage of WTISignalProcesssing. For installation instructions, please
+This page provides basic tutorials about the usage of ChangShuoRadioRecognition. For installation instructions, please
 see [install.md](install.md).
 
 ## Prepare datasets
@@ -14,7 +14,7 @@ For different dataset, please refer:
 
 ## Train a model
 
-WTISignalProcessing implements distributed training and non-distributed training, which uses `MMDistributedDataParallel`
+ChangShuoRadioRecognition implements distributed training and non-distributed training, which uses `MMDistributedDataParallel`
 and `MMDataParallel` respectively.
 
 All outputs (log files and checkpoints) will be saved to the working directory, which is specified by `work_dir` in the

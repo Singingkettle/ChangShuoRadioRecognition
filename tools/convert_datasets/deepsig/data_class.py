@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from wtisp.datasets.utils import Constellation
+from csrr.datasets.utils import Constellation
 
 _Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()

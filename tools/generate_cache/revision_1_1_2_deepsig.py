@@ -8,7 +8,7 @@ import zlib
 import numpy as np
 from tqdm import tqdm
 
-from wtisp.common.fileio import load as IOLoad
+from csrr.common.fileio import load as IOLoad
 
 _DATA_VERSION = ['201610A']
 

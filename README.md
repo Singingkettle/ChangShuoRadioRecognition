@@ -2,7 +2,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-WTISP is an open source signal processing toolbox based on PyTorch. The framework of this project is based on
+CSRR is an open source signal processing toolbox based on PyTorch. The framework of this project is based on
 the [mmdetection](https://github.com/open-mmlab/mmdetection) and [mmcv](https://github.com/open-mmlab/mmcv).
 
 ### Major features
@@ -47,7 +47,7 @@ Please refer to [install.md](docs/install.md) for installation and dataset prepa
 
 ## Getting Started
 
-Please see [getting_started.md](docs/getting_started.md) for the basic usage of WTISP.
+Please see [getting_started.md](docs/getting_started.md) for the basic usage of CSRR.
 
 ## Benchmark Results
 
@@ -62,8 +62,8 @@ For version control, we use the git. Please refer [**This tutorial**](docs/git_t
 If you use this toolbox or benchmark in your research, please cite this project.
 
 ```
-@article{wtisp,
-  title   = {{WTISP}: Open WTI SignalProcessing Toolbox and Benchmark},
+@article{csrr,
+  title   = {{CSRR}: Open ChangShuo RadioRecognition Toolbox and Benchmark},
   author  = {Shuo Chang},
   journal= {coming soon},
   year={2020}
@@ -89,7 +89,7 @@ If you use this toolbox or benchmark in your research, please cite this project.
 
 ## Acknowledgement
 
-WTISP is an open source project that is contributed by ShuoChang. We appreciate all the contributors who implement their
+CSRR is an open source project that is contributed by ShuoChang. We appreciate all the contributors who implement their
 methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could
 serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their
 own new signal processing algorithms.

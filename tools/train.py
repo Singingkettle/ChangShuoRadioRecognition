@@ -8,18 +8,18 @@ import warnings
 import torch
 import torch.distributed as dist
 
-from wtisp import __version__
-from wtisp.apis import init_random_seed, set_random_seed, train_task
-from wtisp.common import get_root_logger, collect_env
-from wtisp.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist
-from wtisp.datasets import build_dataset
-from wtisp.models import build_task
-from wtisp.runner import init_dist, get_dist_info
+from csrr import __version__
+from csrr.apis import init_random_seed, set_random_seed, train_task
+from csrr.common import get_root_logger, collect_env
+from csrr.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist
+from csrr.datasets import build_dataset
+from csrr.models import build_task
+from csrr.runner import init_dist, get_dist_info
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='WTISignalProcessingTrain a model')
+        description='ChangShuoRadioRecognitionTrain a model')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs, models and results')
     parser.add_argument('--resume_from', help='the checkpoint file to resume from')
@@ -155,7 +155,7 @@ def main():
 
     if cfg.checkpoint_config is not None:
         # save version in checkpoints as meta data
-        cfg.checkpoint_config.meta = dict(wtiss_version=__version__)
+        cfg.checkpoint_config.meta = dict(csrr_version=__version__)
 
     if hasattr(datasets[0], 'CLASSES'):
         model.CLASSES = datasets[0].CLASSES

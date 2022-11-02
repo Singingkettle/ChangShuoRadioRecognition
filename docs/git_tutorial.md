@@ -16,7 +16,7 @@
 7. passwd: 123
 8. cat id_rsa.pub >> .ssh/authorized_keys 客户端公钥导入验证文件
 9. ctrl+d
-10. git clone SaiTeam@10.108.4.124:/home/SaiTeam/Git/wtisignalprocessing.git（提示：不需要输入服务端密码说明验证成功）
+10. git clone SaiTeam@10.108.4.124:/home/SaiTeam/Git/ChangShuoRadioRecognition.git（提示：不需要输入服务端密码说明验证成功）
 11. git config --global user.name "yourname"
 12. git config --global user.email "youremail"
 
