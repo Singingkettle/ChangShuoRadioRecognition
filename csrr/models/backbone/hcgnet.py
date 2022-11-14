@@ -159,9 +159,10 @@ class HCGNetGRU1(nn.Module):
 @BACKBONES.register_module()
 class HCGNetGRU2(nn.Module):
 
-    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetGRU2, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
+        self.cnn = _CNN(depth=depth, input_size=input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
+        self.cnn = _CNN(depth=depth, input_size=input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
@@ -220,7 +221,7 @@ class HCGNetCG1(nn.Module):
 class HCGNetCG2(nn.Module):
     def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
         super(HCGNetCG2, self).__init__()
-        self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
+        self.cnn = _CNN(avg_pool=avg_pool, input_size=input_size, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)

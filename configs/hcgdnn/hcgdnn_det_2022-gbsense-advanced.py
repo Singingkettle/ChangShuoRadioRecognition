@@ -2,56 +2,69 @@ _base_ = [
     '../_base_/default_runtime.py',
 ]
 
-dataset_type = 'GBSenseBasic'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Basic'
+dataset_type = 'GBSenseAdvanced'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Advanced'
 data = dict(
-    samples_per_gpu=320,
-    workers_per_gpu=40,
+    samples_per_gpu=640,
+    workers_per_gpu=4,
     train=dict(
         type=dataset_type,
-        file_name='data_1_train.h5',
+        file_name='data_2_train.h5',
         data_root=data_root,
+        head=dict(
+            type='det',
+
+        )
     ),
     val=dict(
         type=dataset_type,
-        file_name='data_1_test.h5',
+        file_name='data_2_test.h5',
         data_root=data_root,
+        head=dict(
+            type='det',
+        )
     ),
     test=dict(
         type=dataset_type,
-        file_name='data_1_test.h5',
+        file_name='data_2_test.h5',
         data_root=data_root,
+        head=dict(
+            type='det',
+        )
     ),
 )
 
 in_size = 100
 out_size = 288
-heads = ['CNN', 'BiGRU1', 'BiGRU2']
 # Model
 model = dict(
     type='DNN',
     method_name='HCGDNN',
     backbone=dict(
-        type='HCGNet',
-        depth=8,
-        heads=heads,
+        type='HCGNetGRU2',
+        depth=16,
         input_size=in_size,
         avg_pool=(1, 8),
     ),
     classifier_head=dict(
-        type='HCGDNNHead',
+        type='GBDetHead',
+        channel_cls_num=24,
+        mod_cls_num=13,
         in_features=in_size,
         out_features=out_size,
-        num_classes=24,
-        heads=heads,
-        loss_cls=dict(
+        is_share=False,
+        loss_channel=dict(
+            type='BinaryCrossEntropyLoss',
+            loss_weight=1,
+        ),
+        loss_mod=dict(
             type='BinaryCrossEntropyLoss',
             loss_weight=1,
         ),
     ),
 )
 
-total_epochs = 800
+total_epochs = 1600
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)
@@ -60,4 +73,4 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[800])
+    step=[300, 600])

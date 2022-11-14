@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 m = nn.LogSoftmax()
 input = torch.randn(3, 2)

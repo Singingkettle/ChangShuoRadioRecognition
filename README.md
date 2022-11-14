@@ -2,7 +2,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-CSRR is an open source signal processing toolbox based on PyTorch. The framework of this project is based on
+CSRR (ChangShuoRadioRecognition) is an open source signal processing toolbox based on PyTorch. The framework of this project is based on
 the [mmdetection](https://github.com/open-mmlab/mmdetection) and [mmcv](https://github.com/open-mmlab/mmcv).
 
 ### Major features

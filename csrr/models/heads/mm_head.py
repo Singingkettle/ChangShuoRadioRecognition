@@ -65,7 +65,8 @@ class ASDHead(BaseHead):
 
 
 class MMHead(nn.Module):
-    def __init__(self, main_cls_num, minor_cls_num, in_features=256, out_features=256, is_share=False):
+    def __init__(self, main_cls_num, minor_cls_num, in_features=256, out_features=256,
+                 is_share=False, main_name='Main', minor_name='Minor'):
         super(MMHead, self).__init__()
         self.main_classifier = nn.Sequential(
             nn.Conv1d(in_features, out_features, kernel_size=1),
@@ -88,6 +89,8 @@ class MMHead(nn.Module):
                 nn.Conv1d(out_features * main_cls_num, main_cls_num * minor_cls_num, kernel_size=1, groups=main_cls_num)
             )
 
+        self.main_name = main_name
+        self.minor_name = minor_name
     def forward(self, x):
         x = torch.unsqueeze(x, dim=2)
         main_pre = self.main_classifier(x)
@@ -95,7 +98,7 @@ class MMHead(nn.Module):
         main_pre = torch.squeeze(main_pre)
         minor_pre = torch.squeeze(minor_pre)
 
-        return dict(Main=main_pre, Minor=minor_pre)
+        return {self.main_name: main_pre, self.minor_name: minor_pre}
 
 
 @HEADS.register_module()

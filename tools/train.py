@@ -19,7 +19,7 @@ from csrr.runner import init_dist, get_dist_info
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='ChangShuoRadioRecognitionTrain a model')
+        description='ChangShuoRadioRecognition Train a model')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs, models and results')
     parser.add_argument('--resume_from', help='the checkpoint file to resume from')
