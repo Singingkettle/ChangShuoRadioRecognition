@@ -5,66 +5,62 @@ _base_ = [
 dataset_type = 'GBSenseAdvanced'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Advanced'
 data = dict(
-    samples_per_gpu=640,
+    samples_per_gpu=320,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
         file_name='data_2_train.h5',
         data_root=data_root,
         head=dict(
-            type='det',
-
-        )
+            type='bce',
+            mod_threshold=0.1
+        ),
+        is_con=True,
     ),
     val=dict(
         type=dataset_type,
         file_name='data_2_test.h5',
         data_root=data_root,
         head=dict(
-            type='det',
-        )
+            type='bce',
+            mod_threshold=0.1
+        ),
+        is_con=True,
     ),
     test=dict(
         type=dataset_type,
         file_name='data_2_test.h5',
         data_root=data_root,
         head=dict(
-            type='det',
-        )
+            type='bce',
+            mod_threshold=0.1
+        ),
+        is_con=True,
     ),
 )
 
-in_size = 100
-out_size = 288
+in_size = 512
+out_size = 256
 # Model
 model = dict(
     type='DNN',
-    method_name='HCGDNN',
+    method_name='VGGNet',
     backbone=dict(
-        type='HCGNetGRU2',
-        depth=16,
-        input_size=in_size,
-        avg_pool=(1, 8),
+        type='VGGNet',
     ),
     classifier_head=dict(
-        type='GBDetHead',
-        channel_cls_num=24,
-        mod_cls_num=13,
+        type='GBBCEHead',
         in_features=in_size,
         out_features=out_size,
-        is_share=False,
-        loss_channel=dict(
-            type='BinaryCrossEntropyLoss',
-            loss_weight=1,
-        ),
-        loss_mod=dict(
+        num_classes=24 * 13,
+        loss_cls=dict(
             type='BinaryCrossEntropyLoss',
             loss_weight=1,
         ),
     ),
 )
 
-total_epochs = 40000
+total_epochs = 800
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)

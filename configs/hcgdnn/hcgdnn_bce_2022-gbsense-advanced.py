@@ -60,13 +60,10 @@ model = dict(
     ),
 )
 
-total_epochs = 1600
+total_epochs = 40000
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
-lr_config = dict(
-    policy='step',
-    gamma=0.3,
-    step=[300, 600])
+lr_config = dict(policy='fixed')

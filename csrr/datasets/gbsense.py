@@ -1,14 +1,17 @@
 import os.path as osp
+import pickle
 
-import tqdm
 import h5py
 import numpy as np
-from scipy.special import expit
+import tqdm
+import zlib
+from scipy.special import expit, softmax
+from sklearn.metrics import precision_recall_curve
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
 from .merge.methods import get_merge_weight_by_grid_search
-from .utils import format_results, reshape_results
+from .utils import format_results, reshape_results, Constellation
 
 
 @DATASETS.register_module()
@@ -22,7 +25,7 @@ class GBSenseBasic(Dataset):
     CLASSES = ["APSK16", "APSK32", "APSK64", "ASK8", "BPSK", "OQPSK",
                "PSK16", "PSK8", "QAM128", "QAM16", "QAM256", "QAM64", "QPSK"]
 
-    def __init__(self, file_name, grid_step=0.01, data_root=None, test_mode=False):
+    def __init__(self, file_name, grid_step=0.09, data_root=None, test_mode=False):
 
         self.grid_step = grid_step
         # load data
@@ -41,13 +44,15 @@ class GBSenseBasic(Dataset):
             self.Y = data['Y'][:, :]
 
         self.test_mode = test_mode
+        self.num = self.X.shape[0]
         # set group flag for the sampler
         if not self.test_mode:
             self._set_group_flag()
+
         del data
 
     def __len__(self):
-        return self.X.shape[0]
+        return self.num
 
     def _set_group_flag(self):
         """Set flag according to the mean value (ms) of signal data snrs.
@@ -72,7 +77,7 @@ class GBSenseBasic(Dataset):
         iqs = np.expand_dims(iqs, axis=1)
         iqs = iqs.astype(np.float32)
 
-        mod_labels = y.astype(np.int64)
+        mod_labels = np.array(y[0], dtype=np.int64)
         return dict(iqs=iqs, mod_labels=mod_labels)
 
     def __getitem__(self, idx):
@@ -98,7 +103,7 @@ class GBSenseBasic(Dataset):
         for key_str in results:
             pre_data = results[key_str]
             pre_data = reshape_results(pre_data, len(self.CLASSES))
-            pre_data = expit(pre_data)
+            pre_data = softmax(pre_data, axis=1)
             pre_data = pre_data[None, :, :]
             pre_matrix.append(pre_data)
 
@@ -251,25 +256,79 @@ EVALUATE = dict(bce=_bce_eval, det=_det_eval, ind=_ind_eval)
 
 @DATASETS.register_module()
 class GBSenseAdvanced(GBSenseBasic):
-    def __init__(self, file_name, grid_step=0.01, data_root=None, head=None, test_mode=False):
+    def __init__(self, file_name, grid_step=0.01, data_root=None, head=None, test_mode=False, is_con=False):
         super(GBSenseAdvanced, self).__init__(file_name, grid_step, data_root, test_mode)
         self.target_handle = TARGET[head['type']]
         self.eval_handle = EVALUATE[head['type']]
         self.type = head['type']
+        self.is_con = is_con
+        if self.is_con:
+            self.convert_tool = Constellation([0.02], [0.02])
+
+            data = []
+            if self.test_mode:
+                co_file_name = 'test_co.pkl'
+            else:
+                co_file_name = 'train_co.pkl'
+            if osp.isfile(osp.join(data_root, co_file_name)):
+                self.X = pickle.load(open(osp.join(data_root, co_file_name), 'rb'))
+            else:
+                for idx in tqdm.tqdm(range(len(self))):
+                    x = self.X[idx, :, :]
+                    x = np.reshape(x, [-1, 2])
+                    x = x[:, 0] + 1j * x[:, 1]
+                    x = x / np.sum((np.abs(x)))
+                    x = np.vstack((np.real(x), np.imag(x)))
+                    cos, _ = self.convert_tool.generate_by_filter(x)
+                    cos = cos[0].astype(np.float32)
+                    cos = np.expand_dims(cos, axis=0)
+                    cdata = zlib.compress(cos.tobytes())
+                    data.append(cdata)
+                    pickle.dump(data, open(osp.join(data_root, co_file_name), 'wb'), protocol=4)
+
+                self.X = data
+
         if 'ind' != self.type:
             self.eval_kwargs = head.pop('type')
 
+    def prepare_test_data(self, idx):
+        if self.is_con:
+            x = self.X[idx]
+            x = zlib.decompress(x)
+            x = np.frombuffer(x, dtype=np.float32).reshape([1, 100, 100])
+            x = x.astype(np.float32)
+            data = dict(cos=x)
+        else:
+            x = self.X[idx, :, :]
+            x = np.reshape(x, [-1, 2])
+            x = x[:, 0] + 1j * x[:, 1]
+            x = x / np.sum((np.abs(x)))
+            x = np.vstack((np.real(x), np.imag(x)))
+            x = np.transpose(x)
+            x = np.expand_dims(x, axis=1)
+            x = x.astype(np.float32)
+            data = dict(iqs=x)
+        return data
+
     def prepare_train_data(self, idx):
-        x = self.X[idx, :, :]
-        x = (x - np.mean(x, axis=0).reshape(1, 16)) / np.std(x, axis=0).reshape(1, 16)
+        if self.is_con:
+            x = self.X[idx]
+            x = zlib.decompress(x)
+            x = np.frombuffer(x, dtype=np.float32).reshape([1, 100, 100])
+            x = x.astype(np.float32)
+            data = dict(cos=x)
+        else:
+            x = self.X[idx, :, :]
+            x = np.reshape(x, [-1, 2])
+            x = x[:, 0] + 1j * x[:, 1]
+            x = x / np.sum((np.abs(x)))
+            x = np.vstack((np.real(x), np.imag(x)))
+            x = np.transpose(x)
+            x = np.expand_dims(x, axis=1)
+            x = x.astype(np.float32)
+            data = dict(iqs=x)
         y = self.Y[idx, :]
         target = self.target_handle(y)
-
-        iqs = np.transpose(x)
-        iqs = np.expand_dims(iqs, axis=1)
-        iqs = iqs.astype(np.float32)
-
-        data = dict(iqs=iqs)
         data.update(target)
 
         return data
@@ -327,11 +386,11 @@ class GBSenseAdvanced(GBSenseBasic):
         results = format_results(results)
 
         if self.type == 'bce':
-            search_range = np.linspace(0.01, 1, 50, endpoint=False)
+            search_range = np.linspace(0.01, 1, 10, endpoint=False)
             search_range = [{'mod_threshold': val} for val in search_range[::-1]]
         elif self.type == 'det':
-            c_search_range = np.linspace(0.01, 1, 50, endpoint=False)
-            m_search_range = np.linspace(0.01, 1, 50, endpoint=False)
+            c_search_range = np.linspace(0.01, 1, 10, endpoint=False)
+            m_search_range = np.linspace(0.01, 1, 10, endpoint=False)
             search_range = []
             for c_val in c_search_range[::-1]:
                 for m_val in m_search_range[::-1]:
@@ -343,20 +402,14 @@ class GBSenseAdvanced(GBSenseBasic):
             y_ = self.eval_handle(results)
             accuracy, f1 = self.get_eval_matrix(y_)
         else:
-            is_increase = True
             y_ = self.eval_handle(results, **search_range[0])
             max_acc, max_f1 = self.get_eval_matrix(y_)
             for i in tqdm.tqdm(range(1, len(search_range))):
-                if is_increase:
-                    y_ = self.eval_handle(results, **search_range[i])
-                    cur_acc, cur_f1 = self.get_eval_matrix(y_)
-                    if cur_acc >= max_acc:
-                        max_acc = cur_acc
-                        max_f1 = cur_f1
-                    else:
-                        is_increase = False
-                else:
-                    break
+                y_ = self.eval_handle(results, **search_range[i])
+                cur_acc, cur_f1 = self.get_eval_matrix(y_)
+                if cur_acc >= max_acc:
+                    max_acc = cur_acc
+                    max_f1 = cur_f1
 
             accuracy = max_acc
             f1 = max_f1
@@ -365,5 +418,140 @@ class GBSenseAdvanced(GBSenseBasic):
 
         eval_results['Accuracy'] = accuracy
         eval_results['F1'] = f1
+
+        return eval_results
+
+
+@DATASETS.register_module()
+class GBSenseAdvancedChannel(Dataset):
+    CLASSES = ['ns', 'hs']
+
+    def __init__(self, file_name, data_root=None, test_mode=False):
+        
+        self.test_mode = test_mode
+        self.data_root = data_root
+        self.y = pickle.load(open(osp.join(data_root, file_name), 'rb'))
+        if not self.test_mode:
+            self._set_group_flag()
+
+    def __len__(self):
+        return len(self.y)
+
+    def _set_group_flag(self):
+        """Set flag according to the mean value (ms) of signal data snrs.
+
+        set as group i, where self.SNRS[i]<=ms<self.SNRS[i+1].
+        """
+        self.flag = np.zeros(len(self), dtype=np.uint8)
+
+    def prepare_test_data(self, idx):
+        x = np.load(osp.join(self.data_root, 'shift/channel', f'test_{idx:07d}.npy'))
+        x = x.astype(np.float32)
+        x = np.expand_dims(x, axis=1)
+        data = dict(iqs=x)
+        return data
+
+    def prepare_train_data(self, idx):
+        x = np.load(osp.join(self.data_root, 'shift/channel', f'train_{idx:07d}.npy'))
+        x = x.astype(np.float32)
+        x = np.expand_dims(x, axis=1)
+
+        data = dict(iqs=x)
+        y = np.zeros(1, dtype=np.float32)
+        y[0] = self.y[idx]
+        target = {'mod_labels': y}
+        data.update(target)
+
+        return data
+
+    def __getitem__(self, idx):
+
+        if self.test_mode:
+            data = self.prepare_test_data(idx)
+        else:
+            data = self.prepare_train_data(idx)
+
+        return data
+
+    def evaluate(self, results, logger=None):
+        results = format_results(results)
+        precision, recall, thresholds = precision_recall_curve(self.y, results['Final'])
+        # convert to f score
+        fscore = (2 * precision * recall) / (precision + recall)
+        fscore = np.nan_to_num(fscore)
+        # locate the index of the largest f score
+        ix = np.argmax(fscore)
+        print('Best Threshold=%f, F-Score=%.3f' % (thresholds[ix], fscore[ix]))
+        eval_results = {'FS': fscore[ix]}
+
+        return eval_results
+
+
+@DATASETS.register_module()
+class GBSenseAdvancedMod(Dataset):
+    CLASSES = ["APSK16", "APSK32", "APSK64", "ASK8", "BPSK", "OQPSK",
+               "PSK16", "PSK8", "QAM128", "QAM16", "QAM256", "QAM64", "QPSK"]
+
+    def __init__(self, file_name, data_root=None, test_mode=False):
+
+        self.test_mode = test_mode
+        self.data_root = data_root
+        self.y = pickle.load(open(osp.join(data_root, file_name), 'rb'))
+        if not self.test_mode:
+            self._set_group_flag()
+
+    def __len__(self):
+        return len(self.y)
+
+    def _set_group_flag(self):
+        """Set flag according to the mean value (ms) of signal data snrs.
+
+        set as group i, where self.SNRS[i]<=ms<self.SNRS[i+1].
+        """
+        self.flag = np.zeros(len(self), dtype=np.uint8)
+
+    def prepare_test_data(self, idx):
+        x = np.load(osp.join(self.data_root, 'shift/mod', f'test_{idx:07d}.npy'))
+        x = x.astype(np.float32)
+        x = np.expand_dims(x, axis=1)
+        data = dict(iqs=x)
+        return data
+
+    def prepare_train_data(self, idx):
+        x = np.load(osp.join(self.data_root, 'shift/mod', f'train_{idx:07d}.npy'))
+        x = x.astype(np.float32)
+        x = np.expand_dims(x, axis=1)
+
+        data = dict(iqs=x)
+        y = np.array(self.y[idx], dtype=np.int64)
+        target = {'mod_labels': y}
+        data.update(target)
+
+        return data
+
+    def __getitem__(self, idx):
+
+        if self.test_mode:
+            data = self.prepare_test_data(idx)
+        else:
+            data = self.prepare_train_data(idx)
+
+        return data
+
+    def get_confusion_matrix(self, results):
+        confusion_matrix = np.zeros((len(self.CLASSES), len(self.CLASSES)), dtype=np.float64)
+        for idx in range(len(results)):
+            predict_label = int(np.argmax(results[idx]))
+            gt_label = self.y[idx]
+            confusion_matrix[gt_label, predict_label] += 1
+        return confusion_matrix
+
+    def evaluate(self, results, logger=None):
+        results = format_results(results)
+        conf = self.get_confusion_matrix(results['Final'])
+        cor = np.sum(np.diag(conf))
+        ncor = np.sum(conf) - cor
+        accuracy = 1.0 * cor / (cor + ncor)
+        eval_results = {'ACC': accuracy}
 
         return eval_results

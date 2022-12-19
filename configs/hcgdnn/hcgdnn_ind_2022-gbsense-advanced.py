@@ -73,8 +73,8 @@ model = dict(
             out_features=out_size,
             num_classes=4,
             loss_cls=dict(
-                type='BinaryCrossEntropyLoss',
-                loss_weight=1,
+                type='FocalLoss',
+                loss_weight=10,
             ),
         ),
 
