@@ -16,4 +16,11 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools
+
+RUN conda clean --all
+RUN git https://github.com/Singingkettle/ChangShuoRadioRecognition.git /ChangShuoRadioRecognition
+WORKDIR /ChangShuoRadioRecognition
+ENV FORCE_CUDA="1"
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -e .

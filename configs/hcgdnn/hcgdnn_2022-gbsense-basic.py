@@ -45,13 +45,14 @@ model = dict(
         num_classes=13,
         heads=heads,
         loss_cls=dict(
-            type='CrossEntropyLoss',
-            loss_weight=1,
+            type='FocalLoss',
+            loss_weight=10,
+            alpha=0.5
         ),
     ),
 )
 
-total_epochs = 800
+total_epochs = 1600
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)
@@ -60,4 +61,4 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[800])
+    step=[300, 500])

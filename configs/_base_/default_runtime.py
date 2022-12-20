@@ -1,4 +1,4 @@
-checkpoint_config = dict(interval=20)
+checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=10,
     hooks=[
@@ -11,5 +11,5 @@ load_from = None
 resume_from = None
 auto_resume = None
 workflow = [('train', 1)]
-evaluation = dict(start=300, interval=10)
+evaluation = dict(interval=1)
 dropout_alive = False

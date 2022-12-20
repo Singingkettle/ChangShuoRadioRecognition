@@ -2,24 +2,24 @@ _base_ = [
     '../_base_/default_runtime.py',
 ]
 
-dataset_type = 'GBSenseAdvanced'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Advanced'
+dataset_type = 'GBSenseBasic'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Basic'
 data = dict(
     samples_per_gpu=640,
-    workers_per_gpu=4,
+    workers_per_gpu=20,
     train=dict(
         type=dataset_type,
-        file_name='data_2_train.h5',
+        file_name='data_1_train.h5',
         data_root=data_root,
     ),
     val=dict(
         type=dataset_type,
-        file_name='data_2_test.h5',
+        file_name='data_1_test.h5',
         data_root=data_root,
     ),
     test=dict(
         type=dataset_type,
-        file_name='data_2_test.h5',
+        file_name='data_1_test.h5',
         data_root=data_root,
     ),
 )
@@ -42,19 +42,22 @@ model = dict(
         type='HCGDNNHead',
         in_features=in_size,
         out_features=out_size,
-        num_classes=24*13,
+        num_classes=13,
         heads=heads,
         loss_cls=dict(
-            type='BinaryCrossEntropyLoss',
+            type='CrossEntropyLoss',
             loss_weight=10,
         ),
     ),
 )
 
-total_epochs = 1600
+total_epochs = 800
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
-lr_config = dict(policy='fixed')
+lr_config = dict(
+    policy='step',
+    gamma=0.3,
+    step=[300, 500])
