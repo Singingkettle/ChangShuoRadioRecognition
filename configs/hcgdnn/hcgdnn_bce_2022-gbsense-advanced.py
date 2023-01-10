@@ -1,7 +1,7 @@
 _base_ = [
     '../_base_/default_runtime.py',
 ]
-
+# 0.19, 0.18, 0.63
 dataset_type = 'GBSenseAdvanced'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Advanced'
 data = dict(
@@ -9,7 +9,7 @@ data = dict(
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
-        file_name='data_2_train.h5',
+        file_name=['data_2_train.h5', 'data_2_test.h5'],
         data_root=data_root,
     ),
     val=dict(
@@ -51,10 +51,12 @@ model = dict(
     ),
 )
 
-total_epochs = 1600
+total_epochs = 2000
 
 # Optimizer
 optimizer = dict(type='Adam', lr=0.001)
 optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='fixed')
+lr_config = dict(
+    policy='step',
+    gamma=0.3,
+    step=[800])

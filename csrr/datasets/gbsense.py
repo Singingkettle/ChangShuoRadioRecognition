@@ -1,17 +1,13 @@
 import os.path as osp
-import pickle
 
 import h5py
 import numpy as np
-import tqdm
-import zlib
 from scipy.special import expit, softmax
-from sklearn.metrics import precision_recall_curve
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
 from .merge.methods import get_merge_weight_by_grid_search
-from .utils import format_results, reshape_results, Constellation
+from .utils import format_results, reshape_results
 
 
 @DATASETS.register_module()
@@ -37,7 +33,7 @@ class GBSenseBasic(Dataset):
                 x.append(data['X'][:, :, :])
                 y.append(data['Y'][:, :])
             self.X = np.concatenate(x, axis=0)
-            self.Y = np.concatenate(y, axis=1)
+            self.Y = np.concatenate(y, axis=0)
         else:
             data = h5py.File(osp.join(data_root, file_name))
             self.X = data['X'][:, :, :]
@@ -234,6 +230,99 @@ class GBSenseAdvanced(GBSenseBasic):
         eval_results['mean_all'] = cur_max_accuracy
 
         return eval_results
+
+
+# @DATASETS.register_module()
+# class GBSenseAdvancedD(GBSenseBasic):
+#     def __init__(self, file_name, data_root=None, test_mode=False):
+#         super(GBSenseAdvancedD, self).__init__(file_name, 0.09, data_root, test_mode)
+#         channel_labels = np.zeros((len(self), 24), dtype=np.float32)
+#         mod_labels = np.zeros((len(self), 24 * 13), dtype=np.float32)
+#         for i, val in range(len(self)):
+#             if val > 0:
+#                 channel_labels[i] = 1
+#                 mod_labels[i * 13 + val - 1] = 1
+#
+#         self.channel_labels = channel_labels
+#         self.mod_labels = mod_labels
+#
+#     def prepare_train_data(self, idx):
+#         x = self._input_data(idx)
+#         c = self.channel_labels[idx, :]
+#         m = self.mod_labels[idx, :]
+#
+#         return dict(iqs=x, channel_labels=c, mod_labels=m)
+#
+#     def evaluate(self, results, logger=None):
+#         results = format_results(results)
+#         eval_results = dict()
+#
+#         def _eval(c_res, m_res):
+#             y_ = np.zeros(24, dtype=np.int64)
+#             sorted_c_index = np.argsort(c_res)
+#             selected_number = 0
+#             channel_threshold = 0.1
+#             mod_threshold = 0.1
+#             for c_index in sorted_c_index[-2:]:
+#                 if c_res[c_index] >= channel_threshold:
+#                     max_m_score = np.max(m_res[c_index, :])
+#                     max_m_index = np.argmax(m_res[c_index, :])
+#                     if max_m_score >= mod_threshold:
+#                         y_[c_index] = max_m_index + 1
+#                         selected_number += 1
+#
+#             if selected_number == 0:
+#                 c_index = sorted_c_index[-1]
+#                 max_m_index = np.argmax(m_res[c_index, :])
+#                 y_[c_index] = max_m_index + 1
+#
+#             return y_
+#
+#         def _acc(preds, gts):
+#             preds_index = np.nonzero(preds)[0]
+#             preds_index = preds_index.tolist()
+#             gts_index = np.nonzero(gts)[0]
+#             gts_index = gts_index.tolist()
+#
+#             gts_index_has_checked = []
+#             is_success = True
+#             for c_index in preds_index:
+#                 if c_index in gts_index:
+#                     gts_index_has_checked.append(c_index)
+#                     if preds[c_index] != gts[c_index]:
+#                         is_success = False
+#                 else:
+#                     is_success = False
+#
+#             for c_index in gts_index:
+#                 if c_index not in gts_index_has_checked:
+#                     is_success = False
+#
+#             if is_success:
+#                 return 1
+#             else:
+#                 return 0
+#
+#         for search_weight in search_weight_list:
+#             search_weight = np.array(search_weight)
+#             search_weight = np.reshape(search_weight, (1, -1))
+#             tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
+#             tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, 24*13))
+#             tmp_merge_matrix = tmp_merge_matrix.tolist()
+#             y_ = list(map(_eval, tmp_merge_matrix))
+#             y = self.Y.tolist()
+#             res = map(_acc, y_, y)
+#             accuracy = 1.0 * sum(res)/len(self)
+#             if accuracy >= cur_max_accuracy:
+#                 cur_max_accuracy = accuracy
+#                 cur_search_weight = search_weight
+#
+#         print('The best search weight is:')
+#         print(cur_search_weight)
+#         print('\n')
+#         eval_results['mean_all'] = cur_max_accuracy
+#
+#         return eval_results
 
 # def _det_label(y):
 #     channel_labels = np.zeros(24, dtype=np.float32)
