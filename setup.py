@@ -126,22 +126,6 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
 install_requires = parse_requirements()
 
-try:
-    # OpenCV installed via conda.
-    import cv2  # NOQA: F401
-
-    major, minor, *rest = cv2.__version__.split('.')
-    if int(major) < 3:
-        raise RuntimeError(
-            f'OpenCV >=3 is required but {cv2.__version__} is installed')
-except ImportError:
-    # If first not installed install second package
-    CHOOSE_INSTALL_REQUIRES = [('opencv-python-headless>=3',
-                                'opencv-python>=3')]
-    for main, secondary in CHOOSE_INSTALL_REQUIRES:
-        install_requires.append(choose_requirement(main, secondary))
-
-
 def get_extensions():
     extensions = []
 
@@ -186,7 +170,7 @@ setup(
     author='ShuoChang',
     author_email='changshuo@bupt.edu.cn',
     keywords='signal separation, deep learning, machine learning',
-    url='https://github.com/Singingkettle/SignalSeperation',
+    url='https://github.com/Singingkettle/ChangShuoRadioRecognition.git',
     packages=find_packages(exclude=('configs', 'tools', 'demo')),
     include_package_data=True,
     classifiers=[

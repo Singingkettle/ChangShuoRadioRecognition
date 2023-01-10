@@ -79,5 +79,3 @@ class LowPassFilter(nn.Module):
 
 a = LowPassFilter(WEIGHT)
 x = torch.randn(20, 2, 4096)
-b = a(x)
-c = 1
