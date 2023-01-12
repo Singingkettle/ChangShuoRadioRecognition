@@ -58,11 +58,11 @@ class GHMC(nn.Module):
     def forward(self, pred, target, label_weight, *args, **kwargs):
         """Calculate the GHM-C loss.
         Args:
-            pred (float tensor of size [batch_num, class_num]):
+            pred (float tensor of size [batch_num, num_class]):
                 The direct prediction of classification fc layer.
-            target (float tensor of size [batch_num, class_num]):
+            target (float tensor of size [batch_num, num_class]):
                 Binary class target for each sample.
-            label_weight (float tensor of size [batch_num, class_num]):
+            label_weight (float tensor of size [batch_num, num_class]):
                 the value is 1 if the sample is valid and 0 if ignored.
         Returns:
             The gradient harmonized loss.

@@ -17,11 +17,11 @@ from ..builder import MERGES
 from ..utils import reshape_results, get_classification_accuracy_with_snr, generate_targets
 
 
-def get_pre_matrix(results, class_num):
+def get_pre_matrix(results, num_class):
     pre_matrix = []
     for key_str in results:
         pre_data = results[key_str]
-        pre_data = reshape_results(pre_data, class_num)
+        pre_data = reshape_results(pre_data, num_class)
         pre_data = softmax(pre_data, axis=1)
         pre_data = pre_data[None, :, :]
         pre_matrix.append(pre_data)
@@ -168,7 +168,7 @@ class GridSearch:
             return
         snr_to_index = data_infos['snr_to_index']
         item_snr_index = data_infos['item_snr_index']
-        snr_num = len(snr_to_index)
+        num_snr = len(snr_to_index)
         mod_label_num = len(data_infos['mod_to_label'])
         item_mod_label = data_infos['item_mod_label']
         pre_matrix = get_pre_matrix(results, mod_label_num)
@@ -182,7 +182,7 @@ class GridSearch:
                 search_weight = np.reshape(search_weight, (1, -1))
                 tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
                 tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, mod_label_num))
-                tmp_eval_results = get_classification_accuracy_with_snr(snr_num, mod_label_num, snr_to_index,
+                tmp_eval_results = get_classification_accuracy_with_snr(num_snr, mod_label_num, snr_to_index,
                                                                               item_snr_index, tmp_merge_matrix,
                                                                               item_mod_label,
                                                                               prefix=prediction_name + '/')

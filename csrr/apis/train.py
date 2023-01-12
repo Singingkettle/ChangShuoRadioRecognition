@@ -8,8 +8,7 @@ from ..common import get_root_logger
 from ..common.parallel import MMDataParallel, MMDistributedDataParallel
 from ..common.utils import build_from_cfg
 from ..datasets import build_dataloader, build_dataset
-from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner,
-                      Fp16OptimizerHook, OptimizerHook, build_optimizer,
+from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner, OptimizerHook, build_optimizer,
                       EvalHook, DistEvalHook, get_dist_info, find_latest_checkpoint)
 
 
@@ -103,12 +102,8 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
     # an ugly workaround to make .log and .log.json filenames the same
     runner.timestamp = timestamp
 
-    # fp16 setting
-    fp16_cfg = cfg.get('fp16', None)
-    if fp16_cfg is not None:
-        optimizer_config = Fp16OptimizerHook(
-            **cfg.optimizer_config, **fp16_cfg, distributed=distributed)
-    elif distributed and 'type' not in cfg.optimizer_config:
+    # Optimizer config
+    if distributed and 'type' not in cfg.optimizer_config:
         optimizer_config = OptimizerHook(**cfg.optimizer_config)
     else:
         optimizer_config = cfg.optimizer_config

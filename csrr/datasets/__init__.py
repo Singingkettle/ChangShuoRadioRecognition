@@ -1,7 +1,7 @@
 from .preprocess import *
 from .builder import (PREPROCESSES, EVALUATES, DATASETS, SAVES, build_preprocess, build_evaluate, build_dataset,
                       build_dataloader, build_save)
-from .custom import CustomAMCDataset
+from .custom import CustomDataset
 from .dataset_wrappers import ConcatDataset
 from .deepsig import DeepSigDataset
 from .evaluate import *
@@ -22,7 +22,7 @@ __all__ = [
     'build_dataset',
     'build_dataloader',
     'build_save',
-    'CustomAMCDataset',
+    'CustomDataset',
     'ConcatDataset',
     'DeepSigDataset',
     'GBSenseBasic', 'GBSenseAdvanced',

@@ -1,11 +1,11 @@
 from .builder import DATASETS, build_preprocess, build_evaluate, build_save
-from .custom import CustomAMCDataset
+from .custom import CustomDataset
 from .utils import format_results
 from ..common.fileio import load as IOLoad
 
 
 @DATASETS.register_module()
-class OnlineDataset(CustomAMCDataset):
+class OnlineDataset(CustomDataset):
     """Custom dataset for modulation classification.
     Args:
         ann_file (str): Annotation file path.

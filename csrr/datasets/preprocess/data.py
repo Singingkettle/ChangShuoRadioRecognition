@@ -68,8 +68,8 @@ class SampleByRatio:
         for idx, snr_value in enumerate(item_snr_value):
             right += 1
             if cur_snr != snr_value:
-                cur_snr_num = right - left
-                save_num = math.ceil(cur_snr_num * self.sample_ratio)
+                cur_num_snr = right - left
+                save_num = math.ceil(cur_num_snr * self.sample_ratio)
 
                 cur_item_filename = copy.copy(item_filename[left:left + save_num])
                 new_item_filename.extend(cur_item_filename)

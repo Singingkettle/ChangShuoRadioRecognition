@@ -10,7 +10,7 @@ def generate_task_eval_results(results, data_infos, class_name):
     eval_results = dict()
     snr_to_index = data_infos['snr_to_index']
     item_snr_index = data_infos['item_snr_index']
-    snr_num = len(snr_to_index)
+    num_snr = len(snr_to_index)
     class_label_num = len(data_infos[f'{class_name}_to_label'])
     item_class_label = data_infos[f'item_{class_name}_label']
 
@@ -20,7 +20,7 @@ def generate_task_eval_results(results, data_infos, class_name):
         if 'fea' in pr_name:
             continue
         sub_results = reshape_results(results[pr_name], class_label_num)
-        sub_eval_results = get_classification_accuracy_with_snr(snr_num, class_label_num, snr_to_index,
+        sub_eval_results = get_classification_accuracy_with_snr(num_snr, class_label_num, snr_to_index,
                                                                 item_snr_index, sub_results, item_class_label,
                                                                 prefix=pr_name + '/')
         eval_results.update(sub_eval_results)
@@ -71,7 +71,7 @@ class EvaluateSNRPrediction:
 
         snr_to_index = data_infos['snr_to_index']
         item_snr_index = data_infos['item_snr_index']
-        snr_num = len(snr_to_index)
+        num_snr = len(snr_to_index)
         snr_label_num = len(data_infos['snr_to_label'])
         item_snr_label = data_infos['item_snr_label']
 
@@ -82,7 +82,7 @@ class EvaluateSNRPrediction:
             if self.prediction_name is None:
                 raise ValueError('You should check your task code to make sure there is a group of SNR prediction!')
         results = reshape_results(results[self.prediction_name], snr_label_num)
-        eval_results = get_classification_accuracy_with_snr(snr_num, snr_label_num, snr_to_index, item_snr_index,
+        eval_results = get_classification_accuracy_with_snr(num_snr, snr_label_num, snr_to_index, item_snr_index,
                                                             results, item_snr_label,
                                                             prefix=self.prediction_name + '/')
 

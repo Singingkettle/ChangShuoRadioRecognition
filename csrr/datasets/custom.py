@@ -10,8 +10,8 @@ from ..common.fileio import load as IOLoad
 
 
 @DATASETS.register_module()
-class CustomAMCDataset(Dataset, metaclass=ABCMeta):
-    """Custom dataset for modulation classification.
+class CustomDataset(Dataset, metaclass=ABCMeta):
+    """Custom dataset.
     Args:
         ann_file (str): Annotation file path.
         data_root (str, optional): Data root for ``ann_file``, ``In-phase/Quadrature data``, ``Amplitude/Phase data``,
@@ -19,9 +19,6 @@ class CustomAMCDataset(Dataset, metaclass=ABCMeta):
         test_mode (bool, optional): If set True, annotation will not be loaded.
 
     """
-    CLASSES = None
-    SNRS = None
-
     def __init__(self, ann_file, pipeline, data_root=None, test_mode=False):
         self.ann_file = ann_file
         self.pipeline = pipeline
@@ -56,9 +53,7 @@ class CustomAMCDataset(Dataset, metaclass=ABCMeta):
         """Load annotation from annotation file."""
         return IOLoad(ann_file)
 
-    def extract_CLASSES_SNRS(self, data_infos):
-        """Extract categories' names of CLASSES and SNRS."""
-
+    @abstractmethod
     def get_ann_info(self, idx):
         """Get annotation by idx.
 
@@ -78,9 +73,11 @@ class CustomAMCDataset(Dataset, metaclass=ABCMeta):
 
         return data
 
-    def pre_pipeline(self, results):
-        """Prepare results dict for pipeline."""
 
+    def pre_pipeline(self, results):
+        """Prepare inputs dict for pipeline."""
+
+    @abstractmethod
     def prepare_train_data(self, idx):
         """Get training data and annotations after pipeline.
 
@@ -92,6 +89,7 @@ class CustomAMCDataset(Dataset, metaclass=ABCMeta):
                 introduced by pipeline.
         """
 
+    @abstractmethod
     def prepare_test_data(self, idx):
         """Get testing data  after pipeline.
 
@@ -103,9 +101,11 @@ class CustomAMCDataset(Dataset, metaclass=ABCMeta):
                 pipeline.
         """
 
+    @abstractmethod
     def format_out(self, out_dir, results):
         """Format results and save."""
 
+    @abstractmethod
     def evaluate(self, results, logger=None):
         """Evaluate the dataset.
 

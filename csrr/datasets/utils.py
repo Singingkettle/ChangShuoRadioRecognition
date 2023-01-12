@@ -1,19 +1,19 @@
 import numpy as np
 
 
-def generate_targets(gts, class_num):
-    targets = np.zeros((len(gts), class_num), dtype=np.float64)
+def generate_targets(gts, num_class):
+    targets = np.zeros((len(gts), num_class), dtype=np.float64)
     for item_index, gt in enumerate(gts):
         targets[item_index, gt] = 1
 
     return targets
 
 
-def reshape_results(results, class_num):
-    data_num = len(results)
-    results = [result.reshape(1, class_num) for result in results]
+def reshape_results(results, num_class):
+    num_data = len(results)
+    results = [result.reshape(1, num_class) for result in results]
     results = np.concatenate(results, axis=0)
-    results = np.reshape(results, (data_num, -1))
+    results = np.reshape(results, (num_data, -1))
     return results
 
 
@@ -26,13 +26,13 @@ def format_results(results):
     return transpose_results
 
 
-def format_and_save(results, class_num, file_path):
-    results = reshape_results(results, class_num)
+def format_and_save(results, num_class, file_path):
+    results = reshape_results(results, num_class)
     np.save(file_path, results)
 
 
-def get_confusion_matrix(snr_num, class_num, snr_info, prs, gts):
-    confusion_matrix = np.zeros((snr_num, class_num, class_num), dtype=np.float64)
+def get_confusion_matrix(num_snr, num_class, snr_info, prs, gts):
+    confusion_matrix = np.zeros((num_snr, num_class, num_class), dtype=np.float64)
 
     for idx in range(prs.shape[0]):
         predict_label = int(np.argmax(prs[idx, :]))
@@ -41,18 +41,18 @@ def get_confusion_matrix(snr_num, class_num, snr_info, prs, gts):
     return confusion_matrix
 
 
-def get_classification_accuracy_with_snr(snr_num, class_num, snr_index, snr_info, prs, gts, prefix=''):
+def get_classification_accuracy_with_snr(num_snr, num_class, snr_index, snr_info, prs, gts, prefix=''):
     """Calculate the accuracy with different snr and average snr for evaluation.
     Args:
-        snr_num: number of values about snr.
-        class_num: size of classification set.
+        num_snr: number of values about snr.
+        num_class: size of classification set.
         snr_index: a dict between snr index and snr value, where low snr index stands for the low snr value.
         snr_info: snr index of every test item, where low snr index stands for the low snr value.
         prs: all items' test results with the shape of [N, K].
         gts: all items' true labels with the shape of [N,].
         prefix: the prefix name to log the accuracy results.
     """
-    confusion_matrix = get_confusion_matrix(snr_num, class_num, snr_info, prs, gts)
+    confusion_matrix = get_confusion_matrix(num_snr, num_class, snr_info, prs, gts)
 
     def _matrix_divide(a, b):
         c = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
@@ -70,7 +70,7 @@ def get_classification_accuracy_with_snr(snr_num, class_num, snr_index, snr_info
         else:
             eval_results[prefix + 'snr_{}'.format(snr)] = 1.0 * cor/ (cor+ncor)
 
-    conf = np.sum(confusion_matrix, axis=0) / snr_num
+    conf = np.sum(confusion_matrix, axis=0) / num_snr
     cor = np.sum(np.diag(conf))
     ncor = np.sum(conf) - cor
     eval_results[prefix + 'snr_mean_all'] = 1.0 * cor / (cor + ncor)
@@ -78,8 +78,8 @@ def get_classification_accuracy_with_snr(snr_num, class_num, snr_index, snr_info
     return eval_results
 
 
-def get_online_confusion_matrix(class_num, prs, gts):
-    confusion_matrix = np.zeros((class_num, class_num), dtype=np.float64)
+def get_online_confusion_matrix(num_class, prs, gts):
+    confusion_matrix = np.zeros((num_class, num_class), dtype=np.float64)
 
     for idx in range(prs.shape[0]):
         predict_label = int(np.argmax(prs[idx, :]))
@@ -88,8 +88,8 @@ def get_online_confusion_matrix(class_num, prs, gts):
     return confusion_matrix
 
 
-def get_online_classification_accuracy_for_evaluation(class_num, prs, gts, prefix=''):
-    confusion_matrix = get_online_confusion_matrix(class_num, prs, gts)
+def get_online_classification_accuracy_for_evaluation(num_class, prs, gts, prefix=''):
+    confusion_matrix = get_online_confusion_matrix(num_class, prs, gts)
 
     cor = np.sum(np.diag(confusion_matrix))
     ncor = np.sum(confusion_matrix) - cor
