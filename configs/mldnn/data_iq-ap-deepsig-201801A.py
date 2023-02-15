@@ -26,7 +26,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
-            dict(type='Collect', keys=['iqs', 'aps'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -43,7 +43,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
-            dict(type='Collect', keys=['iqs', 'aps'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

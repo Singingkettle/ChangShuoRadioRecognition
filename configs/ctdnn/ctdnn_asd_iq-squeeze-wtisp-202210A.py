@@ -35,7 +35,7 @@ data = dict(
         ann_file='train.json',
         pipeline=[
             dict(type='LoadIQFromFile', is_squeeze=True, to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -47,7 +47,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromFile', is_squeeze=True, to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

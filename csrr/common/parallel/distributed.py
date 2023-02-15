@@ -27,6 +27,23 @@ class MMDistributedDataParallel(DistributedDataParallel):
                 device_ids: List[int]) -> Tuple[tuple, tuple]:
         return scatter_kwargs(inputs, kwargs, device_ids, dim=self.dim)
 
+    def forward(self, *inputs, **kwargs):
+        """Override the original forward function.
+
+        The main difference lies in the CPU inference where the datas in
+        :class:`DataContainers` will still be gathered.
+        """
+        if self.device_ids:
+            inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
+            if len(self.device_ids) == 1:
+                return self.module(*inputs[0], **kwargs[0])
+            else:
+                outputs = self.parallel_apply(
+                    self._module_copies[:len(inputs)], inputs, kwargs)
+                return self.gather(outputs, self.output_device)
+        else:
+            return super().forward(*inputs, **kwargs)
+
     def train_step(self, *inputs, **kwargs):
         """train_step() API for module wrapped by DistributedDataParallel.
         This method is basically the same as

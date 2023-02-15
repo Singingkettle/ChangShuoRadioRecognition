@@ -35,7 +35,7 @@ class LoadIQFromFile:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             iq = np.expand_dims(iq, axis=0)
-        results['iqs'] = iq
+        results['inputs']['iqs'] = iq
         return results
 
     def __repr__(self):
@@ -66,7 +66,7 @@ class LoadAPFromFile:
         if not self.is_squeeze:
             # make the ap as a three-dimensional tensor [1, 2, L]
             ap = np.expand_dims(ap, axis=0)
-        results['aps'] = ap
+        results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):
@@ -92,7 +92,7 @@ class LoadConstellationFromFile:
 
         # make a constellation map (square matrix) as a three-dimensional tensor [1, R, R]
         co = np.expand_dims(co, axis=0)
-        results['cos'] = co.reshape(1, )
+        results['inputs']['cos'] = co.reshape(1, )
         return results
 
     def __repr__(self):
@@ -125,7 +125,7 @@ class LoadConstellationFromIQFile:
 
         # make the iq as a three-dimensional tensor [1, 2, L]
         co = np.expand_dims(co, axis=0)
-        results['cos'] = co
+        results['inputs']['cos'] = co
         return results
 
     def __repr__(self):
@@ -162,7 +162,7 @@ class LoadIQFromCache:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             iq = np.expand_dims(iq, axis=0)
-        results['iqs'] = iq
+        results['inputs']['iqs'] = iq
         return results
 
     def __repr__(self):
@@ -200,7 +200,7 @@ class LoadAPFromCache:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             ap = np.expand_dims(ap, axis=0)
-        results['aps'] = ap
+        results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):
@@ -233,7 +233,7 @@ class LoadConstellationFromCache:
 
         # make the iq as a three-dimensional tensor [1, R, R]
         co = np.expand_dims(co, axis=0)
-        results['cos'] = co
+        results['inputs']['cos'] = co
         return results
 
     def __repr__(self):
@@ -273,7 +273,7 @@ class LoadIQFromHDF5:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             iq = np.expand_dims(iq, axis=0)
-        results['iqs'] = iq
+        results['inputs']['iqs'] = iq
         return results
 
     def __repr__(self):
@@ -314,7 +314,7 @@ class LoadAPFromHDF5:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             ap = np.expand_dims(ap, axis=0)
-        results['aps'] = ap
+        results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):
@@ -353,7 +353,7 @@ class LoadConstellationFromIQCache:
 
         # make the iq as a three-dimensional tensor [1, 2, L]
         co = np.expand_dims(co, axis=0)
-        results['cos'] = co
+        results['inputs']['cos'] = co
         return results
 
     def __repr__(self):
@@ -388,13 +388,12 @@ class LoadAPFromIQ:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             ap = np.expand_dims(ap, axis=0)
-        results['aps'] = ap
+        results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('
-                    f'data_root={self.data_root},'
-                    f'filename={self.filename},'
+                    f'is_squeeze={self.is_squeeze},'
                     f'to_float32={self.to_float32}, '
                     f'to_norm={self.to_norm}, )')
         return repr_str
@@ -424,7 +423,7 @@ class LoadFTFromIQ:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             ft = np.expand_dims(ft, axis=0)
-        results['fts'] = ft
+        results['inputs']['fts'] = ft
         return results
 
     def __repr__(self):
@@ -445,11 +444,11 @@ class LoadAnnotations:
 
     def __call__(self, results):
         if self.with_mode:
-            results['mod_labels'] = np.array(results['item_mod_label'], dtype=np.int64)
+            results['targets']['mod_labels'] = np.array(results['item_mod_label'], dtype=np.int64)
         if self.with_snr:
-            results['snr_labels'] = np.array(results['item_snr_label'], dtype=np.int64)
+            results['targets']['snr_labels'] = np.array(results['item_snr_label'], dtype=np.int64)
         if self.with_dev:
-            results['dev_labels'] = np.array(results['item_dev_label'], dtype=np.int64)
+            results['targets']['dev_labels'] = np.array(results['item_dev_label'], dtype=np.int64)
 
         return results
 

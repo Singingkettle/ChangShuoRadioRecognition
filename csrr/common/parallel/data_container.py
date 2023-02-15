@@ -19,7 +19,7 @@ def assert_tensor_type(func):
 class DataContainer:
     """A container for any type of objects.
 
-    Typically tensors will be stacked in the collate function and sliced along
+    Typically, tensors will be stacked in the collate function and sliced along
     some dimension in the scatter function. This behavior has some limitations.
     1. All tensors have to be the same size.
     2. Types are limited (numpy array or Tensor).

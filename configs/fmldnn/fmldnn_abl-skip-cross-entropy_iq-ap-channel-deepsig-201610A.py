@@ -17,7 +17,7 @@ model = dict(
         skip_connection=True,
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         in_features=in_features,
         out_features=out_features,
         num_classes=num_classes,

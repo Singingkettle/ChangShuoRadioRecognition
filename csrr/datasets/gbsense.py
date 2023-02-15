@@ -31,13 +31,20 @@ class GBSenseBasic(Dataset):
             for h5_file in file_name:
                 data = h5py.File(osp.join(data_root, h5_file))
                 x.append(data['X'][:, :, :])
-                y.append(data['Y'][:, :])
+                if 'Y' in data:
+                    y.append(data['Y'][:, :])
             self.X = np.concatenate(x, axis=0)
-            self.Y = np.concatenate(y, axis=0)
+            if len(y) > 0:
+                self.Y = np.concatenate(y, axis=0)
+            else:
+                self.Y = False
         else:
             data = h5py.File(osp.join(data_root, file_name))
             self.X = data['X'][:, :, :]
-            self.Y = data['Y'][:, :]
+            if 'Y' in data:
+                self.Y = data['Y'][:, :]
+            else:
+                self.Y = False
 
         self.test_mode = test_mode
         self.num = self.X.shape[0]
@@ -71,13 +78,13 @@ class GBSenseBasic(Dataset):
         return x
 
     def prepare_test_data(self, idx):
-        return dict(iqs=self._input_data(idx))
+        return dict(signals=dict(iqs=self._input_data(idx)))
 
     def prepare_train_data(self, idx):
         x = self._input_data(idx)
         y = self.Y[idx, :] - 1
         mod_labels = np.array(y[0], dtype=np.int64)
-        return dict(iqs=x, mod_labels=mod_labels)
+        return dict(signals=dict(iqs=x, mod_labels=mod_labels))
 
     def __getitem__(self, idx):
 
@@ -95,6 +102,25 @@ class GBSenseBasic(Dataset):
             gt_label = int(self.Y[idx, :] - 1)
             confusion_matrix[gt_label, predict_label] += 1
         return confusion_matrix
+
+    def format_out(self, out_dir, results):
+        results = format_results(results)
+        pre_matrix = []
+        for key_str in results:
+            pre_data = results[key_str]
+            pre_data = reshape_results(pre_data, len(self.CLASSES))
+            pre_data = softmax(pre_data, axis=1)
+            pre_data = pre_data[None, :, :]
+            pre_matrix.append(pre_data)
+
+        search_weight = np.array([1, 0, 0])
+        search_weight = np.reshape(search_weight, (1, -1))
+        pre_matrix = np.concatenate(pre_matrix, axis=0)
+        merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
+        merge_matrix = np.reshape(merge_matrix, (-1, len(self.CLASSES)))
+        res = np.argmax(merge_matrix, axis=1) + 1
+        np.savetxt(osp.join(out_dir, 'basic.txt'), res, fmt='%d')
+        return merge_matrix
 
     def evaluate(self, results, logger=None):
         results = format_results(results)
@@ -136,14 +162,17 @@ class GBSenseAdvanced(GBSenseBasic):
     def __init__(self, file_name, data_root=None, test_mode=False):
         super(GBSenseAdvanced, self).__init__(file_name, 0.09, data_root, test_mode)
 
-        mod_labels = np.zeros((len(self), 24 * 13), dtype=np.float32)
-        for idx in range(len(self)):
-            y = self.Y[idx, :]
-            for i, val in enumerate(y):
-                if val > 0:
-                    mod_labels[idx, i * 13 + val - 1] = 1.0
+        if self.Y:
+            mod_labels = np.zeros((len(self), 24 * 13), dtype=np.float32)
+            for idx in range(len(self)):
+                y = self.Y[idx, :]
+                for i, val in enumerate(y):
+                    if val > 0:
+                        mod_labels[idx, i * 13 + val - 1] = 1.0
 
-        self.mod_labels = mod_labels
+            self.mod_labels = mod_labels
+        else:
+            self.mod_labels = False
 
     def prepare_train_data(self, idx):
         x = self._input_data(idx)
@@ -151,14 +180,52 @@ class GBSenseAdvanced(GBSenseBasic):
 
         return dict(iqs=x, mod_labels=y)
 
+    def format_out(self, out_dir, results):
+        results = format_results(results)
+        pre_matrix = []
+        for key_str in results:
+            pre_data = results[key_str]
+            pre_data = reshape_results(pre_data, 24 * 13)
+            pre_data = expit(pre_data)
+            pre_data = pre_data[None, :, :]
+            pre_matrix.append(pre_data)
+        pre_matrix = np.concatenate(pre_matrix, axis=0)
 
+        search_weight = np.array([1, 0, 0])
+        search_weight = np.reshape(search_weight, (1, -1))
+        pre_matrix = np.concatenate(pre_matrix, axis=0)
+        merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
+        merge_matrix = np.reshape(merge_matrix, (-1, 24 * 13))
+        merge_matrix = merge_matrix.tolist()
+
+        def _eval(res):
+            mod_threshold = 0.1
+            y_ = np.zeros((1, 24), dtype=np.int64)
+            res = np.reshape(res, [24, 13])
+            max_scores = np.max(res, axis=1)
+            max_scores_index = np.argmax(res, axis=1)
+            sorted_index = np.argsort(max_scores)
+            selected_number = 0
+            for index in sorted_index[-2:]:
+                if max_scores[index] >= mod_threshold:
+                    y_[0, index] = max_scores_index[index] + 1
+                    selected_number += 1
+
+            if selected_number == 0:
+                y_[0, sorted_index[-1]] = max_scores_index[sorted_index[-1]] + 1
+            return y_
+
+        res = list(map(_eval, merge_matrix))
+        res = np.concatenate(res, axis=0)
+        np.savetxt(osp.join(out_dir, 'advanced.txt'), res, fmt='%d')
+        return res
 
     def evaluate(self, results, logger=None):
         results = format_results(results)
         pre_matrix = []
         for key_str in results:
             pre_data = results[key_str]
-            pre_data = reshape_results(pre_data, 24*13)
+            pre_data = reshape_results(pre_data, 24 * 13)
             pre_data = expit(pre_data)
             pre_data = pre_data[None, :, :]
             pre_matrix.append(pre_data)
@@ -214,12 +281,12 @@ class GBSenseAdvanced(GBSenseBasic):
             search_weight = np.array(search_weight)
             search_weight = np.reshape(search_weight, (1, -1))
             tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
-            tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, 24*13))
+            tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, 24 * 13))
             tmp_merge_matrix = tmp_merge_matrix.tolist()
             y_ = list(map(_eval, tmp_merge_matrix))
             y = self.Y.tolist()
             res = map(_acc, y_, y)
-            accuracy = 1.0 * sum(res)/len(self)
+            accuracy = 1.0 * sum(res) / len(self)
             if accuracy >= cur_max_accuracy:
                 cur_max_accuracy = accuracy
                 cur_search_weight = search_weight
@@ -230,7 +297,6 @@ class GBSenseAdvanced(GBSenseBasic):
         eval_results['mean_all'] = cur_max_accuracy
 
         return eval_results
-
 
 # @DATASETS.register_module()
 # class GBSenseAdvancedD(GBSenseBasic):

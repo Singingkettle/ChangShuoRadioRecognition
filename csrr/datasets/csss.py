@@ -1,22 +1,22 @@
+import copy
 import os
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import scipy.io as sio
-from scipy.special import expit, softmax
+from scipy.special import expit
 from torch.utils.data import Dataset
 
 from .builder import DATASETS
 from .merge.methods import get_merge_weight_by_grid_search
 from .utils import format_results, reshape_results
+from ..common import DataContainer as DC
 
 
-@DATASETS.register_module()
-class CSSSMat(Dataset, metaclass=ABCMeta):
+class BaseCSSS(Dataset, metaclass=ABCMeta):
     CLASSES = ["BPSK", "QPSK", "8PSK", "16QAM", "64QAM"]
-    SNRS = list(range(-8, 22, 2))
 
-    def __init__(self, file_info, data_root=None, test_mode=False):
+    def __init__(self, file_info, data_root, test_mode):
         file_prefixes = file_info['file_prefixes']
         snrs = file_info['snrs']
 
@@ -26,24 +26,34 @@ class CSSSMat(Dataset, metaclass=ABCMeta):
         self.band_labels = []
         self.snrs = snrs
         self.num_snr = len(snrs)
-        for file_prefix in file_prefixes:
-            for snr in snrs:
+        self.test_mode = test_mode
+        self.snr_range = [0]
+        self.num_mod = len(self.CLASSES)
+
+        for snr in snrs:
+            new_index = 0
+            for file_prefix in file_prefixes:
                 file_path = os.path.join(data_root, f'{file_prefix}_{snr:02d}.mat')
                 data = sio.loadmat(file_path)
-                iqs = data[file_prefix][0, 0][0].astype(np.float32)
-                iqs_ = data[file_prefix][0, 0][1].astype(np.float32)
-                mod_labels = data[file_prefix][0, 0][2].astype(np.int)
-                band_labels = data[file_prefix][0, 0][3].astype(np.float32)
+                iqs = data[file_prefix]['x'][0, 0].astype(np.float32)
+                iqs_ = data[file_prefix]['x_'][0, 0].astype(np.float32)
+                mod_labels = data[file_prefix]['m'][0, 0].astype(np.int64)
+                band_labels = data[file_prefix]['b'][0, 0].astype(np.int64)
+                new_index = iqs.shape[0] + new_index
                 self.iqs.append(iqs)
                 self.iqs_.append(iqs_)
                 self.mod_labels.append(mod_labels)
                 self.band_labels.append(band_labels)
+            new_index = new_index + self.snr_range[-1]
+            self.snr_range.append(new_index)
 
         self.iqs = np.concatenate(self.iqs, axis=0)
         self.iqs_ = np.concatenate(self.iqs_, axis=0)
         self.mod_labels = np.concatenate(self.mod_labels, axis=0)
         self.band_labels = np.concatenate(self.band_labels, axis=0)
         self.num = self.iqs.shape[0]
+        self.num_band = self.iqs_.shape[1]
+        self.time_length = self.iqs.shape[-1]
 
         # set group flag for the sampler
         if not self.test_mode:
@@ -82,9 +92,9 @@ class CSSSMat(Dataset, metaclass=ABCMeta):
 
 
 @DATASETS.register_module()
-class CSSSBCE(CSSSMat):
+class CSSSBCE(BaseCSSS):
     def __int__(self, file_info, data_root=None, test_mode=False):
-        super(CSSSBCE).__int__(file_info, data_root, test_mode)
+        super(CSSSBCE, self).__init__(file_info, data_root, test_mode)
 
         mod_labels = np.zeros((len(self), 5 * 9), dtype=np.float32)
         for idx in range(len(self)):
@@ -164,15 +174,14 @@ class CSSSBCE(CSSSMat):
 
 
 @DATASETS.register_module()
-class CSSSDetTwoStage(CSSSMat):
-    def __int__(self, file_info, num_anchor=4, data_root=None, test_mode=False):
-        super(CSSSDetTwoStage).__int__(file_info, data_root, test_mode)
+class CSSSDetTwoStage(BaseCSSS):
+    def __init__(self, file_info, data_root=None, test_mode=False):
+        super(CSSSDetTwoStage, self).__init__(file_info, data_root, test_mode)
 
-        self.num_anchor = num_anchor
-        fft_iqs = np.zeros((len(self), 2, 4096), dtype=np.float32)
-        mod_labels = np.zeros((len(self), 9), dtype=np.float32) + 5
-        band_labels = np.zeros((len(self), 9), dtype=np.float32)
-        self.gt = np.zeros((len(self), 9 * 5), dtype=np.float32)
+        fft_iqs = np.zeros((len(self), 2, self.time_length), dtype=np.float32)
+        band_labels = np.zeros((len(self), self.num_band), dtype=np.float32)
+        self.gt = np.zeros((len(self), self.num_band * self.num_mod), dtype=np.float32)
+        self.occupied_bands = copy.deepcopy(self.band_labels)
         for idx in range(len(self)):
             iq = self.iqs[idx, 0, :] + 1j * self.iqs[idx, 1, :]
             iq = np.fft.fft(iq)
@@ -181,104 +190,357 @@ class CSSSDetTwoStage(CSSSMat):
             fft_iqs[idx, :, :] = iq
             band_labels[idx, self.band_labels[idx, 0]] = 1
             band_labels[idx, self.band_labels[idx, 1]] = 1
-            mod_labels[idx, 0] = self.mod_labels[idx, 0]
-            mod_labels[idx, 1] = self.mod_labels[idx, 1]
             for i in range(2):
-                col_index = band_labels[i] * 5 + mod_labels[i]
+                col_index = self.band_labels[idx, i] * self.num_mod + self.mod_labels[idx, i]
                 self.gt[idx, col_index] = 1.0
 
         self.iqs = fft_iqs
         self.band_labels = band_labels
-        self.mod_labels = mod_labels
+
+    def prepare_test_data(self, idx):
+        x = self.iqs[idx, :, :]
+        x_ = self.iqs_[idx, :, :, :]
+
+        inputs = dict(iqs=x, iqs_=x_)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas)
 
     def prepare_train_data(self, idx):
         x = self.iqs[idx, :, :]
         x_ = self.iqs_[idx, :, :, :]
+        x_ = [x_[self.occupied_bands[idx, 0], :, :], x_[self.occupied_bands[idx, 1], :, :]]
+        x_ = np.concatenate(x_, axis=0)
+
         my = self.mod_labels[idx, :]
         by = self.band_labels[idx, :]
 
-        return dict(iqs=x, iqs_=x_, mod_labels=my, band_labels=by)
+        inputs = dict(iqs=x, iqs_=x_)
+        targets = dict(mod_labels=my, band_labels=by)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas, targets=targets)
 
     def evaluate(self, results, logger=None):
         results = format_results(results)
         eval_results = dict()
 
         def _eval(res_band, res_mod):
-            y_ = np.zeros((1, 9 * 5), dtype=np.float32)
-            anchor_scores = []
-            for anchor_index in range(self.num_anchor):
-                anchor_scores.append(res_band[anchor_index] * max(res_mod[anchor_index]))
-
-            anchor_scores = np.array(anchor_scores)
-            sorted_anchor_index = np.argsort(anchor_scores)
+            y_ = np.zeros((1, self.num_mod * self.num_band), dtype=np.float32)
+            sorted_anchor_index = np.argsort(res_band)
             for anchor_index in sorted_anchor_index[-2:]:
-                y_[0, res_band[anchor_index] * 5 + np.argmax(res_mod[anchor_index])] = 1.0
+                y_[0, anchor_index * self.num_mod + np.argmax(res_mod[anchor_index, :])] = 1.0
 
             return y_
 
         y_ = list(map(_eval, results['Band'], results['Mod']))
+        y_ = np.concatenate(y_, axis=0)
         dy = self.gt - y_
         dy = np.sum(np.abs(dy), axis=1)
         for snr_index in range(self.num_snr):
-            accuracy = (len(self) / self.num_snr - np.count_nonzero(dy[snr_index, :])) * 1.0 / len(
-                self) / self.num_snr
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+
+        y_ = np.reshape(y_, [-1, self.num_band, self.num_mod])
+        y_ = np.sum(y_, axis=2)
+        dy = self.band_labels - y_
+        dy = np.sum(np.abs(dy), axis=1)
+        for snr_index in range(self.num_snr):
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'band_acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['band_acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+
+        return eval_results
+
+
+@DATASETS.register_module()
+class CSSSDetSingleStage(BaseCSSS):
+    def __init__(self, file_info, data_root=None, test_mode=False):
+        super(CSSSDetSingleStage, self).__init__(file_info, data_root, test_mode)
+        fft_iqs = np.zeros((len(self), 2, self.time_length), dtype=np.float32)
+        mod_labels = np.ones(len(self) * self.num_band, dtype=np.int64) * self.num_mod
+        band_labels = np.zeros((len(self), self.num_band), dtype=np.float32)
+        self.gt = np.zeros((len(self), self.num_mod * self.num_band), dtype=np.float32)
+        for idx in range(len(self)):
+            iq = self.iqs[idx, 0, :] + 1j * self.iqs[idx, 1, :]
+            iq = np.fft.fft(iq)
+            iq = np.fft.fftshift(iq)
+            iq = np.vstack((np.real(iq), np.imag(iq)))
+            fft_iqs[idx, :, :] = iq
+            band_labels[idx, self.band_labels[idx, 0]] = 1
+            band_labels[idx, self.band_labels[idx, 1]] = 1
+            mod_labels[idx * self.num_band + self.band_labels[idx, 0]] = self.mod_labels[idx, 0]
+            mod_labels[idx * self.num_band + self.band_labels[idx, 1]] = self.mod_labels[idx, 1]
+            for i in range(2):
+                col_index = self.band_labels[idx, i] * self.num_mod + self.mod_labels[idx, i]
+                self.gt[idx, col_index] = 1.0
+
+        self.time_length = self.time_length // self.num_band
+        self.mod_labels = mod_labels
+        self.band_labels = band_labels
+        fft_iqs = np.transpose(fft_iqs, [1, 0, 2])
+        fft_iqs = np.reshape(fft_iqs, [2, -1, self.time_length])
+        fft_iqs = np.transpose(fft_iqs, [1, 0, 2])
+        self.iqs = fft_iqs
+        del self.iqs_
+
+    def prepare_train_data(self, idx):
+        x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
+        my = self.mod_labels[idx * self.num_band:(idx + 1) * self.num_band]
+
+        inputs = dict(iqs=x)
+        targets = dict(labels=my)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas, targets=targets)
+
+    def prepare_test_data(self, idx):
+        x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
+        inputs = dict(iqs=x)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas)
+
+    def evaluate(self, results, logger=None):
+        results = format_results(results)
+        eval_results = dict()
+
+        def _eval(res_mod):
+            y_ = np.zeros((1, self.num_mod * self.num_band), dtype=np.float32)
+            sorted_anchor_index = np.argsort(res_mod[:, -1])
+            for anchor_index in sorted_anchor_index[:2]:
+                y_[0, anchor_index * self.num_mod + np.argmax(res_mod[anchor_index, :-1])] = 1.0
+            return y_
+
+        y_ = list(map(_eval, results['Final']))
+        y_ = np.concatenate(y_, axis=0)
+        dy = self.gt - y_
+        dy = np.sum(np.abs(dy), axis=1)
+        for snr_index in range(self.num_snr):
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+
+        y_ = np.reshape(y_, [-1, self.num_band, self.num_mod])
+        y_ = np.sum(y_, axis=2)
+        dy = self.band_labels - y_
+        dy = np.sum(np.abs(dy), axis=1)
+        for snr_index in range(self.num_snr):
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'band_acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['band_acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+
+        return eval_results
+
+
+@DATASETS.register_module()
+class PureCSSS(Dataset):
+    CLASSES = ["BPSK", "QPSK", "8PSK", "16QAM", "64QAM"]
+
+    def __init__(self, file_info, data_root, test_mode=False, use_fft=True):
+        file_prefixes = file_info['file_prefixes']
+        snrs = file_info['snrs']
+
+        self.iqs = []
+        self.mod_labels = []
+        self.snrs = snrs
+        self.num_snr = len(snrs)
+        self.test_mode = test_mode
+        self.snr_range = [0]
+        self.num_mod = len(self.CLASSES)
+
+        for snr in snrs:
+            new_index = 0
+            for file_prefix in file_prefixes:
+                file_path = os.path.join(data_root, f'{file_prefix}_{snr:02d}.mat')
+                data = sio.loadmat(file_path)
+                iqs = data[file_prefix]['x'][0, 0].astype(np.float32)
+                mod_labels = data[file_prefix]['m'][0, 0].astype(np.int64)
+                mod_labels = mod_labels.flatten()
+                new_index = iqs.shape[0] + new_index
+                self.iqs.append(iqs)
+                self.mod_labels.append(mod_labels)
+            new_index = new_index + self.snr_range[-1]
+            self.snr_range.append(new_index)
+
+        self.iqs = np.concatenate(self.iqs, axis=0)
+        self.mod_labels = np.concatenate(self.mod_labels, axis=0)
+        self.num = self.iqs.shape[0]
+        self.time_length = self.iqs.shape[-1]
+
+        self.gt = np.zeros((len(self), self.num_mod), dtype=np.float32)
+        for i in range(len(self)):
+            self.gt[i, self.mod_labels[i]] = 1.0
+
+        if use_fft:
+            fft_iqs = np.zeros((len(self), 2, 1025), dtype=np.float32)
+            for idx in range(len(self)):
+                iq = self.iqs[idx, 0, :] + 1j * self.iqs[idx, 1, :]
+                iq = np.fft.fft(iq)
+                iq = np.fft.fftshift(iq)
+                iq = np.vstack((np.real(iq), np.imag(iq)))
+                fft_iqs[idx, :, :] = iq
+            self.iqs = fft_iqs
+
+        # set group flag for the sampler
+        if not self.test_mode:
+            self._set_group_flag()
+
+    def __len__(self):
+        return self.num
+
+    def _set_group_flag(self):
+        """Set flag according to the mean value (ms) of signal data snrs.
+
+        set as group i, where self.SNRS[i]<=ms<self.SNRS[i+1].
+        """
+        self.flag = np.zeros(len(self), dtype=np.uint8)
+
+    def prepare_train_data(self, idx):
+        x = self.iqs[idx, :, :]
+        x = np.expand_dims(x, axis=0)
+        my = self.mod_labels[idx]
+
+        inputs = dict(iqs=x)
+        targets = dict(labels=my)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas, targets=targets)
+
+    def prepare_test_data(self, idx):
+        x = self.iqs[idx, :, :]
+        x = np.expand_dims(x, axis=0)
+        inputs = dict(iqs=x)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas)
+
+    def __getitem__(self, idx):
+
+        if self.test_mode:
+            data = self.prepare_test_data(idx)
+        else:
+            data = self.prepare_train_data(idx)
+
+        return data
+
+    def evaluate(self, results, logger=None):
+        results = format_results(results)
+        eval_results = dict()
+
+        def _eval(res_mod):
+            y_ = np.zeros((1, self.num_mod), dtype=np.float32)
+            sorted_anchor_index = np.argsort(res_mod)
+            y_[0, sorted_anchor_index[-1]] = 1.0
+
+            return y_
+
+        y_ = list(map(_eval, results['Final']))
+        y_ = np.concatenate(y_, axis=0)
+        dy = self.gt - y_
+        dy = np.sum(np.abs(dy), axis=1)
+        for snr_index in range(self.num_snr):
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
             eval_results[f'snr_{self.snrs[snr_index]:02d}dB'] = accuracy
         eval_results['snr_mean_all'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
 
         return eval_results
 
 
+
 @DATASETS.register_module()
-class CSSSDetSingleStage(CSSSMat):
-    def __int__(self, file_info, num_anchor=4, data_root=None, test_mode=False):
-        super(CSSSDetSingleStage).__int__(file_info, data_root, test_mode)
-        self.num_anchor = num_anchor
-        mod_labels = np.zeros((len(self), 9), dtype=np.int64) + -1
-        band_labels = np.zeros((len(self), 9), dtype=np.float32)
-        self.gt = np.zeros((len(self), 9 * 5), dtype=np.float32)
+class CSSSDetSingleStageV2(BaseCSSS):
+    def __init__(self, file_info, data_root=None, test_mode=False):
+        super(CSSSDetSingleStageV2, self).__init__(file_info, data_root, test_mode)
+        fft_iqs = np.zeros((len(self), 2, self.time_length), dtype=np.float32)
+        mod_labels = np.ones(len(self) * self.num_band, dtype=np.int64) * self.num_mod
+        band_labels = np.zeros((len(self), self.num_band), dtype=np.float32)
+        self.gt = np.zeros((len(self), self.num_mod * self.num_band), dtype=np.float32)
         for idx in range(len(self)):
+            iq = self.iqs[idx, 0, :] + 1j * self.iqs[idx, 1, :]
+            iq = np.fft.fft(iq)
+            iq = np.fft.fftshift(iq)
+            iq = np.vstack((np.real(iq), np.imag(iq)))
+            fft_iqs[idx, :, :] = iq
             band_labels[idx, self.band_labels[idx, 0]] = 1
             band_labels[idx, self.band_labels[idx, 1]] = 1
-            mod_labels[idx, self.band_labels[idx, 0]] = self.mod_labels[idx, 0]
-            mod_labels[idx, self.band_labels[idx, 1]] = self.mod_labels[idx, 1]
+            mod_labels[idx * self.num_band + self.band_labels[idx, 0]] = self.mod_labels[idx, 0]
+            mod_labels[idx * self.num_band + self.band_labels[idx, 1]] = self.mod_labels[idx, 1]
             for i in range(2):
-                col_index = band_labels[i] * 5 + mod_labels[i]
+                col_index = self.band_labels[idx, i] * self.num_mod + self.mod_labels[idx, i]
                 self.gt[idx, col_index] = 1.0
 
-        self.band_labels = band_labels
         self.mod_labels = mod_labels
+        self.band_labels = band_labels
+        self.iqs = fft_iqs
+        del self.iqs_
 
     def prepare_train_data(self, idx):
-        x = self.iqs[idx, :, :]
-        my = self.mod_labels[idx, :]
-        by = self.band_labels[idx, :]
+        x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
+        my = self.mod_labels[idx * self.num_band:(idx + 1) * self.num_band]
 
-        return dict(iqs=x, mod_labels=my, band_labels=by)
+        inputs = dict(iqs=x)
+        targets = dict(labels=my)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas, targets=targets)
+
+    def prepare_test_data(self, idx):
+        x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
+        inputs = dict(iqs=x)
+        input_metas = DC(dict(filename=0), cpu_only=True)
+
+        return dict(inputs=inputs, input_metas=input_metas)
 
     def evaluate(self, results, logger=None):
         results = format_results(results)
         eval_results = dict()
 
-        def _eval(res_band, res_mod):
-            y_ = np.zeros((1, 9 * 5), dtype=np.float32)
-            anchor_scores = []
-            for anchor_index in range(4):
-                anchor_scores.append(res_band[anchor_index] * max(res_mod[anchor_index]))
-
-            anchor_scores = np.array(anchor_scores)
-            sorted_anchor_index = np.argsort(anchor_scores)
-            for anchor_index in sorted_anchor_index[-2:]:
-                y_[0, res_band[anchor_index] * 5 + np.argmax(res_mod[anchor_index])] = 1.0
-
+        def _eval(res_mod):
+            y_ = np.zeros((1, self.num_mod * self.num_band), dtype=np.float32)
+            sorted_anchor_index = np.argsort(res_mod[:, -1])
+            for anchor_index in sorted_anchor_index[:2]:
+                y_[0, anchor_index * self.num_mod + np.argmax(res_mod[anchor_index, :-1])] = 1.0
             return y_
 
-        y_ = list(map(_eval, results['Band'], results['Mod']))
+        y_ = list(map(_eval, results['Final']))
+        y_ = np.concatenate(y_, axis=0)
         dy = self.gt - y_
         dy = np.sum(np.abs(dy), axis=1)
         for snr_index in range(self.num_snr):
-            accuracy = (len(self) / self.num_snr - np.count_nonzero(dy[snr_index, :])) * 1.0 / len(
-                self) / self.num_snr
-            eval_results[f'snr_{self.snrs[snr_index]:02d}dB'] = accuracy
-        eval_results['snr_mean_all'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
+
+        y_ = np.reshape(y_, [-1, self.num_band, self.num_mod])
+        y_ = np.sum(y_, axis=2)
+        dy = self.band_labels - y_
+        dy = np.sum(np.abs(dy), axis=1)
+        for snr_index in range(self.num_snr):
+            snr_left_index = self.snr_range[snr_index]
+            snr_right_index = self.snr_range[snr_index + 1]
+            accuracy = (snr_right_index - snr_left_index - np.count_nonzero(
+                dy[snr_left_index:snr_right_index])) * 1.0 / (snr_right_index - snr_left_index)
+            eval_results[f'band_acc_snr_{self.snrs[snr_index]:02d}dB'] = accuracy
+        eval_results['band_acc_all_snr'] = (len(self) - np.count_nonzero(dy)) * 1.0 / len(self)
 
         return eval_results

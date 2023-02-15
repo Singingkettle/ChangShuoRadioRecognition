@@ -11,6 +11,7 @@ from .mlnet import MLNet
 from .resnet import ResNet
 from .mctnet import MCTNet
 from .vggnet import VGGNet
+from .ssnet import SSNet
 
 __all__ = [
     'AlexNet',
@@ -33,4 +34,5 @@ __all__ = [
     'ResNet',
     'MCTNet',
     'VGGNet',
+    'SSNet',
 ]

@@ -13,7 +13,7 @@ data = dict(
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='train_and_validation_filter_size_0.020_stride_0.020.pkl', to_float32=True),
             dict(type='LoadAnnotations'),
-            dict(type='Collect', keys=['cos', 'mod_labels'])
+            dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
     ),
@@ -26,7 +26,7 @@ data = dict(
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='test_filter_size_0.020_stride_0.020.pkl', to_float32=True),
-            dict(type='Collect', keys=['cos'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -42,7 +42,7 @@ data = dict(
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  filename='test_filter_size_0.020_stride_0.020.pkl', to_float32=True),
-            dict(type='Collect', keys=['cos'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

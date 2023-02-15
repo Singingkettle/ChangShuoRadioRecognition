@@ -1,14 +1,14 @@
 import torch
 import torch.nn as nn
 
-from .amc_head import AMCHead
+from .classification_head import ClassificationHead
 from .base_head import BaseHead
 from .mm_head import MMHead
 from ..builder import HEADS, build_loss, build_head
 
 
 @HEADS.register_module()
-class GBBCEHead(AMCHead):
+class GBBCEHead(ClassificationHead):
     def __init__(self, num_classes, in_features=10560, out_features=256, loss_cls=None):
         super(GBBCEHead, self).__init__(num_classes, in_features, out_features, loss_cls)
 

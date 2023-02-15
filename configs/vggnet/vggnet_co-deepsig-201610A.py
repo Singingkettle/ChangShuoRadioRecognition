@@ -12,7 +12,7 @@ model = dict(
         type='VGGNet'
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=11,
         in_features=512,
         out_features=256,

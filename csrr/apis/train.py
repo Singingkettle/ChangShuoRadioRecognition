@@ -72,7 +72,7 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
             cfg.data.samples_per_gpu,
             cfg.data.workers_per_gpu,
             # cfg.gpus will be ignored if distributed
-            len(cfg.gpu_ids),
+            len(cfg.gpu_id),
             dist=distributed,
             seed=cfg.seed) for ds in dataset
     ]
@@ -89,7 +89,7 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
             find_unused_parameters=find_unused_parameters)
     else:
         model = MMDataParallel(
-            model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+            model.cuda(cfg.gpu_id[0]), device_ids=cfg.gpu_id)
 
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)

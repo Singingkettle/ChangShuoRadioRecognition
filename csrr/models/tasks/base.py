@@ -20,11 +20,7 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def forward_train(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def simple_test(self, **kwargs):
+    def simple_test(self, inputs, input_metas, **kwargs):
         pass
 
     @abstractmethod
@@ -40,17 +36,17 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
             logger = get_root_logger()
             print_log(f'load model from: {pre_trained}', logger=logger)
 
-    def forward_test(self, **kwargs):
-        return self.simple_test(**kwargs)
+    def forward_test(self, inputs, input_metas, **kwargs):
+        return self.simple_test(inputs, input_metas, **kwargs)
 
-    def forward(self, return_loss=True, **kwargs):
+    def forward(self, inputs, input_metas, return_loss=True, **kwargs):
         """Calls either :func:`forward_train` or :func:`forward_test` depending
         on whether ``return_loss`` is ``True``.
         """
         if return_loss:
-            return self.forward_train(**kwargs)
+            return self.forward_train(inputs, input_metas, **kwargs)
         else:
-            return self.forward_test(**kwargs)
+            return self.forward_test(inputs, input_metas, **kwargs)
 
     def _parse_losses(self, losses):
         """Parse the raw outputs (losses) of the network.
@@ -77,6 +73,16 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
         loss = sum(_value for _key, _value in log_vars.items()
                    if 'loss' in _key)
 
+        # If the loss_vars has different length, GPUs will wait infinitely
+        if dist.is_available() and dist.is_initialized():
+            log_var_length = torch.tensor(len(log_vars), device=loss.device)
+            dist.all_reduce(log_var_length)
+            message = (f'rank {dist.get_rank()}' +
+                       f' len(log_vars): {len(log_vars)}' + ' keys: ' +
+                       ','.join(log_vars.keys()))
+            assert log_var_length == len(log_vars) * dist.get_world_size(), \
+                'loss log variables are different across GPUs!\n' + message
+
         log_vars['loss'] = loss
         for loss_name, loss_value in log_vars.items():
             # reduce loss when distributed training
@@ -97,7 +103,7 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
         this method, such as GAN.
 
         Args:
-            data (dict): The output of dataloader.
+            signals (dict): The output of dataloader.
             optimizer (:obj:`torch.optim.Optimizer` | dict): The optimizer of
                 runner is passed to ``train_step()``. This argument is unused
                 and reserved.
@@ -115,11 +121,11 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
         loss, log_vars = self._parse_losses(losses)
 
         outputs = dict(loss=loss, log_vars=log_vars,
-                       num_samples=len(data['mod_labels']))
+                       num_samples=len(data['input_metas']))
 
         return outputs
 
-    def val_step(self, data, optimizer):
+    def val_step(self, data, optimizer=None):
         """The iteration step during validation.
 
         This method shares the same signature as :func:`train_step`, but used
@@ -129,8 +135,8 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
         losses = self(**data)
         loss, log_vars = self._parse_losses(losses)
 
-        outputs = dict(loss=loss, log_vars=log_vars,
-                       num_samples=len(data['mod_labels']))
+        outputs = dict(
+            loss=loss, log_vars=log_vars, num_samples=len(data['input_metas']))
 
         return outputs
 

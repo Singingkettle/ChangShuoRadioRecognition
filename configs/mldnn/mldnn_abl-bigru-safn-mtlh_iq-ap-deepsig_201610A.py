@@ -19,7 +19,7 @@ model = dict(
         heads=[
             # Snr Head
             dict(
-                type='AMCHead',
+                type='ClassificationHead',
                 num_classes=2,
                 in_features=100,
                 out_features=256,
@@ -30,7 +30,7 @@ model = dict(
             ),
             # Low Head
             dict(
-                type='AMCHead',
+                type='ClassificationHead',
                 num_classes=11,
                 in_features=100,
                 out_features=256,
@@ -41,7 +41,7 @@ model = dict(
             ),
             # High Head
             dict(
-                type='AMCHead',
+                type='ClassificationHead',
                 num_classes=11,
                 in_features=100,
                 out_features=256,

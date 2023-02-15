@@ -38,7 +38,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='Cumulants'),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

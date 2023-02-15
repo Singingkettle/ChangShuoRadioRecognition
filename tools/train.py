@@ -11,7 +11,7 @@ import torch.distributed as dist
 from csrr import __version__
 from csrr.apis import init_random_seed, set_random_seed, train_task
 from csrr.common import get_root_logger, collect_env
-from csrr.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist
+from csrr.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist, setup_multi_processes, get_device
 from csrr.datasets import build_dataset
 from csrr.models import build_task
 from csrr.runner import init_dist, get_dist_info
@@ -27,10 +27,8 @@ def parse_args():
     parser.add_argument('--no_validate', action='store_true',
                         help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()
-    group_gpus.add_argument('--gpus', type=int,
-                            help='number of gpus to use (only applicable to non-distributed training)')
-    group_gpus.add_argument('--gpu_ids', type=int, nargs='+',
-                            help='ids of gpus to use (only applicable to non-distributed training)')
+    group_gpus.add_argument('--gpu_id', type=int, default=0,
+                            help='id of gpu to use (only applicable to non-distributed training)')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument('--diff-seed', action='store_true',
                         help='Whether or not set different seeds for different ranks')
@@ -43,6 +41,7 @@ def parse_args():
     parser.add_argument('--cfg_options', nargs='+', action=DictAction,
                         help='override some settings in the used config, '
                              'the key-value pair in xxx=yyy format will be merged into config file.')
+    parser.add_argument('--auto-scale-lr', action='store_true', help='enable automatically scaling LR.')
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm', 'mpi'], default='none', help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
 
@@ -68,6 +67,9 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
+    # set multi-process settings
+    setup_multi_processes(cfg)
+
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -85,10 +87,10 @@ def main():
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
     cfg.auto_resume = args.auto_resume
-    if args.gpu_ids is not None:
-        cfg.gpu_ids = args.gpu_ids
+    if args.gpu_id is not None:
+        cfg.gpu_id = [args.gpu_id]
     else:
-        cfg.gpu_ids = range(1) if args.gpus is None else range(args.gpus)
+        cfg.gpu_id = range(1)
 
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
@@ -112,7 +114,6 @@ def main():
 
     # dump config
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
-
     # init the logger before other steps
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
     log_file = osp.join(cfg.work_dir, f'{timestamp}.log')
@@ -130,11 +131,12 @@ def main():
     meta['env_info'] = env_info
     meta['config'] = cfg.pretty_text
     # log some basic info
+    logger.info(f'Distributed training: {distributed}')
     logger.info(f'Config:\n{cfg.pretty_text}')
 
-    # cfg.device = get_device()
+    cfg.device = get_device()
     # set random seeds
-    seed = init_random_seed(args.seed)
+    seed = init_random_seed(args.seed, device=cfg.device)
     seed = seed + dist.get_rank() if args.diff_seed else seed
     logger.info(f'Set random seed to {seed}, '
                 f'deterministic: {args.deterministic}')

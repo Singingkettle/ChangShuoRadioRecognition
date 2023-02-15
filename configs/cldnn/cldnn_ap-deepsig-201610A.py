@@ -18,7 +18,7 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=11,
         in_features=50,
         out_features=128,

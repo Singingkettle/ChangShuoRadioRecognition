@@ -10,7 +10,7 @@ data = dict(
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='LoadAnnotations'),
-            dict(type='Collect', keys=['iqs', 'aps', 'mod_labels'])
+            dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
     ),
@@ -20,7 +20,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
-            dict(type='Collect', keys=['iqs', 'aps'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -33,7 +33,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
-            dict(type='Collect', keys=['iqs', 'aps'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

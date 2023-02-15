@@ -11,5 +11,5 @@ load_from = None
 resume_from = None
 auto_resume = None
 workflow = [('train', 1)]
-evaluation = dict(start=700, interval=10)
+evaluation = dict(interval=1)
 dropout_alive = False

@@ -10,7 +10,7 @@ data = dict(
             dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
             dict(type='SigmoidLossWeight', alpha=0.2),
             dict(type='RebaseModLabelBySNR', alpha=0.4),
-            dict(type='Collect', keys=['iqs', 'mod_labels']),
+            dict(type='Collect', keys=['inputs', 'targets']),
         ],
         data_root=data_root,
     ),
@@ -19,7 +19,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -31,7 +31,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

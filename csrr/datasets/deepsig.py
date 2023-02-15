@@ -81,7 +81,8 @@ class DeepSigDataset(CustomDataset):
         results['iq_folder'] = 'sequence_data/iq'
         results['ap_folder'] = 'sequence_data/ap'
         results['co_folder'] = 'constellation_data'
-
+        results['inputs'] = dict()
+        results['targets'] = dict()
         return results
 
     def prepare_train_data(self, idx):

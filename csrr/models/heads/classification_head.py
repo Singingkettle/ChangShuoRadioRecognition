@@ -5,10 +5,10 @@ from ..builder import HEADS, build_loss
 
 
 @HEADS.register_module()
-class AMCHead(BaseHead):
+class ClassificationHead(BaseHead):
     def __init__(self, num_classes, in_features=10560, out_features=256,
                  loss_cls=None):
-        super(AMCHead, self).__init__()
+        super(ClassificationHead, self).__init__()
         if loss_cls is None:
             loss_cls = dict(
                 type='CrossEntropyLoss',
@@ -32,12 +32,12 @@ class AMCHead(BaseHead):
                     m.weight, mode='fan_in', nonlinearity='relu')
                 nn.init.constant_(m.bias, 0)
 
-    def loss(self, x, mod_labels=None, weight=None, **kwargs):
-        loss_Final = self.loss_cls(x, mod_labels, weight=weight)
+    def loss(self, inputs, labels, weight=None, **kwargs):
+        loss_Final = self.loss_cls(inputs, labels, weight=weight)
         return dict(loss_Final=loss_Final)
 
-    def forward(self, x, vis_fea=False, is_test=False):
-        x = x.reshape(-1, self.in_features)
+    def forward(self, inputs, vis_fea=False, is_test=False):
+        x = inputs.reshape(-1, self.in_features)
         if vis_fea:
             x = self.classifier[0](x)
             fea = self.classifier[1](x)

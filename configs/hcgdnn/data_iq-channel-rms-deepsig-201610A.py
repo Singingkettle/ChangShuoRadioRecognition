@@ -11,7 +11,7 @@ data = dict(
             dict(type='ChannelMode', ),
             dict(type='SigmoidLossWeight', alpha=0.2),
             dict(type='RebaseModLabelBySNR', alpha=0.4, beta=20),
-            dict(type='Collect', keys=['iqs', 'mod_labels']),
+            dict(type='Collect', keys=['inputs', 'targets']),
         ],
         data_root=data_root,
     ),
@@ -21,7 +21,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -34,7 +34,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[

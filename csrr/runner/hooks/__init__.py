@@ -9,13 +9,13 @@ from .logger import LoggerHook, TensorboardLoggerHook, TextLoggerHook
 from .lr_updater import LrUpdaterHook
 from .memory import EmptyCacheHook
 from .momentum_updater import MomentumUpdaterHook
-from .optimizer import Fp16OptimizerHook, OptimizerHook
+from .optimizer import OptimizerHook
 from .sampler_seed import DistSamplerSeedHook
 from .sync_buffer import SyncBuffersHook
 
 __all__ = [
     'HOOKS', 'Hook', 'CheckpointHook', 'ClosureHook', 'LrUpdaterHook',
-    'OptimizerHook', 'Fp16OptimizerHook', 'IterTimerHook',
+    'OptimizerHook', 'IterTimerHook',
     'DistSamplerSeedHook', 'EmptyCacheHook', 'LoggerHook', 'TextLoggerHook',
     'TensorboardLoggerHook', 'MomentumUpdaterHook', 'SyncBuffersHook', 'EMAHook',
     'EvalHook', 'DistEvalHook'

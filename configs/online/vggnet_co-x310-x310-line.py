@@ -12,7 +12,7 @@ data = dict(
             dict(type='LoadConstellationFromIQFile', to_float32=True),
             dict(type='ChannelMode'),
             dict(type='LoadAnnotations'),
-            dict(type='Collect', keys=['cos', 'mod_labels'])
+            dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
     ),
@@ -23,7 +23,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_0.25m/Online',
             evaluate=[
@@ -36,7 +36,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_1.2m/Online',
             evaluate=[
@@ -49,7 +49,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_3m/Online',
             evaluate=[
@@ -62,7 +62,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_line/Online',
             evaluate=[
@@ -75,7 +75,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_line/Online',
             evaluate=[
@@ -88,7 +88,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadConstellationFromIQFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['cos'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line/Online',
             evaluate=[
@@ -102,7 +102,7 @@ data = dict(
         pipeline=[
             dict(type='LoadConstellationFromIQFile', to_float32=True),
             dict(type='ChannelMode'),
-            dict(type='Collect', keys=['cos'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -118,7 +118,7 @@ model = dict(
         type='VGGNetCO',
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=8,
         in_features=512,
         out_features=256,

@@ -13,6 +13,8 @@ from .progressbar import (ProgressBar, track_iter_progress,
 from .registry import build_from_cfg, Registry
 from .timer import Timer, TimerError, check_time
 from .version_utils import digit_version, get_git_hash
+from .setup_env import setup_multi_processes
+from .device_type import IS_IPU_AVAILABLE, IS_MLU_AVAILABLE, IS_MPS_AVAILABLE, IS_NPU_AVAILABLE, get_device
 
 __all__ = [
     'check_prerequisites', 'concat_list', 'deprecated_api_warning', 'import_modules_from_strings',
@@ -22,5 +24,6 @@ __all__ = [
     'track_parallel_progress', 'track_progress', 'build_from_cfg', 'Registry', 'Timer', 'TimerError', 'check_time',
     'check_file_exist', 'fopen', 'is_filepath', 'mkdir_or_exist', 'redir_and_exist', 'scandir', 'symlink', 'glob',
     'ConfigDict', 'Config', 'DictAction', 'fuse_conv_bn', 'load_ext', 'get_model_complexity_info', 'filter_config',
-    'digit_version', 'get_git_hash',
+    'digit_version', 'get_git_hash', 'setup_multi_processes',
+    'IS_IPU_AVAILABLE', 'IS_MPS_AVAILABLE', 'IS_NPU_AVAILABLE', 'IS_MLU_AVAILABLE', 'get_device',
 ]

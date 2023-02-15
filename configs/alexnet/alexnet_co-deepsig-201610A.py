@@ -12,7 +12,7 @@ model = dict(
         type='AlexNet'
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=11,
         in_features=256,
         out_features=256,

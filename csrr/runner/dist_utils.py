@@ -12,6 +12,8 @@ from torch import distributed as dist
 from torch._utils import (_flatten_dense_tensors, _take_tensors,
                           _unflatten_dense_tensors)
 
+from ..common.utils import IS_MLU_AVAILABLE, IS_NPU_AVAILABLE
+
 
 def _find_free_port() -> str:
     # Copied from https://github.com/facebookresearch/detectron2/blob/main/detectron2/engine/launch.py # noqa: E501
@@ -47,9 +49,27 @@ def init_dist(launcher: str, backend: str = 'nccl', **kwargs) -> None:
 def _init_dist_pytorch(backend: str, **kwargs) -> None:
     # TODO: use local_rank instead of rank % num_gpus
     rank = int(os.environ['RANK'])
-    num_gpus = torch.cuda.device_count()
-    torch.cuda.set_device(rank % num_gpus)
-    dist.init_process_group(backend=backend, **kwargs)
+    if IS_MLU_AVAILABLE:
+        import torch_mlu  # noqa: F401
+        torch.mlu.set_device(rank)
+        dist.init_process_group(
+            backend='cncl',
+            rank=rank,
+            world_size=int(os.environ['WORLD_SIZE']),
+            **kwargs)
+    elif IS_NPU_AVAILABLE:
+        import torch_npu  # noqa: F401
+        num_npus = torch.npu.device_count()
+        torch.npu.set_device(rank % num_npus)
+        dist.init_process_group(
+            backend='hccl',
+            rank=rank,
+            world_size=int(os.environ['WORLD_SIZE']),
+            **kwargs)
+    else:
+        num_gpus = torch.cuda.device_count()
+        torch.cuda.set_device(rank % num_gpus)
+        dist.init_process_group(backend=backend, **kwargs)
 
 
 def _init_dist_mpi(backend: str, **kwargs) -> None:
@@ -67,9 +87,11 @@ def _init_dist_mpi(backend: str, **kwargs) -> None:
 
 def _init_dist_slurm(backend: str, port: Optional[int] = None) -> None:
     """Initialize slurm distributed training environment.
+
     If argument ``port`` is not specified, then the master port will be system
     environment variable ``MASTER_PORT``. If ``MASTER_PORT`` is not in system
     environment variable, then a default port ``29500`` will be used.
+
     Args:
         backend (str): Backend of torch.distributed.
         port (int, optional): Master port. Defaults to None.

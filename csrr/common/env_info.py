@@ -4,14 +4,21 @@ import subprocess
 import sys
 from collections import defaultdict
 
-import sklearn
 import torch
 
 import csrr
+from ..ops import get_compiler_version, get_compiling_cuda_version
+
+TORCH_VERSION = torch.__version__
+
+
+def _get_cuda_home():
+    from torch.utils.cpp_extension import CUDA_HOME
+    return CUDA_HOME
 
 
 def collect_base_env():
-    """Collect the base information of the running environments.
+    """Collect the information of the running environments.
 
     Returns:
         dict: The environment information. The following fields are contained.
@@ -22,7 +29,8 @@ def collect_base_env():
             - GPU devices: Device type of each GPU.
             - CUDA_HOME (optional): The env var ``CUDA_HOME``.
             - NVCC (optional): NVCC version.
-            - GCC: GCC version, 'n/a' if GCC is not installed.
+            - GCC: GCC version, "n/a" if GCC is not installed.
+            - MSVC: Microsoft Virtual C++ Compiler version, Windows only.
             - PyTorch: PyTorch version.
             - PyTorch compiling details: The output of \
                 ``torch.__config__.show()``.
@@ -46,34 +54,74 @@ def collect_base_env():
         for name, device_ids in devices.items():
             env_info['GPU ' + ','.join(device_ids)] = name
 
-        from torch.utils.cpp_extension import CUDA_HOME
+        CUDA_HOME = _get_cuda_home()
         env_info['CUDA_HOME'] = CUDA_HOME
 
         if CUDA_HOME is not None and osp.isdir(CUDA_HOME):
-            try:
-                nvcc = osp.join(CUDA_HOME, 'bin/nvcc')
-                nvcc = subprocess.check_output(
-                    f'"{nvcc}" -V | tail -n1', shell=True)
-                nvcc = nvcc.decode('utf-8').strip()
-            except subprocess.SubprocessError:
-                nvcc = 'Not Available'
+            if CUDA_HOME == '/opt/rocm':
+                try:
+                    nvcc = osp.join(CUDA_HOME, 'hip/bin/hipcc')
+                    nvcc = subprocess.check_output(
+                        f'"{nvcc}" --version', shell=True)
+                    nvcc = nvcc.decode('utf-8').strip()
+                    release = nvcc.rfind('HIP version:')
+                    build = nvcc.rfind('')
+                    nvcc = nvcc[release:build].strip()
+                except subprocess.SubprocessError:
+                    nvcc = 'Not Available'
+            else:
+                try:
+                    nvcc = osp.join(CUDA_HOME, 'bin/nvcc')
+                    nvcc = subprocess.check_output(f'"{nvcc}" -V', shell=True)
+                    nvcc = nvcc.decode('utf-8').strip()
+                    release = nvcc.rfind('Cuda compilation tools')
+                    build = nvcc.rfind('Build ')
+                    nvcc = nvcc[release:build].strip()
+                except subprocess.SubprocessError:
+                    nvcc = 'Not Available'
             env_info['NVCC'] = nvcc
 
     try:
-        gcc = subprocess.check_output('gcc --version | head -n1', shell=True)
-        gcc = gcc.decode('utf-8').strip()
-        env_info['GCC'] = gcc
-    except subprocess.CalledProcessError:  # gcc is unavailable
+        # Check C++ Compiler.
+        # For Unix-like, sysconfig has 'CC' variable like 'gcc -pthread ...',
+        # indicating the compiler used, we use this to get the compiler name
+        import sysconfig
+        cc = sysconfig.get_config_var('CC')
+        if cc:
+            cc = osp.basename(cc.split()[0])
+            cc_info = subprocess.check_output(f'{cc} --version', shell=True)
+            env_info['GCC'] = cc_info.decode('utf-8').partition(
+                '\n')[0].strip()
+        else:
+            # on Windows, cl.exe is not in PATH. We need to find the path.
+            # distutils.ccompiler.new_compiler() returns a msvccompiler
+            # object and after initialization, path to cl.exe is found.
+            import locale
+            import os
+            from distutils.ccompiler import new_compiler
+            ccompiler = new_compiler()
+            ccompiler.initialize()
+            cc = subprocess.check_output(
+                f'{ccompiler.cc}', stderr=subprocess.STDOUT, shell=True)
+            encoding = os.device_encoding(
+                sys.stdout.fileno()) or locale.getpreferredencoding()
+            env_info['MSVC'] = cc.decode(encoding).partition('\n')[0].strip()
+            env_info['GCC'] = 'n/a'
+    except subprocess.CalledProcessError:
         env_info['GCC'] = 'n/a'
 
     env_info['PyTorch'] = torch.__version__
-    env_info['Scikit-Learn'] = sklearn.__version__
+    env_info['PyTorch compiling details'] = torch.__config__.show()
 
     try:
         import torchvision
         env_info['TorchVision'] = torchvision.__version__
     except ModuleNotFoundError:
         pass
+
+    env_info['CSRR'] = csrr.__version__
+    env_info['CSRR Compiler'] = get_compiler_version()
+    env_info['CSRR CUDA Compiler'] = get_compiling_cuda_version()
 
     return env_info
 

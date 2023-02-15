@@ -12,7 +12,7 @@ data = dict(
             dict(type='LoadIQFromFile', to_float32=True),
             dict(type='ChannelMode'),
             dict(type='LoadAnnotations'),
-            dict(type='Collect', keys=['iqs', 'mod_labels'])
+            dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
     ),
@@ -23,7 +23,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_0.25m/Online',
             evaluate=[
@@ -36,7 +36,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_1.2m/Online',
             evaluate=[
@@ -49,7 +49,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_3m/Online',
             evaluate=[
@@ -62,7 +62,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_b210_x310_line/Online',
             evaluate=[
@@ -75,7 +75,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_x310_line/Online',
             evaluate=[
@@ -88,7 +88,7 @@ data = dict(
             pipeline=[
                 dict(type='LoadIQFromFile', to_float32=True),
                 dict(type='ChannelMode'),
-                dict(type='Collect', keys=['iqs'])
+                dict(type='Collect', keys=['inputs'])
             ],
             data_root='/home/citybuster/Data/SignalProcessing/ModulationClassification/Online/ModulationClassification_x310_b210_line/Online',
             evaluate=[
@@ -102,7 +102,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromFile', to_float32=True),
             dict(type='ChannelMode'),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -122,7 +122,7 @@ model = dict(
         input_size=in_size,
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         in_features=in_size,
         out_features=out_size,
         num_classes=8,

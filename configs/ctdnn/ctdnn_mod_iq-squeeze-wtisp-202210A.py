@@ -35,7 +35,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromFile', is_squeeze=True, to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -47,7 +47,7 @@ data = dict(
         ann_file='test.json',
         pipeline=[
             dict(type='LoadIQFromFile', is_squeeze=True, to_float32=True),
-            dict(type='Collect', keys=['iqs'])
+            dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
         evaluate=[
@@ -71,7 +71,7 @@ model = dict(
         kernel_size=11
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=5,
         in_features=162,
         out_features=256,

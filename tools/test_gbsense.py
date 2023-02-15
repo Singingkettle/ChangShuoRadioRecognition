@@ -1,29 +1,34 @@
 import argparse
 import os
-import os.path as osp
 
 import torch
-from csrr.dataset import build_dataloader, build_dataset
 
 from csrr.apis import multi_gpu_test, single_gpu_test
 from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
-from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, get_the_best_checkpoint
+from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist
+from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_task
 from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='ChangShuoRadioRecognition get distillation knowledge of a model')
-    parser.add_argument('config', help='config file path to provide distillation knowledge')
-    parser.add_argument('--work_dir', help='the dir to save logs and models')
+        description='ChangShuoRadioRecognition test (and eval) a model')
+    parser.add_argument('config', help='test config file path')
+    parser.add_argument('checkpoint', help='checkpoint file')
+    parser.add_argument('file_name', help='test data file name')
+    parser.add_argument('data_root', help='test data dir')
     parser.add_argument(
-        '--fuse-conv-bn',
+        '--format_out',
+        type=str,
+        help='the dir to save output result file in json format')
+    parser.add_argument(
+        '--fuse_conv_bn',
         action='store_true',
         help='Whether to fuse conv and bn, this will slightly increase'
              'the inference speed')
     parser.add_argument(
-        '--gpu-collect',
+        '--gpu_collect',
         action='store_true',
         help='whether to use gpu to collect results.')
     parser.add_argument(
@@ -31,7 +36,7 @@ def parse_args():
         help='tmp directory used for collecting results from multiple '
              'workers, available when gpu-collect is not specified')
     parser.add_argument(
-        '--cfg-options',
+        '--cfg_options',
         nargs='+',
         action=DictAction,
         help='override some settings in the used config, the key-value pair '
@@ -51,24 +56,21 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print('Command Line Args:', args)
 
     cfg = Config.fromfile(args.config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
-    print(cfg.pretty_text)
-
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
-    if args.work_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
-        cfg.work_dir = args.work_dir
-    elif cfg.get('work_dir', None) is None:
-        # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = './work_dirs'
+    # format_out is determined in this priority: CLI > segment in file > filename
+    if args.format_out is not None:
+        # update configs according to CLI args if args.format_out is not None
+        cfg.format_out = args.format_out
+    elif cfg.get('format_out', None) is None:
+        # use config filename as default format_out if cfg.format_out is None
+        cfg.format_out = './format_out'
 
     # in case the test dataset is concatenated
     if isinstance(cfg.data.test, dict):
@@ -87,22 +89,19 @@ def main():
     # build the dataloader
     samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 4)
     workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 4)
-
-    cfg.data.test['ann_file'] = 'train_and_val.json'
+    cfg.data.test['file_name'] = args.file_name
+    cfg.data.test['data_root'] = args.data_root
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=samples_per_gpu,
-        workers_per_gpu=workers_per_gpu,
+        workers_per_gpu=1,
         dist=distributed,
         shuffle=False)
 
     # build the model and load checkpoint
-    config = osp.splitext(osp.basename(args.config))[0]
-    best_epoch = get_the_best_checkpoint(cfg.work_dir, config)
-    checkpoint = cfg.work_dir + '/{}/epoch_{}.pth'.format(config, best_epoch)
-    model = build_task(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
-    checkpoint = load_checkpoint(model, checkpoint, map_location='cpu')
+    model = build_task(cfg.model)
+    checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
     if args.fuse_conv_bn:
         model = fuse_conv_bn(model)
 
@@ -122,11 +121,14 @@ def main():
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect, cfg.dropout_alive)
 
-    format_out_distillation = osp.join(cfg.work_dir, config, 'format_out_distillation')
     rank, _ = get_dist_info()
     if rank == 0:
-        mkdir_or_exist(format_out_distillation)
-        dataset.format_out(format_out_distillation, outputs)
+        if args.format_out:
+            mkdir_or_exist(cfg.format_out)
+            dataset.format_out(cfg.format_out, outputs)
+        if hasattr(dataset, 'confusion_plot'):
+            dataset.confusion_plot = False
+        print(dataset.evaluate(outputs))
 
 
 if __name__ == '__main__':

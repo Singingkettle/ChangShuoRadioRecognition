@@ -76,6 +76,7 @@ class CSRRDataset(CustomDataset):
     def pre_pipeline(self, results):
         results['data_root'] = self.data_root
         results['iq_folder'] = 'iqs'
+        results['signals'] = dict()
 
         return results
 

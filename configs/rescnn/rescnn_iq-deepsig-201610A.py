@@ -12,7 +12,7 @@ model = dict(
         type='ResCNN',
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=11,
         in_features=10240,
         out_features=128,

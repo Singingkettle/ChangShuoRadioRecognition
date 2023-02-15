@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from .amc_head import AMCHead
+from .classification_head import ClassificationHead
 from .base_head import BaseHead
 from ..builder import HEADS
 
@@ -18,7 +18,7 @@ class HCGDNNHead(BaseHead):
             heads = ['CNN', 'BIGRU1', 'BIGRU2']
         self.heads = heads
         for layer_name in self.heads:
-            self.add_module(layer_name, AMCHead(num_classes, in_features, out_features, loss_cls))
+            self.add_module(layer_name, ClassificationHead(num_classes, in_features, out_features, loss_cls))
 
     def init_weights(self):
         for m in self.modules():

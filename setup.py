@@ -1,6 +1,8 @@
 import glob
 import os
 import re
+import platform
+import warnings
 
 from pkg_resources import DistributionNotFound, get_distribution
 from setuptools import find_packages, setup
@@ -126,6 +128,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
 install_requires = parse_requirements()
 
+
 def get_extensions():
     extensions = []
 
@@ -134,26 +137,56 @@ def get_extensions():
         from torch.utils.cpp_extension import CppExtension, CUDAExtension
 
         # prevent ninja from using too many resources
-        os.environ.setdefault('MAX_JOBS', '4')
+        try:
+            import psutil
+            num_cpu = len(psutil.Process().cpu_affinity())
+            cpu_use = max(4, num_cpu - 1)
+        except (ModuleNotFoundError, AttributeError):
+            cpu_use = 4
+
+        os.environ.setdefault('MAX_JOBS', str(cpu_use))
         define_macros = []
+
+        # Before PyTorch1.8.0, when compiling CUDA code, `cxx` is a
+        # required key passed to PyTorch. Even if there is no flag passed
+        # to cxx, users also need to pass an empty list to PyTorch.
+        # Since PyTorch1.8.0, it has a default value so users do not need
+        # to pass an empty list anymore.
+        # More details at https://github.com/pytorch/pytorch/pull/45956
         extra_compile_args = {'cxx': []}
 
+        # Since the PR (https://github.com/open-mmlab/mmcv/pull/1463) uses
+        # c++14 features, the argument ['std=c++14'] must be added here.
+        # However, in the windows environment, some standard libraries
+        # will depend on c++17 or higher. In fact, for the windows
+        # environment, the compiler will choose the appropriate compiler
+        # to compile those cpp files, so there is no need to add the
+        # argument
+        if platform.system() != 'Windows':
+            extra_compile_args['cxx'] = ['-std=c++14']
+
+        include_dirs = []
         if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
             define_macros += [('CSRR_WITH_CUDA', None)]
             cuda_args = os.getenv('CSRR_CUDA_ARGS')
             extra_compile_args['nvcc'] = [cuda_args] if cuda_args else []
-            op_files = glob.glob('csrr/ops/csrc/pytorch/*')
+            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp') + \
+                       glob.glob('csrr/ops/csrc/pytorch/cpu/*.cpp') + \
+                       glob.glob('csrr/ops/csrc/pytorch/cuda/*.cu')
             extension = CUDAExtension
+            include_dirs.append(os.path.abspath('csrr/ops/csrc/common'))
+            include_dirs.append(os.path.abspath('csrr/ops/csrc/common/cuda'))
         else:
-            print(f'Compiling {ext_name} without CUDA')
-            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp')
+            print(f'Compiling {ext_name} only with CPU')
+            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp') + \
+                       glob.glob('csrr/ops/csrc/pytorch/cpu/*.cpp')
             extension = CppExtension
+            include_dirs.append(os.path.abspath('csrr/ops/csrc/common'))
 
-        include_path = os.path.abspath('csrr/ops/csrc')
         ext_ops = extension(
             name=ext_name,
             sources=op_files,
-            include_dirs=[include_path],
+            include_dirs=include_dirs,
             define_macros=define_macros,
             extra_compile_args=extra_compile_args)
         extensions.append(ext_ops)

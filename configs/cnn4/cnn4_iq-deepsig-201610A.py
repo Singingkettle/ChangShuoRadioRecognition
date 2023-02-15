@@ -15,7 +15,7 @@ model = dict(
         out_indices=(3,),
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='ClassificationHead',
         num_classes=11,
         in_features=10880,
         out_features=128,
