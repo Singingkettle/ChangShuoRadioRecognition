@@ -57,7 +57,7 @@ def dump(obj, file=None, file_format=None, **kwargs):
         obj (any): The python object to be dumped.
         file (str or :obj:`Path` or file-like object, optional): If not
             specified, then the object is dump to a str, otherwise to a file
-            specified by the filename or file-like object.
+            specified by the file_name or file-like object.
         file_format (str, optional): Same as :func:`load`.
 
     Returns:
@@ -82,7 +82,7 @@ def dump(obj, file=None, file_format=None, **kwargs):
     elif hasattr(file, 'write'):
         handler.dump_to_fileobj(obj, file, **kwargs)
     else:
-        raise TypeError('"file" must be a filename str or a file-object')
+        raise TypeError('"file" must be a file_name str or a file-object')
 
 
 def _register_handler(handler, file_formats):

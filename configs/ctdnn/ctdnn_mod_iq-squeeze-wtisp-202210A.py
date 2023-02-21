@@ -61,7 +61,7 @@ data = dict(
 
 # model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='CTDNN',
     backbone=dict(
         type='CTNet',
@@ -71,7 +71,7 @@ model = dict(
         kernel_size=11
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=5,
         in_features=162,
         out_features=256,

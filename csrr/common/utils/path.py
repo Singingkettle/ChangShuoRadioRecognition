@@ -18,9 +18,9 @@ def fopen(filepath, *args, **kwargs):
     raise ValueError('`filepath` should be a string or a Path')
 
 
-def check_file_exist(filename, msg_tmpl='file "{}" does not exist'):
-    if not osp.isfile(filename):
-        raise FileNotFoundError(msg_tmpl.format(filename))
+def check_file_exist(file_name, msg_tmpl='file "{}" does not exist'):
+    if not osp.isfile(file_name):
+        raise FileNotFoundError(msg_tmpl.format(file_name))
 
 
 def mkdir_or_exist(dir_name, mode=0o777):

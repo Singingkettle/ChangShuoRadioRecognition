@@ -7,7 +7,7 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', is_squeeze=True,
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', is_squeeze=True,
                  to_float32=True),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['inputs', 'targets'])
@@ -18,7 +18,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', is_squeeze=True,
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', is_squeeze=True,
                  to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -31,7 +31,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', is_squeeze=True,
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', is_squeeze=True,
                  to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],

@@ -36,7 +36,7 @@ class BaseRunner(metaclass=ABCMeta):
         optimizer (dict or :obj:`torch.optim.Optimizer`): It can be either an
             optimizer (in most cases) or a dict of optimizers (in models that
             requires more than one optimizer, e.g., GAN).
-        work_dir (str, optional): The working directory to save checkpoints
+        work_dir (str, optional): The working directory to format checkpoints
             and logs. Defaults to None.
         logger (:obj:`logging.Logger`): Logger used during training.
              Defaults to None. (The default value is just for backward
@@ -198,7 +198,7 @@ class BaseRunner(metaclass=ABCMeta):
     @abstractmethod
     def save_checkpoint(self,
                         out_dir,
-                        filename_tmpl,
+                        file_name_tmpl,
                         save_optimizer=True,
                         meta=None,
                         create_symlink=True):
@@ -308,9 +308,9 @@ class BaseRunner(metaclass=ABCMeta):
         for hook in self._hooks:
             getattr(hook, fn_name)(self)
 
-    def load_checkpoint(self, filename, map_location='cpu', strict=False):
-        self.logger.info('load checkpoint from %s', filename)
-        return load_checkpoint(self.model, filename, map_location, strict,
+    def load_checkpoint(self, file_name, map_location='cpu', strict=False):
+        self.logger.info('load checkpoint from %s', file_name)
+        return load_checkpoint(self.model, file_name, map_location, strict,
                                self.logger)
 
     def resume(self,

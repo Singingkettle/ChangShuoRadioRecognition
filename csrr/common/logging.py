@@ -16,7 +16,7 @@ def get_logger(name, log_file=None, log_level=logging.INFO, file_mode='w'):
 
     Args:
         name (str): Logger name.
-        log_file (str | None): The log filename. If specified, a FileHandler
+        log_file (str | None): The log file_name. If specified, a FileHandler
             will be added to the logger.
         log_level (int): The logger level. Note that only the process of
             rank 0 is affected, and other processes will set the level to

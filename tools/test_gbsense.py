@@ -7,7 +7,7 @@ from csrr.apis import multi_gpu_test, single_gpu_test
 from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
 from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist
 from csrr.datasets import build_dataloader, build_dataset
-from csrr.models import build_task
+from csrr.models import build_method
 from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 
 
@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument(
         '--format_out',
         type=str,
-        help='the dir to save output result file in json format')
+        help='the dir to format output result file in json format')
     parser.add_argument(
         '--fuse_conv_bn',
         action='store_true',
@@ -64,12 +64,12 @@ def main():
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
 
-    # format_out is determined in this priority: CLI > segment in file > filename
+    # format_out is determined in this priority: CLI > segment in file > file_name
     if args.format_out is not None:
         # update configs according to CLI args if args.format_out is not None
         cfg.format_out = args.format_out
     elif cfg.get('format_out', None) is None:
-        # use config filename as default format_out if cfg.format_out is None
+        # use config file_name as default format_out if cfg.format_out is None
         cfg.format_out = './format_out'
 
     # in case the test dataset is concatenated
@@ -100,7 +100,7 @@ def main():
         shuffle=False)
 
     # build the model and load checkpoint
-    model = build_task(cfg.model)
+    model = build_method(cfg.model)
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
     if args.fuse_conv_bn:
         model = fuse_conv_bn(model)

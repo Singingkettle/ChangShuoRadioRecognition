@@ -1,8 +1,8 @@
 import torch
 
-from .dnn import DNN
+from .single_head_classifier import SingleHeadClassifier
 from .base import BaseDNN
-from ..builder import TASKS, build_task
+from ..builder import TASKS, build_method
 from ...common.utils import outs2result
 
 
@@ -11,8 +11,8 @@ class SSNNTwoStage(BaseDNN):
 
     def __init__(self, band_net, mod_net, num_band, num_mod, vis_fea=False, method_name='SSNN'):
         super(SSNNTwoStage, self).__init__()
-        self.band_net = build_task(band_net)
-        self.mod_net = build_task(mod_net)
+        self.band_net = build_method(band_net)
+        self.mod_net = build_method(mod_net)
         self.num_band = num_band
         self.num_mod = num_mod
         self.vis_fea = vis_fea
@@ -22,7 +22,7 @@ class SSNNTwoStage(BaseDNN):
         self.init_weights()
 
     def init_weights(self, pre_trained=None):
-        """Initialize the weights in task.
+        """Initialize the weights in method.
 
         Args:
             pre_trained (str, optional): Path to pre-trained weights.
@@ -89,7 +89,7 @@ class SSNNTwoStage(BaseDNN):
 
 
 @TASKS.register_module()
-class SSNNSingleStage(DNN):
+class SSNNSingleStage(SingleHeadClassifier):
     def __init__(self, backbone, classifier_head, num_mod, vis_fea=False, method_name=None):
         super(SSNNSingleStage, self).__init__(backbone, classifier_head, vis_fea, method_name)
         self.num_mod = num_mod

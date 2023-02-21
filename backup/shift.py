@@ -79,7 +79,7 @@ pickle.dump(mod_label, open(osp.join(data_root, 'test_mod_label.pkl'), 'wb'), pr
 #         item = X[i, :, :]
 #         item = np.transpose(item) * move[j]
 #         item = item.astype(np.float32)
-#         np.save(osp.join(data_root, 'shift/channel', f'train_{c_num:07d}.npy'), item)
+#         np.format(osp.join(data_root, 'shift/channel', f'train_{c_num:07d}.npy'), item)
 #         c_num += 1
 #         if Y[i, j] > 0:
 #             channel_label.append(1)
@@ -97,7 +97,7 @@ pickle.dump(mod_label, open(osp.join(data_root, 'test_mod_label.pkl'), 'wb'), pr
 #         item = np.transpose(item) * move[j]
 #         item = item.astype(np.float32)
 #         if Y[i, j] > 0:
-#             np.save(osp.join(data_root, 'shift/mod', f'train_{m_num:07d}.npy'), item)
+#             np.format(osp.join(data_root, 'shift/mod', f'train_{m_num:07d}.npy'), item)
 #             m_num += 1
 #             mod_label.append(Y[i, j] - 1)
 

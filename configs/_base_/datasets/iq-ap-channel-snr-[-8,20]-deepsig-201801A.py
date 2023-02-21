@@ -10,8 +10,8 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[snr for snr in range(-8, 22, 2)]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='train_and_validation_ap.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='train_and_validation_ap.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['inputs', 'targets'])
@@ -25,8 +25,8 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[snr for snr in range(-8, 22, 2)]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='test_ap.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -42,8 +42,8 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[snr for snr in range(-8, 22, 2)]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='test_ap.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])
         ],

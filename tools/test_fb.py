@@ -16,7 +16,7 @@ def parse_args():
         '--format-out',
         type=str,
         default=None,
-        help='the dir to save output result file in json format')
+        help='the dir to format output result file in json format')
     args = parser.parse_args()
     return args
 
@@ -26,12 +26,12 @@ def main():
 
     cfg = Config.fromfile(args.config)
 
-    # format_out is determined in this priority: CLI > segment in file > filename
+    # format_out is determined in this priority: CLI > segment in file > file_name
     if args.format_out is not None:
         # update configs according to CLI args if args.format_out is not None
         cfg.format_out = args.format_out
     elif cfg.get('format_out', None) is None:
-        # use config filename as default format_out if cfg.format_out is None
+        # use config file_name as default format_out if cfg.format_out is None
         cfg.format_out = './format_out'
 
     # build the dataloader

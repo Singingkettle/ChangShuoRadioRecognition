@@ -25,7 +25,7 @@ class BaseDNN(nn.Module, metaclass=ABCMeta):
 
     @abstractmethod
     def init_weights(self, pre_trained=None):
-        """Initialize the weights in task.
+        """Initialize the weights in method.
 
        Args:
            pre_trained (str, optional): Path to pre-trained weights.

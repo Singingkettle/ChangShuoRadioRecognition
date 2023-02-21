@@ -14,7 +14,7 @@ PIPELINES = Registry('pipeline')
 PREPROCESSES = Registry('preprocess')
 EVALUATES = Registry('evaluate')
 MERGES = Registry('merge')
-SAVES = Registry('save')
+SAVES = Registry('format')
 
 
 def build(cfg, registry, default_args=None):

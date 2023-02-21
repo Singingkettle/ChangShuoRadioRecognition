@@ -10,7 +10,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='LoadAnnotations', with_snr=True),
             dict(type='Collect', keys=['iqs', 'aps', 'mod_labels', 'snr_labels'])
@@ -24,7 +24,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -41,7 +41,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],

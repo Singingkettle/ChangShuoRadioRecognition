@@ -21,7 +21,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from csrr.common.utils import Config, fuse_conv_bn, mkdir_or_exist
 from csrr.datasets import build_dataset
-from csrr.models import build_task
+from csrr.models import build_method
 from csrr.runner import load_checkpoint
 
 _IS_SIG_UP = False
@@ -32,7 +32,7 @@ def parse_args():
         description='ChangShuoRadioRecognition test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
-    parser.add_argument('--log_dir', help='dir to save the log file for online performance results')
+    parser.add_argument('--log_dir', help='dir to format the log file for online performance results')
     parser.add_argument(
         '--fuse-conv-bn',
         action='store_true',
@@ -77,7 +77,7 @@ def main():
             ds_cfg.test_mode = True
 
     # build the model and load checkpoint
-    model = build_task(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
+    model = build_method(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
     if args.fuse_conv_bn:
         model = fuse_conv_bn(model)
@@ -97,7 +97,7 @@ def main():
         # update configs according to CLI args if args.work_dir is not None
         log_dir = osp.join(args.log_dir, osp.splitext(osp.basename(args.config))[0])
     else:
-        # use config filename as default work_dir if cfg.work_dir is None
+        # use config file_name as default work_dir if cfg.work_dir is None
         log_dir = osp.join('./online_performance_dirs', osp.splitext(osp.basename(args.config))[0])
     log_dir = osp.join(log_dir, 'tf_logs')
     mkdir_or_exist(log_dir)

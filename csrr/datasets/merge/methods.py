@@ -14,8 +14,6 @@ from scipy.optimize import minimize, Bounds, LinearConstraint
 from scipy.special import softmax
 
 from ..builder import MERGES
-from ..utils import reshape_results, get_classification_accuracy_with_snr, generate_targets
-
 
 def get_pre_matrix(results, num_class):
     pre_matrix = []

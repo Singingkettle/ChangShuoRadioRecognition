@@ -6,13 +6,13 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
+    type='AlexNet',
     method_name='AlexNet-CO',
     backbone=dict(
         type='AlexNet'
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=24,
         in_features=256,
         out_features=256,

@@ -6,14 +6,14 @@ _base_ = [
 
 # model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='DensCNN-IQ',
     backbone=dict(
         type='DensCNN',
         avg_pool=(1, 8),
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=24,
         in_features=10240,
         out_features=128,

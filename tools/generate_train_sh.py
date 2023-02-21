@@ -11,11 +11,11 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Generate Train.sh File')
     parser.add_argument('config', help='plot config file path')
-    parser.add_argument('--scripts_dir', help='dir to save the train.sh files')
+    parser.add_argument('--scripts_dir', help='dir to format the train.sh files')
     parser.add_argument('--parallel', default=False, action='store_true',
                         help='run multi python scripts')
     parser.add_argument('--group_num', default=4, type=int, help='number of configs in one train.sh file')
-    parser.add_argument('--work_dir', help='the dir to save logs and models')
+    parser.add_argument('--work_dir', help='the dir to format logs and models')
     parser.add_argument('--multi_gpu', default=False, action='store_true',
                         help='use parallel gpu training')
     parser.add_argument('--is_regeneration', default=False, action='store_true',

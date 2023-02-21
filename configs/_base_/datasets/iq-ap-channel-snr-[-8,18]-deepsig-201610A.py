@@ -10,8 +10,8 @@ data = dict(
             dict(type='FilterBySNR', low_snr=-8, high_snr=18),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='train_and_validation_ap.pkl', to_float32=True,
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='train_and_validation_ap.pkl', to_float32=True,
                  to_norm=True),
             dict(type='ChannelMode', ),
             dict(type='LoadAnnotations'),
@@ -26,8 +26,8 @@ data = dict(
             dict(type='FilterBySNR', low_snr=-8, high_snr=18),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='test_ap.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -43,8 +43,8 @@ data = dict(
             dict(type='FilterBySNR', low_snr=-8, high_snr=18),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
-            dict(type='LoadAPFromCache', data_root=data_root, filename='test_ap.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadAPFromCache', data_root=data_root, file_name='test_ap.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])
         ],

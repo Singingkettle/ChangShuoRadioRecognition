@@ -16,14 +16,14 @@ class GeneratePSDFromIQ:
         self.to_norm = to_norm
 
     def __call__(self, results):
-        iqs = results['iqs']
+        iqs = results['inputs']['iqs']
         iqs = iqs[0, :] + 1j * iqs[1, :]
         N = iqs.shape[0]
         xdft = np.fft.fft(iqs)
         psdx = 1 / (2 * np.pi * N) * np.power(np.abs(xdft), 2)
         psd = 10 * np.log10(psdx)
 
-        results['psds'] = psd
+        results['inputs']['psds'] = psd
 
     def __repr__(self):
         repr_str = (f'{self.__class__.__name__}('

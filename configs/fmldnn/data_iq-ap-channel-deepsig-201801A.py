@@ -7,7 +7,7 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='ChannelMode', ),
             dict(type='LoadAnnotations'),
@@ -19,7 +19,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])
@@ -33,7 +33,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['inputs'])

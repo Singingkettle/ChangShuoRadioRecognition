@@ -6,7 +6,7 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='CLDNN-IQ',
     backbone=dict(
         type='CRNet',
@@ -18,7 +18,7 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=11,
         in_features=50,
         out_features=128,

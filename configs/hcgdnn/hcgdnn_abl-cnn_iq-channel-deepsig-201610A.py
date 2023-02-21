@@ -8,14 +8,14 @@ in_size = 100
 out_size = 288
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='HCGDNN-V1',
     backbone=dict(
         type='HCGNetCNN',
         input_size=in_size,
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         in_features=in_size,
         out_features=out_size,
         num_classes=11,

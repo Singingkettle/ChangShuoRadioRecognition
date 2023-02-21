@@ -15,7 +15,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognitionTrain a regression model')
     parser.add_argument('config', help='train config file path')
-    parser.add_argument('--work_dir', help='the dir to save logs and models')
+    parser.add_argument('--work_dir', help='the dir to format logs and models')
 
     args = parser.parse_args()
 
@@ -29,13 +29,13 @@ def main():
     # load cfg
     cfg = Config.fromfile(args.config)
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
+    # work_dir is determined in this priority: CLI > segment in file > file_name
     if args.work_dir is not None:
         # update configs according to CLI args if args.work_dir is not None
         cfg.work_dir = osp.join(
             args.work_dir, osp.splitext(osp.basename(args.config))[0])
     elif cfg.get('work_dir', None) is None:
-        # use config filename as default work_dir if cfg.work_dir is None
+        # use config file_name as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
     # create work_dir

@@ -8,7 +8,7 @@ in_features = 100
 out_features = 256
 num_classes = 11
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='Fast MLDNN-V4',
     backbone=dict(
         type='FMLNet',
@@ -17,7 +17,7 @@ model = dict(
         skip_connection=True,
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         in_features=in_features,
         out_features=out_features,
         num_classes=num_classes,

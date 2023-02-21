@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 from .base_head import BaseHead
@@ -33,8 +34,8 @@ class ClassificationHead(BaseHead):
                 nn.init.constant_(m.bias, 0)
 
     def loss(self, inputs, labels, weight=None, **kwargs):
-        loss_Final = self.loss_cls(inputs, labels, weight=weight)
-        return dict(loss_Final=loss_Final)
+        loss_Cls = self.loss_cls(inputs, labels, weight=weight)
+        return dict(loss_Cls=loss_Cls)
 
     def forward(self, inputs, vis_fea=False, is_test=False):
         x = inputs.reshape(-1, self.in_features)
@@ -46,4 +47,6 @@ class ClassificationHead(BaseHead):
             return dict(fea=fea, Final=pre)
         else:
             pre = self.classifier(x)
+            if is_test:
+                pre = torch.softmax(pre, dim=1)
             return pre

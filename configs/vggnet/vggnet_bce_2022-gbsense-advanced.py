@@ -43,7 +43,7 @@ in_size = 512
 out_size = 256
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='VGGNet',
     backbone=dict(
         type='VGGNet',

@@ -4,7 +4,7 @@ import os.path as osp
 import numpy as np
 from torch.utils.data import Dataset
 
-from .builder import DATASETS
+from .builder import DATASETS, build_preprocess, build_evaluate, build_save
 from .pipeline import Compose
 from ..common.fileio import load as IOLoad
 
@@ -19,11 +19,26 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
         test_mode (bool, optional): If set True, annotation will not be loaded.
 
     """
-    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False):
+
+    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None, save=None):
         self.ann_file = ann_file
         self.pipeline = pipeline
         self.data_root = data_root
         self.test_mode = test_mode
+        if preprocess is not None:
+            preprocess = build_preprocess(preprocess)
+            for process in preprocess:
+                self.data_infos = process(self.data_infos)
+
+        if evaluate is not None:
+            self.eval = build_evaluate(evaluate)
+        else:
+            self.eval = None
+
+        if save is not None:
+            self.save = build_save(save)
+        else:
+            self.save = None
 
         if self.data_root is not None:
             if not osp.isabs(self.ann_file):
@@ -48,6 +63,7 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
 
     def __len__(self):
         """Total number of samples of data."""
+        return len(self.data_infos['annotations'])
 
     def load_annotations(self, ann_file):
         """Load annotation from annotation file."""
@@ -73,11 +89,10 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
 
         return data
 
-
+    @abstractmethod
     def pre_pipeline(self, results):
         """Prepare inputs dict for pipeline."""
 
-    @abstractmethod
     def prepare_train_data(self, idx):
         """Get training data and annotations after pipeline.
 
@@ -88,8 +103,11 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             dict: Training data and annotation after pipeline with new keys \
                 introduced by pipeline.
         """
+        results = self.get_ann_info(idx)
+        results = self.pre_pipeline(results)
+        results['targets'] = dict()
+        return self.pipeline(results)
 
-    @abstractmethod
     def prepare_test_data(self, idx):
         """Get testing data  after pipeline.
 
@@ -100,12 +118,25 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             dict: Testing data after pipeline with new keys introduced by \
                 pipeline.
         """
+        file_name = self.data_infos['annotations'][idx]['file_name']
+        results = dict(file_name=file_name)
+        results = self.pre_pipeline(results)
+        return self.pipeline(results)
 
-    @abstractmethod
-    def format_out(self, out_dir, results):
-        """Format results and save."""
+    def format_results(self, out_dir, results):
+        """ Format results and format.
+        Args:
+            out_dir (str): The format folder
+            results (list): The ACM test results
+        Returns:
+            None
+        """
+        assert isinstance(results, list), 'results must be a list'
+        assert len(results) == len(self), (
+            'The length of results is not equal to the dataset len: {} != {}'.format(len(results), len(self)))
+        for process in self.save:
+            process(out_dir, results, self.data_infos)
 
-    @abstractmethod
     def evaluate(self, results, logger=None):
         """Evaluate the dataset.
 
@@ -113,4 +144,13 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             results (list): Testing results of the dataset.
             logger (logging.Logger | None | str): Logger used for printing
                 related information during evaluation. Default: None.
+        Returns:
+            eval_results (dict):
         """
+
+        eval_results = dict()
+        for process in self.eval:
+            sub_eval_results = process(results, self.data_infos)
+            eval_results.update(sub_eval_results)
+
+        return eval_results

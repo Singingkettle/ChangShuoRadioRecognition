@@ -1,6 +1,5 @@
 from .builder import DATASETS, build_preprocess, build_evaluate, build_save
 from .custom import CustomDataset
-from .utils import format_results
 from ..common.fileio import load as IOLoad
 
 
@@ -40,7 +39,7 @@ class CSRRDataset(CustomDataset):
 
     def load_annotations(self, ann_file):
         data_infos = IOLoad(ann_file)
-        # there is a bug when using json package to save the dict var, where its key is int
+        # there is a bug when using json package to format the dict var, where its key is int
         # after saving, the int key will be transferred as string
         # please refer to:
         # https://stackoverflow.com/questions/1450957/pythons-json-module-converts-int-dictionary-keys-to-strings
@@ -63,7 +62,7 @@ class CSRRDataset(CustomDataset):
         return data_infos
 
     def __len__(self):
-        return len(self.data_infos['item_filename'])
+        return len(self.data_infos['item_file_name'])
 
     def get_ann_info(self, idx):
         results = dict()
@@ -81,21 +80,21 @@ class CSRRDataset(CustomDataset):
         return results
 
     def prepare_train_data(self, idx):
-        filename = self.data_infos['item_filename'][idx]
+        file_name = self.data_infos['item_file_name'][idx]
         ann_info = self.get_ann_info(idx)
-        results = dict(filename=filename)
+        results = dict(file_name=file_name)
         results.update(ann_info)
         results = self.pre_pipeline(results)
         return self.pipeline(results)
 
     def prepare_test_data(self, idx):
-        filename = self.data_infos['item_filename'][idx]
-        results = dict(filename=filename)
+        file_name = self.data_infos['item_file_name'][idx]
+        results = dict(file_name=file_name)
         results = self.pre_pipeline(results)
         return self.pipeline(results)
 
     def format_out(self, out_dir, results):
-        """Format results and save."""
+        """Format results and format."""
 
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (

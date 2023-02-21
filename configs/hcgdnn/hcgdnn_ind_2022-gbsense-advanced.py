@@ -37,7 +37,7 @@ in_size = 100
 out_size = 288
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='HCGDNN',
     backbone=dict(
         type='HCGNetGRU2',
@@ -48,7 +48,7 @@ model = dict(
     classifier_head=dict(
         type='GBIndHead',
         channel_head=dict(
-            type='ClassificationHead',
+            type='ACMHead',
             in_features=in_size,
             out_features=out_size,
             num_classes=24,
@@ -58,7 +58,7 @@ model = dict(
             ),
         ),
         mod_head=dict(
-            type='ClassificationHead',
+            type='ACMHead',
             in_features=in_size,
             out_features=out_size,
             num_classes=13,
@@ -68,7 +68,7 @@ model = dict(
             ),
         ),
         order_head=dict(
-            type='ClassificationHead',
+            type='ACMHead',
             in_features=in_size,
             out_features=out_size,
             num_classes=4,

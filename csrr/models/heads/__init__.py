@@ -1,3 +1,4 @@
+from .amc_head import AMCHead
 from .classification_head import ClassificationHead
 from .shrinkage_head import ShrinkageHead
 from .base_head import BaseHead
@@ -12,6 +13,7 @@ from .ss_head import SSHead
 
 __all__ = [
     'BaseHead',
+    'AMCHead',
     'ClassificationHead',
     'ShrinkageHead',
     'DSCLDNNHead',

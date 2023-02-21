@@ -9,7 +9,7 @@ out_size = 288
 heads = ['CNN', 'BiGRU1']
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='HCGDNN-V4',
     backbone=dict(
         type='HCGNet',

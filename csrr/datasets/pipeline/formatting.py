@@ -7,7 +7,7 @@ class Collect:
 
     def __init__(self,
                  keys,
-                 meta_keys=('filename',)):
+                 meta_keys=('file_name',)):
         self.keys = keys
         self.meta_keys = meta_keys
 

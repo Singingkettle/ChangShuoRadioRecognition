@@ -92,7 +92,7 @@ _g_timers = {}  # global timers
 def check_time(timer_id):
     """Add check points in a single line.
 
-    This method is suitable for running a task on a list of items. A timer will
+    This method is suitable for running a method on a list of items. A timer will
     be registered when the method is called for the first time.
 
     :Example:
@@ -102,7 +102,7 @@ def check_time(timer_id):
     >>> for i in range(1, 6):
     >>>     # simulate a code block
     >>>     time.sleep(i)
-    >>>     csrr.check_time('task1')
+    >>>     csrr.check_time('method1')
     2.000
     3.000
     4.000

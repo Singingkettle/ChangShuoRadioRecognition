@@ -14,13 +14,13 @@ class RebaseModLabelBySNR:
         self.num_class = num_class
 
     def __call__(self, results):
-        snr = results['item_snr_value']
-        gt = results['item_mod_label']
+        snr = results['snr']
+        gt = results['modulation']
         target = (1 - 1.0 / self.num_class) * (
                 1.0 / (1 + math.exp(-self.alpha * (snr + self.beta)))) + 1.0 / self.num_class
         label = np.zeros(self.num_class, dtype=np.float32)
         label[gt] = target
-        results['mod_labels'] = label
+        results['targets']['modulation'] = label
         return results
 
     def __repr__(self):
@@ -35,12 +35,12 @@ class SigmoidLossWeight:
         self.num_class = num_class
 
     def __call__(self, results):
-        snr = results['item_snr_value']
-        gt = results['item_mod_label']
+        snr = results['snr']
+        gt = results['modulation']
         weight = np.zeros(self.num_class, dtype=np.float32)
         weight[:] = 1.0 / (1 + math.exp(-self.alpha * (snr + self.beta)))
         weight[gt] = 1
-        results['weight'] = weight
+        results['weights']['modulation'] = weight
         return results
 
     def __repr__(self):

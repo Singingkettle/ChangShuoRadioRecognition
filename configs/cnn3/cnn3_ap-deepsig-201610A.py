@@ -6,7 +6,7 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='CNN3-AP',
     backbone=dict(
         type='CNNNet',
@@ -15,7 +15,7 @@ model = dict(
         out_indices=(2,),
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=11,
         in_features=10720,
         out_features=256,

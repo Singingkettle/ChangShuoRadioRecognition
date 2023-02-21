@@ -9,7 +9,7 @@ num_mod = 5
 model = dict(
     type='SSNNTwoStage',
     band_net=dict(
-        type='DNN',
+        type='SingleHeadClassifier',
         method_name='CNN3-IQ',
         backbone=dict(
             type='CNNNet',
@@ -19,7 +19,7 @@ model = dict(
             avg_pool=(1, 8),
         ),
         classifier_head=dict(
-            type='ClassificationHead',
+            type='ACMHead',
             num_classes=num_band,
             in_features=10240,
             out_features=128,
@@ -30,7 +30,7 @@ model = dict(
         ),
     ),
     mod_net=dict(
-        type='DNN',
+        type='SingleHeadClassifier',
         method_name='CGDNN',
         backbone=dict(
             type='CRNet',
@@ -43,7 +43,7 @@ model = dict(
             rnn_mode='GRU',
         ),
         classifier_head=dict(
-            type='ClassificationHead',
+            type='ACMHead',
             num_classes=num_mod,
             in_features=50,
             out_features=128,

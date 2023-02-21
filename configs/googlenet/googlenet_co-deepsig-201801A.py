@@ -6,13 +6,13 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='GoogleNet-CO',
     backbone=dict(
         type='GoogleNet'
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=24,
         in_features=1024,
         out_features=256,

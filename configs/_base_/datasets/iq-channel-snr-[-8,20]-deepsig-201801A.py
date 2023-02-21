@@ -11,7 +11,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['inputs', 'targets'])
@@ -26,7 +26,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['iqs', ])
         ],
@@ -43,7 +43,7 @@ data = dict(
             dict(type='MLDNNSNRLabel'),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
             dict(type='Collect', keys=['iqs', ])
         ],

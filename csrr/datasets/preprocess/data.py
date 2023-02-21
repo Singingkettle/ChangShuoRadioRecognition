@@ -10,89 +10,46 @@ class FilterBySNR:
         self.snr_set = snr_set
 
     def __call__(self, data_infos):
-        item_filename = []
-        item_mod_label = []
-        item_snr_value = data_infos['item_snr_value']
 
-        selected_item_snr_value = []
-        for idx, snr_value in enumerate(item_snr_value):
-            if snr_value in self.snr_set:
-                item_filename.append(data_infos['item_filename'][idx])
-                item_mod_label.append(data_infos['item_mod_label'][idx])
-                selected_item_snr_value.append(snr_value)
+        annotations = data_infos['annotations']
+        save_annotations = []
+        for annotation in annotations:
+            if annotation['snr'] in self.snr_set:
+                save_annotations.append(annotation)
 
-        data_infos['item_filename'] = item_filename
-        data_infos['item_mod_label'] = item_mod_label
-        data_infos['item_snr_value'] = selected_item_snr_value
-
-        snr_to_label = {snr: index for index, snr in enumerate(sorted(list(set(selected_item_snr_value))))}
-        label_to_snr = {snr_to_label[snr]: snr for snr in snr_to_label}
-
-        data_infos['snr_to_label'] = snr_to_label
-        data_infos['label_to_snr'] = label_to_snr
-        data_infos['snr_to_index'] = snr_to_label
-
-        item_snr_index = []
-        item_snr_label = []
-        for snr_value in data_infos['item_snr_value']:
-            item_snr_index.append(snr_to_label[snr_value])
-            item_snr_label.append(snr_to_label[snr_value])
-
-        data_infos['item_snr_index'] = item_snr_index
-        data_infos['item_snr_label'] = item_snr_label
+        data_infos['annotations'] = save_annotations
+        data_infos['snrs'] = sorted(self.snr_set)
 
         return data_infos
 
 
 @PREPROCESSES.register_module()
 class SampleByRatio:
-    def __init__(self, sample_ratio):
+    def __init__(self, sample_ratio, key_set=None):
+        if key_set is None:
+            key_set = ['modulation', 'snr']
         self.sample_ratio = sample_ratio
+        self.key_set = key_set
 
     def __call__(self, data_infos):
-        item_filename = data_infos['item_filename']
-        item_mod_label = data_infos['item_mod_label']
-        item_snr_label = data_infos['item_snr_label']
-        item_snr_index = data_infos['item_snr_index']
-        item_snr_value = data_infos['item_snr_value']
+        annotations = data_infos['annotations']
 
-        left = 0
-        right = -1
-        cur_snr = item_snr_value[0]
-        new_item_filename = []
-        new_item_mod_label = []
-        new_item_snr_label = []
-        new_item_snr_index = []
-        new_item_snr_value = []
-        item_snr_value.append(None)
-        for idx, snr_value in enumerate(item_snr_value):
-            right += 1
-            if cur_snr != snr_value:
-                cur_num_snr = right - left
-                save_num = math.ceil(cur_num_snr * self.sample_ratio)
+        statistical_infos = dict()
+        for annotation in annotations:
+            new_key = [None] * len(self.key_set)
+            for i, key_val in enumerate(self.key_set):
+                new_key[i] = annotation[key_val]
+            new_key = tuple(new_key)
+            if new_key in statistical_infos:
+                statistical_infos[new_key].append(copy.deepcopy(annotation))
+            else:
+                statistical_infos[new_key] = [copy.deepcopy(annotation)]
 
-                cur_item_filename = copy.copy(item_filename[left:left + save_num])
-                new_item_filename.extend(cur_item_filename)
+        save_annotations = []
+        for key_val in statistical_infos:
+            save_num = math.ceil(len(statistical_infos[key_val]) * self.sample_ratio)
+            save_annotations.extend(copy.deepcopy(statistical_infos[key_val][:save_num]))
 
-                cur_item_mod_label = copy.copy(item_mod_label[left:left + save_num])
-                new_item_mod_label.extend(cur_item_mod_label)
-
-                cur_item_snr_label = copy.copy(item_snr_label[left:left + save_num])
-                new_item_snr_label.extend(cur_item_snr_label)
-
-                cur_item_snr_index = copy.copy(item_snr_index[left:left + save_num])
-                new_item_snr_index.extend(cur_item_snr_index)
-
-                cur_item_snr_value = copy.copy(item_snr_value[left:left + save_num])
-                new_item_snr_value.extend(cur_item_snr_value)
-
-                cur_snr = snr_value
-                left = right
-
-        data_infos['item_filename'] = new_item_filename
-        data_infos['item_mod_label'] = new_item_mod_label
-        data_infos['item_snr_label'] = new_item_snr_label
-        data_infos['item_snr_index'] = new_item_snr_index
-        data_infos['item_snr_value'] = new_item_snr_value
+        data_infos['annotations'] = save_annotations
 
         return data_infos

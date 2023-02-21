@@ -1,15 +1,7 @@
 from .amc import (
-    EvaluateSNRPrediction,
-    EvaluateClassificationWithSNR,
-    EvaluateOnlineModulationPrediction,
-    EvaluateClassificationWithSNROfHCGDNN,
-    EvaluateTwoClassificationTaskWithSNR
+    EvaluateSingleHeadClassifierWithSNR
 )
 
 __all__ = [
-    'EvaluateSNRPrediction',
-    'EvaluateClassificationWithSNR',
-    'EvaluateOnlineModulationPrediction',
-    'EvaluateClassificationWithSNROfHCGDNN',
-    'EvaluateTwoClassificationTaskWithSNR',
+    'EvaluateSingleHeadClassifierWithSNR',
 ]

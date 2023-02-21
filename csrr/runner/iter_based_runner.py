@@ -174,19 +174,19 @@ class IterBasedRunner(BaseRunner):
 
     def save_checkpoint(self,
                         out_dir,
-                        filename_tmpl='iter_{}.pth',
+                        file_name_tmpl='iter_{}.pth',
                         meta=None,
                         save_optimizer=True,
                         create_symlink=True):
         """Save checkpoint to file.
 
         Args:
-            out_dir (str): Directory to save checkpoint files.
-            filename_tmpl (str, optional): Checkpoint file template.
+            out_dir (str): Directory to format checkpoint files.
+            file_name_tmpl (str, optional): Checkpoint file template.
                 Defaults to 'iter_{}.pth'.
             meta (dict, optional): Metadata to be saved in checkpoint.
                 Defaults to None.
-            save_optimizer (bool, optional): Whether save optimizer.
+            save_optimizer (bool, optional): Whether format optimizer.
                 Defaults to True.
             create_symlink (bool, optional): Whether create symlink to the
                 latest checkpoint file. Defaults to True.
@@ -201,8 +201,8 @@ class IterBasedRunner(BaseRunner):
         if self.meta is not None:
             meta.update(self.meta)
 
-        filename = filename_tmpl.format(self.iter + 1)
-        filepath = osp.join(out_dir, filename)
+        file_name = file_name_tmpl.format(self.iter + 1)
+        filepath = osp.join(out_dir, file_name)
         optimizer = self.optimizer if save_optimizer else None
         save_checkpoint(self.model, filepath, optimizer=optimizer, meta=meta)
         # in some environments, `os.symlink` is not supported, you may need to
@@ -210,9 +210,9 @@ class IterBasedRunner(BaseRunner):
         if create_symlink:
             dst_file = osp.join(out_dir, 'latest.pth')
             if platform.system() != 'Windows':
-                symlink(filename, dst_file)
+                symlink(file_name, dst_file)
             else:
-                shutil.copy(filename, dst_file)
+                shutil.copy(file_name, dst_file)
 
     def register_training_hooks(self,
                                 lr_config,

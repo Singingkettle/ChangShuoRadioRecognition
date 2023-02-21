@@ -7,7 +7,6 @@ from torch.utils.data import Dataset
 
 from .builder import DATASETS
 from .merge.methods import get_merge_weight_by_grid_search
-from .utils import format_results, reshape_results
 
 
 @DATASETS.register_module()

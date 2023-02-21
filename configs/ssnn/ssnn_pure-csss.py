@@ -7,7 +7,7 @@ _base_ = [
 num_mod = 5
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='CGDNN',
     backbone=dict(
         type='CRNet',
@@ -20,7 +20,7 @@ model = dict(
         rnn_mode='GRU',
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=num_mod,
         in_features=50,
         out_features=128,

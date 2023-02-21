@@ -5,7 +5,7 @@ _base_ = [
 ]
 
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='MLDNN-V7',
     backbone=dict(
         type='MLNet',
@@ -20,7 +20,7 @@ model = dict(
         heads=[
             # Snr Head
             dict(
-                type='ClassificationHead',
+                type='ACMHead',
                 num_classes=2,
                 in_features=100,
                 out_features=256,
@@ -31,7 +31,7 @@ model = dict(
             ),
             # Low Head
             dict(
-                type='ClassificationHead',
+                type='ACMHead',
                 num_classes=11,
                 in_features=100,
                 out_features=256,
@@ -42,7 +42,7 @@ model = dict(
             ),
             # High Head
             dict(
-                type='ClassificationHead',
+                type='ACMHead',
                 num_classes=11,
                 in_features=100,
                 out_features=256,

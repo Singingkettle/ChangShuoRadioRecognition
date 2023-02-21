@@ -6,8 +6,7 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
-    method_name='CNN4-IQ',
+    type='CNN4',
     backbone=dict(
         type='CNNNet',
         depth=4,
@@ -15,7 +14,7 @@ model = dict(
         out_indices=(3,),
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='AMCHead',
         num_classes=11,
         in_features=10880,
         out_features=128,

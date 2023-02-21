@@ -10,7 +10,9 @@ from tqdm import tqdm
 
 from csrr.common.fileio import load as IOLoad
 
-_DATA_VERSION = ['201801A', '201610A', '201604C', '201610B']
+# _DATA_VERSION = ['201801A', '201610A', '201604C', '201610B']
+
+_DATA_VERSION = ['201610A', '201801A']
 
 
 def parse_args():
@@ -24,17 +26,18 @@ def parse_args():
 
 def run(dataset_folder, json_file):
     mode = json_file.split('.')[0]
-    annotation = IOLoad(osp.join(dataset_folder, json_file))
+    annotations = IOLoad(osp.join(dataset_folder, json_file))
     cache_data = {'sequence_data/ap': {'data': [], 'shape': None, 'dtype': None},
                   'sequence_data/iq': {'data': [], 'shape': None, 'dtype': None},
                   'constellation_data/filter_size_0.020_stride_0.020': {'data': [], 'shape': None, 'dtype': None},
                   'constellation_data/filter_size_0.050_stride_0.050': {'data': [], 'shape': None, 'dtype': None},
                   }
-    filename_index = dict()
+    file_name_index = dict()
     idx = 0
-    for item_filename in tqdm(annotation['item_filename']):
+    for annotation in tqdm(annotations['annotations']):
+        file_name = annotation['file_name']
         for key in cache_data:
-            file_path = osp.join(dataset_folder, key, item_filename)
+            file_path = osp.join(dataset_folder, key, file_name)
             data = np.load(file_path)
             data = data.astype(np.float32)
             cache_data[key]['shape'] = data.shape
@@ -46,13 +49,13 @@ def run(dataset_folder, json_file):
             else:
                 cdata = zlib.compress(data.tobytes())
                 cache_data[key]['data'].append(cdata)
-        filename_index[item_filename] = idx
+        file_name_index[file_name] = idx
         idx += 1
 
     for key in cache_data:
         if 'sequence_data' in key:
             cache_data[key]['data'] = np.concatenate(cache_data[key]['data'], axis=0)
-        cache_data[key]['lookup_table'] = filename_index
+        cache_data[key]['lookup_table'] = file_name_index
 
     cache_dir = osp.join(dataset_folder, 'cache')
     if not osp.isdir(cache_dir):

@@ -6,13 +6,13 @@ _base_ = [
 
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='VGGNet',
     backbone=dict(
         type='VGGNet'
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         num_classes=24,
         in_features=512,
         out_features=256,

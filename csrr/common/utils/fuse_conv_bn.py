@@ -28,7 +28,7 @@ def fuse_conv_bn(module):
 
     During inference, the functionary of batch norm layers is turned off
     but only the mean and var alone channels are used, which exposes the
-    chance to fuse it with the preceding conv layers to save computations and
+    chance to fuse it with the preceding conv layers to format computations and
     simplify network structures.
 
     Args:

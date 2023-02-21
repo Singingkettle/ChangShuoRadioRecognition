@@ -5,7 +5,7 @@ _base_ = [
 ]
 
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='DSCLDNN',
     backbone=dict(
         type='DSCLNet',

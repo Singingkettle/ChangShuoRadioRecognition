@@ -9,7 +9,6 @@ from torch.utils.data import Dataset
 
 from .builder import DATASETS
 from .merge.methods import get_merge_weight_by_grid_search
-from .utils import format_results, reshape_results
 from ..common import DataContainer as DC
 
 
@@ -202,7 +201,7 @@ class CSSSDetTwoStage(BaseCSSS):
         x_ = self.iqs_[idx, :, :, :]
 
         inputs = dict(iqs=x, iqs_=x_)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas)
 
@@ -217,7 +216,7 @@ class CSSSDetTwoStage(BaseCSSS):
 
         inputs = dict(iqs=x, iqs_=x_)
         targets = dict(mod_labels=my, band_labels=by)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas, targets=targets)
 
@@ -297,14 +296,14 @@ class CSSSDetSingleStage(BaseCSSS):
 
         inputs = dict(iqs=x)
         targets = dict(labels=my)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas, targets=targets)
 
     def prepare_test_data(self, idx):
         x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
         inputs = dict(iqs=x)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas)
 
@@ -416,7 +415,7 @@ class PureCSSS(Dataset):
 
         inputs = dict(iqs=x)
         targets = dict(labels=my)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas, targets=targets)
 
@@ -424,7 +423,7 @@ class PureCSSS(Dataset):
         x = self.iqs[idx, :, :]
         x = np.expand_dims(x, axis=0)
         inputs = dict(iqs=x)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas)
 
@@ -497,14 +496,14 @@ class CSSSDetSingleStageV2(BaseCSSS):
 
         inputs = dict(iqs=x)
         targets = dict(labels=my)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas, targets=targets)
 
     def prepare_test_data(self, idx):
         x = self.iqs[idx * self.num_band:(idx + 1) * self.num_band, :, :]
         inputs = dict(iqs=x)
-        input_metas = DC(dict(filename=0), cpu_only=True)
+        input_metas = DC(dict(file_name=0), cpu_only=True)
 
         return dict(inputs=inputs, input_metas=input_metas)
 

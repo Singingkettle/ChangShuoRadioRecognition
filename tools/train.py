@@ -9,11 +9,11 @@ import torch
 import torch.distributed as dist
 
 from csrr import __version__
-from csrr.apis import init_random_seed, set_random_seed, train_task
+from csrr.apis import init_random_seed, set_random_seed, train_method
 from csrr.common import get_root_logger, collect_env
 from csrr.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist, setup_multi_processes, get_device
 from csrr.datasets import build_dataset
-from csrr.models import build_task
+from csrr.models import build_method
 from csrr.runner import init_dist, get_dist_info
 
 
@@ -21,7 +21,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Train a model')
     parser.add_argument('config', help='train config file path')
-    parser.add_argument('--work_dir', help='the dir to save logs, models and results')
+    parser.add_argument('--work_dir', help='the dir to format logs, models and results')
     parser.add_argument('--resume_from', help='the checkpoint file to resume from')
     parser.add_argument('--auto_resume', action='store_true', help='resume from the latest checkpoint automatically')
     parser.add_argument('--no_validate', action='store_true',
@@ -74,13 +74,13 @@ def main():
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
+    # work_dir is determined in this priority: CLI > segment in file > file_name
     if args.work_dir is not None:
         # update configs according to CLI args if args.work_dir is not None
         cfg.work_dir = osp.join(
             args.work_dir, osp.splitext(osp.basename(args.config))[0])
     elif cfg.get('work_dir', None) is None:
-        # use config filename as default work_dir if cfg.work_dir is None
+        # use config file_name as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
 
@@ -145,7 +145,7 @@ def main():
     meta['seed'] = args.seed
     meta['exp_name'] = osp.basename(args.config)
 
-    model = build_task(cfg.model)
+    model = build_method(cfg.model)
 
     # log network structure
     logger.info(f'Network Structure:\n{model}')
@@ -156,14 +156,14 @@ def main():
         datasets.append(build_dataset(val_dataset))
 
     if cfg.checkpoint_config is not None:
-        # save version in checkpoints as meta data
+        # format version in checkpoints as meta data
         cfg.checkpoint_config.meta = dict(csrr_version=__version__)
 
     if hasattr(datasets[0], 'CLASSES'):
         model.CLASSES = datasets[0].CLASSES
         meta['CLASSES'] = datasets[0].CLASSES
 
-    train_task(model, datasets, cfg, distributed=distributed, validate=(not args.no_validate),
+    train_method(model, datasets, cfg, distributed=distributed, validate=(not args.no_validate),
                timestamp=timestamp, meta=meta)
 
 

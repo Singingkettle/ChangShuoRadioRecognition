@@ -133,7 +133,7 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
       print conf matrix with default layout (like matlab)
       params:
         df_cm          dataframe (pandas) without totals
-        save_path      path to save confusion map
+        save_path      path to format confusion map
         annot          print text in each cell
         cmap           Oranges,Oranges_r,YlGnBu,Blues,RdBu, ... see:
         fz             fontsize

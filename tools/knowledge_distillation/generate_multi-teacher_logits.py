@@ -13,9 +13,9 @@ from csrr.common.fileio import load as IOLoad
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition generate logits for knowledge distillation!')
-    parser.add_argument('--work_dir', help='the dir to save logs and models')
+    parser.add_argument('--work_dir', help='the dir to format logs and models')
     parser.add_argument('-config', '--configs', nargs='+')
-    parser.add_argument('--anno_dir', help='the dir to save annotations')
+    parser.add_argument('--anno_dir', help='the dir to format annotations')
     parser.add_argument('--anno_name', help='the file name of annotations', type=str, default='test.json',
                         choices={'train_and_val.json', 'train.json', 'val.json', 'test.json'})
     args = parser.parse_args()

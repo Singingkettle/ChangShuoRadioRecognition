@@ -17,7 +17,7 @@ from ..builder import FLOPS
 from ...common.utils import Config
 from ...common.utils.flops_counter import get_model_complexity_info, flops_to_string, params_to_string, \
     inference_time_to_string
-from ...models import build_task
+from ...models import build_method
 
 
 @FLOPS.register_module()
@@ -28,7 +28,7 @@ class GetFlops(object):
 
     def _evaluate_model(self, cfg_path, name, input_shape):
         cfg = Config.fromfile(cfg_path)
-        model = build_task(cfg.model)
+        model = build_method(cfg.model)
         if torch.cuda.is_available():
             model.cuda()
         model.eval()

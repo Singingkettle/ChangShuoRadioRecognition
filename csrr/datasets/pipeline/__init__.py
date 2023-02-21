@@ -6,11 +6,11 @@ from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromHDF5, LoadIQFromHDF5,
                       LoadConstellationFromIQFile, LoadConstellationFromIQCache, LoadAPFromIQ,
                       LoadFTFromIQ,
-                      LoadAnnotations)
+                      LoadAnnotations,
+                      MLDNNSNRLabel)
+from .train import RebaseModLabelBySNR, SigmoidLossWeight, ASSMaskWeight
 from .transform import (ChannelMode, NormalizeAP, NormalizeIQ,
                         NormalizeConstellation)
-
-from .train import RebaseModLabelBySNR, SigmoidLossWeight, ASSMaskWeight
 
 __all__ = [
     'Compose',
@@ -29,6 +29,7 @@ __all__ = [
     'LoadAPFromIQ',
     'LoadFTFromIQ',
     'LoadAnnotations',
+    'MLDNNSNRLabel',
     'ChannelMode',
     'NormalizeAP',
     'NormalizeIQ',

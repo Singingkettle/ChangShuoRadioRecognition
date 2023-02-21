@@ -12,7 +12,7 @@ class NormalizeIQ:
         self.std = self.std.reshape(-1, 1)
 
     def __call__(self, results):
-        results['iqs'] = (results['iqs'] - self.mean) / self.std
+        results['inputs']['iqs'] = (results['inputs']['iqs'] - self.mean) / self.std
 
         return results
 
@@ -26,7 +26,7 @@ class NormalizeAP:
         self.std = self.std.reshape(-1, 1)
 
     def __call__(self, results):
-        results['aps'] = (results['aps'] - self.mean) / self.std
+        results['inputs']['aps'] = (results['inputs']['aps'] - self.mean) / self.std
 
         return results
 
@@ -38,7 +38,7 @@ class NormalizeConstellation:
         self.std = std
 
     def __call__(self, results):
-        results['cos'] = (results['cos'] - self.mean) / self.std
+        results['inputs']['cos'] = (results['inputs']['cos'] - self.mean) / self.std
 
         return results
 
@@ -46,9 +46,9 @@ class NormalizeConstellation:
 @PIPELINES.register_module()
 class ChannelMode:
     def __call__(self, results):
-        if 'iqs' in results:
-            results['iqs'] = np.reshape(results['iqs'], [2, 1, -1])
-        if 'aps' in results:
-            results['aps'] = np.reshape(results['aps'], [2, 1, -1])
+        if 'iqs' in results['inputs']:
+            results['inputs']['iqs'] = np.reshape(results['inputs'], [2, 1, -1])
+        if 'aps' in results['inputs']:
+            results['inputs']['aps'] = np.reshape(results['inputs'], [2, 1, -1])
 
         return results

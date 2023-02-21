@@ -7,14 +7,14 @@ in_size = 80
 out_size = 288
 # Model
 model = dict(
-    type='DNN',
+    type='SingleHeadClassifier',
     method_name='MCT',
     backbone=dict(
         type='MCTNet',
         input_size=in_size,
     ),
     classifier_head=dict(
-        type='ClassificationHead',
+        type='ACMHead',
         in_features=in_size,
         out_features=out_size,
         num_classes=11,

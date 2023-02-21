@@ -50,7 +50,7 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False, dropout_a
     Args:
         model (nn.Module): Model to be tested.
         data_loader (nn.Dataloader): Pytorch data loader.
-        tmpdir (str): Path of directory to save the temporary results from
+        tmpdir (str): Path of directory to format the temporary results from
             different gpus under cpu mode.
         gpu_collect (bool): Option to use either gpu or cpu to collect results.
 

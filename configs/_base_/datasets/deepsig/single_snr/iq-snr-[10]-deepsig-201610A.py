@@ -10,7 +10,7 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[10]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAnnotations'),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
@@ -23,7 +23,7 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[10]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
@@ -38,7 +38,7 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[10]),
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,

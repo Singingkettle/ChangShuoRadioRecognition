@@ -60,7 +60,7 @@ def set_random_seed(seed, deterministic=False):
         torch.backends.cudnn.benchmark = False
 
 
-def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp=None, meta=None):
+def train_method(model, dataset, cfg, distributed=False, validate=False, timestamp=None, meta=None):
     logger = get_root_logger(cfg.log_level)
 
     # prepare data loaders
@@ -99,7 +99,7 @@ def train_task(model, dataset, cfg, distributed=False, validate=False, timestamp
         work_dir=cfg.work_dir,
         logger=logger,
         meta=meta)
-    # an ugly workaround to make .log and .log.json filenames the same
+    # an ugly workaround to make .log and .log.json file_names the same
     runner.timestamp = timestamp
 
     # Optimizer config

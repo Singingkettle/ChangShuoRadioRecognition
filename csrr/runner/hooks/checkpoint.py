@@ -16,14 +16,14 @@ class CheckpointHook(Hook):
             Default: -1, which means "never".
         by_epoch (bool): Saving checkpoints by epoch or by iteration.
             Default: True.
-        save_optimizer (bool): Whether to save optimizer state_dict in the
+        save_optimizer (bool): Whether to format optimizer state_dict in the
             checkpoint. It is usually used for resuming experiments.
             Default: True.
-        out_dir (str, optional): The directory to save checkpoints. If not
+        out_dir (str, optional): The directory to format checkpoints. If not
             specified, ``runner.work_dir`` will be used by default.
         max_keep_ckpts (int, optional): The maximum checkpoints to keep.
             In some cases we want only the latest few checkpoints and would
-            like to delete old ones to save the disk space.
+            like to delete old ones to format the disk space.
             Default: -1, which means unlimited.
         sync_buffer (bool): Whether to synchronize buffers in different
             gpus. Default: False.
@@ -40,7 +40,7 @@ class CheckpointHook(Hook):
                  **kwargs):
         if start is not None and start < 0:
             warnings.warn(
-                f'The save-checkpoint start epoch {start} is smaller than 0, '
+                f'The format-checkpoint start epoch {start} is smaller than 0, '
                 f'use 0 instead', UserWarning)
             start = 0
         if start is None:
@@ -81,10 +81,10 @@ class CheckpointHook(Hook):
             redundant_ckpts = range(
                 current_ckpt - self.max_keep_ckpts * self.interval, 0,
                 -self.interval)
-            filename_tmpl = self.args.get('filename_tmpl', name)
+            file_name_tmpl = self.args.get('file_name_tmpl', name)
             for _step in redundant_ckpts:
                 ckpt_path = os.path.join(self.out_dir,
-                                         filename_tmpl.format(_step))
+                                         file_name_tmpl.format(_step))
                 if os.path.exists(ckpt_path):
                     os.remove(ckpt_path)
                 else:

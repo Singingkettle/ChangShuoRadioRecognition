@@ -1,6 +1,5 @@
 from .builder import DATASETS, build_preprocess, build_evaluate, build_save
 from .custom import CustomDataset
-from .utils import format_results
 from ..common.fileio import load as IOLoad
 
 
@@ -41,10 +40,10 @@ class OnlineDataset(CustomDataset):
         label_to_mod = {value: key for key, value in data_infos['mod_to_label'].items()}
         data_infos['label_to_mod'] = label_to_mod
 
-        data_infos['item_filename'] = []
+        data_infos['item_file_name'] = []
         data_infos['item_mod_label'] = []
         for item in data_infos['data']:
-            data_infos['item_filename'].append(item['filename'])
+            data_infos['item_file_name'].append(item['file_name'])
             data_infos['item_mod_label'].append(data_infos['mod_to_label'][item['ann']['labels']])
 
         data_infos.pop('mods', None)
@@ -53,7 +52,7 @@ class OnlineDataset(CustomDataset):
         return data_infos
 
     def __len__(self):
-        return len(self.data_infos['item_filename'])
+        return len(self.data_infos['item_file_name'])
 
     def extract_CLASSES(self, data_infos):
 
@@ -77,21 +76,21 @@ class OnlineDataset(CustomDataset):
         return results
 
     def prepare_train_data(self, idx):
-        filename = self.data_infos['item_filename'][idx]
+        file_name = self.data_infos['item_file_name'][idx]
         ann_info = self.get_ann_info(idx)
-        results = dict(filename=filename)
+        results = dict(file_name=file_name)
         results.update(ann_info)
         results = self.pre_pipeline(results)
         return self.pipeline(results)
 
     def prepare_test_data(self, idx):
-        filename = self.data_infos['item_filename'][idx]
-        results = dict(filename=filename)
+        file_name = self.data_infos['item_file_name'][idx]
+        results = dict(file_name=file_name)
         results = self.pre_pipeline(results)
         return self.pipeline(results)
 
     def format_out(self, out_dir, results):
-        """Format results and save."""
+        """Format results and format."""
 
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (

@@ -127,7 +127,7 @@ class EpochBasedRunner(BaseRunner):
 
     def save_checkpoint(self,
                         out_dir,
-                        filename_tmpl='epoch_{}.pth',
+                        file_name_tmpl='epoch_{}.pth',
                         save_optimizer=True,
                         meta=None,
                         create_symlink=True):
@@ -135,10 +135,10 @@ class EpochBasedRunner(BaseRunner):
 
         Args:
             out_dir (str): The directory that checkpoints are saved.
-            filename_tmpl (str, optional): The checkpoint filename template,
+            file_name_tmpl (str, optional): The checkpoint file_name template,
                 which contains a placeholder for the epoch number.
                 Defaults to 'epoch_{}.pth'.
-            save_optimizer (bool, optional): Whether to save the optimizer to
+            save_optimizer (bool, optional): Whether to format the optimizer to
                 the checkpoint. Defaults to True.
             meta (dict, optional): The meta information to be saved in the
                 checkpoint. Defaults to None.
@@ -156,8 +156,8 @@ class EpochBasedRunner(BaseRunner):
         if self.meta is not None:
             meta.update(self.meta)
 
-        filename = filename_tmpl.format(self.epoch + 1)
-        filepath = osp.join(out_dir, filename)
+        file_name = file_name_tmpl.format(self.epoch + 1)
+        filepath = osp.join(out_dir, file_name)
         optimizer = self.optimizer if save_optimizer else None
         save_checkpoint(self.model, filepath, optimizer=optimizer, meta=meta)
         # in some environments, `os.symlink` is not supported, you may need to

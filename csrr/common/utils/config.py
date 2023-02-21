@@ -25,7 +25,7 @@ else:
 
 BASE_KEY = '_base_'
 DELETE_KEY = '_delete_'
-RESERVED_KEYS = ['filename', 'text', 'pretty_text']
+RESERVED_KEYS = ['file_name', 'text', 'pretty_text']
 
 
 class ConfigDict(Dict):
@@ -81,7 +81,7 @@ class Config:
         >>> cfg.b.b1
         [0, 1]
         >>> cfg = Config.fromfile('tests/data/config/a.py')
-        >>> cfg.filename
+        >>> cfg.file_name
         "/home/kchen/projects/mmcv/tests/data/config/a.py"
         >>> cfg.item4
         'test'
@@ -91,27 +91,27 @@ class Config:
     """
 
     @staticmethod
-    def _validate_py_syntax(filename):
-        with open(filename, 'r') as f:
+    def _validate_py_syntax(file_name):
+        with open(file_name, 'r') as f:
             content = f.read()
         try:
             ast.parse(content)
         except SyntaxError as e:
             raise SyntaxError('There are syntax errors in config '
-                              f'file {filename}: {e}')
+                              f'file {file_name}: {e}')
 
     @staticmethod
-    def _substitute_predefined_vars(filename, temp_config_name):
-        file_dirname = osp.dirname(filename)
-        file_basename = osp.basename(filename)
+    def _substitute_predefined_vars(file_name, temp_config_name):
+        file_dirname = osp.dirname(file_name)
+        file_basename = osp.basename(file_name)
         file_basename_no_extension = osp.splitext(file_basename)[0]
-        file_extname = osp.splitext(filename)[1]
+        file_extname = osp.splitext(file_name)[1]
         support_templates = dict(
             fileDirname=file_dirname,
             fileBasename=file_basename,
             fileBasenameNoExtension=file_basename_no_extension,
             fileExtname=file_extname)
-        with open(filename, 'r') as f:
+        with open(file_name, 'r') as f:
             config_file = f.read()
         for key, value in support_templates.items():
             regexp = r'\{\{\s*' + str(key) + r'\s*\}\}'
@@ -121,12 +121,12 @@ class Config:
             tmp_config_file.write(config_file)
 
     @staticmethod
-    def _file2dict(filename, use_predefined_variables=True):
-        filename = osp.abspath(osp.expanduser(filename))
-        if not osp.isfile(filename):
-            raise FileNotFoundError('file "{}" does not exist'.format(filename))
+    def _file2dict(file_name, use_predefined_variables=True):
+        file_name = osp.abspath(osp.expanduser(file_name))
+        if not osp.isfile(file_name):
+            raise FileNotFoundError('file "{}" does not exist'.format(file_name))
 
-        fileExtname = osp.splitext(filename)[1]
+        fileExtname = osp.splitext(file_name)[1]
         if fileExtname not in ['.py', '.json', '.yaml', '.yml']:
             raise IOError('Only py/yml/yaml/json type are supported now!')
 
@@ -138,15 +138,15 @@ class Config:
             temp_config_name = osp.basename(temp_config_file.name)
             # Substitute predefined variables
             if use_predefined_variables:
-                Config._substitute_predefined_vars(filename,
+                Config._substitute_predefined_vars(file_name,
                                                    temp_config_file.name)
             else:
-                shutil.copyfile(filename, temp_config_file.name)
+                shutil.copyfile(file_name, temp_config_file.name)
 
-            if filename.endswith('.py'):
+            if file_name.endswith('.py'):
                 temp_module_name = osp.splitext(temp_config_name)[0]
                 sys.path.insert(0, temp_config_dir)
-                Config._validate_py_syntax(filename)
+                Config._validate_py_syntax(file_name)
                 mod = import_module(temp_module_name)
                 sys.path.pop(0)
                 cfg_dict = {
@@ -156,25 +156,25 @@ class Config:
                 }
                 # delete imported module
                 del sys.modules[temp_module_name]
-            elif filename.endswith(('.yml', '.yaml', '.json')):
+            elif file_name.endswith(('.yml', '.yaml', '.json')):
                 import mmcv
                 cfg_dict = mmcv.load(temp_config_file.name)
             # close temp file
             temp_config_file.close()
 
-        cfg_text = filename + '\n'
-        with open(filename, 'r') as f:
+        cfg_text = file_name + '\n'
+        with open(file_name, 'r') as f:
             cfg_text += f.read()
 
         if BASE_KEY in cfg_dict:
-            cfg_dir = osp.dirname(filename)
-            base_filename = cfg_dict.pop(BASE_KEY)
-            base_filename = base_filename if isinstance(
-                base_filename, list) else [base_filename]
+            cfg_dir = osp.dirname(file_name)
+            base_file_name = cfg_dict.pop(BASE_KEY)
+            base_file_name = base_file_name if isinstance(
+                base_file_name, list) else [base_file_name]
 
             cfg_dict_list = list()
             cfg_text_list = list()
-            for f in base_filename:
+            for f in base_file_name:
                 _cfg_dict, _cfg_text = Config._file2dict(osp.join(cfg_dir, f))
                 cfg_dict_list.append(_cfg_dict)
                 cfg_text_list.append(_cfg_text)
@@ -214,10 +214,10 @@ class Config:
         return b
 
     @staticmethod
-    def fromfile(filename, use_predefined_variables=True):
-        cfg_dict, cfg_text = Config._file2dict(filename,
+    def fromfile(file_name, use_predefined_variables=True):
+        cfg_dict, cfg_text = Config._file2dict(file_name,
                                                use_predefined_variables)
-        return Config(cfg_dict, cfg_text=cfg_text, filename=filename)
+        return Config(cfg_dict, cfg_text=cfg_text, file_name=file_name)
 
     @staticmethod
     def auto_argparser(description=None):
@@ -231,7 +231,7 @@ class Config:
         add_args(parser, cfg)
         return parser, cfg
 
-    def __init__(self, cfg_dict=None, cfg_text=None, filename=None):
+    def __init__(self, cfg_dict=None, cfg_text=None, file_name=None):
         if cfg_dict is None:
             cfg_dict = dict()
         elif not isinstance(cfg_dict, dict):
@@ -242,19 +242,19 @@ class Config:
                 raise KeyError(f'{key} is reserved for config file')
 
         super(Config, self).__setattr__('_cfg_dict', ConfigDict(cfg_dict))
-        super(Config, self).__setattr__('_filename', filename)
+        super(Config, self).__setattr__('_file_name', file_name)
         if cfg_text:
             text = cfg_text
-        elif filename:
-            with open(filename, 'r') as f:
+        elif file_name:
+            with open(file_name, 'r') as f:
                 text = f.read()
         else:
             text = ''
         super(Config, self).__setattr__('_text', text)
 
     @property
-    def filename(self):
-        return self._filename
+    def file_name(self):
+        return self._file_name
 
     @property
     def text(self):
@@ -355,7 +355,7 @@ class Config:
         return text
 
     def __repr__(self):
-        return f'Config (path: {self.filename}): {self._cfg_dict.__repr__()}'
+        return f'Config (path: {self.file_name}): {self._cfg_dict.__repr__()}'
 
     def __len__(self):
         return len(self._cfg_dict)
@@ -380,17 +380,17 @@ class Config:
         return iter(self._cfg_dict)
 
     def __getstate__(self):
-        return (self._cfg_dict, self._filename, self._text)
+        return (self._cfg_dict, self._file_name, self._text)
 
     def __setstate__(self, state):
-        _cfg_dict, _filename, _text = state
+        _cfg_dict, _file_name, _text = state
         super(Config, self).__setattr__('_cfg_dict', _cfg_dict)
-        super(Config, self).__setattr__('_filename', _filename)
+        super(Config, self).__setattr__('_file_name', _file_name)
         super(Config, self).__setattr__('_text', _text)
 
     def dump(self, file=None):
         cfg_dict = super(Config, self).__getattribute__('_cfg_dict').to_dict()
-        if self.filename.endswith('.py'):
+        if self.file_name.endswith('.py'):
             if file is None:
                 return self.pretty_text
             else:
@@ -399,7 +399,7 @@ class Config:
         else:
             import mmcv
             if file is None:
-                file_format = self.filename.split('.')[-1]
+                file_format = self.file_name.split('.')[-1]
                 return mmcv.dump(cfg_dict, file_format=file_format)
             else:
                 mmcv.dump(cfg_dict, file)

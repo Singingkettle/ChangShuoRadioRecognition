@@ -7,7 +7,7 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='SigmoidLossWeight', alpha=0.2),
             dict(type='RebaseModLabelBySNR', alpha=0.4),
             dict(type='Collect', keys=['inputs', 'targets']),
@@ -18,7 +18,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,
@@ -30,7 +30,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, filename='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Collect', keys=['inputs'])
         ],
         data_root=data_root,

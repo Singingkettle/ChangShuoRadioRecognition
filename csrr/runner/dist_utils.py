@@ -97,7 +97,7 @@ def _init_dist_slurm(backend: str, port: Optional[int] = None) -> None:
         port (int, optional): Master port. Defaults to None.
     """
     proc_id = int(os.environ['SLURM_PROCID'])
-    ntasks = int(os.environ['SLURM_NTASKS'])
+    nmethods = int(os.environ['SLURM_NTASKS'])
     node_list = os.environ['SLURM_NODELIST']
     num_gpus = torch.cuda.device_count()
     torch.cuda.set_device(proc_id % num_gpus)
@@ -118,7 +118,7 @@ def _init_dist_slurm(backend: str, port: Optional[int] = None) -> None:
     # use MASTER_ADDR in the environment variable if it already exists
     if 'MASTER_ADDR' not in os.environ:
         os.environ['MASTER_ADDR'] = addr
-    os.environ['WORLD_SIZE'] = str(ntasks)
+    os.environ['WORLD_SIZE'] = str(nmethods)
     os.environ['LOCAL_RANK'] = str(proc_id % num_gpus)
     os.environ['RANK'] = str(proc_id)
     dist.init_process_group(backend=backend)

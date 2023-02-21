@@ -85,11 +85,11 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
             print(err_msg)
 
 
-def _load_checkpoint(filename, map_location=None):
+def _load_checkpoint(file_name, map_location=None):
     """Load checkpoint from somewhere (modelzoo, file, url).
 
     Args:
-        filename (str): Accept local filepath, URL, ``torchvision://xxx``,
+        file_name (str): Accept local filepath, URL, ``torchvision://xxx``,
             ``open-mmlab://xxx``. Please refer to ``docs/model_zoo.md`` for
             details.
         map_location (str | None): Same as :func:`torch.load`. Default: None.
@@ -100,14 +100,14 @@ def _load_checkpoint(filename, map_location=None):
             information, which depends on the checkpoint.
     """
 
-    if not osp.isfile(filename):
-        raise IOError(f'{filename} is not a checkpoint file')
-    checkpoint = torch.load(filename, map_location=map_location)
+    if not osp.isfile(file_name):
+        raise IOError(f'{file_name} is not a checkpoint file')
+    checkpoint = torch.load(file_name, map_location=map_location)
     return checkpoint
 
 
 def load_checkpoint(model,
-                    filename,
+                    file_name,
                     map_location=None,
                     strict=False,
                     logger=None):
@@ -115,7 +115,7 @@ def load_checkpoint(model,
 
     Args:
         model (Module): Module to load checkpoint.
-        filename (str): Accept local filepath, URL, ``torchvision://xxx``,
+        file_name (str): Accept local filepath, URL, ``torchvision://xxx``,
             ``open-mmlab://xxx``. Please refer to ``docs/model_zoo.md`` for
             details.
         map_location (str): Same as :func:`torch.load`.
@@ -126,11 +126,11 @@ def load_checkpoint(model,
     Returns:
         dict or OrderedDict: The loaded checkpoint.
     """
-    checkpoint = _load_checkpoint(filename, map_location)
+    checkpoint = _load_checkpoint(file_name, map_location)
     # OrderedDict is a subclass of dict
     if not isinstance(checkpoint, dict):
         raise RuntimeError(
-            f'No state_dict found in checkpoint file {filename}')
+            f'No state_dict found in checkpoint file {file_name}')
     # get state_dict from checkpoint
     if 'state_dict' in checkpoint:
         state_dict = checkpoint['state_dict']
@@ -223,7 +223,7 @@ def get_state_dict(module, destination=None, prefix='', keep_vars=False):
     return destination
 
 
-def save_checkpoint(model, filename, optimizer=None, meta=None):
+def save_checkpoint(model, file_name, optimizer=None, meta=None):
     """Save checkpoint to file.
 
     The checkpoint will have 3 fields: ``meta``, ``state_dict`` and
@@ -231,7 +231,7 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
 
     Args:
         model (Module): Module whose params are to be saved.
-        filename (str): Checkpoint filename.
+        file_name (str): Checkpoint file_name.
         optimizer (:obj:`Optimizer`, optional): Optimizer to be saved.
         meta (dict, optional): Metadata to be saved in checkpoint.
     """
@@ -241,7 +241,7 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
         raise TypeError(f'meta must be a dict or None, but got {type(meta)}')
     meta.update(mmcv_version=csrr.__version__, time=time.asctime())
 
-    mkdir_or_exist(osp.dirname(filename))
+    mkdir_or_exist(osp.dirname(file_name))
     if is_module_wrapper(model):
         model = model.module
 
@@ -249,7 +249,7 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
         'meta': meta,
         'state_dict': weights_to_cpu(get_state_dict(model))
     }
-    # save optimizer state dict in the checkpoint
+    # format optimizer state dict in the checkpoint
     if isinstance(optimizer, Optimizer):
         checkpoint['optimizer'] = optimizer.state_dict()
     elif isinstance(optimizer, dict):
@@ -257,6 +257,6 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
         for name, optim in optimizer.items():
             checkpoint['optimizer'][name] = optim.state_dict()
     # immediately flush buffer
-    with open(filename, 'wb') as f:
+    with open(file_name, 'wb') as f:
         torch.save(checkpoint, f)
         f.flush()
