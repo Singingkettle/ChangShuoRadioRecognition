@@ -14,7 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition generate logits for knowledge distillation!')
     parser.add_argument('--work_dir', help='the dir to format logs and models')
-    parser.add_argument('-config', '--configs', nargs='+')
+    parser.add_argument('-figure_configs', '--figure_configs', nargs='+')
     parser.add_argument('--anno_dir', help='the dir to format annotations')
     parser.add_argument('--anno_name', help='the file name of annotations', type=str, default='test.json',
                         choices={'train_and_val.json', 'train.json', 'val.json', 'test.json'})
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         for subset_index, subset in enumerate(configs_sets):
             if 'mldnn_mlnetv5_640_0.0004_0.5_deepsig_201610A' in subset:
                 if len(subset) > 0:
-                    print('lambda: {:.2f}-configs-{}'.format(lambda_val, '+'.join(subset)))
+                    print('lambda: {:.2f}-figure_configs-{}'.format(lambda_val, '+'.join(subset)))
                     pre_matrix = []
                     for config in subset:
                         pre_matrix.append(logits_dict[config])

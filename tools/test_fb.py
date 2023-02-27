@@ -10,7 +10,7 @@ from csrr.models import build_fb
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('config', help='test config file path')
+    parser.add_argument('figure_configs', help='test figure_configs file path')
     parser.add_argument('model', help='model file')
     parser.add_argument(
         '--format-out',
@@ -28,10 +28,10 @@ def main():
 
     # format_out is determined in this priority: CLI > segment in file > file_name
     if args.format_out is not None:
-        # update configs according to CLI args if args.format_out is not None
+        # update figure_configs according to CLI args if args.format_out is not None
         cfg.format_out = args.format_out
     elif cfg.get('format_out', None) is None:
-        # use config file_name as default format_out if cfg.format_out is None
+        # use figure_configs file_name as default format_out if cfg.format_out is None
         cfg.format_out = './format_out'
 
     # build the dataloader

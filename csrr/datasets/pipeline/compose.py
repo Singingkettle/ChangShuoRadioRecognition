@@ -10,7 +10,7 @@ class Compose:
 
     Args:
         transforms (Sequence[dict | callable]): Sequence of transform object or
-            config dict to be composed.
+            figure_configs dict to be composed.
     """
 
     def __init__(self, transforms):

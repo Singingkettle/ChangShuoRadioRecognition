@@ -14,8 +14,8 @@ For different dataset, please refer:
 
 ## Train a model
 
-ChangShuoRadioRecognition implements distributed training and non-distributed training, which uses `MMDistributedDataParallel`
-and `MMDataParallel` respectively.
+ChangShuoRadioRecognition implements distributed training and non-distributed training, which uses `CSDistributedDataParallel`
+and `CSDataParallel` respectively.
 
 All outputs (log files and checkpoints) will be saved to the working directory, which is specified by `work_dir` in the
 config file.
@@ -36,7 +36,7 @@ sample/gpu.
 
 For example, when you want to train a DL AMC classifier using [CNN2](configs/cnn2) on [DeepSig 201610A dataset](https://www.deepsig.ai/datasets), you can run the command: 
 ```shell
-python tools/train.py ./configs/cnn2/cnn2_iq-deepsig-201610A.py
+python tools/train.py ./figure_configs/cnn2/cnn2_iq-deepsig-201610A.py
 ```
 The common style is:
 ```shell

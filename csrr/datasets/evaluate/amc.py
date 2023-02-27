@@ -3,7 +3,7 @@ from typing import Dict, Any, List
 import numpy as np
 
 from ..builder import EVALUATES
-from ...common.performance import ClassificationMetricsWithSNR
+from csrr.performance.metrics import ClassificationMetricsWithSNR
 
 
 @EVALUATES.register_module()

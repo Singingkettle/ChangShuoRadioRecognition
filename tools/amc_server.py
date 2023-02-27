@@ -30,9 +30,9 @@ _IS_SIG_UP = False
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('config', help='test config file path')
+    parser.add_argument('figure_configs', help='test figure_configs file path')
     parser.add_argument('checkpoint', help='checkpoint file')
-    parser.add_argument('--log_dir', help='dir to format the log file for online performance results')
+    parser.add_argument('--log_dir', help='dir to format the log file for online figures results')
     parser.add_argument(
         '--fuse-conv-bn',
         action='store_true',
@@ -94,10 +94,10 @@ def main():
 
     # log
     if args.log_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
+        # update figure_configs according to CLI args if args.work_dir is not None
         log_dir = osp.join(args.log_dir, osp.splitext(osp.basename(args.config))[0])
     else:
-        # use config file_name as default work_dir if cfg.work_dir is None
+        # use figure_configs file_name as default work_dir if cfg.work_dir is None
         log_dir = osp.join('./online_performance_dirs', osp.splitext(osp.basename(args.config))[0])
     log_dir = osp.join(log_dir, 'tf_logs')
     mkdir_or_exist(log_dir)

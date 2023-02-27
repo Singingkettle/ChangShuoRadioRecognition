@@ -66,10 +66,10 @@ def add_args(parser, cfg, prefix=''):
 
 
 class Config:
-    """A facility for config and config files.
+    """A facility for figure_configs and figure_configs files.
 
-    It supports common file formats as configs: python/json/yaml. The interface
-    is the same as a dict object and also allows access config values as
+    It supports common file formats as figure_configs: python/json/yaml. The interface
+    is the same as a dict object and also allows access figure_configs values as
     attributes.
 
     Example:
@@ -80,13 +80,13 @@ class Config:
         {'b1': [0, 1]}
         >>> cfg.b.b1
         [0, 1]
-        >>> cfg = Config.fromfile('tests/data/config/a.py')
+        >>> cfg = Config.fromfile('tests/data/figure_configs/a.py')
         >>> cfg.file_name
-        "/home/kchen/projects/mmcv/tests/data/config/a.py"
+        "/home/kchen/projects/mmcv/tests/data/figure_configs/a.py"
         >>> cfg.item4
         'test'
         >>> cfg
-        "Config [path: /home/kchen/projects/mmcv/tests/data/config/a.py]: "
+        "Config [path: /home/kchen/projects/mmcv/tests/data/figure_configs/a.py]: "
         "{'item1': [1, 2], 'item2': {'a': 0}, 'item3': True, 'item4': 'test'}"
     """
 
@@ -97,7 +97,7 @@ class Config:
         try:
             ast.parse(content)
         except SyntaxError as e:
-            raise SyntaxError('There are syntax errors in config '
+            raise SyntaxError('There are syntax errors in figure_configs '
                               f'file {file_name}: {e}')
 
     @staticmethod
@@ -204,10 +204,10 @@ class Config:
             if isinstance(v, dict) and k in b and not v.pop(DELETE_KEY, False):
                 if not isinstance(b[k], dict):
                     raise TypeError(
-                        f'{k}={v} in child config cannot inherit from base '
-                        f'because {k} is a dict in the child config but is of '
-                        f'type {type(b[k])} in base config. You may set '
-                        f'`{DELETE_KEY}=True` to ignore the base config')
+                        f'{k}={v} in child figure_configs cannot inherit from base '
+                        f'because {k} is a dict in the child figure_configs but is of '
+                        f'type {type(b[k])} in base figure_configs. You may set '
+                        f'`{DELETE_KEY}=True` to ignore the base figure_configs')
                 b[k] = Config._merge_a_into_b(v, b[k])
             else:
                 b[k] = v
@@ -221,13 +221,13 @@ class Config:
 
     @staticmethod
     def auto_argparser(description=None):
-        """Generate argparser from config file automatically (experimental)"""
+        """Generate argparser from figure_configs file automatically (experimental)"""
         partial_parser = ArgumentParser(description=description)
-        partial_parser.add_argument('config', help='config file path')
+        partial_parser.add_argument('figure_configs', help='figure_configs file path')
         cfg_file = partial_parser.parse_known_args()[0].config
         cfg = Config.fromfile(cfg_file)
         parser = ArgumentParser(description=description)
-        parser.add_argument('config', help='config file path')
+        parser.add_argument('figure_configs', help='figure_configs file path')
         add_args(parser, cfg)
         return parser, cfg
 
@@ -239,7 +239,7 @@ class Config:
                             f'got {type(cfg_dict)}')
         for key in cfg_dict:
             if key in RESERVED_KEYS:
-                raise KeyError(f'{key} is reserved for config file')
+                raise KeyError(f'{key} is reserved for figure_configs file')
 
         super(Config, self).__setattr__('_cfg_dict', ConfigDict(cfg_dict))
         super(Config, self).__setattr__('_file_name', file_name)
@@ -419,7 +419,7 @@ class Config:
             ...     model=dict(backbone=dict(depth=50, with_cp=True)))
 
         Args:
-            options (dict): dict of configs to merge from.
+            options (dict): dict of figure_configs to merge from.
         """
         option_cfg_dict = {}
         for full_key, v in options.items():
@@ -476,17 +476,17 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
     config_method_map = dict()
 
     def extract_info(m):
-        c = m['config']
+        c = m['figure_configs']
         if c in configs:
             if config_legend_map[c] is not m['name']:
                 raise ValueError(
-                    'The config {} is assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
+                    'The figure_configs {} is assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
         else:
             configs.append(c)
             config_legend_map[c] = m['name']
             config_method_map[c] = m
 
-    # Add config from confusion_map
+    # Add figure_configs from confusion_map
     if 'confusion_map' in cfg.plot:
         if isinstance(cfg.plot['confusion_map'], dict):
             confusion_map = cfg.plot['confusion_map']
@@ -500,7 +500,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
             raise ValueError('The confusion maps must be list or dict!')
 
     if mode == 'train':
-        # Add config from train_test_curve
+        # Add figure_configs from train_test_curve
         if 'train_test_curve' in cfg.plot:
             if isinstance(cfg.plot['train_test_curve'], dict):
                 train_test_curve = cfg.plot['train_test_curve']
@@ -513,7 +513,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
             else:
                 raise ValueError('The train test curves must be list or dict!')
 
-    # Add config from snr_modulation
+    # Add figure_configs from snr_modulation
     if 'snr_modulation' in cfg.plot:
         if isinstance(cfg.plot['snr_modulation'], dict):
             snr_modulation = cfg.plot['snr_modulation']
@@ -554,7 +554,7 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
     elif mode == 'summary':
         return config_legend_map, config_method_map
     else:
-        raise ValueError('Unknown mod {} for filtering config'.format(mode))
+        raise ValueError('Unknown mod {} for filtering figure_configs'.format(mode))
 
 
 def load_json_log(json_log):

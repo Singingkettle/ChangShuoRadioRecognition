@@ -376,7 +376,7 @@ class CyclicLrUpdaterHook(LrUpdaterHook):
     https://arxiv.org/pdf/1506.01186.pdf
 
     Different from the original paper, we use cosine anealing rather than
-    triangular policy inside a cycle. This improves the performance in the
+    triangular policy inside a cycle. This improves the figures in the
     3D detection area.
 
     Attributes:

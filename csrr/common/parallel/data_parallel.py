@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 from itertools import chain
 
 from torch.nn.parallel import DataParallel
@@ -6,10 +5,10 @@ from torch.nn.parallel import DataParallel
 from .scatter_gather import scatter_kwargs
 
 
-class MMDataParallel(DataParallel):
+class CSDataParallel(DataParallel):
     """The DataParallel module that supports DataContainer.
 
-    SSDataParallel has two main differences with PyTorch DataParallel:
+    CSDataParallel has two main differences with PyTorch DataParallel:
 
     - It supports a custom type :class:`DataContainer` which allows more
       flexible control of input data during both GPU and CPU inference.
@@ -24,7 +23,7 @@ class MMDataParallel(DataParallel):
     """
 
     def __init__(self, *args, dim=0, **kwargs):
-        super(MMDataParallel, self).__init__(*args, dim=dim, **kwargs)
+        super(CSDataParallel, self).__init__(*args, dim=dim, **kwargs)
         self.dim = dim
 
     def forward(self, *inputs, **kwargs):
@@ -52,8 +51,8 @@ class MMDataParallel(DataParallel):
             return self.module.train_step(*inputs, **kwargs)
 
         assert len(self.device_ids) == 1, \
-            ('MMDataParallel only supports single GPU training, if you need to'
-             ' train with multiple GPUs, please use MMDistributedDataParallel'
+            ('CSDataParallel only supports single GPU training, if you need to'
+             ' train with multiple GPUs, please use CSDistributedDataParallel'
              'instead.')
 
         for t in chain(self.module.parameters(), self.module.buffers()):
@@ -74,8 +73,8 @@ class MMDataParallel(DataParallel):
             return self.module.val_step(*inputs, **kwargs)
 
         assert len(self.device_ids) == 1, \
-            ('MMDataParallel only supports single GPU training, if you need to'
-             ' train with multiple GPUs, please use MMDistributedDataParallel'
+            ('CSDataParallel only supports single GPU training, if you need to'
+             ' train with multiple GPUs, please use CSDistributedDataParallel'
              'instead.')
 
         for t in chain(self.module.parameters(), self.module.buffers()):

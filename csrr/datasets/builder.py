@@ -14,21 +14,21 @@ PIPELINES = Registry('pipeline')
 PREPROCESSES = Registry('preprocess')
 EVALUATES = Registry('evaluate')
 MERGES = Registry('merge')
-SAVES = Registry('format')
+SAVES = Registry('save')
 
 
 def build(cfg, registry, default_args=None):
     """Build a module.
 
     Args:
-        cfg (dict, list[dict]): The config of modules, is either a dict
-            or a list of configs.
+        cfg (dict, list[dict]): The figure_configs of modules, is either a dict
+            or a list of figure_configs.
         registry (:obj:`Registry`): A registry the module belongs to.
         default_args (dict, optional): Default arguments to build the module.
             Defaults to None.
 
     Returns:
-        plots: A list of plot handle.
+        performance: A list of performance handle.
     """
     if isinstance(cfg, list):
         plots = [

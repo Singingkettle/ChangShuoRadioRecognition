@@ -4,7 +4,7 @@ import os
 import torch
 
 from csrr.apis import multi_gpu_test, single_gpu_test
-from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
+from csrr.common.parallel import CSDataParallel, CSDistributedDataParallel
 from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist
 from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_method
@@ -14,7 +14,7 @@ from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('config', help='test config file path')
+    parser.add_argument('figure_configs', help='test figure_configs file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('file_name', help='test data file name')
     parser.add_argument('data_root', help='test data dir')
@@ -39,8 +39,8 @@ def parse_args():
         '--cfg_options',
         nargs='+',
         action=DictAction,
-        help='override some settings in the used config, the key-value pair '
-             'in xxx=yyy format will be merged into config file.')
+        help='override some settings in the used figure_configs, the key-value pair '
+             'in xxx=yyy format will be merged into figure_configs file.')
     parser.add_argument(
         '--launcher',
         choices=['none', 'pytorch', 'slurm', 'mpi'],
@@ -66,10 +66,10 @@ def main():
 
     # format_out is determined in this priority: CLI > segment in file > file_name
     if args.format_out is not None:
-        # update configs according to CLI args if args.format_out is not None
+        # update figure_configs according to CLI args if args.format_out is not None
         cfg.format_out = args.format_out
     elif cfg.get('format_out', None) is None:
-        # use config file_name as default format_out if cfg.format_out is None
+        # use figure_configs file_name as default format_out if cfg.format_out is None
         cfg.format_out = './format_out'
 
     # in case the test dataset is concatenated
@@ -111,10 +111,10 @@ def main():
         model.CLASSES = dataset.CLASSES
 
     if not distributed:
-        model = MMDataParallel(model, device_ids=[0])
+        model = CSDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader, cfg.dropout_alive)
     else:
-        model = MMDistributedDataParallel(
+        model = CSDistributedDataParallel(
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)

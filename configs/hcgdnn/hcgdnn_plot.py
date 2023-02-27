@@ -1,29 +1,29 @@
 _base_ = [
-    '../_base_/plot/amc.py',
+    '../_base_/performance/classification.py',
 ]
 
 plot = dict(
-    type='CommonPlot',
-    config='hcgdnn_iq-channel-deepsig-201610A',
-    # Set the configs about confusion maps
+    type='BasePlot',
+    config='hcgdnn_iq-channel-deepsig201610A',
+    # Set the figure_configs about confusion maps
     confusion_map=[
         dict(
             type='ConfusionMap',
-            name='confusion-map_hcgdnn_deepsig-201610A.pdf',
+            name='confusion-map_hcgdnn_deepsig201610A.pdf',
             method=dict(
-                config='hcgdnn_iq-channel-deepsig-201610A.py',
+                config='hcgdnn_iq-channel-deepsig201610A.py',
                 name='HCGDNN',
             ),
         ),
     ],
 
-    # Set the configs about loss accuracy
+    # Set the figure_configs about loss accuracy
     train_test_curve=[
         dict(
             type='LossAccuracyPlot',
             name='loss_accuracy_201610A.pdf',
             method=dict(
-                config='hcgdnn_iq-channel-deepsig-201610A.py',
+                config='hcgdnn_iq-channel-deepsig201610A.py',
                 name='HCGDNN',
                 train_metrics=['loss_CNN', 'loss_GRU1', 'loss_GRU2', 'loss'],
                 test_metrics=['CNN/snr_mean_all', 'GRU1/snr_mean_all',
@@ -33,7 +33,7 @@ plot = dict(
         ),
     ],
 
-    # Set the configs about snr accuracy and modulation F1 score
+    # Set the figure_configs about snr accuracy and modulation F1 score
     snr_modulation=[
         # Ablation Study by an incremental way
         dict(
@@ -42,7 +42,7 @@ plot = dict(
             method=[
                 # CNN
                 dict(
-                    config='hcgdnn_abl-cnn_iq-channel-deepsig-201610A',
+                    config='hcgdnn_abl-cnn_iq-channel-deepsig201610A',
                     name='V1',
                 ),
                 # GRU1
@@ -209,11 +209,11 @@ plot = dict(
         # 
         #     method=[
         #         dict(
-        #             config='hcgdnn_lr-0.00100_deepsig_iq_201801A',
+        #             figure_configs='hcgdnn_lr-0.00100_deepsig_iq_201801A',
         #             name='HCGDNN',
         #         ),
         #         dict(
-        #             config='hcgdnn_lr-0.00150_deepsig_iq_201801A',
+        #             figure_configs='hcgdnn_lr-0.00150_deepsig_iq_201801A',
         #             name='HCGDNN',
         #         ),
         #     ],

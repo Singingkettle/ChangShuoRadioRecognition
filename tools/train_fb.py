@@ -14,7 +14,7 @@ from csrr.models import build_fb
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognitionTrain a regression model')
-    parser.add_argument('config', help='train config file path')
+    parser.add_argument('figure_configs', help='train figure_configs file path')
     parser.add_argument('--work_dir', help='the dir to format logs and models')
 
     args = parser.parse_args()
@@ -31,16 +31,16 @@ def main():
 
     # work_dir is determined in this priority: CLI > segment in file > file_name
     if args.work_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
+        # update figure_configs according to CLI args if args.work_dir is not None
         cfg.work_dir = osp.join(
             args.work_dir, osp.splitext(osp.basename(args.config))[0])
     elif cfg.get('work_dir', None) is None:
-        # use config file_name as default work_dir if cfg.work_dir is None
+        # use figure_configs file_name as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))
-    # dump config
+    # dump figure_configs
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
 
     # init the logger before other steps
@@ -58,7 +58,7 @@ def main():
     logger.info('Environment info:\n' + dash_line + env_info + '\n' +
                 dash_line)
     meta['env_info'] = env_info
-    meta['config'] = cfg.pretty_text
+    meta['figure_configs'] = cfg.pretty_text
     # log some basic info
     logger.info(f'Config:\n{cfg.pretty_text}')
 

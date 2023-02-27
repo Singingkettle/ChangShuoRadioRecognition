@@ -8,7 +8,7 @@ from csrr.common.utils import Config, filter_config
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Generate Test.sh File')
-    parser.add_argument('config', help='plot config file path')
+    parser.add_argument('figure_configs', help='performance figure_configs file path')
     parser.add_argument('--is_regeneration', default=False, type=bool, help='is retest')
     args = parser.parse_args()
     return args
@@ -22,7 +22,7 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg.pretty_text)
 
-    test_sh_name = cfg.plot['config'] + '_test.sh'
+    test_sh_name = cfg.plot['figure_configs'] + '_test.sh'
 
     train_configs = filter_config(cfg, is_regeneration=args.is_regeneration, mode='test')
 
@@ -38,7 +38,7 @@ def main():
                 python_sh = 'python -m torch.distributed.launch --nproc_per_node={} \
                 --master_port={} tools/test.py'.format(
                     torch.cuda.device_count(), base_master_port + method_index)
-            config_sh = './configs/{}/{}'.format(
+            config_sh = './figure_configs/{}/{}'.format(
                 config.split('_')[0], config + '.py')
 
             if epoch == -1:
@@ -49,10 +49,10 @@ def main():
 
             if epoch == -1:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
-                          '--format_out ' + format_out_sh + '\n\n\n'
+                          '--work_dir ' + format_out_sh + ' --format_only\n\n\n'
             else:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
-                          '--format_out ' + format_out_sh + ' --launcher pytorch\n\n\n'
+                          '--work_dir ' + format_out_sh + ' --format_only --launcher pytorch\n\n\n'
             start_info = 'echo \"Start Test: {}\"\n'.format(config_sh)
             f.write(start_info)
             f.write(test_sh)

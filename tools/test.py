@@ -5,7 +5,7 @@ import torch
 
 from csrr.apis import multi_gpu_test, single_gpu_test
 from csrr.common.fileio import dump as IODump
-from csrr.common.parallel import MMDataParallel, MMDistributedDataParallel
+from csrr.common.parallel import CSDataParallel, CSDistributedDataParallel
 from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, setup_multi_processes
 from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_method
@@ -15,23 +15,23 @@ from csrr.runner import (get_dist_info, init_dist, load_checkpoint)
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('config', help='test config file path')
+    parser.add_argument('figure_configs', help='test figure_configs file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
         '--work_dir',
-        help='the directory to format the file containing evaluation metrics, results in pickle format, '
+        help='the directory to format the file containing evaluation figures, results in pickle format, '
              'and format data to upload into test server')
+    parser.add_argument('--out', action='store_true', help='output result file in pickle format')
     parser.add_argument(
-        '--format-only',
+        '--format_only',
         action='store_true',
         help='Format the output results without perform evaluation. It is'
              'useful when you want to format the result to a specific format and '
              'submit it to the test server')
     parser.add_argument(
         '--eval',
-        type=str,
-        nargs='+',
-        help='evaluation metrics, which depends on the dataset')
+        action='store_true',
+        help='evaluation on the dataset')
     parser.add_argument(
         '--fuse_conv_bn',
         action='store_true',
@@ -49,8 +49,8 @@ def parse_args():
         '--cfg_options',
         nargs='+',
         action=DictAction,
-        help='override some settings in the used config, the key-value pair '
-             'in xxx=yyy format will be merged into config file.')
+        help='override some settings in the used figure_configs, the key-value pair '
+             'in xxx=yyy format will be merged into figure_configs file.')
     parser.add_argument(
         '--launcher',
         choices=['none', 'pytorch', 'slurm', 'mpi'],
@@ -80,14 +80,6 @@ def main():
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
-
-    # format_out is determined in this priority: CLI > segment in file > file_name
-    if args.format_out is not None:
-        # update configs according to CLI args if args.format_out is not None
-        cfg.format_out = args.format_out
-    elif cfg.get('format_out', None) is None:
-        # use config file_name as default format_out if cfg.format_out is None
-        cfg.format_out = './format_out'
 
     # in case the test dataset is concatenated
     if isinstance(cfg.data.test, dict):
@@ -126,10 +118,10 @@ def main():
         model.CLASSES = dataset.CLASSES
 
     if not distributed:
-        model = MMDataParallel(model, device_ids=[0])
+        model = CSDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader, cfg.dropout_alive)
     else:
-        model = MMDistributedDataParallel(
+        model = CSDistributedDataParallel(
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)
@@ -141,10 +133,19 @@ def main():
     mkdir_or_exist(os.path.abspath(args.work_dir))
 
     if rank == 0:
-        print(f'\nwriting results to {args.work_dir}')
-        IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
+        if args.out:
+            print(f'\nwriting results to {args.work_dir}')
+            IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
         if args.format_only:
-            dataset.format_out(args.work_dir, outputs)
+            dataset.format_results(args.work_dir, outputs)
+        if args.eval:
+            metric = dataset.evaluate(outputs)
+            print(metric)
+            metric_dict = dict(config=args.config, metric=metric)
+            if args.work_dir is not None and rank == 0:
+                timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+                json_file = os.path.join(args.work_dir, f'eval_{timestamp}.json')
+                IODump(metric_dict, json_file)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,6 @@ from .fileio import *
 from .logging import get_root_logger, print_log
 from .matlab import *
 from .parallel import *
-from .performance import *
 from .utils import *
 
 __all__ = [

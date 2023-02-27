@@ -9,7 +9,7 @@ from ..utils import TORCH_VERSION, digit_version
 from .scatter_gather import ScatterInputs, scatter_kwargs
 
 
-class MMDistributedDataParallel(DistributedDataParallel):
+class CSDistributedDataParallel(DistributedDataParallel):
     """The DDP module that supports DataContainer.
     MMDDP has two main differences with PyTorch DDP:
     - It supports a custom type :class:`DataContainer` which allows more

@@ -203,7 +203,7 @@ setup(
     author_email='changshuo@bupt.edu.cn',
     keywords='signal separation, deep learning, machine learning',
     url='https://github.com/Singingkettle/ChangShuoRadioRecognition.git',
-    packages=find_packages(exclude=('configs', 'tools', 'demo')),
+    packages=find_packages(exclude=('figure_configs', 'tools', 'demo')),
     include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',

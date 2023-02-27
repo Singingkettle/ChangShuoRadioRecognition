@@ -20,7 +20,7 @@ from csrr.runner import init_dist, get_dist_info
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Train a model')
-    parser.add_argument('config', help='train config file path')
+    parser.add_argument('figure_configs', help='train figure_configs file path')
     parser.add_argument('--work_dir', help='the dir to format logs, models and results')
     parser.add_argument('--resume_from', help='the checkpoint file to resume from')
     parser.add_argument('--auto_resume', action='store_true', help='resume from the latest checkpoint automatically')
@@ -35,12 +35,12 @@ def parse_args():
     parser.add_argument('--deterministic', action='store_true',
                         help='whether to set deterministic options for CUDNN backend.')
     parser.add_argument('--options', nargs='+', action=DictAction,
-                        help='override some settings in the used config, the key-value pair '
-                             'in xxx=yyy format will be merged into config file (deprecate), '
+                        help='override some settings in the used figure_configs, the key-value pair '
+                             'in xxx=yyy format will be merged into figure_configs file (deprecate), '
                              'change to --cfg-options instead.')
     parser.add_argument('--cfg_options', nargs='+', action=DictAction,
-                        help='override some settings in the used config, '
-                             'the key-value pair in xxx=yyy format will be merged into config file.')
+                        help='override some settings in the used figure_configs, '
+                             'the key-value pair in xxx=yyy format will be merged into figure_configs file.')
     parser.add_argument('--auto-scale-lr', action='store_true', help='enable automatically scaling LR.')
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm', 'mpi'], default='none', help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
@@ -76,11 +76,11 @@ def main():
 
     # work_dir is determined in this priority: CLI > segment in file > file_name
     if args.work_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
+        # update figure_configs according to CLI args if args.work_dir is not None
         cfg.work_dir = osp.join(
             args.work_dir, osp.splitext(osp.basename(args.config))[0])
     elif cfg.get('work_dir', None) is None:
-        # use config file_name as default work_dir if cfg.work_dir is None
+        # use figure_configs file_name as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
 
@@ -112,7 +112,7 @@ def main():
         if cfg.resume_from is None and not cfg.auto_resume:
             redir_and_exist(cfg.work_dir)
 
-    # dump config
+    # dump figure_configs
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
     # init the logger before other steps
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
@@ -129,7 +129,7 @@ def main():
     logger.info('Environment info:\n' + dash_line + env_info + '\n' +
                 dash_line)
     meta['env_info'] = env_info
-    meta['config'] = cfg.pretty_text
+    meta['figure_configs'] = cfg.pretty_text
     # log some basic info
     logger.info(f'Distributed training: {distributed}')
     logger.info(f'Config:\n{cfg.pretty_text}')

@@ -136,7 +136,7 @@ class LmdbBackend(BaseStorageBackend):
             concurrent access occurs, do not lock the database. Default: False.
         readahead (bool, optional): Lmdb environment parameter. If False,
             disable the OS filesystem readahead mechanism, which may improve
-            random read performance when a database is larger than RAM.
+            random read figures when a database is larger than RAM.
             Default: False.
 
     Attributes:

@@ -1,7 +1,5 @@
-from .amc import (SaveSNRPrediction, SaveModulationPrediction, SaveModulationPredictionOfHCGDNN)
+from .amc import (FormatSingleHeadClassifierWithSNR)
 
 __all__ = [
-    'SaveSNRPrediction',
-    'SaveModulationPrediction',
-    'SaveModulationPredictionOfHCGDNN'
+    'FormatSingleHeadClassifierWithSNR',
 ]

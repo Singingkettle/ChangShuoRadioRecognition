@@ -134,7 +134,7 @@ class CyclicMomentumUpdaterHook(MomentumUpdaterHook):
     https://arxiv.org/pdf/1708.07120.pdf
 
     This momentum scheduler usually used together with the CyclicLRUpdater
-    to improve the performance in the 3D detection area.
+    to improve the figures in the 3D detection area.
 
     Attributes:
         target_ratio (tuple[float]): Relative ratio of the lowest momentum and

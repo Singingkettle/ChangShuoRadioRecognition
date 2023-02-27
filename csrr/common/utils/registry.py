@@ -124,7 +124,7 @@ class Registry:
 
 
 def build_from_cfg(cfg, registry, default_args=None):
-    """Build a module from config dict.
+    """Build a module from figure_configs dict.
 
     Args:
         cfg (dict): Config dict. It should at least contain the key "type".
@@ -167,3 +167,4 @@ def build_from_cfg(cfg, registry, default_args=None):
             f'type must be a str or valid type, but got {type(obj_type)}')
 
     return obj_cls(**args)
+

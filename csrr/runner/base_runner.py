@@ -286,7 +286,7 @@ class BaseRunner(metaclass=ABCMeta):
         """Register a hook from its cfg.
 
         Args:
-            hook_cfg (dict): Hook config. It should have at least keys 'type'
+            hook_cfg (dict): Hook figure_configs. It should have at least keys 'type'
               and 'priority' indicating its type and priority.
 
         Notes:

@@ -39,7 +39,7 @@ Supported Automatic Modulation Classification methods:
 - [x] [MLDNN](configs/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation
   Classification**](https://ieeexplore.ieee.org/document/9462447)
 - [x] [HCGDNN](configs/hcgdnn). [**A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9764618)
-- [X] [FMLDNN](configs/fmldnn). 'New proposed by Shuo Chang'
+- [X] [FMLDNN](configs/fastmldnn). 'New proposed by Shuo Chang'
 
 ## Installation
 

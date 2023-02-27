@@ -5,7 +5,7 @@ import torch
 import torch.distributed as dist
 
 from ..common import get_root_logger
-from ..common.parallel import MMDataParallel, MMDistributedDataParallel
+from ..common.parallel import CSDataParallel, CSDistributedDataParallel
 from ..common.utils import build_from_cfg
 from ..datasets import build_dataloader, build_dataset
 from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner, OptimizerHook, build_optimizer,
@@ -82,13 +82,13 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
         find_unused_parameters = cfg.get('find_unused_parameters', False)
         # Sets the `find_unused_parameters` parameter in
         # torch.nn.parallel.DistributedDataParallel
-        model = MMDistributedDataParallel(
+        model = CSDistributedDataParallel(
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False,
             find_unused_parameters=find_unused_parameters)
     else:
-        model = MMDataParallel(
+        model = CSDataParallel(
             model.cuda(cfg.gpu_id[0]), device_ids=cfg.gpu_id)
 
     # build runner
@@ -102,7 +102,7 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
     # an ugly workaround to make .log and .log.json file_names the same
     runner.timestamp = timestamp
 
-    # Optimizer config
+    # Optimizer figure_configs
     if distributed and 'type' not in cfg.optimizer_config:
         optimizer_config = OptimizerHook(**cfg.optimizer_config)
     else:

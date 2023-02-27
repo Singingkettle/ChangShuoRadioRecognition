@@ -46,7 +46,7 @@ def contrastive_classic(x,
     Args:
         x (torch.Tensor): The embedding vectors with shape (N, M), M is the vector length.
         label (torch.Tensor): The sign label of x, where 2x=M, M must be even number.
-        contrastive (dict): The config to build loss
+        contrastive (dict): The figure_configs to build loss
         weight (torch.Tensor, optional): Sample-pair loss weight.
         reduction (str, optional): The method used to reduce the loss.
         avg_factor (int, optional): Average factor that is used to average
@@ -90,7 +90,7 @@ def contrastive_exp(x,
     Args:
         x (torch.Tensor): The embedding vectors with shape (N, M), M is the vector length.
         label (torch.Tensor): The sign label of x, where 2x=M, M must be even number.
-        contrastive (dict): The config to build loss
+        contrastive (dict): The figure_configs to build loss
         weight (torch.Tensor, optional): Sample-pair loss weight.
         reduction (str, optional): The method used to reduce the loss.
         avg_factor (int, optional): Average factor that is used to average
@@ -134,7 +134,7 @@ def contrastive_quadratic(x,
     Args:
         x (torch.Tensor): The embedding vectors with shape (N, M), M is the vector length.
         label (torch.Tensor): The sign label of x, where 2x=M, M must be even number.
-        contrastive (dict): The config to build loss
+        contrastive (dict): The figure_configs to build loss
         weight (torch.Tensor, optional): Sample-pair loss weight.
         reduction (str, optional): The method used to reduce the loss.
         avg_factor (int, optional): Average factor that is used to average

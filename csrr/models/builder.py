@@ -13,8 +13,8 @@ def build(cfg, registry, default_args=None):
     """Build a module.
 
     Args:
-        cfg (dict, list[dict]): The config of modules, is is either a dict
-            or a list of configs.
+        cfg (dict, list[dict]): The figure_configs of modules, is is either a dict
+            or a list of figure_configs.
         registry (:obj:`Registry`): A registry the module belongs to.
         default_args (dict, optional): Default arguments to build the module.
             Defaults to None.

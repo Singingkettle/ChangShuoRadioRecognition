@@ -59,7 +59,7 @@ class DefaultOptimizerConstructor:
 
     Args:
         model (:obj:`nn.Module`): The model with parameters to be optimized.
-        optimizer_cfg (dict): The config dict of the optimizer.
+        optimizer_cfg (dict): The figure_configs dict of the optimizer.
             Positional fields are
 
                 - `type`: class name of the optimizer.
