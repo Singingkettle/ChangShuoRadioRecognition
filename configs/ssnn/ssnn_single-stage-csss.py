@@ -8,7 +8,7 @@ num_mod = 5
 # Model
 model = dict(
     type='SSNNSingleStage',
-    method_name='SSNN',
+
     backbone=dict(
         type='SSNet',
     ),

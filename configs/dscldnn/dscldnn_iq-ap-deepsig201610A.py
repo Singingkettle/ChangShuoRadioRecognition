@@ -6,7 +6,7 @@ _base_ = [
 
 model = dict(
     type='SingleHeadClassifier',
-    method_name='DSCLDNN',
+
     backbone=dict(
         type='DSCLNet',
         in_channels=1,

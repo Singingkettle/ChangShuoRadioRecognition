@@ -7,7 +7,7 @@ _base_ = [
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='CNN4-IQ',
+
     backbone=dict(
         type='CNNNet',
         depth=4,

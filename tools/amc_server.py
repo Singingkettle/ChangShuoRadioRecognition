@@ -30,7 +30,7 @@ _IS_SIG_UP = False
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('figure_configs', help='test figure_configs file path')
+    parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('--log_dir', help='dir to format the log file for online figures results')
     parser.add_argument(

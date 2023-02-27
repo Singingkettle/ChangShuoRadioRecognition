@@ -8,7 +8,7 @@ num_mod = 5
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='CGDNN',
+
     backbone=dict(
         type='CRNet',
         in_channels=1,

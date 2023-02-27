@@ -10,7 +10,7 @@ from csrr.common.utils import Config, mkdir_or_exist, filter_config
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Generate Train.sh File')
-    parser.add_argument('figure_configs', help='performance figure_configs file path')
+    parser.add_argument('config', help='performance config file path')
     parser.add_argument('--scripts_dir', help='dir to format the train.sh files')
     parser.add_argument('--parallel', default=False, action='store_true',
                         help='run multi python scripts')

@@ -1,5 +1,5 @@
-from .classification import ClassificationMetrics, ClassificationMetricsWithSNR
+from .classification import ClassificationMetricsForSingle, ClassificationMetricsWithSNRForSingle
 
 __all__ = [
-    'ClassificationMetrics', 'ClassificationMetricsWithSNR'
+    'ClassificationMetricsForSingle', 'ClassificationMetricsWithSNRForSingle'
 ]

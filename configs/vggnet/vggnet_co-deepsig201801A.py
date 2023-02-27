@@ -7,7 +7,7 @@ _base_ = [
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='VGGNet',
+
     backbone=dict(
         type='VGGNet'
     ),

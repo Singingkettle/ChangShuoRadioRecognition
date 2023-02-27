@@ -50,7 +50,7 @@ legend = {
     'HCGDNN_V6': 40,
 }
 
-scatter = [
+modulations = [
     'FM',
     'AM-SSB-SC',
     'AM-DSB-SC',

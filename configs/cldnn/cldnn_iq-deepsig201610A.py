@@ -7,7 +7,7 @@ _base_ = [
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='CLDNN-IQ',
+
     backbone=dict(
         type='CRNet',
         in_channels=1,

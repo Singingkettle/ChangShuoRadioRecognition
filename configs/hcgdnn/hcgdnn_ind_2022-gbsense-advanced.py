@@ -38,7 +38,7 @@ out_size = 288
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='HCGDNN',
+
     backbone=dict(
         type='HCGNetGRU2',
         depth=16,

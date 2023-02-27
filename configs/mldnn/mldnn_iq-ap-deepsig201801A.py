@@ -6,7 +6,7 @@ _base_ = [
 
 model = dict(
     type='SingleHeadClassifier',
-    method_name='MLDNN',
+
     backbone=dict(
         type='MLNet',
         avg_pool=(1, 8),

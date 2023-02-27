@@ -223,11 +223,11 @@ class Config:
     def auto_argparser(description=None):
         """Generate argparser from figure_configs file automatically (experimental)"""
         partial_parser = ArgumentParser(description=description)
-        partial_parser.add_argument('figure_configs', help='figure_configs file path')
+        partial_parser.add_argument('config', help='config file path')
         cfg_file = partial_parser.parse_known_args()[0].config
         cfg = Config.fromfile(cfg_file)
         parser = ArgumentParser(description=description)
-        parser.add_argument('figure_configs', help='figure_configs file path')
+        parser.add_argument('config', help='config file path')
         add_args(parser, cfg)
         return parser, cfg
 

@@ -14,7 +14,7 @@ from csrr.models import build_fb
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognitionTrain a regression model')
-    parser.add_argument('figure_configs', help='train figure_configs file path')
+    parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to format logs and models')
 
     args = parser.parse_args()

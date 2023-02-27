@@ -10,7 +10,7 @@ from csrr.models import build_fb
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
-    parser.add_argument('figure_configs', help='test figure_configs file path')
+    parser.add_argument('config', help='test config file path')
     parser.add_argument('model', help='model file')
     parser.add_argument(
         '--format-out',

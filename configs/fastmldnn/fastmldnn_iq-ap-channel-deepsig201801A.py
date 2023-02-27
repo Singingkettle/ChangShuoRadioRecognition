@@ -8,7 +8,7 @@ out_features = 256
 num_classes = 24
 model = dict(
     type='SingleHeadClassifier',
-    method_name='Fast MLDNN',
+
     backbone=dict(
         type='FMLNet',
         avg_pool=(1, 8),

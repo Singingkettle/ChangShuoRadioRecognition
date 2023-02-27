@@ -3,7 +3,7 @@ from typing import Dict, Any, List
 import numpy as np
 
 from ..builder import EVALUATES
-from csrr.performance.metrics import ClassificationMetricsWithSNR
+from csrr.performance.metrics import ClassificationMetricsWithSNRForSingle
 
 
 @EVALUATES.register_module()
@@ -19,13 +19,14 @@ class EvaluateSingleHeadClassifierWithSNR:
         gts = []
         snrs = []
         for annotation in data_infos['annotations']:
-            gt = data_infos['modulations'].index(annotation[self.target_name])
+            gt = data_infos[f'{self.target_name}s'].index(annotation[self.target_name])
             gts.append(gt)
             snrs.append(annotation['snr'])
         gts = np.array(gts, dtype=np.float64)
         pps = np.stack(results, axis=0)
         snrs = np.array(snrs, dtype=np.int64)
-        performance_generator = ClassificationMetricsWithSNR(pps, gts, snrs)
+        performance_generator = ClassificationMetricsWithSNRForSingle(pps, gts, snrs,
+                                                                      self.data_infos[f'{self.target_name}s'])
         eval_results = dict()
         for metric in self.metrics:
             eval_results.update(getattr(performance_generator, metric))

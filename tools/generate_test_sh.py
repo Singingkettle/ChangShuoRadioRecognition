@@ -8,7 +8,7 @@ from csrr.common.utils import Config, filter_config
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Generate Test.sh File')
-    parser.add_argument('figure_configs', help='performance figure_configs file path')
+    parser.add_argument('config', help='performance config file path')
     parser.add_argument('--is_regeneration', default=False, type=bool, help='is retest')
     args = parser.parse_args()
     return args

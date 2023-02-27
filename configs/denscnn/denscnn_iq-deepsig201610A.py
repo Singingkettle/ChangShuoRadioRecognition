@@ -7,7 +7,7 @@ _base_ = [
 # model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='DensCNN-IQ',
+
     backbone=dict(
         type='DensCNN',
     ),

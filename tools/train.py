@@ -20,7 +20,7 @@ from csrr.runner import init_dist, get_dist_info
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Train a model')
-    parser.add_argument('figure_configs', help='train figure_configs file path')
+    parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to format logs, models and results')
     parser.add_argument('--resume_from', help='the checkpoint file to resume from')
     parser.add_argument('--auto_resume', action='store_true', help='resume from the latest checkpoint automatically')

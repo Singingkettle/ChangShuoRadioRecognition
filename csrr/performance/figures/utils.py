@@ -21,6 +21,27 @@ from matplotlib.spines import Spine
 from matplotlib.transforms import Affine2D
 
 from ...common.fileio import load as IOLoad
+import copy
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from .utils import (load_amc_evaluation_results, reorder_results,
+                    radar_factory, get_classification_accuracy_and_f1)
+from ..builder import ACCURACYF1S
+
+plt.rcParams["font.family"] = "Times New Roman"
+
+
+def get_new_fig(fn, fig_size=None):
+    """ Init graphics """
+    if fig_size is None:
+        fig_size = [9, 9]
+    fig = plt.figure(fn, fig_size)
+    ax = fig.gca()  # Get Current Axis
+    ax.cla()  # clear existing performance
+    return fig, ax
 
 
 def load_annotation(ann_file):

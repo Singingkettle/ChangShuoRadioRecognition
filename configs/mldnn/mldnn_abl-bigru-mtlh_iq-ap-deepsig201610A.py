@@ -6,7 +6,7 @@ _base_ = [
 
 model = dict(
     type='SingleHeadClassifier',
-    method_name='MLDNN-V4',
+
     backbone=dict(
         type='MLNet',
         dropout_rate=0.5,

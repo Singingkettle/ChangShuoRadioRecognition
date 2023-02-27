@@ -30,7 +30,7 @@ heads = ['CNN', 'BiGRU1', 'BiGRU2']
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='HCGDNN',
+
     backbone=dict(
         type='HCGNet',
         depth=16,

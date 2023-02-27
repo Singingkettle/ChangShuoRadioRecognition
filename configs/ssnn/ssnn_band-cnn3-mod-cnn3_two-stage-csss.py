@@ -10,7 +10,7 @@ model = dict(
     type='SSNNTwoStage',
     band_net=dict(
         type='SingleHeadClassifier',
-        method_name='CNN3-IQ',
+
         backbone=dict(
             type='CNNNet',
             depth=4,
@@ -31,7 +31,7 @@ model = dict(
     ),
     mod_net=dict(
         type='SingleHeadClassifier',
-        method_name='CGDNN',
+
         backbone=dict(
             type='CRNet',
             in_channels=1,

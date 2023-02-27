@@ -7,7 +7,6 @@ _base_ = [
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='CGDNN2-AP',
     backbone=dict(
         type='CRNet',
         in_channels=1,

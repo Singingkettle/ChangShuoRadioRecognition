@@ -1,13 +1,12 @@
 import argparse
 
 from csrr.common.utils import Config, filter_config
-from csrr.performance import
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition Plot Results')
-    parser.add_argument('figure_configs', help='performance figure_configs file path')
+    parser.add_argument('config', help='performance config file path')
     args = parser.parse_args()
     return args
 
@@ -21,9 +20,8 @@ def main():
     print(cfg.pretty_text)
 
     config_legend_map, config_method_map = filter_config(cfg, mode='summary')
-    plot = build_performance(cfg.performance, cfg.log_dir, cfg.legend, cfg.scatter, config_legend_map, config_method_map)
+    pass
 
-    plot.plot()
 
 
 if __name__ == '__main__':

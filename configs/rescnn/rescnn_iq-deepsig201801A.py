@@ -7,7 +7,7 @@ _base_ = [
 # model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='ResCNN-IQ',
+
     backbone=dict(
         type='ResCNN',
         avg_pool=(1, 8),

@@ -10,7 +10,7 @@ heads = ['BiGRU1', 'BiGRU2']
 # Model
 model = dict(
     type='SingleHeadClassifier',
-    method_name='HCGDNN-V6',
+
     backbone=dict(
         type='HCGNet',
         heads=heads,

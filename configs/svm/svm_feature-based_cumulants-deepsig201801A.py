@@ -54,5 +54,5 @@ model = dict(
     type='SVM',
     regularization=1,
     max_iter=50000,
-    method_name='SVM',
+
 )

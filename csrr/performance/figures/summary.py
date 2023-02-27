@@ -75,7 +75,7 @@ class ModulationSummary(object):
                 for snr in self.summary_info[dataset_name]['snrs']:
                     table_str1 = table_str1 + '| {:d}dB'.format(int(snr))
                     table_str2 = table_str2 + '|:---------------------------------------------:'
-                table_str1 = table_str1 + '| MAA |  \n'
+                table_str1 = table_str1 + '| ACC |  \n'
                 table_str2 = table_str2 + '|:---------------------------------------------:|  \n'
                 f.write(table_str1)
                 f.write(table_str2)
@@ -97,7 +97,7 @@ class ModulationSummary(object):
                 for modulation in self.summary_info[dataset_name]['classes']:
                     table_str1 = table_str1 + '| {}'.format(modulation)
                     table_str2 = table_str2 + '|:---------------------------------------------:'
-                table_str1 = table_str1 + '| MAF |  \n'
+                table_str1 = table_str1 + '| F1 |  \n'
                 table_str2 = table_str2 + '|:---------------------------------------------:|  \n'
                 f.write(table_str1)
                 f.write(table_str2)

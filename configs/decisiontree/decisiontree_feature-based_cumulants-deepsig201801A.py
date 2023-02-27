@@ -56,5 +56,5 @@ y = 'mod_labels'
 model = dict(
     type='Tree',
     max_depth=6,
-    method_name='DecisionTree-FB',
+
 )

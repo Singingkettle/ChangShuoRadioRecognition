@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/co-deepsig201610A.py',
+    '../_base_/datasets/deepsig/co-deepsig201610A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py',
 ]
@@ -7,7 +7,6 @@ _base_ = [
 # Model
 model = dict(
     type='AlexNet',
-    method_name='AlexNet-CO',
     backbone=dict(
         type='AlexNet'
     ),
