@@ -11,21 +11,8 @@ import copy
 
 import numpy as np
 from scipy.optimize import minimize, Bounds, LinearConstraint
-from scipy.special import softmax
 
 from ..builder import MERGES
-
-def get_pre_matrix(results, num_class):
-    pre_matrix = []
-    for key_str in results:
-        pre_data = results[key_str]
-        pre_data = reshape_results(pre_data, num_class)
-        pre_data = softmax(pre_data, axis=1)
-        pre_data = pre_data[None, :, :]
-        pre_matrix.append(pre_data)
-
-    pre_matrix = np.concatenate(pre_matrix, axis=0)
-    return pre_matrix
 
 
 def get_merge_weight_by_grid_search(num_pre, search_step):
@@ -162,33 +149,34 @@ class GridSearch:
         self.grid_step = grid_step
 
     def __call__(self, results, data_infos, prediction_name):
-        if prediction_name is None:
-            return
-        snr_to_index = data_infos['snr_to_index']
-        item_snr_index = data_infos['item_snr_index']
-        num_snr = len(snr_to_index)
-        mod_label_num = len(data_infos['mod_to_label'])
-        item_mod_label = data_infos['item_mod_label']
-        pre_matrix = get_pre_matrix(results, mod_label_num)
-
-        eval_results = None
-        for grid_step in self.grid_step:
-            search_weight_list = get_merge_weight_by_grid_search(len(results), grid_step)
-            cur_max_accuracy = 0
-            for search_weight in search_weight_list:
-                search_weight = np.array(search_weight)
-                search_weight = np.reshape(search_weight, (1, -1))
-                tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
-                tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, mod_label_num))
-                tmp_eval_results = get_classification_accuracy_with_snr(num_snr, mod_label_num, snr_to_index,
-                                                                              item_snr_index, tmp_merge_matrix,
-                                                                              item_mod_label,
-                                                                              prefix=prediction_name + '/')
-                if cur_max_accuracy < tmp_eval_results[prediction_name + '/snr_mean_all']:
-                    cur_max_accuracy = tmp_eval_results[prediction_name + '/snr_mean_all']
-                    eval_results = copy.deepcopy(tmp_eval_results)
-
-        return eval_results
+        # if prediction_name is None:
+        #     return
+        # snr_to_index = data_infos['snr_to_index']
+        # item_snr_index = data_infos['item_snr_index']
+        # num_snr = len(snr_to_index)
+        # mod_label_num = len(data_infos['mod_to_label'])
+        # item_mod_label = data_infos['item_mod_label']
+        # pre_matrix = get_pre_matrix(results, mod_label_num)
+        #
+        # eval_results = None
+        # for grid_step in self.grid_step:
+        #     search_weight_list = get_merge_weight_by_grid_search(len(results), grid_step)
+        #     cur_max_accuracy = 0
+        #     for search_weight in search_weight_list:
+        #         search_weight = np.array(search_weight)
+        #         search_weight = np.reshape(search_weight, (1, -1))
+        #         tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
+        #         tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, mod_label_num))
+        #         tmp_eval_results = get_classification_accuracy_with_snr(num_snr, mod_label_num, snr_to_index,
+        #                                                                 item_snr_index, tmp_merge_matrix,
+        #                                                                 item_mod_label,
+        #                                                                 prefix=prediction_name + '/')
+        #         if cur_max_accuracy < tmp_eval_results[prediction_name + '/snr_mean_all']:
+        #             cur_max_accuracy = tmp_eval_results[prediction_name + '/snr_mean_all']
+        #             eval_results = copy.deepcopy(tmp_eval_results)
+        #
+        # return eval_results
+        pass
 
 
 @MERGES.register_module()
@@ -196,26 +184,29 @@ class Optimization:
     def __init__(self, method='trust-constr'):
         self.method = method
 
-    def __call__(self, results, data_infos, prediction_name):
-        if prediction_name is None:
-            return
-        mod_label_num = len(data_infos['mod_to_label'])
-        gts = data_infos['item_mod_label']
-        pre_matrix = get_pre_matrix(results, mod_label_num)
-        targets = generate_targets(gts, mod_label_num)
+    def __call__(self, mpps, gts):
+        """
 
-        pre_max_index = np.argmax(pre_matrix, axis=2)
-        pre_max_index = np.sum(pre_max_index, axis=0)
-        gt_max_index = np.argmax(targets, axis=1) * len(pre_matrix)
-        no_zero_index = np.nonzero((pre_max_index - gt_max_index))[0]
+        Args:
+            mpps (List[np.ndarry]):
+            gts:
+        Returns:
 
-        bad_pre_matrix = pre_matrix[:, no_zero_index[:], :]
-        targets = targets[no_zero_index[:], :]
+        """
+        mpps = np.concatenate(mpps, axis=0)
+        m, n, c = mpps.shape
+        mpps = np.concatenate(mpps, axis=0)
+
+        pre_max_index = np.argmax(mpps, axis=2)
+        gt_max_index = np.argmax(gts, axis=1)
+        diff_index = pre_max_index - np.reshape(gt_max_index, (1, -1))
+        no_zero_index = np.nonzero((np.sum(np.abs(diff_index), axis=0)))[0]
+
+        bad_pre_matrix = mpps[:, no_zero_index[:], :]
+        targets = gts[no_zero_index[:], :]
 
         w = get_merge_weight_by_optimization(bad_pre_matrix, targets, self.method)
-        merge_matrix = np.dot(w.T, np.reshape(pre_matrix, (len(results), -1)))
-        merge_matrix = np.reshape(merge_matrix, (-1, mod_label_num))
+        mpps = np.dot(w.T, np.reshape(mpps, (m, -1)))
+        pps = np.reshape(mpps, (n, c))
 
-        results[prediction_name] = merge_matrix
-
-        return results
+        return pps

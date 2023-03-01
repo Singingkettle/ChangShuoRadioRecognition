@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/deepsig/co-deepsig-201801A.py',
+    '../_base_/datasets/deepsig/co-deepsig201801A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
@@ -11,10 +11,10 @@ model = dict(
         type='AlexNet'
     ),
     classifier_head=dict(
-        type='ACMHead',
+        type='AMCHead',
         num_classes=24,
-        in_features=256,
-        out_features=256,
+        in_size=256,
+        out_size=256,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1

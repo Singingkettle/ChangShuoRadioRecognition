@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from csrr.datasets.utils import Constellation
+from csrr.datasets.pipeline.loading import Constellation
 
 _Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()
@@ -98,7 +98,7 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
         np.save(constellation_path, constellation)
 
 
-class DeepSigBase(object):
+class DeepSigBase:
     def __init__(self, root_dir, version, data_ratios):
 
         self.name = 'DeepSig'

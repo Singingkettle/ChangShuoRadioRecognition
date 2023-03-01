@@ -4,22 +4,21 @@ _base_ = [
     './data_iq-ap-channel-deepsig201610A.py'
 ]
 
-in_features = 100
-out_features = 256
+in_size = 100
+out_size = 256
 num_classes = 11
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='FastMLDNN',
     backbone=dict(
         type='FMLNet',
-        in_features=4,
+        in_size=4,
         channel_mode=True,
         skip_connection=True,
     ),
     classifier_head=dict(
-        type='ACMHead',
-        in_features=in_features,
-        out_features=out_features,
+        type='AMCHead',
+        in_size=in_size,
+        out_size=out_size,
         num_classes=num_classes,
         loss_cls=dict(
             type='FocalLoss',
@@ -28,8 +27,8 @@ model = dict(
         ),
     ),
 )
-train_cfg = dict()
-test_cfg = dict(vis_fea=True)
+
+
 
 # for flops calculation
 input_shape = [(2, 1, 128), (2, 1, 128), (1, 128, 128)]

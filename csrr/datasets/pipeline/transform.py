@@ -47,8 +47,8 @@ class NormalizeConstellation:
 class ChannelMode:
     def __call__(self, results):
         if 'iqs' in results['inputs']:
-            results['inputs']['iqs'] = np.reshape(results['inputs'], [2, 1, -1])
+            results['inputs']['iqs'] = np.reshape(results['inputs']['iqs'], [2, 1, -1])
         if 'aps' in results['inputs']:
-            results['inputs']['aps'] = np.reshape(results['inputs'], [2, 1, -1])
+            results['inputs']['aps'] = np.reshape(results['inputs']['aps'], [2, 1, -1])
 
         return results

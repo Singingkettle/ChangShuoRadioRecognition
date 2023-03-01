@@ -1,21 +1,20 @@
 _base_ = [
-    '../_base_/datasets/co-deepsig201610A.py',
+    '../_base_/datasets/deepsig/co-deepsig201610A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py',
 ]
 
 # Model
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='VGGNet',
     backbone=dict(
         type='VGGNet'
     ),
     classifier_head=dict(
-        type='ACMHead',
+        type='AMCHead',
         num_classes=11,
-        in_features=512,
-        out_features=256,
+        in_size=512,
+        out_size=256,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1

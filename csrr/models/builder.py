@@ -5,8 +5,7 @@ from ..common.utils import Registry, build_from_cfg
 BACKBONES = Registry('backbone')
 HEADS = Registry('head')
 LOSSES = Registry('loss')
-TASKS = Registry('method')
-FBS = Registry('fb')
+METHODS = Registry('method')
 
 
 def build(cfg, registry, default_args=None):
@@ -36,11 +35,6 @@ def build_backbone(cfg):
     return build(cfg, BACKBONES)
 
 
-def build_fb(cfg):
-    """Build backbone."""
-    return build(cfg, FBS)
-
-
 def build_head(cfg):
     """Build head."""
     return build(cfg, HEADS)
@@ -53,4 +47,4 @@ def build_loss(cfg):
 
 def build_method(cfg):
     """Build method"""
-    return build(cfg, TASKS)
+    return build(cfg, METHODS)

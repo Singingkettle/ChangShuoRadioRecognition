@@ -62,7 +62,7 @@ def plot_fea_distribution(fea, label_names, scatter_config, save_path, fig_size=
 
 
 @VISFEATURES.register_module()
-class VisFea(object):
+class VisFea:
     def __init__(self, name, method, log_dir, scatter_config, tool='tsne'):
         self.name = name
         self.config = method['figure_configs']

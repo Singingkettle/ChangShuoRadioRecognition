@@ -2,8 +2,9 @@ from typing import Dict, Any, List
 
 import numpy as np
 
-from ..builder import EVALUATES
-from csrr.performance.metrics import ClassificationMetricsWithSNRForSingle
+from ..builder import EVALUATES, MERGES, build_from_cfg
+from ..utils import list_dict_to_dict_list
+from ...performance.metrics import get_classification_eval_with_snr
 
 
 @EVALUATES.register_module()
@@ -11,7 +12,7 @@ class EvaluateSingleHeadClassifierWithSNR:
 
     def __init__(self, target_name: str, metrics: str = None):
         if metrics is None:
-            metrics = ['accuracy']
+            metrics = ['ACC']
         self.target_name = target_name
         self.metrics = metrics
 
@@ -22,29 +23,86 @@ class EvaluateSingleHeadClassifierWithSNR:
             gt = data_infos[f'{self.target_name}s'].index(annotation[self.target_name])
             gts.append(gt)
             snrs.append(annotation['snr'])
+
         gts = np.array(gts, dtype=np.float64)
         pps = np.stack(results, axis=0)
         snrs = np.array(snrs, dtype=np.int64)
-        performance_generator = ClassificationMetricsWithSNRForSingle(pps, gts, snrs,
-                                                                      self.data_infos[f'{self.target_name}s'])
-        eval_results = dict()
-        for metric in self.metrics:
-            eval_results.update(getattr(performance_generator, metric))
+        eval_results = get_classification_eval_with_snr(pps, gts, snrs, data_infos[f'{self.target_name}s'],
+                                                        self.metrics)
         return eval_results
 
-# @EVALUATES.register_module()
-# class EvaluateClassificationWithSNROfHCGDNN:
-#     def __init__(self, merge=None):
-#         if merge is not None:
-#             self.merge = build_from_cfg(merge, MERGES)
-#         else:
-#             self.merge = None
-#             raise ValueError('You should give a fusion strategy for HCGDNN model!')
-#
-#     def __call__(self, results, data_infos):
-#         results = self.merge(results, data_infos, 'Final')
-#         eval_results = generate_method_eval_results(results, data_infos, 'mod')
-#         return eval_results
+
+@EVALUATES.register_module()
+class EvaluateMLDNN:
+
+    def __init__(self, snr_threshold=0, metrics: str = None):
+        self.snr_threshold = snr_threshold
+        if metrics is None:
+            metrics = ['ACC']
+        self.metrics = metrics
+
+    def __call__(self, results: List[Dict[str, np.ndarray]], data_infos: Dict[str, Any]) -> Dict[str, Any]:
+        gts = []
+        snr_gts = []
+        snrs = []
+        for annotation in data_infos['annotations']:
+            gt = data_infos['modulations'].index(annotation['modulation'])
+            if annotation['snr'] >= self.snr_threshold:
+                snr_gt = 0
+            else:
+                snr_gt = 1
+            gts.append(gt)
+            snr_gts.append(snr_gt)
+            snrs.append(annotation['snr'])
+        results = list_dict_to_dict_list(results)
+        gts = np.array(gts, dtype=np.float64)
+        snr_gts = np.array(snr_gts, dtype=np.float64)
+        eval_results = dict()
+        for key in results:
+            pps = np.stack(results[key], axis=0)
+            if key == 'snr':
+                res = get_classification_eval_with_snr(pps, snr_gts, snrs, ['HighSNR', 'LowSNR'], self.metrics)
+            else:
+                res = get_classification_eval_with_snr(pps, gts, snrs, data_infos['modulations'], self.metrics)
+            eval_results.update({f'{k}_{key}': v for k, v in res.items()})
+
+        return eval_results
+
+
+@EVALUATES.register_module()
+class EvaluateHCGDNN:
+    def __init__(self, metrics: str = None, merge: Dict[str, str] = None):
+        if metrics is None:
+            metrics = ['ACC']
+        self.metrics = metrics
+        if merge is not None:
+            self.merge = build_from_cfg(merge, MERGES)
+        else:
+            self.merge = None
+            raise ValueError('You should give a fusion strategy for HCGDNN model!')
+
+    def __call__(self, results, data_infos):
+        gts = []
+        snrs = []
+        eval_results = dict()
+        for annotation in data_infos['annotations']:
+            gt = data_infos['modulations'].index(annotation['modulation'])
+            gts.append(gt)
+            snrs.append(annotation['snr'])
+        results = list_dict_to_dict_list(results)
+        gts = np.array(gts, dtype=np.float64)
+        snrs = np.array(snrs, dtype=np.int64)
+
+        mpps = []
+        for key in results:
+            pps = np.stack(results[key], axis=0)
+            res = get_classification_eval_with_snr(pps, gts, snrs, data_infos['modulations'], self.metrics)
+            eval_results.update({f'{k}_{key}': v for k, v in res.items()})
+            mpps.append(pps)
+        pps = self.merge(mpps, gts)
+        res = get_classification_eval_with_snr(pps, gts, snrs, data_infos['modulations'], self.metrics)
+        eval_results.update(res)
+        return eval_results
 #
 #
 # @EVALUATES.register_module()

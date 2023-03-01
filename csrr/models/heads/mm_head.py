@@ -7,22 +7,22 @@ from ..builder import HEADS, build_loss
 
 @HEADS.register_module()
 class ASDHead(BaseHead):
-    def __init__(self, amc_cls_num, sei_cls_num, in_features=256, out_features=256,
+    def __init__(self, amc_cls_num, sei_cls_num, in_size=256, out_size=256,
                  loss_amc=None, loss_sei=None):
         super(ASDHead, self).__init__()
         self.amc_cls_num = amc_cls_num
         self.sei_cls_num = sei_cls_num
         self.amc_classifier = nn.Sequential(
-            nn.Linear(in_features, out_features),
+            nn.Linear(in_size, out_size),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Linear(out_features, amc_cls_num)
+            nn.Linear(out_size, amc_cls_num)
         )
         self.sei_classifier = nn.Sequential(
-            nn.Linear(in_features, out_features),
+            nn.Linear(in_size, out_size),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Linear(out_features, sei_cls_num)
+            nn.Linear(out_size, sei_cls_num)
         )
         if loss_amc is None:
             loss_amc = dict(
@@ -65,28 +65,28 @@ class ASDHead(BaseHead):
 
 
 class MMHead(nn.Module):
-    def __init__(self, main_cls_num, minor_cls_num, in_features=256, out_features=256,
+    def __init__(self, main_cls_num, minor_cls_num, in_size=256, out_size=256,
                  is_share=False, main_name='Main', minor_name='Minor'):
         super(MMHead, self).__init__()
         self.main_classifier = nn.Sequential(
-            nn.Conv1d(in_features, out_features, kernel_size=1),
+            nn.Conv1d(in_size, out_size, kernel_size=1),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Conv1d(out_features, main_cls_num, kernel_size=1)
+            nn.Conv1d(out_size, main_cls_num, kernel_size=1)
         )
         if is_share:
             self.minor_classifier = nn.Sequential(
-                nn.Conv1d(in_features, out_features, kernel_size=1),
+                nn.Conv1d(in_size, out_size, kernel_size=1),
                 nn.ReLU(inplace=True),
                 nn.Dropout(0.5),
-                nn.Conv1d(out_features, main_cls_num * minor_cls_num, kernel_size=1)
+                nn.Conv1d(out_size, main_cls_num * minor_cls_num, kernel_size=1)
             )
         else:
             self.minor_classifier = nn.Sequential(
-                nn.Conv1d(in_features, out_features * main_cls_num, kernel_size=1),
+                nn.Conv1d(in_size, out_size * main_cls_num, kernel_size=1),
                 nn.ReLU(inplace=True),
                 nn.Dropout(0.5),
-                nn.Conv1d(out_features * main_cls_num, main_cls_num * minor_cls_num, kernel_size=1, groups=main_cls_num)
+                nn.Conv1d(out_size * main_cls_num, main_cls_num * minor_cls_num, kernel_size=1, groups=main_cls_num)
             )
 
         self.main_name = main_name
@@ -103,16 +103,16 @@ class MMHead(nn.Module):
 
 @HEADS.register_module()
 class ASSHead(BaseHead):
-    def __init__(self, amc_cls_num, sei_cls_num, in_features=256, out_features=256,
+    def __init__(self, amc_cls_num, sei_cls_num, in_size=256, out_size=256,
                  is_abs=True, loss_amc=None, loss_sei=None, is_share=False):
         super(ASSHead, self).__init__()
         self.amc_cls_num = amc_cls_num
         self.sei_cls_num = sei_cls_num
         self.is_abs = is_abs
         if self.is_abs:
-            self.classifier = MMHead(sei_cls_num, amc_cls_num, in_features, out_features, is_share)
+            self.classifier = MMHead(sei_cls_num, amc_cls_num, in_size, out_size, is_share)
         else:
-            self.classifier = MMHead(amc_cls_num, sei_cls_num, in_features, out_features, is_share)
+            self.classifier = MMHead(amc_cls_num, sei_cls_num, in_size, out_size, is_share)
 
         if loss_amc is None:
             loss_amc = dict(
@@ -180,12 +180,12 @@ class ASSHead(BaseHead):
 
 @HEADS.register_module()
 class CASHead(BaseHead):
-    def __init__(self, channel_cls_num, mod_cls_num, in_features=256, out_features=256,
+    def __init__(self, channel_cls_num, mod_cls_num, in_size=256, out_size=256,
                  loss_channel=None, loss_amc=None, is_share=False):
         super(CASHead, self).__init__()
         self.channel_cls_num = channel_cls_num
         self.mod_cls_num = mod_cls_num
-        self.classifier = MMHead(channel_cls_num, mod_cls_num, in_features, out_features, is_share)
+        self.classifier = MMHead(channel_cls_num, mod_cls_num, in_size, out_size, is_share)
 
         if loss_channel is None:
             loss_channel = dict(

@@ -13,7 +13,7 @@ data = dict(
         pipeline=[
             dict(type='LoadConstellationFromCache', data_root=data_root,
                  file_name='train_and_validation_filter_size_0.020_stride_0.020.pkl', to_float32=True),
-            dict(type='LoadAnnotations'),
+            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,

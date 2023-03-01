@@ -2,16 +2,17 @@ import os.path as osp
 import pickle
 import zlib
 from typing import Dict
+
 import h5py
 import numpy as np
 
 from ..builder import PIPELINES
 
 
-
 def normalize_iq_or_ap(x):
     x = (x - np.mean(x, axis=1).reshape(2, 1)) / np.std(x, axis=1).reshape(2, 1)
     return x
+
 
 class Constellation:
     def __init__(self, filter_size=None, filter_stride=None):
@@ -431,20 +432,25 @@ class LoadAPFromIQ:
         self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
+        self._cache = dict()
 
     def __call__(self, results):
-        iq = results['iqs']
-        iq = iq[0, :, :]
-        amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
-        phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
-        ap = np.vstack((amplitude, phase))
-        if self.to_float32:
-            ap = ap.astype(np.float32)
+        if results['file_name'] in self._cache:
+            results['inputs']['aps'] = self._cache[results['file_name']]
+        else:
+            iq = results['inputs']['iqs']
+            iq = iq[0, :, :]
+            amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
+            phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
+            ap = np.vstack((amplitude, phase))
+            if self.to_float32:
+                ap = ap.astype(np.float32)
 
-        if not self.is_squeeze:
-            # make the iq as a three-dimensional tensor [1, 2, L]
-            ap = np.expand_dims(ap, axis=0)
-        results['inputs']['aps'] = ap
+            if not self.is_squeeze:
+                # make the iq as a three-dimensional tensor [1, 2, L]
+                ap = np.expand_dims(ap, axis=0)
+            self._cache[results['file_name']] = ap
+            results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):
@@ -501,7 +507,7 @@ class LoadAnnotations:
         for target_name in self.target_info:
             target_type = self.numpy_type_look_table[self.target_info[target_name]]
             if isinstance(results[target_name], np.ndarray):
-                results['targets'][f'{target_name}s'] = results['targets'][target_name].astype(target_type)
+                results['targets'][f'{target_name}s'] = results[target_name].astype(target_type)
             elif isinstance(results[target_name], list):
                 results['targets'][f'{target_name}s'] = np.array(results[target_name], target_type)
             elif isinstance(results[target_name], tuple):
@@ -530,9 +536,9 @@ class MLDNNSNRLabel:
     def __call__(self, results):
         snr = results['snr']
         if snr >= self.snr_threshold:
-            results['targets']['snr'] = np.array(0, np.int64)
+            results['targets']['snrs'] = np.array(0, np.int64)
         else:
-            results['targets']['snr'] = np.array(1, np.int64)
+            results['targets']['snrs'] = np.array(1, np.int64)
 
         return results
 

@@ -1,7 +1,7 @@
 from .amc import (
-    EvaluateSingleHeadClassifierWithSNR
+    EvaluateSingleHeadClassifierWithSNR, EvaluateMLDNN
 )
 
 __all__ = [
-    'EvaluateSingleHeadClassifierWithSNR',
+    'EvaluateSingleHeadClassifierWithSNR', 'EvaluateMLDNN'
 ]

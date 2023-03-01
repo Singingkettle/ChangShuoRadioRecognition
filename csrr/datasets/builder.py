@@ -31,10 +31,10 @@ def build(cfg, registry, default_args=None):
         performance: A list of performance handle.
     """
     if isinstance(cfg, list):
-        plots = [
+        datas = [
             build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
         ]
-        return plots
+        return datas
     else:
         return build_from_cfg(cfg, registry, default_args)
 

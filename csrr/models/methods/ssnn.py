@@ -1,12 +1,10 @@
-import torch
-
-from .single_head_classifier import SingleHeadClassifier
 from .base import BaseDNN
-from ..builder import TASKS, build_method
+from .base_classifier import BaseClassifier
+from ..builder import METHODS, build_method
 from ...common.utils import outs2result
 
 
-@TASKS.register_module()
+@METHODS.register_module()
 class SSNNTwoStage(BaseDNN):
 
     def __init__(self, band_net, mod_net, num_band, num_mod, vis_fea=False, method_name='SSNN'):
@@ -88,8 +86,8 @@ class SSNNTwoStage(BaseDNN):
         return dict(Band=band_outs, Mod=mod_outs)
 
 
-@TASKS.register_module()
-class SSNNSingleStage(SingleHeadClassifier):
+@METHODS.register_module()
+class SSNNSingleStage(BaseClassifier):
     def __init__(self, backbone, classifier_head, num_mod, vis_fea=False, method_name=None):
         super(SSNNSingleStage, self).__init__(backbone, classifier_head, vis_fea, method_name)
         self.num_mod = num_mod

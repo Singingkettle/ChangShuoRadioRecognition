@@ -3,15 +3,15 @@ import numpy as np
 from sklearn import svm
 from tqdm import tqdm
 
-from ..builder import FBS
+from ..builder import METHODS
 
 
-@FBS.register_module()
-class SVM(object):
-    def __init__(self, regularization, max_iter, model_path, method_name, mode='train'):
+@METHODS.register_module()
+class SVM:
+    def __init__(self, regularization, max_iter, model_path, mode='train'):
         super(SVM, self).__init__()
         self.model_path = model_path
-        self.method_name = method_name
+        self.method_name = 'SVM'
         self.mode = mode
         self.svm = svm.SVC(C=regularization, tol=0.005, verbose=3, max_iter=max_iter, decision_function_shape='ovo',
                            shrinking=0)

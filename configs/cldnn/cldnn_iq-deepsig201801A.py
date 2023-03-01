@@ -1,13 +1,12 @@
 _base_ = [
-    '../_base_/datasets/iq-deepsig-201801A.py',
+    '../_base_/datasets/deepsig/iq-deepsig201801A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
 # Model
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='CLDNN',
     backbone=dict(
         type='CRNet',
         in_channels=1,
@@ -19,10 +18,10 @@ model = dict(
         rnn_mode='LSTM',
     ),
     classifier_head=dict(
-        type='ACMHead',
+        type='AMCHead',
         num_classes=24,
-        in_features=50,
-        out_features=128,
+        in_size=50,
+        out_size=128,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1.0,

@@ -25,7 +25,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNROfHCGDNN', merge=dict(type='Optimization'))
+            dict(type='EvaluateHCGDNN', merge=dict(type='Optimization'))
         ],
     ),
     test=dict(
@@ -38,7 +38,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNROfHCGDNN', merge=dict(type='Optimization'))
+            dict(type='EvaluateHCGDNN', merge=dict(type='Optimization'))
         ],
         save=[
             dict(type='SaveModulationPredictionOfHCGDNN', merge=dict(type='Optimization'))

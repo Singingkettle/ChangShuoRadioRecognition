@@ -1,12 +1,11 @@
 _base_ = [
-    './data_iq-ap-deepsig-201801A.py',
+    './data_iq-ap-deepsig201801A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='DSCLDNN',
     backbone=dict(
         type='DSCLNet',
         in_channels=1,
@@ -20,7 +19,7 @@ model = dict(
     classifier_head=dict(
         type='DSCLDNNHead',
         num_classes=24,
-        in_features=2500,
+        in_size=2500,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1.0,

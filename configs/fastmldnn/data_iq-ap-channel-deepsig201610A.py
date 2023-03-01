@@ -1,5 +1,6 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
+target_name = 'modulation'
 data = dict(
     samples_per_gpu=640,
     workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
@@ -10,7 +11,7 @@ data = dict(
             dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='ChannelMode', ),
-            dict(type='LoadAnnotations'),
+            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
@@ -26,7 +27,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNR', )
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),
     test=dict(
@@ -40,7 +41,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNR', )
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
         save=[
             dict(type='SaveModulationPrediction', )

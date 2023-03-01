@@ -156,9 +156,8 @@ class Config:
                 }
                 # delete imported module
                 del sys.modules[temp_module_name]
-            elif file_name.endswith(('.yml', '.yaml', '.json')):
-                import mmcv
-                cfg_dict = mmcv.load(temp_config_file.name)
+            else:
+                raise NotImplementedError('The config file must be a python script.')
             # close temp file
             temp_config_file.close()
 

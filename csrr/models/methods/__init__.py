@@ -9,15 +9,16 @@ from .cnn4 import CNN4
 from .ctdnn import CTDNN
 from .denscnn import DensCNN
 from .dscldnn import DSCLDNN
-from .fmldnn import FastMLDNN
+from .dt import DecisionTree
+from .fast_mldnn import FastMLDNN
 from .googlenet import GoogleNet
 from .hcgdnn import HCGDNN
-from .mct import MCT
 from .mldnn import MLDNN
 from .rescnn import ResCNN
 from .resnet import ResNet
-from .single_head_classifier import SingleHeadClassifier
+from .base_classifier import BaseClassifier
 from .ssnn import SSNNTwoStage, SSNNSingleStage
+from .svm import SVM
 from .vggnet import VGGNet
 
 __all__ = [
@@ -31,15 +32,16 @@ __all__ = [
     'CNN4',
     'CTDNN',
     'DensCNN',
+    'DecisionTree',
     'DSCLDNN',
     'FastMLDNN',
     'GoogleNet',
     'HCGDNN',
-    'MCT',
     'MLDNN',
     'ResCNN',
     'ResNet',
-    'SingleHeadClassifier',
+    'BaseClassifier',
     'SSNNTwoStage', 'SSNNSingleStage',
+    'SVM',
     'VGGNet'
 ]

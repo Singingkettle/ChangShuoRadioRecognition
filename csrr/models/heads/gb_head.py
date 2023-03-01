@@ -9,11 +9,11 @@ from ..builder import HEADS, build_loss, build_head
 
 @HEADS.register_module()
 class GBBCEHead(ClassificationHead):
-    def __init__(self, num_classes, in_features=10560, out_features=256, loss_cls=None):
-        super(GBBCEHead, self).__init__(num_classes, in_features, out_features, loss_cls)
+    def __init__(self, num_classes, in_size=10560, out_size=256, loss_cls=None):
+        super(GBBCEHead, self).__init__(num_classes, in_size, out_size, loss_cls)
 
     def forward(self, x, vis_fea=False, is_test=False):
-        x = x.reshape(-1, self.in_features)
+        x = x.reshape(-1, self.in_size)
         x = self.classifier(x)
         if is_test:
             x = torch.sigmoid(x)
@@ -53,13 +53,13 @@ class GBIndHead(BaseHead):
 
 @HEADS.register_module()
 class GBDetHead(BaseHead):
-    def __init__(self, channel_cls_num, mod_cls_num, in_features=256, out_features=256,
+    def __init__(self, channel_cls_num, mod_cls_num, in_size=256, out_size=256,
                  is_share=False, loss_channel=None, loss_mod=None):
         super(GBDetHead, self).__init__()
         self.channel_cls_num = channel_cls_num
         self.mod_cls_num = mod_cls_num
-        self.classifier = MMHead(channel_cls_num, mod_cls_num, in_features,
-                                 out_features, is_share, main_name='Channel', minor_name='Mod')
+        self.classifier = MMHead(channel_cls_num, mod_cls_num, in_size,
+                                 out_size, is_share, main_name='Channel', minor_name='Mod')
         self.loss_channel = build_loss(loss_channel)
         self.loss_mod = build_loss(loss_mod)
 

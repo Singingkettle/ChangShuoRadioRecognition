@@ -1,5 +1,5 @@
 from .compose import Compose
-from .features import Cumulants
+from .features import LoadCumulants
 from .formatting import Collect
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
@@ -14,7 +14,7 @@ from .transform import (ChannelMode, NormalizeAP, NormalizeIQ,
 
 __all__ = [
     'Compose',
-    'Cumulants',
+    'LoadCumulants',
     'Collect',
     'LoadAPFromFile',
     'LoadIQFromFile',

@@ -2,6 +2,20 @@ from ..builder import PIPELINES
 from ...common import DataContainer as DC
 
 
+def recurrence_copy_dict(data, results, keys):
+    if isinstance(keys, str):
+        data[keys] = results[keys]
+        return data
+    elif isinstance(keys, dict):
+        for k, v in keys.items():
+            data[k] = dict()
+            return recurrence_copy_dict(data[k], results[k], v)
+    elif isinstance(keys, list):
+        for k in keys:
+            recurrence_copy_dict(data, results, k)
+        return data
+
+
 @PIPELINES.register_module()
 class Collect:
 
@@ -23,8 +37,8 @@ class Collect:
                 - keys in``self.keys``
         """
 
-        data = {}
-        input_metas = {}
+        data = dict()
+        input_metas = dict()
         for key in self.meta_keys:
             if key in results:
                 input_metas[key] = results[key]
@@ -32,8 +46,7 @@ class Collect:
                 input_metas[key] = 0
         data['input_metas'] = DC(input_metas, cpu_only=True)
 
-        for key in self.keys:
-            data[key] = results[key]
+        data = recurrence_copy_dict(data, results, self.keys)
         return data
 
     def __repr__(self):

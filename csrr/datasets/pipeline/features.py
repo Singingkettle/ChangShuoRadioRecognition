@@ -4,12 +4,12 @@ from ..builder import PIPELINES
 
 
 @PIPELINES.register_module()
-class Cumulants:
+class LoadCumulants:
     def __init__(self):
         pass
 
     def __call__(self, results):
-        iq = results['iqs']
+        iq = results['inputs']['iqs']
         iq = iq.reshape(2, -1)
         iq = iq[0, :] + 1j * iq[1, :]
         iq_length = iq.shape[0]
@@ -56,5 +56,5 @@ class Cumulants:
         cumulants[0, 7] = np.abs(C62_norm)
         cumulants[0, 8] = np.abs(C63_norm)
 
-        results['cls'] = cumulants
+        results['inputs']['cls'] = cumulants
         return results

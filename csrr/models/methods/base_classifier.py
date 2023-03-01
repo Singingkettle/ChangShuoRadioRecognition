@@ -1,13 +1,13 @@
 from .base import BaseDNN
-from ..builder import TASKS, build_backbone, build_head
+from ..builder import METHODS, build_backbone, build_head
 from ...common.utils import outs2result
 
 
-@TASKS.register_module()
-class SingleHeadClassifier(BaseDNN):
+@METHODS.register_module()
+class BaseClassifier(BaseDNN):
 
     def __init__(self, backbone, classifier_head, vis_fea=False, method_name=None):
-        super(SingleHeadClassifier, self).__init__()
+        super(BaseClassifier, self).__init__()
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
         self.vis_fea = vis_fea
@@ -26,7 +26,7 @@ class SingleHeadClassifier(BaseDNN):
             pre_trained (str, optional): Path to pre-trained weights.
                 Defaults to None.
         """
-        super(SingleHeadClassifier, self).init_weights(pre_trained)
+        super(BaseClassifier, self).init_weights(pre_trained)
         self.backbone.init_weights(pre_trained=pre_trained)
 
         self.classifier_head.init_weights()
@@ -38,7 +38,7 @@ class SingleHeadClassifier(BaseDNN):
 
     def forward_train(self, inputs, input_metas, targets, **kwargs):
         x = self.extract_feat(inputs)
-        losses = self.classifier_head.forward_train(x, **targets, **kwargs)
+        losses = self.classifier_head.forward_train(x, targets, **kwargs)
 
         return losses
 
@@ -47,10 +47,20 @@ class SingleHeadClassifier(BaseDNN):
         outs = self.classifier_head(x, self.vis_fea, True)
 
         results_list = []
-        for idx in range(outs.shape[0]):
-            result = outs2result(outs[idx, :])
-            results_list.append(result)
-        return results_list
+        if isinstance(outs, dict):
+            keys = list(outs.keys())
+            batch_size = outs[keys[0]].shape[0]
+            for idx in range(batch_size):
+                item = dict()
+                for key_str in keys:
+                    item[key_str] = outs2result(outs[key_str][idx, :])
+                results_list.append(item)
+            return results_list
+        else:
+            for idx in range(outs.shape[0]):
+                result = outs2result(outs[idx, :])
+                results_list.append(result)
+            return results_list
 
     def forward_dummy(self, inputs):
         x = self.extract_feat(inputs)

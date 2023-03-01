@@ -15,7 +15,7 @@ from ..builder import SUMMARIES
 
 
 @SUMMARIES.register_module()
-class ModulationSummary(object):
+class ModulationSummary:
     def __init__(self, name, dataset, log_dir, config_legend_map, config_method_map):
         self.name = name
         self.dataset = dataset

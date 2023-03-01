@@ -9,8 +9,7 @@ out_size = 288
 heads = ['BiGRU1', 'BiGRU2']
 # Model
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='HCGDNN',
     backbone=dict(
         type='HCGNet',
         heads=heads,
@@ -18,8 +17,8 @@ model = dict(
     ),
     classifier_head=dict(
         type='HCGDNNHead',
-        in_features=in_size,
-        out_features=out_size,
+        in_size=in_size,
+        out_size=out_size,
         num_classes=11,
         heads=heads,
         loss_cls=dict(

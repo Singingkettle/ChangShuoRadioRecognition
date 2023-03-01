@@ -11,6 +11,13 @@ from ....common.parallel import is_module_wrapper
 from ....common.utils import TORCH_VERSION
 
 
+def flatten_dict(dd, separator='/', prefix=''):
+    return {prefix + separator + k if prefix else k: v
+            for kk, vv in dd.items()
+            for k, v in flatten_dict(vv, separator, kk).items()
+            } if isinstance(dd, dict) else {prefix: dd}
+
+
 @HOOKS.register_module()
 class TensorboardLoggerHook(LoggerHook):
 
@@ -51,6 +58,7 @@ class TensorboardLoggerHook(LoggerHook):
     @master_only
     def log(self, runner):
         tags = self.get_loggable_tags(runner, allow_text=True)
+        tags = flatten_dict(tags)
         for tag, val in tags.items():
             if 'figure' in tag:
                 fig_number = val.number

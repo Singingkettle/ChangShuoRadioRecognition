@@ -11,7 +11,7 @@ from ...runner import load_checkpoint
 @BACKBONES.register_module()
 class FMLNet(nn.Module):
 
-    def __init__(self, dropout_rate=0.5, in_features=4,
+    def __init__(self, dropout_rate=0.5, in_size=4,
                  channel_mode=False, skip_connection=False,
                  reduction=16, avg_pool=None):
         super(FMLNet, self).__init__()
@@ -19,7 +19,7 @@ class FMLNet(nn.Module):
         self.skip_connection = skip_connection
         if self.channel_mode:
             self.conv_net = nn.Sequential(
-                nn.Conv2d(in_features, 256, kernel_size=(1, 3)),
+                nn.Conv2d(in_size, 256, kernel_size=(1, 3)),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dropout_rate),
                 nn.Conv2d(256, 256, kernel_size=(1, 3)),
@@ -40,7 +40,7 @@ class FMLNet(nn.Module):
                 nn.Conv2d(256, 100, kernel_size=(1, 3)),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dropout_rate),
-                nn.AvgPool2d((in_features, 1)),
+                nn.AvgPool2d((in_size, 1)),
             )
         if avg_pool is not None:
             self.has_avg_pool = True

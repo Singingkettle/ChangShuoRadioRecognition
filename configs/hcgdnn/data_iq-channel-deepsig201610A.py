@@ -1,5 +1,6 @@
 dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
+target_name = 'modulation'
 data = dict(
     samples_per_gpu=320,
     workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
@@ -9,7 +10,7 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
-            dict(type='LoadAnnotations'),
+            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
@@ -20,11 +21,11 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
-            dict(type='Collect', keys=['iqs', ])
+            dict(type='Collect', keys=['inputs', ])
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNROfHCGDNN', merge=dict(type='Optimization'))
+            dict(type='EvaluateHCGDNN', merge=dict(type='Optimization'))
         ],
     ),
     test=dict(
@@ -37,7 +38,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateClassificationWithSNROfHCGDNN', merge=dict(type='Optimization'))
+            dict(type='EvaluateHCGDNN', merge=dict(type='Optimization'))
         ],
         save=[
             dict(type='SaveModulationPredictionOfHCGDNN', merge=dict(type='Optimization'))

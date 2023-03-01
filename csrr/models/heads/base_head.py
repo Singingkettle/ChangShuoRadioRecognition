@@ -10,24 +10,24 @@ class BaseHead(nn.Module, metaclass=ABCMeta):
         super(BaseHead, self).__init__()
 
     @abstractmethod
-    def loss(self, inputs, labels, **kwargs):
+    def loss(self, inputs, targets, **kwargs):
         """Compute losses of the head."""
         pass
 
     def forward_train(self,
                       inputs,
-                      labels,
+                      targets,
                       **kwargs):
         """
         Args:
             inputs (Tensor or dict[str, Tensor]): Features from Backbone.
-            labels (Tensor): classification labels
+            targets (Tensor or dict[str, Tensor]): Training Targets for Supervision
 
         Returns:
             tuple:
                 losses: (dict[str, Tensor]): A dictionary of loss components.
         """
         loss_inputs = self(inputs)
-        losses = self.loss(loss_inputs, labels, **kwargs)
+        losses = self.loss(loss_inputs, targets, **kwargs)
 
         return losses

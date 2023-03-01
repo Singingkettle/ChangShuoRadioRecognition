@@ -6,14 +6,14 @@ import time
 import numpy as np
 
 from csrr.common import get_root_logger, collect_env
-from csrr.common.utils import Config, mkdir_or_exist
+from csrr.common.utils import Config, mkdir_or_exist, setup_multi_processes
 from csrr.datasets import build_dataset
-from csrr.models import build_fb
+from csrr.models import build_method
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='ChangShuoRadioRecognitionTrain a regression model')
+        description='ChangShuoRadioRecognition Train a FB AMC model')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to format logs and models')
 
@@ -24,10 +24,12 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print('Command Line Args:', args)
 
     # load cfg
     cfg = Config.fromfile(args.config)
+
+    # set multi-process settings
+    setup_multi_processes(cfg)
 
     # work_dir is determined in this priority: CLI > segment in file > file_name
     if args.work_dir is not None:
@@ -65,7 +67,7 @@ def main():
     meta['exp_name'] = osp.basename(args.config)
 
     cfg.model['model_path'] = os.path.join(cfg.work_dir, 'model.fb')
-    model = build_fb(cfg.model)
+    model = build_method(cfg.model)
 
     dataset = build_dataset(cfg.data.train)
     if hasattr(dataset, 'CLASSES'):
@@ -73,9 +75,9 @@ def main():
 
     data = []
     label = []
-    for idx in range(len(dataset)):
-        data.append(dataset[idx][cfg.x])
-        label.append(dataset[idx][cfg.y])
+    for signal in dataset:
+        data.append(signal['inputs'][cfg.x])
+        label.append(signal['targets'][cfg.y])
 
     data = np.concatenate(data)
     label = np.array(label)

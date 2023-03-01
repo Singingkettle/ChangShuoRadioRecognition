@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import List, Union, Dict, Tuple, Any, List
+from typing import Union, Dict, Tuple, Any, List
 
 import numpy as np
 from numpy import ndarray
@@ -32,7 +32,7 @@ class ClassificationMetricsForSingle:
         self._cm = None
         self._cache_cm = False
         self._as = None
-        self._cache_as = None
+        self._cache_as = False
         self._fs = None
         self._cache_fs = False
         self._pr = None
@@ -75,18 +75,18 @@ class ClassificationMetricsForSingle:
             average_precision[i] = average_precision_score(tps[:, i], pps[:, i])
         # A "micro-average": quantifying score on all classes jointly
         precision['micro'], recall["micro"], _ = precision_recall_curve(tps.ravel(), pps.ravel())
-        average_precision["micro"] = average_precision_score(pps, tps, average="micro")
+        average_precision["micro"] = average_precision_score(tps.ravel(), pps.ravel(), average="micro")
 
         pr = dict(precision=precision, recall=recall, average_precision=average_precision)
 
         return pr
 
     def _f1_score(self, confusion_matrix) -> Dict[str, float]:
-        recall = confusion_matrix[:-1, -1]
-        precision = confusion_matrix[-1, :-1]
-        f1_score = 2 * precision * recall / (precision + recall)
+        tp_fn = confusion_matrix[:-1, -1]
+        tp_fp = confusion_matrix[-1, :-1]
+        f1_score = 2 * np.diag(confusion_matrix[:-1, :-1]) / (tp_fn + tp_fp)
         f1_score = {self.classes[index]: f1 for index, f1 in enumerate(f1_score)}
-        f1_score['F1'] = 1.0 * sum(f1_score.values()) / len(f1_score)
+        f1_score['AllClass'] = 1.0 * sum(f1_score.values()) / len(f1_score)
 
         return f1_score
 
@@ -174,7 +174,7 @@ class ClassificationMetricsForSingle:
         return self._cm
 
     @property
-    def accuracy(self) -> float:
+    def ACC(self) -> float:
         if not self._cache_as:
             accuracy = self._accuracy(self.confusion_matrix)
             self._as = accuracy
@@ -182,7 +182,7 @@ class ClassificationMetricsForSingle:
         return self._as
 
     @property
-    def f1_score(self) -> Dict[str, float]:
+    def F1(self) -> Dict[str, float]:
         if not self._cache_fs:
             f1_score = self._f1_score(self.confusion_matrix)
             self._fs = f1_score
@@ -212,14 +212,14 @@ class ClassificationMetricsForSingle:
 
 
 class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
-    def __init__(self, pps: np.ndarray, gts: np.ndarray, snrs: np.ndarray, classes):
+    def __init__(self, pps: np.ndarray, gts: np.ndarray, snrs: np.ndarray, classes: List[str]):
         """
         Args:
             pps (np.ndarray): all items' prediction probabilities with the shape of [N, C], and sum(pps[i, :]) = 1
             gts (np.ndarray): all items' true labels with the shape of [N,], where the value should be between [0, C)
             snrs (np.ndarray): all items' snr with the shape of [N,]
-            classes: list with categories' name, and the index of a specific category in the list is corresponding
-            to the prediction index.
+            classes (List[str]): list with categories' name, and the index of a specific category in the list is
+            corresponding to the prediction index.
         """
         super(ClassificationMetricsWithSNRForSingle, self).__init__(pps, gts, classes)
         self.snrs = snrs
@@ -242,8 +242,8 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             for snr in self.snr_to_index:
                 confusion_matrix[f'{snr:02d}dB'] = self._confusion_matrix(self.pps_along_snr[snr],
                                                                           self.tps_along_snr[snr])
-            # Add all snr together
-            confusion_matrix['All SNR'] = np.sum(confusion_matrix[:-1, :, :], axis=0)
+            # Add All SNR together
+            confusion_matrix['AllSNR'] = self._confusion_matrix(self.pps, self.tps)
 
             self._cm = confusion_matrix
             self._cache_cm = True
@@ -251,28 +251,28 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
         return self._cm
 
     @property
-    def accuracy(self) -> Dict[Union[str, Any], float]:
+    def ACC(self) -> Dict[Union[str, Any], float]:
         if not self._cache_as:
             accuracy = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                accuracy[f'{snr:02d}dB'] = self._accuracy(confusion_matrix[self.snr_to_index[snr], :, :])
-            macro_accuracy = 1.0 * sum(accuracy.values()) / len(accuracy)
-            accuracy['ACC'] = macro_accuracy
+                accuracy[f'{snr:02d}dB'] = self._accuracy(confusion_matrix[f'{snr:02d}dB'])
+            # For All SNR
+            accuracy['AllSNR'] = self._accuracy(confusion_matrix['AllSNR'])
             self._as = accuracy
             self._cache_as = True
 
         return self._as
 
     @property
-    def f1_score(self) -> Dict[str, Dict[str, float]]:
+    def F1(self) -> Dict[str, Dict[str, float]]:
         if not self._cache_fs:
             f1_score = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                f1_score[f'{snr:02d}dB'] = self._f1_score(confusion_matrix[self.snr_to_index[snr], :, :])
-            f1_score['All SNR'] = self._f1_score(confusion_matrix[-1, :, :])
-
+                f1_score[f'{snr:02d}dB'] = self._f1_score(confusion_matrix[f'{snr:02d}dB'])
+            f1_score['AllSNR'] = self._f1_score(confusion_matrix['AllSNR'])
+            self._fs = f1_score
             self._cache_fs = True
 
         return self._fs
@@ -312,3 +312,17 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             self._cache_roc = True
 
         return self._roc
+
+
+def get_classification_eval_with_snr(ps, gs, ss, cs, ms):
+    performance_generator = ClassificationMetricsWithSNRForSingle(ps, gs, ss, cs)
+    eval_results = dict()
+    for metric in ms:
+        res = getattr(performance_generator, metric)
+        save_res = dict()
+        for key in res:
+            if 'All' in key:
+                save_res.update({metric: res[key]})
+        eval_results.update(save_res)
+
+    return eval_results

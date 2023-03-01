@@ -25,24 +25,23 @@ class MergeAMCHead(BaseHead):
         pass
 
     def loss(self, x, mod_labels=None, weight=None, **kwargs):
-        loss_Final = self.loss_cls(x, mod_labels, weight=weight)
-        return dict(loss_Final=loss_Final)
+        loss_cls = self.loss_cls(x, mod_labels, weight=weight)
+        return dict(loss_cls=loss_cls)
 
     def forward(self, x):
-        SNR_p = self.softmax(x['SNR'])
-        Low_p = self.softmax(x['Low'])
-        High_p = self.softmax(x['High'])
+        snr = self.softmax(x['snr'])
+        low = self.softmax(x['low'])
+        high = self.softmax(x['high'])
 
-        Low_snr_pred = torch.mul(Low_p, SNR_p[:, -1:])
-
-        High_snr_pred = torch.mul(High_p, SNR_p[:, :1])
-        Final_pre = torch.add(Low_snr_pred, High_snr_pred)
+        low_snr = torch.mul(low, snr[:, -1:])
+        high_snr = torch.mul(high, snr[:, :1])
+        merge = torch.add(low_snr, high_snr)
 
         if self.with_log:
-            Final_pre = torch.where(Final_pre > 0, Final_pre, Final_pre.new_tensor(1))
-            Final_pre = torch.log(Final_pre)
+            merge = torch.where(merge > 0, merge, merge.new_tensor(1))
+            merge = torch.log(merge)
 
-        return Final_pre
+        return dict(snr=snr, low=low, high=high, merge=merge)
 
 
 @HEADS.register_module()
@@ -50,38 +49,32 @@ class MLDNNHead(BaseHead):
     def __init__(self, heads):
         super(MLDNNHead, self).__init__()
         self.num_head = len(heads)
-        self.classifier_head = nn.ModuleList()
-        for head in heads:
-            head_block = build_head(head)
-            self.classifier_head.append(head_block)
+        self.heads = []
+        for name in heads:
+            self.heads.append(name)
+            head_block = build_head(heads[name])
+            self.add_module(name, head_block)
 
     def init_weights(self):
-        for i in range(self.num_head):
-            self.classifier_head[i].init_weights()
+        for name in self.heads:
+            getattr(self, name).init_weights()
 
-    def loss(self, x, mod_labels=None, snr_labels=None, **kwargs):
+    def loss(self, inputs, targets, **kwargs):
         losses = dict()
-        snr_loss = self.classifier_head[0].loss(
-            x['SNR'], mod_labels=snr_labels)
-        low_loss = self.classifier_head[1].loss(
-            x['Low'], mod_labels=mod_labels)
-        high_loss = self.classifier_head[2].loss(
-            x['High'], mod_labels=mod_labels)
-        Final_loss = self.classifier_head[3].loss(
-            x['Final'], mod_labels=mod_labels)
-
-        losses['loss_SNR'] = snr_loss['loss_Final']
-        losses['loss_Low'] = low_loss['loss_Final']
-        losses['loss_High'] = high_loss['loss_Final']
-        losses['loss_Final'] = Final_loss['loss_Final']
+        for key in inputs:
+            if 'snr' in key:
+                losses[f'loss_{key}'] = getattr(self, key).loss(inputs[key], targets['snrs'])['loss_cls']
+            else:
+                losses[f'loss_{key}'] = getattr(self, key).loss(inputs[key], targets['modulations'])['loss_cls']
 
         return losses
 
-    def forward(self, x, vis_fea=False, is_test=False):
-        SNR = self.classifier_head[0](x[0])
-        Low = self.classifier_head[1](x[1])
-        High = self.classifier_head[2](x[2])
-        x = dict(SNR=SNR, Low=Low, High=High)
-        Final = self.classifier_head[3](x)
+    def forward(self, inputs, vis_fea=False, is_test=False):
+        outputs = dict()
+        for key in inputs:
+            outputs[key] = getattr(self, key)(inputs[key])
+        outputs = getattr(self, 'merge')(outputs)
+        if vis_fea:
+            raise NotImplementedError('The vis fea for MLDNN is not supported!')
 
-        return dict(SNR=SNR, Low=Low, High=High, Final=Final)
+        return outputs

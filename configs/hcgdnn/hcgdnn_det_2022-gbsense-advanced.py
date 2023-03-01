@@ -38,8 +38,7 @@ in_size = 100
 out_size = 288
 # Model
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='HCGDNN',
     backbone=dict(
         type='HCGNetGRU2',
         depth=16,
@@ -50,8 +49,8 @@ model = dict(
         type='GBDetHead',
         channel_cls_num=24,
         mod_cls_num=13,
-        in_features=in_size,
-        out_features=out_size,
+        in_size=in_size,
+        out_size=out_size,
         is_share=False,
         loss_channel=dict(
             type='BinaryCrossEntropyLoss',

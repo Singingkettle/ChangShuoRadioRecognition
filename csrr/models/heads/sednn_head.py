@@ -9,23 +9,23 @@ from ..builder import HEADS, build_loss
 @HEADS.register_module()
 class SEDNNHead(BaseHead):
     def __init__(self, num_mod, num_snr, snrs=None,
-                 in_features=256, mod_out_features=256, snr_out_features=256,
+                 in_size=256, mod_out_size=256, snr_out_size=256,
                  loss_mod=None, loss_snr=None, loss_merge=None):
         super(SEDNNHead, self).__init__()
         self.num_mod = num_mod
         self.num_snr = num_snr
         self.snrs = snrs
         self.amc_classifier = nn.Sequential(
-            nn.Conv2d(in_features, num_snr * mod_out_features, stride=1, padding=0, kernel_size=1),
+            nn.Conv2d(in_size, num_snr * mod_out_size, stride=1, padding=0, kernel_size=1),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Conv2d(num_snr * mod_out_features, num_snr * num_mod, groups=num_snr, stride=1, padding=0, kernel_size=1)
+            nn.Conv2d(num_snr * mod_out_size, num_snr * num_mod, groups=num_snr, stride=1, padding=0, kernel_size=1)
         )
         self.snr_classifier = nn.Sequential(
-            nn.Conv2d(in_features, snr_out_features, stride=1, padding=0, kernel_size=1),
+            nn.Conv2d(in_size, snr_out_size, stride=1, padding=0, kernel_size=1),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Conv2d(snr_out_features, num_snr, stride=1, padding=0, kernel_size=1)
+            nn.Conv2d(snr_out_size, num_snr, stride=1, padding=0, kernel_size=1)
         )
         if loss_mod is None:
             loss_mod = dict(

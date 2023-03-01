@@ -37,8 +37,7 @@ in_size = 100
 out_size = 288
 # Model
 model = dict(
-    type='SingleHeadClassifier',
-
+    type='HCGDNN',
     backbone=dict(
         type='HCGNetGRU2',
         depth=16,
@@ -48,9 +47,9 @@ model = dict(
     classifier_head=dict(
         type='GBIndHead',
         channel_head=dict(
-            type='ACMHead',
-            in_features=in_size,
-            out_features=out_size,
+            type='AMCHead',
+            in_size=in_size,
+            out_size=out_size,
             num_classes=24,
             loss_cls=dict(
                 type='BinaryCrossEntropyLoss',
@@ -58,9 +57,9 @@ model = dict(
             ),
         ),
         mod_head=dict(
-            type='ACMHead',
-            in_features=in_size,
-            out_features=out_size,
+            type='AMCHead',
+            in_size=in_size,
+            out_size=out_size,
             num_classes=13,
             loss_cls=dict(
                 type='BinaryCrossEntropyLoss',
@@ -68,9 +67,9 @@ model = dict(
             ),
         ),
         order_head=dict(
-            type='ACMHead',
-            in_features=in_size,
-            out_features=out_size,
+            type='AMCHead',
+            in_size=in_size,
+            out_size=out_size,
             num_classes=4,
             loss_cls=dict(
                 type='FocalLoss',

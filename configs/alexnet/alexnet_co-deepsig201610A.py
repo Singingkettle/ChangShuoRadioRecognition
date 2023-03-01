@@ -11,10 +11,10 @@ model = dict(
         type='AlexNet'
     ),
     classifier_head=dict(
-        type='ACMHead',
+        type='AMCHead',
         num_classes=11,
-        in_features=256,
-        out_features=256,
+        in_size=256,
+        out_size=256,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1

@@ -134,12 +134,12 @@ class MLNet(nn.Module):
                             nn.init.zeros_(param)
 
     def forward(self, iqs, aps):
-        iq_fea = self.iq_net(iqs)
-        ap_fea = self.ap_net(aps)
+        low = self.iq_net(iqs)
+        high = self.ap_net(aps)
         if self.gradient_truncation:
             with torch.no_grad():
-                snr_fea = torch.add(iq_fea, ap_fea)
+                snr = torch.add(low, high)
         else:
-            snr_fea = torch.add(iq_fea, ap_fea)
+            snr = torch.add(low, high)
 
-        return [snr_fea, iq_fea, ap_fea]
+        return dict(snr=snr, low=low, high=high)

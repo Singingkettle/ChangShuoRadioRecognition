@@ -9,7 +9,7 @@ data = dict(
         ann_file='train_and_validation.json',
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadAnnotations'),
+            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,

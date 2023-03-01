@@ -7,7 +7,7 @@ _base_ = [
 num_mod = 5
 # Model
 model = dict(
-    type='SingleHeadClassifier',
+    type='BaseClassifier',
 
     backbone=dict(
         type='CRNet',
@@ -20,10 +20,10 @@ model = dict(
         rnn_mode='GRU',
     ),
     classifier_head=dict(
-        type='ACMHead',
+        type='AMCHead',
         num_classes=num_mod,
-        in_features=50,
-        out_features=128,
+        in_size=50,
+        out_size=128,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1.0,

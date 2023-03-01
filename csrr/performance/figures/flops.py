@@ -21,7 +21,7 @@ from ...models import build_method
 
 
 @FLOPS.register_module()
-class GetFlops(object):
+class GetFlops:
     def __init__(self, method, log_dir):
         self.method = method
         self.log_dir = log_dir

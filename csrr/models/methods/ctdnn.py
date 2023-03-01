@@ -1,9 +1,9 @@
-from .single_head_classifier import SingleHeadClassifier
+from .base_classifier import BaseClassifier
 
-from ..builder import TASKS
+from ..builder import METHODS
 
 
-@TASKS.register_module()
-class CTDNN(SingleHeadClassifier):
+@METHODS.register_module()
+class CTDNN(BaseClassifier):
     def __init__(self, backbone, classifier_head, vis_fea=False):
         super(CTDNN, self).__init__(backbone, classifier_head, vis_fea, 'CTDNN')

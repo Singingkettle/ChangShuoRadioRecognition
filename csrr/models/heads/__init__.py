@@ -3,7 +3,7 @@ from .classification_head import ClassificationHead
 from .shrinkage_head import ShrinkageHead
 from .base_head import BaseHead
 from .dscldnn_head import DSCLDNNHead
-from .fmldnn_head import FMLDNNHead
+from .fast_mldnn_head import FastMLDNNHead
 from .gb_head import GBBCEHead, GBIndHead, GBDetHead
 from .hcgdnn_head import HCGDNNHead
 from .mldnn_head import MergeAMCHead, MLDNNHead
@@ -17,7 +17,7 @@ __all__ = [
     'ClassificationHead',
     'ShrinkageHead',
     'DSCLDNNHead',
-    'FMLDNNHead',
+    'FastMLDNNHead',
     'GBBCEHead', 'GBIndHead', 'GBDetHead',
     'HCGDNNHead',
     'MergeAMCHead',
