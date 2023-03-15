@@ -469,89 +469,39 @@ class DictAction(Action):
 
 def filter_config(cfg, is_regeneration=False, mode='test'):
     configs = []
-    train_configs = dict()
+    test_configs = []
     no_test_configs = dict()
-    config_legend_map = dict()
-    config_method_map = dict()
-
-    def extract_info(m):
-        c = m['figure_configs']
-        if c in configs:
-            if config_legend_map[c] is not m['name']:
-                raise ValueError(
-                    'The figure_configs {} is assigned two legends: {}-{}!!!!'.format(c, config_legend_map[c], m['name']))
-        else:
-            configs.append(c)
-            config_legend_map[c] = m['name']
-            config_method_map[c] = m
-
-    # Add figure_configs from confusion_map
-    if 'confusion_map' in cfg.plot:
-        if isinstance(cfg.plot['confusion_map'], dict):
-            confusion_map = cfg.plot['confusion_map']
-            method = confusion_map['method']
-            extract_info(method)
-        elif isinstance(cfg.plot['confusion_map'], list):
-            for confusion_map in cfg.plot['confusion_map']:
-                method = confusion_map['method']
-                extract_info(method)
-        else:
-            raise ValueError('The confusion maps must be list or dict!')
-
-    if mode == 'train':
-        # Add figure_configs from train_test_curve
-        if 'train_test_curve' in cfg.plot:
-            if isinstance(cfg.plot['train_test_curve'], dict):
-                train_test_curve = cfg.plot['train_test_curve']
-                for method in train_test_curve['method']:
-                    extract_info(method)
-            elif isinstance(cfg.plot['train_test_curve'], list):
-                for train_test_curve in cfg.plot['train_test_curve']:
-                    for method in train_test_curve['method']:
-                        extract_info(method)
-            else:
-                raise ValueError('The train test curves must be list or dict!')
-
-    # Add figure_configs from snr_modulation
-    if 'snr_modulation' in cfg.plot:
-        if isinstance(cfg.plot['snr_modulation'], dict):
-            snr_modulation = cfg.plot['snr_modulation']
-            for method in snr_modulation['method']:
-                extract_info(method)
-        elif isinstance(cfg.plot['snr_modulation'], list):
-            for snr_modulation in cfg.plot['snr_modulation']:
-                for method in snr_modulation['method']:
-                    extract_info(method)
-        else:
-            raise ValueError('The snr_modulation must be list or dict!')
-
-    if is_regeneration:
-        no_train_configs = list(set(configs))
-    else:
-        for config in configs:
-            if osp.isdir(osp.join(cfg.log_dir, config)):
-                format_out_dir = osp.join(cfg.log_dir, config, 'format_out')
-                json_paths = glob(format_out_dir, 'json')
-                if 'feature-based' in config:
-                    train_configs[config] = -1
+    train_configs = dict()
+    for dataset in cfg.publish:
+        for method_name in cfg.publish[dataset]:
+            config_name = cfg.publish[dataset][method_name]
+            config_file_path = osp.join(cfg.work_dir, config_name, f'{config_name}.py')
+            if osp.isfile(config_file_path):
+                if 'feature-based' in config_name:
+                    train_configs[config_name] = -1
                 else:
-                    best_epoch = get_the_best_checkpoint(
-                        cfg.log_dir, config)
+                    best_epoch = get_the_best_checkpoint(cfg.work_dir, config_name)
                     if best_epoch > 0:
-                        train_configs[config] = best_epoch
-                        if len(json_paths) != 1:
-                            no_test_configs[config] = train_configs[config]
-        no_train_configs = list(set(configs) - set(train_configs.keys()))
+                        train_configs[config_name] = best_epoch
+                        if not osp.isfile(osp.join(cfg.work_dir, config_name, 'format/res.pkl')):
+                            no_test_configs[config_name] = best_epoch
+                        else:
+                            test_configs.append(config_name)
+
+            configs.append(config_name)
 
     if is_regeneration:
         no_test_configs = train_configs
+        no_train_configs = configs
+    else:
+        no_train_configs = list(set(configs) - set(train_configs.keys()))
 
     if mode == 'test':
         return no_test_configs
     elif mode == 'train':
         return no_train_configs
     elif mode == 'summary':
-        return config_legend_map, config_method_map
+        return test_configs
     else:
         raise ValueError('Unknown mod {} for filtering figure_configs'.format(mode))
 
@@ -583,14 +533,14 @@ def get_total_epoch(log_file):
     return 0
 
 
-def get_the_best_checkpoint(log_dir, config):
-    json_paths = glob(os.path.join(log_dir, config), 'json')
+def get_the_best_checkpoint(work_dir, config_name):
+    json_paths = glob(os.path.join(work_dir, config_name), 'json')
 
     best_epoch = 0
     if len(json_paths) > 0:
         json_paths = sorted(json_paths)
         max_epoch = 0
-        final_metric = 'Final/snr_mean_all'
+        final_metric = 'ACC'
         total_epoch = get_total_epoch(json_paths[-1].replace('.json', ''))
         merge_log = {i + 1: 0 for i in range(total_epoch)}
         for json_path in json_paths:
@@ -601,8 +551,12 @@ def get_the_best_checkpoint(log_dir, config):
             if max(epochs) > max_epoch:
                 max_epoch = max(epochs)
             for epoch in epochs:
-                if log_dict[epoch]['mode'][-1] == 'val':
-                    merge_log[epoch] = log_dict[epoch][final_metric][0]
+                try:
+                    if log_dict[epoch]['mode'][-1] == 'val':
+                        merge_log[epoch] = log_dict[epoch][final_metric][0]
+                except:
+                    max_epoch = 0
+                    break
         best_epoch = max(merge_log, key=merge_log.get)
         if total_epoch != max_epoch:
             best_epoch = 0

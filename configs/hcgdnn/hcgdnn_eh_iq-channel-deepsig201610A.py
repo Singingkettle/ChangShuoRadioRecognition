@@ -1,23 +1,27 @@
 _base_ = [
     './schedule.py',
+    './data_iq-channel-deepsig201610A.py',
     '../_base_/default_runtime.py',
-    '../_base_/datasets/deepsig/iq-channel-deepsig201610A.py',
 ]
 
 in_size = 100
 out_size = 288
+heads = ['CNN', 'BiGRU1', 'BiGRU2']
 # Model
 model = dict(
     type='HCGDNN',
     backbone=dict(
-        type='HCGNetGRU1',
+        type='HCGNet',
+        heads=heads,
         input_size=in_size,
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='HCGDNNHead',
         in_size=in_size,
         out_size=out_size,
         num_classes=11,
+        heads=heads,
+        use_eh=True,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1,

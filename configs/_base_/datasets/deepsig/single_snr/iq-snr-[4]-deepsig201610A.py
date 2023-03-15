@@ -3,7 +3,7 @@ data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/Dee
 target_name = 'modulation'
 data = dict(
     samples_per_gpu=320,
-    workers_per_gpu=4, persistent_workers=True, prefetch_factor=3,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',

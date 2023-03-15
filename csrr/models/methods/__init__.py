@@ -14,6 +14,7 @@ from .fast_mldnn import FastMLDNN
 from .googlenet import GoogleNet
 from .hcgdnn import HCGDNN
 from .mldnn import MLDNN
+from .pointdnn import PointDNN
 from .rescnn import ResCNN
 from .resnet import ResNet
 from .base_classifier import BaseClassifier
@@ -38,6 +39,7 @@ __all__ = [
     'GoogleNet',
     'HCGDNN',
     'MLDNN',
+    'PointDNN',
     'ResCNN',
     'ResNet',
     'BaseClassifier',

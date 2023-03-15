@@ -10,7 +10,7 @@ from .mldnn_head import MergeAMCHead, MLDNNHead
 from .sednn_head import SEDNNHead
 from .mm_head import ASDHead, ASSHead
 from .ss_head import SSHead
-
+from .euclidean_head import EuclideanHead
 __all__ = [
     'BaseHead',
     'AMCHead',
@@ -26,4 +26,5 @@ __all__ = [
     'ASDHead',
     'ASSHead',
     'SSHead',
+    'EuclideanHead'
 ]

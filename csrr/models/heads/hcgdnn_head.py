@@ -1,13 +1,14 @@
 import torch.nn as nn
 
 from .amc_head import AMCHead
+from .euclidean_head import EuclideanHead
 from .base_head import BaseHead
 from ..builder import HEADS
 
 
 @HEADS.register_module()
 class HCGDNNHead(BaseHead):
-    def __init__(self, num_classes, heads=None, in_size=80, out_size=256, loss_cls=None):
+    def __init__(self, num_classes, heads=None, in_size=80, out_size=256, loss_cls=None, use_eh=False):
         super(HCGDNNHead, self).__init__()
         if loss_cls is None:
             loss_cls = dict(
@@ -18,7 +19,10 @@ class HCGDNNHead(BaseHead):
             heads = ['CNN', 'BIGRU1', 'BIGRU2']
         self.heads = heads
         for layer_name in self.heads:
-            self.add_module(layer_name, AMCHead(num_classes, in_size, out_size, loss_cls))
+            if use_eh:
+                self.add_module(layer_name, EuclideanHead(num_classes, in_size, out_size, loss_cls=loss_cls))
+            else:
+                self.add_module(layer_name, AMCHead(num_classes, in_size, out_size, loss_cls))
 
     def init_weights(self):
         for m in self.modules():

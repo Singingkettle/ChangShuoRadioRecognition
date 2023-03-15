@@ -424,44 +424,6 @@ class LoadConstellationFromIQCache:
 
 
 @PIPELINES.register_module()
-class LoadAPFromIQ:
-    def __init__(self,
-                 is_squeeze=False,
-                 to_float32=False,
-                 to_norm=False):
-        self.is_squeeze = is_squeeze
-        self.to_float32 = to_float32
-        self.to_norm = to_norm
-        self._cache = dict()
-
-    def __call__(self, results):
-        if results['file_name'] in self._cache:
-            results['inputs']['aps'] = self._cache[results['file_name']]
-        else:
-            iq = results['inputs']['iqs']
-            iq = iq[0, :, :]
-            amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
-            phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
-            ap = np.vstack((amplitude, phase))
-            if self.to_float32:
-                ap = ap.astype(np.float32)
-
-            if not self.is_squeeze:
-                # make the iq as a three-dimensional tensor [1, 2, L]
-                ap = np.expand_dims(ap, axis=0)
-            self._cache[results['file_name']] = ap
-            results['inputs']['aps'] = ap
-        return results
-
-    def __repr__(self):
-        repr_str = (f'{self.__class__.__name__}('
-                    f'is_squeeze={self.is_squeeze},'
-                    f'to_float32={self.to_float32}, '
-                    f'to_norm={self.to_norm}, )')
-        return repr_str
-
-
-@PIPELINES.register_module()
 class LoadFTFromIQ:
     def __init__(self,
                  is_squeeze=False,

@@ -21,9 +21,6 @@ from ..builder import VISFEATURES
 from ...common.utils import glob
 
 
-plt.rcParams["font.family"] = "Times New Roman"
-
-
 def get_new_fig(fn, fig_size=None):
     """ Init graphics """
     if fig_size is None:

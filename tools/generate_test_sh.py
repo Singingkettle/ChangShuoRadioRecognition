@@ -45,7 +45,7 @@ def main():
                 checkpoint_sh = cfg.log_dir + '/{}/model.fb'.format(config)
             else:
                 checkpoint_sh = cfg.log_dir + '/{}/epoch_{}.pth'.format(config, epoch)
-            format_out_sh = cfg.log_dir + '/{}/eval'.format(config)
+            format_out_sh = cfg.log_dir + '/{}/format'.format(config)
 
             if epoch == -1:
                 test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \

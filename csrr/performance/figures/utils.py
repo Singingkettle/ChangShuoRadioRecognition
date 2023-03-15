@@ -7,11 +7,10 @@ Author: Citybuster
 Time: 2021/5/31 21:45
 Email: chagshuo@bupt.edu.cn
 """
-import copy
 import json
-import os
 from collections import defaultdict
 
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Circle, RegularPolygon
 from matplotlib.path import Path
@@ -19,17 +18,6 @@ from matplotlib.projections import register_projection
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.spines import Spine
 from matplotlib.transforms import Affine2D
-
-from ...common.fileio import load as IOLoad
-import copy
-import os
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-from .utils import (load_amc_evaluation_results, reorder_results,
-                    radar_factory, get_classification_accuracy_and_f1)
-from ..builder import ACCURACYF1S
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -42,126 +30,6 @@ def get_new_fig(fn, fig_size=None):
     ax = fig.gca()  # Get Current Axis
     ax.cla()  # clear existing performance
     return fig, ax
-
-
-def load_annotation(ann_file):
-    """Load annotation from annotation file."""
-    annos = IOLoad(ann_file)
-    SNRS = annos['SNRS']
-    CLASSES = annos['CLASSES']
-    ann_info = annos['ANN']
-    mods_dict = annos['mods_dict']
-    snrs_dict = annos['snrs_dict']
-    replace_dict = {'PAM4': '4PAM', 'QAM16': '16QAM', 'QAM64': '64QAM'}
-    for index, item in enumerate(CLASSES):
-        if item in replace_dict:
-            CLASSES[index] = replace_dict[item]
-            mods_dict[replace_dict[item]] = mods_dict[item]
-            mods_dict.pop(item)
-    return SNRS, CLASSES, mods_dict, snrs_dict, ann_info
-
-
-def get_classification_accuracy_and_f1(prediction_name, confusion_matrix, SNRS, CLASSES):
-    all_class_snr_accuracy = list()
-    single_class_snr_f1 = {class_name: [] for class_name in CLASSES}
-    single_snr_class_f1 = {snr: [] for snr in SNRS}
-    for snr_index, snr in enumerate(SNRS):
-        conf = confusion_matrix[snr_index, :, :]
-        cor = np.sum(np.diag(conf))
-        ncor = np.sum(conf) - cor
-        all_class_snr_accuracy.append(1.0 * cor / (cor + ncor))
-        for class_index in range(len(CLASSES)):
-            num_tp_fn = confusion_matrix[snr_index, class_index, :]
-            num_tp_fp = confusion_matrix[snr_index, :, class_index]
-            num_tp_tn = confusion_matrix[snr_index, class_index, class_index]
-            class_snr_f1 = 2 * num_tp_tn / (num_tp_fn + num_tp_fp)
-            single_class_snr_f1[CLASSES[class_index]].append(class_snr_f1)
-            single_snr_class_f1[SNRS[snr_index]].append(class_snr_f1)
-
-    average_accuracy = sum(all_class_snr_accuracy) / float(len(SNRS))
-    all_class_snr_accuracy_info = dict(
-        score=all_class_snr_accuracy, average=average_accuracy, name=prediction_name, SNRS=SNRS)
-
-    single_class_snr_f1_info = dict()
-    for class_name in single_class_snr_f1:
-        average_f1 = sum(single_class_snr_f1[class_name]) / float(len(SNRS))
-        info = dict(score=single_class_snr_f1[class_name], average=average_f1, name=prediction_name, SNRS=SNRS)
-        single_class_snr_f1_info[class_name] = info
-
-    all_snr_class_f1 = list()
-    conf = np.sum(confusion_matrix, axis=0)
-    for class_index in range(len(CLASSES)):
-        f1 = 2.0 * conf[class_index, class_index] / (np.sum(conf[class_index, :]) + np.sum(conf[:, class_index]))
-        all_snr_class_f1.append(f1)
-    average_f1 = sum(all_snr_class_f1) / float(len(CLASSES))
-    all_snr_class_f1_info = dict(score=all_snr_class_f1, average=average_f1, name=prediction_name, CLASSES=CLASSES)
-
-    single_snr_class_f1_info = dict()
-    for snr in single_snr_class_f1:
-        average_f1 = sum(single_snr_class_f1[snr]) / float(len(CLASSES))
-        info = dict(score=single_snr_class_f1[snr], average=average_f1, name=prediction_name, CLASSES=CLASSES)
-        single_snr_class_f1_info[snr] = info
-
-    return all_class_snr_accuracy_info, single_class_snr_f1_info, all_snr_class_f1_info, single_snr_class_f1_info
-
-
-def load_amc_evaluation_results(obj_pointer):
-    amc_results = list()
-
-    if isinstance(obj_pointer.method, dict):
-        obj_pointer.method = [obj_pointer.method]
-
-    for method in obj_pointer.method:
-        config = method['figure_configs']
-        name = method['name']
-
-        format_out_dir = os.path.join(obj_pointer.log_dir, config, 'format_out')
-        pre_files = [os.path.join(format_out_dir, 'Final.pkl')]
-        if 'extra_predictions' in method:
-            for extra_prediction in method['extra_predictions']:
-                pre_files.append(os.path.join(format_out_dir, extra_prediction + '.pkl'))
-        for pre_file in pre_files:
-            if os.path.isfile(pre_file):
-                save_res = IOLoad(pre_file)
-                prediction_name = os.path.basename(pre_file)
-                if prediction_name is 'Final':
-                    prediction_name = name
-                save_res['method_name'] = prediction_name
-                amc_results.append(save_res)
-
-    return amc_results
-
-
-def reorder_results(class_scores):
-    if len(class_scores) == 1:
-        min_clss_scores = copy.deepcopy(class_scores[0]['score'])
-
-    else:
-        num_classes = len(class_scores[0]['score'])
-        num_method = len(class_scores)
-        min_clss_scores = copy.deepcopy(class_scores[0]['score'])
-        for class_index in range(num_classes):
-            for method_index in range(1, num_method):
-                if min_clss_scores[class_index] > class_scores[method_index]['score'][class_index]:
-                    min_clss_scores[class_index] = copy.copy(
-                        class_scores[method_index]['score'][class_index])
-    sort_indices = np.argsort(np.array(min_clss_scores) * -1)
-
-    new_class_scores = []
-    num_method = len(class_scores)
-    for method_index in range(num_method):
-        new_scores = list()
-        new_classes = list()
-        new_class_score = dict()
-        for class_index in sort_indices:
-            new_scores.append(copy.copy(class_scores[method_index]['score'][class_index]))
-            new_classes.append(copy.copy(class_scores[method_index]['CLASSES'][class_index]))
-        new_class_score['score'] = copy.deepcopy(new_scores)
-        new_class_score['CLASSES'] = copy.deepcopy(new_classes)
-        new_class_score['average'] = copy.deepcopy(class_scores[method_index]['average'])
-        new_class_score['name'] = copy.deepcopy(class_scores[method_index]['name'])
-        new_class_scores.append(new_class_score)
-    return new_class_scores
 
 
 def radar_factory(num_vars, frame='circle'):

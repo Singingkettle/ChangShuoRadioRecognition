@@ -164,7 +164,7 @@ def main():
         meta['CLASSES'] = datasets[0].CLASSES
 
     train_method(model, datasets, cfg, distributed=distributed, validate=(not args.no_validate),
-               timestamp=timestamp, meta=meta)
+                 timestamp=timestamp, meta=meta)
 
 
 if __name__ == '__main__':

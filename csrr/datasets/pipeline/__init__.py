@@ -4,7 +4,7 @@ from .formatting import Collect
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
                       LoadAPFromHDF5, LoadIQFromHDF5,
-                      LoadConstellationFromIQFile, LoadConstellationFromIQCache, LoadAPFromIQ,
+                      LoadConstellationFromIQFile, LoadConstellationFromIQCache,
                       LoadFTFromIQ,
                       LoadAnnotations,
                       MLDNNSNRLabel)

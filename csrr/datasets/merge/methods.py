@@ -11,6 +11,8 @@ import copy
 
 import numpy as np
 from scipy.optimize import minimize, Bounds, LinearConstraint
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import label_binarize
 
 from ..builder import MERGES
 
@@ -148,35 +150,33 @@ class GridSearch:
     def __init__(self, grid_step):
         self.grid_step = grid_step
 
-    def __call__(self, results, data_infos, prediction_name):
-        # if prediction_name is None:
-        #     return
-        # snr_to_index = data_infos['snr_to_index']
-        # item_snr_index = data_infos['item_snr_index']
-        # num_snr = len(snr_to_index)
-        # mod_label_num = len(data_infos['mod_to_label'])
-        # item_mod_label = data_infos['item_mod_label']
-        # pre_matrix = get_pre_matrix(results, mod_label_num)
-        #
-        # eval_results = None
-        # for grid_step in self.grid_step:
-        #     search_weight_list = get_merge_weight_by_grid_search(len(results), grid_step)
-        #     cur_max_accuracy = 0
-        #     for search_weight in search_weight_list:
-        #         search_weight = np.array(search_weight)
-        #         search_weight = np.reshape(search_weight, (1, -1))
-        #         tmp_merge_matrix = np.dot(search_weight, np.reshape(pre_matrix, (len(results), -1)))
-        #         tmp_merge_matrix = np.reshape(tmp_merge_matrix, (-1, mod_label_num))
-        #         tmp_eval_results = get_classification_accuracy_with_snr(num_snr, mod_label_num, snr_to_index,
-        #                                                                 item_snr_index, tmp_merge_matrix,
-        #                                                                 item_mod_label,
-        #                                                                 prefix=prediction_name + '/')
-        #         if cur_max_accuracy < tmp_eval_results[prediction_name + '/snr_mean_all']:
-        #             cur_max_accuracy = tmp_eval_results[prediction_name + '/snr_mean_all']
-        #             eval_results = copy.deepcopy(tmp_eval_results)
-        #
-        # return eval_results
-        pass
+    def __call__(self, mpps, gts):
+        """
+
+        Args:
+            mpps (List[np.ndarry]):
+            gts:
+        Returns:
+
+        """
+        mpps = np.stack(mpps, axis=0)
+        m, n, c = mpps.shape
+        ws = get_merge_weight_by_grid_search(m, self.grid_step)
+        ws = np.array(ws, dtype=np.float64)
+        pps = np.reshape(mpps, (m, -1))
+        pps = ws @ pps
+        pps = np.reshape(pps, (-1, n, c))
+        pps_ = np.argmax(pps, axis=2)
+
+        max_acc = 0
+        best_pps = pps[0, :, :]
+        for w_index in range(ws.shape[0]):
+            cur_acc = accuracy_score(gts, pps_[w_index, :])
+            if cur_acc > max_acc:
+                max_acc = cur_acc
+                best_pps = pps[w_index, :, :]
+
+        return best_pps
 
 
 @MERGES.register_module()
@@ -193,9 +193,10 @@ class Optimization:
         Returns:
 
         """
-        mpps = np.concatenate(mpps, axis=0)
+
+        mpps = np.stack(mpps, axis=0)
         m, n, c = mpps.shape
-        mpps = np.concatenate(mpps, axis=0)
+        gts = label_binarize(gts, classes=[i for i in range(c)])
 
         pre_max_index = np.argmax(mpps, axis=2)
         gt_max_index = np.argmax(gts, axis=1)

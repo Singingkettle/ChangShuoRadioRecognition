@@ -1,5 +1,6 @@
 import random
-
+import os
+import shutil
 import numpy as np
 import torch
 import torch.distributed as dist
@@ -142,12 +143,26 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
             hook = build_from_cfg(hook_cfg, HOOKS)
             runner.register_hook(hook, priority=priority)
 
+    delete_old = False
     if cfg.resume_from is None and cfg.get('auto_resume'):
         resume_from = find_latest_checkpoint(cfg.work_dir)
         cfg.resume_from = resume_from
+        delete_old = True
 
     if cfg.resume_from is not None:
         runner.resume(cfg.resume_from)
+        delete_old = True
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
+        delete_old = True
+    if delete_old:
+        for filename in os.listdir(cfg.work_dir):
+            file_path = os.path.join(cfg.work_dir, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
     runner.run(data_loaders, cfg.workflow, cfg.total_epochs)

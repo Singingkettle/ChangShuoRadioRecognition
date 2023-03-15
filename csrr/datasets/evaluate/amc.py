@@ -64,7 +64,10 @@ class EvaluateMLDNN:
                 res = get_classification_eval_with_snr(pps, snr_gts, snrs, ['HighSNR', 'LowSNR'], self.metrics)
             else:
                 res = get_classification_eval_with_snr(pps, gts, snrs, data_infos['modulations'], self.metrics)
-            eval_results.update({f'{k}_{key}': v for k, v in res.items()})
+            if key == 'merge':
+                eval_results.update(res)
+            else:
+                eval_results.update({f'{k}_{key}': v for k, v in res.items()})
 
         return eval_results
 

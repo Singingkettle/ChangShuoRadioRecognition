@@ -11,7 +11,7 @@ plot = dict(
             type='ConfusionMap',
             name='confusion-map_hcgdnn_deepsig201610A.pdf',
             method=dict(
-                config='hcgdnn_iq-channel-deepsig201610A.py',
+                config='pointdnn_iq-channel-deepsig201610A.py',
                 name='HCGDNN',
             ),
         ),
@@ -23,7 +23,7 @@ plot = dict(
             type='LossAccuracyPlot',
             name='loss_accuracy_201610A.pdf',
             method=dict(
-                config='hcgdnn_iq-channel-deepsig201610A.py',
+                config='pointdnn_iq-channel-deepsig201610A.py',
                 name='HCGDNN',
                 train_metrics=['loss_CNN', 'loss_GRU1', 'loss_GRU2', 'loss'],
                 test_metrics=['CNN/snr_mean_all', 'GRU1/snr_mean_all',
