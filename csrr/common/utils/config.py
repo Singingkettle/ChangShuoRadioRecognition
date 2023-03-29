@@ -82,11 +82,11 @@ class Config:
         [0, 1]
         >>> cfg = Config.fromfile('tests/data/figure_configs/a.py')
         >>> cfg.file_name
-        "/home/kchen/projects/mmcv/tests/data/figure_configs/a.py"
+        "/home/kchen/projects/CSRR/tests/data/figure_configs/a.py"
         >>> cfg.item4
         'test'
         >>> cfg
-        "Config [path: /home/kchen/projects/mmcv/tests/data/figure_configs/a.py]: "
+        "Config [path: /home/kchen/projects/CSRR/tests/data/figure_configs/a.py]: "
         "{'item1': [1, 2], 'item2': {'a': 0}, 'item3': True, 'item4': 'test'}"
     """
 
@@ -396,12 +396,12 @@ class Config:
                 with open(file, 'w') as f:
                     f.write(self.pretty_text)
         else:
-            import mmcv
+            import CSRR
             if file is None:
                 file_format = self.file_name.split('.')[-1]
-                return mmcv.dump(cfg_dict, file_format=file_format)
+                return CSRR.dump(cfg_dict, file_format=file_format)
             else:
-                mmcv.dump(cfg_dict, file)
+                CSRR.dump(cfg_dict, file)
 
     def merge_from_dict(self, options):
         """Merge list into cfg_dict.

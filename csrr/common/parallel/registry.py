@@ -10,10 +10,10 @@ MODULE_WRAPPERS.register_module(module=DistributedDataParallel)
 def is_module_wrapper(module):
     """Check if a module is a module wrapper.
 
-    The following 3 modules in MMCV (and their subclasses) are regarded as
+    The following 3 modules in CSRR (and their subclasses) are regarded as
     module wrappers: DataParallel, DistributedDataParallel,
     CSDistributedDataParallel (the deprecated version). You may add you own
-    module wrapper by registering it to mmcv.parallel.MODULE_WRAPPERS.
+    module wrapper by registering it to CSRR.parallel.MODULE_WRAPPERS.
 
     Args:
         module (nn.Module): The module to be checked.

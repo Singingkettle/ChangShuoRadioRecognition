@@ -1,8 +1,9 @@
-import numpy as np
-import h5py
 import copy
 import os.path as osp
 import pickle
+
+import h5py
+import numpy as np
 from tqdm import tqdm
 
 

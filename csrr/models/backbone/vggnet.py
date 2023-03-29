@@ -1,10 +1,9 @@
-import logging
 from typing import Union, List, Dict, cast
 
 import torch.nn as nn
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 cfgs: Dict[str, List[Union[str, int]]] = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -15,10 +14,10 @@ cfgs: Dict[str, List[Union[str, int]]] = {
 
 
 @BACKBONES.register_module()
-class VGGNet(nn.Module):
+class VGGNet(BaseBackbone):
 
-    def __init__(self, net_type='D', batch_norm=False):
-        super(VGGNet, self).__init__()
+    def __init__(self, net_type='D', batch_norm=False, init_cfg=None):
+        super(VGGNet, self).__init__(init_cfg)
         layers: List[nn.Module] = []
         in_channels = 1
         cfg = cfgs[net_type]
@@ -35,23 +34,6 @@ class VGGNet(nn.Module):
                 in_channels = v
         self.features = nn.Sequential(*layers)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.BatchNorm2d):
-                    nn.init.constant_(m.weight, 1)
-                    nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.Linear):
-                    nn.init.normal_(m.weight, 0, 0.01)
-                    nn.init.constant_(m.bias, 0)
 
     def forward(self, cos):
         x = self.features(cos)

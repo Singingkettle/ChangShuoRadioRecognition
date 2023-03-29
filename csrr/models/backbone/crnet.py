@@ -1,11 +1,9 @@
-import logging
-
 import torch
 import torch.nn as nn
 
+from .base import BaseBackbone
 from .cnnnet import CNNNet
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 class RNNBasicBlock(nn.Module):
@@ -66,37 +64,6 @@ class RNNNet(nn.Module):
             self.rnnlayers.append(layer_name)
             input_size = hidden_size
 
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
-
     def make_rnn_layer(self, **kwargs):
         return RNNBasicBlock(**kwargs)
 
@@ -114,29 +81,21 @@ class RNNNet(nn.Module):
 
 
 @BACKBONES.register_module()
-class CRNet(nn.Module):
+class CRNet(BaseBackbone):
 
     def __init__(self, in_channels, cnn_depth, rnn_depth, input_size, in_height=2, avg_pool=None, out_indices=(1,),
-                 is_last=True, rnn_mode='LSTM'):
-        super(CRNet, self).__init__()
-        self.cnn_net = self.make_cnn_net(
+                 is_last=True, rnn_mode='LSTM', init_cfg=None):
+        super(CRNet, self).__init__(init_cfg)
+        self.cnn_net = self._make_cnn_net(
             depth=cnn_depth, in_channels=in_channels, in_height=in_height, avg_pool=avg_pool, out_indices=out_indices)
-        self.rnn_net = self.make_rnn_net(
+        self.rnn_net = self._make_rnn_net(
             depth=rnn_depth, input_size=input_size, is_last=is_last, rnn_mode=rnn_mode)
 
-    def make_cnn_net(self, **kwargs):
+    def _make_cnn_net(self, **kwargs):
         return CNNNet(**kwargs)
 
-    def make_rnn_net(self, **kwargs):
+    def _make_rnn_net(self, **kwargs):
         return RNNNet(**kwargs)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            self.cnn_net.init_weights()
-            self.rnn_net.init_weights()
 
     def forward(self, iqs=None, aps=None):
         if iqs is None:

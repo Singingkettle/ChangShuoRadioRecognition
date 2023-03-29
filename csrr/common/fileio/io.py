@@ -1,5 +1,4 @@
 # Copyright (c) Open-MMLab. All rights reserved.
-import os
 from pathlib import Path
 
 from .handlers import BaseFileHandler, JsonHandler, PickleHandler, YamlHandler

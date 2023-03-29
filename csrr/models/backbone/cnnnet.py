@@ -1,10 +1,8 @@
-import logging
-
 import torch
 import torch.nn as nn
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 class Truncation2d(nn.Module):
@@ -58,15 +56,15 @@ class CNNBasicBlock(nn.Module):
 
 
 @BACKBONES.register_module()
-class CNNNet(nn.Module):
+class CNNNet(BaseBackbone):
     arch_settings = {
         2: ((256, 80), (2, 0.5, 1)),
         3: ((256, 256, 80), (2, 0.5, 1)),
         4: ((256, 256, 80, 80), (2, 0.5, 1)),
     }
 
-    def __init__(self, depth, in_channels, in_height=2, avg_pool=None, out_indices=(1,)):
-        super(CNNNet, self).__init__()
+    def __init__(self, depth, in_channels, in_height=2, avg_pool=None, out_indices=(1,), init_cfg=None):
+        super(CNNNet, self).__init__(init_cfg)
         self.out_indices = out_indices
         filters, configs = self.arch_settings[depth]
 
@@ -95,17 +93,6 @@ class CNNNet(nn.Module):
         else:
             self.has_avg_pool = False
 
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-
     def make_conv_layer(self, **kwargs):
         return CNNBasicBlock(**kwargs)
 
@@ -124,10 +111,10 @@ class CNNNet(nn.Module):
 
 
 @BACKBONES.register_module()
-class ResCNN(nn.Module):
+class ResCNN(BaseBackbone):
 
-    def __init__(self, avg_pool=None):
-        super(ResCNN, self).__init__()
+    def __init__(self, avg_pool=None, init_cfg=None):
+        super(ResCNN, self).__init__(init_cfg)
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 256, kernel_size=(1, 3), stride=1, padding=(0, 1)),
             nn.ReLU(inplace=True),
@@ -155,17 +142,6 @@ class ResCNN(nn.Module):
         else:
             self.has_avg_pool = False
 
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-
     def forward(self, iqs):
         x1 = self.conv1(iqs)
         xc = self.connect(x1)
@@ -179,10 +155,10 @@ class ResCNN(nn.Module):
 
 
 @BACKBONES.register_module()
-class DensCNN(nn.Module):
+class DensCNN(BaseBackbone):
 
-    def __init__(self, avg_pool=None):
-        super(DensCNN, self).__init__()
+    def __init__(self, avg_pool=None, init_cfg=None):
+        super(DensCNN, self).__init__(init_cfg)
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 256, kernel_size=(1, 3), stride=1, padding=(0, 1)),
             nn.ReLU(inplace=True),
@@ -212,17 +188,6 @@ class DensCNN(nn.Module):
             self.avg_pool_layer = nn.AvgPool2d(avg_pool)
         else:
             self.has_avg_pool = False
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
 
     def forward(self, iqs):
         x1 = self.conv1(iqs)

@@ -124,8 +124,6 @@ class LoggerHook(Hook):
                           tags_to_skip=('time', 'data_time')):
         tags = {}
         for var, val in runner.log_buffer.output.items():
-            if 'figure' in var:
-                continue
             if var in tags_to_skip:
                 continue
             if self.is_scalar(val) and not allow_scalar:

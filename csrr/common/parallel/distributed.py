@@ -4,9 +4,9 @@ import torch
 from torch.nn.parallel.distributed import (DistributedDataParallel,
                                            _find_tensors)
 
-from ..logging import print_log
-from ..utils import TORCH_VERSION, digit_version
+from csrr.common.utils.logging import print_log
 from .scatter_gather import ScatterInputs, scatter_kwargs
+from ..utils import TORCH_VERSION, digit_version
 
 
 class CSDistributedDataParallel(DistributedDataParallel):
@@ -113,7 +113,7 @@ class CSDistributedDataParallel(DistributedDataParallel):
                 and self.reducer._rebuild_buckets()):
             print_log(
                 'Reducer buckets have been rebuilt in this iteration.',
-                logger='mmcv')
+                logger='CSRR')
 
         if ('parrots' not in TORCH_VERSION
                 and digit_version(TORCH_VERSION) >= digit_version('1.11.0a0')):

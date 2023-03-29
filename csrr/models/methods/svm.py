@@ -13,7 +13,8 @@ class SVM:
         self.model_path = model_path
         self.method_name = 'SVM'
         self.mode = mode
-        self.svm = svm.SVC(C=regularization, tol=0.005, verbose=3, max_iter=max_iter, decision_function_shape='ovo',
+        self.svm = svm.SVC(C=regularization, tol=0.005, verbose=3, max_iter=max_iter,
+                           decision_function_shape='ovo', probability=True,
                            shrinking=0)
         if mode == 'test':
             self.load_model()
@@ -30,8 +31,13 @@ class SVM:
             self.save_model()
             return True
         else:
-            label = []
+            inputs = []
             for item in tqdm(data):
                 item = np.reshape(item, (1, -1))
-                label.append({'Final': self.svm.predict(item)})
-            return label
+                inputs.append(item)
+            inputs = np.concatenate(inputs, axis=0)
+            # pres = self.svm.predict_proba(inputs)
+            ps = self.svm.predict(inputs)
+            pres = np.zeros((ps.size, ps.max() + 1))
+            pres[np.arange(ps.size), ps] = 1
+            return pres

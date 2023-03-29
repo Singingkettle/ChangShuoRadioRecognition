@@ -7,7 +7,7 @@ from collections import defaultdict
 import torch
 
 import csrr
-from ..ops import get_compiler_version, get_compiling_cuda_version
+from csrr.ops import get_compiler_version, get_compiling_cuda_version
 
 TORCH_VERSION = torch.__version__
 
@@ -36,9 +36,9 @@ def collect_base_env():
                 ``torch.__config__.show()``.
             - TorchVision (optional): TorchVision version.
             - OpenCV: OpenCV version.
-            - MMCV: MMCV version.
-            - MMCV Compiler: The GCC version for compiling MMCV ops.
-            - MMCV CUDA Compiler: The CUDA version for compiling MMCV ops.
+            - CSRR: CSRR version.
+            - CSRR Compiler: The GCC version for compiling CSRR ops.
+            - CSRR CUDA Compiler: The CUDA version for compiling CSRR ops.
     """
     env_info = {}
     env_info['sys.platform'] = sys.platform

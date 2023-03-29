@@ -15,7 +15,7 @@ def scatter(inputs: ScatterInputs,
             dim: int = 0) -> list:
     """Scatter inputs to target gpus.
     The only difference from original :func:`scatter` is to add support for
-    :type:`~mmcv.parallel.DataContainer`.
+    :type:`~CSRR.parallel.DataContainer`.
     """
 
     def scatter_map(obj):

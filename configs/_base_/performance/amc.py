@@ -128,8 +128,8 @@ publish = dict(
         HCGDNN_V1='hcgdnn_abl-cnn_iq-channel-deepsig201610A',
         HCGDNN_V2='hcgdnn_abl-bigru1_iq-channel-deepsig201610A',
         HCGDNN_V3='hcgdnn_abl-bigru2_iq-channel-deepsig201610A',
-        HCGDNN_V4='hcgdnn_abl-cnn-bigru1_iq-channel-deepsig201610A',
-        HCGDNN_V5='hcgdnn_abl-cnn-bigru2_iq-channel-deepsig201610A',
+        HCGDNN_V4='hcgdnn_abl-init-bigru1_iq-channel-deepsig201610A',
+        HCGDNN_V5='hcgdnn_abl-init-bigru2_iq-channel-deepsig201610A',
         HCGDNN_V6='hcgdnn_abl-bigru1-bigru2_iq-channel-deepsig201610A',
     ),
     # deepsig201801A=dict(

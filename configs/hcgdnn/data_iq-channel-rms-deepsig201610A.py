@@ -40,8 +40,8 @@ data = dict(
         evaluate=[
             dict(type='EvaluateHCGDNN', merge=dict(type='Optimization'))
         ],
-        save=[
-            dict(type='SaveModulationPredictionOfHCGDNN', merge=dict(type='Optimization'))
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNROfHCGDNN', merge=dict(type='Optimization'))
         ],
     ),
 )

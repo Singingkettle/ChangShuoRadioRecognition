@@ -45,8 +45,7 @@ class BinaryCrossEntropyLoss(CrossEntropyLoss):
     def __init__(self,
                  reduction='mean',
                  class_weight=None,
-                 loss_weight=1.0,
-                 use_sample_and_class_weighted=False):
+                 loss_weight=1.0):
         """BinaryCrossEntropyLoss.
 
         Args:
@@ -62,5 +61,4 @@ class BinaryCrossEntropyLoss(CrossEntropyLoss):
         self.loss_weight = loss_weight
         self.class_weight = class_weight
 
-        self.use_sample_and_class_weighted = use_sample_and_class_weighted
         self.cls_criterion = binary_cross_entropy

@@ -66,7 +66,7 @@ def main():
 
     meta['exp_name'] = osp.basename(args.config)
 
-    cfg.model['model_path'] = os.path.join(cfg.work_dir, 'model.fb')
+    cfg.model['model_path'] = os.path.join(cfg.work_dir, 'model.pth')
     model = build_method(cfg.model)
 
     dataset = build_dataset(cfg.data.train)

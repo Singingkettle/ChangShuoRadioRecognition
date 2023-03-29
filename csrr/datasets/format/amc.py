@@ -2,11 +2,11 @@ import os
 
 import numpy as np
 
-from ..builder import SAVES
+from ..builder import FORMATS
 from ...common.fileio import dump as IODump
 
 
-@SAVES.register_module()
+@FORMATS.register_module()
 class FormatSingleHeadClassifierWithSNR:
     def __init__(self, target_name: str):
         self.target_name = target_name
@@ -15,11 +15,31 @@ class FormatSingleHeadClassifierWithSNR:
         gts = []
         snrs = []
         for annotation in data_infos['annotations']:
-            gt = data_infos['modulations'].index(annotation[self.target_name])
+            gt = data_infos[self.target_name].index(annotation[self.target_name])
             gts.append(gt)
             snrs.append(annotation['snr'])
         gts = np.array(gts, dtype=np.float64)
         pps = np.stack(results, axis=0)
+        snrs = np.array(snrs, dtype=np.int64)
+
+        format_data = dict(gts=gts, pps=pps, snrs=snrs)
+        IODump(format_data, os.path.join(out_dir, 'format.pkl'))
+
+
+@FORMATS.register_module()
+class FormatMLDNN:
+    def __call__(self, out_dir, results, data_infos):
+        gts = []
+        snrs = []
+        merges = []
+        for idx, annotation in enumerate(data_infos['annotations']):
+            gt = data_infos['modulations'].index(annotation[self.target_name])
+            merge = results[idx]['merge']
+            gts.append(gt)
+            merges.append(merge)
+            snrs.append(annotation['snr'])
+        gts = np.array(gts, dtype=np.float64)
+        pps = np.stack(merges, axis=0)
         snrs = np.array(snrs, dtype=np.int64)
 
         format_data = dict(gts=gts, pps=pps, snrs=snrs)

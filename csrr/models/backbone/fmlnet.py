@@ -1,100 +1,120 @@
-import logging
+from typing import Optional, Union, Callable
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from torch import Tensor
+from torch.nn.modules.activation import MultiheadAttention
+from torch.nn.modules.dropout import Dropout
+from torch.nn.modules.normalization import LayerNorm
 
-from .mlnet import SELayer
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
+from ...runner import Sequential
+
+
+def _get_activation_fn(activation: str) -> Callable[[Tensor], Tensor]:
+    if activation == "relu":
+        return F.relu
+    elif activation == "gelu":
+        return F.gelu
+
+    raise RuntimeError("activation should be relu/gelu, not {}".format(activation))
+
+
+class TransformerEncoderLayer(nn.Module):
+    __constants__ = ['batch_first', 'norm_first']
+
+    def __init__(self, d_model: int, nhead: int, dim_feedforward: int = 2048, dropout: float = 0.1,
+                 activation: Union[str, Callable[[Tensor], Tensor]] = F.relu,
+                 layer_norm_eps: float = 1e-5, batch_first: bool = False, norm_first: bool = False,
+                 device=None, dtype=None) -> None:
+        factory_kwargs = {'device': device, 'dtype': dtype}
+        super(TransformerEncoderLayer, self).__init__()
+        self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout, batch_first=batch_first,
+                                            **factory_kwargs)
+
+        self.norm_first = norm_first
+        self.norm1 = LayerNorm(d_model, eps=layer_norm_eps, **factory_kwargs)
+        self.dropout1 = Dropout(dropout)
+
+        # Legacy string support for activation function.
+        if isinstance(activation, str):
+            activation = _get_activation_fn(activation)
+
+        # We can't test self.activation in forward() in TorchScript,
+        # so stash some information about it instead.
+        if activation is F.relu or isinstance(activation, torch.nn.ReLU):
+            self.activation_relu_or_gelu = 1
+        elif activation is F.gelu or isinstance(activation, torch.nn.GELU):
+            self.activation_relu_or_gelu = 2
+        else:
+            self.activation_relu_or_gelu = 0
+        self.activation = activation
+
+    def __setstate__(self, state):
+        super(TransformerEncoderLayer, self).__setstate__(state)
+        if not hasattr(self, 'activation'):
+            self.activation = F.relu
+
+    def forward(self, src: Tensor, src_mask: Optional[Tensor] = None,
+                src_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+        x = src
+        if self.norm_first:
+            x = x + self._sa_block(self.norm1(x), src_mask, src_key_padding_mask)
+        else:
+            x = self.norm1(x + self._sa_block(x, src_mask, src_key_padding_mask))
+
+        return x
+
+    # self-attention block
+    def _sa_block(self, x: Tensor,
+                  attn_mask: Optional[Tensor], key_padding_mask: Optional[Tensor]) -> Tensor:
+        x = self.self_attn(x, x, x,
+                           attn_mask=attn_mask,
+                           key_padding_mask=key_padding_mask,
+                           need_weights=False)[0]
+        return self.dropout1(x)
 
 
 @BACKBONES.register_module()
-class FMLNet(nn.Module):
+class FMLNet(BaseBackbone):
 
-    def __init__(self, dropout_rate=0.5, in_size=4,
-                 channel_mode=False, skip_connection=False,
-                 reduction=16, avg_pool=None):
-        super(FMLNet, self).__init__()
-        self.channel_mode = channel_mode
-        self.skip_connection = skip_connection
-        if self.channel_mode:
-            self.conv_net = nn.Sequential(
-                nn.Conv2d(in_size, 256, kernel_size=(1, 3)),
+    def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None, use_my=False, use_group=False):
+        super(FMLNet, self).__init__(init_cfg)
+        if use_group:
+            self.cnn = Sequential(
+                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
-                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=16),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
-                nn.Conv2d(256, 100, kernel_size=(1, 3)),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=4),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
+                nn.Dropout(dp),
             )
         else:
-            self.conv_net = nn.Sequential(
-                nn.Conv2d(1, 256, kernel_size=(1, 3)),
+            self.cnn = Sequential(
+                nn.Conv1d(depth, hidden_size, kernel_size=3),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
-                nn.Conv2d(256, 256, kernel_size=(1, 3)),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
-                nn.Conv2d(256, 100, kernel_size=(1, 3)),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3),
                 nn.ReLU(inplace=True),
-                nn.Dropout(dropout_rate),
-                nn.AvgPool2d((in_size, 1)),
+                nn.Dropout(dp),
             )
-        if avg_pool is not None:
-            self.has_avg_pool = True
-            self.avg_pool_layer = nn.AvgPool2d(avg_pool)
-            self.se = SELayer(127, reduction=reduction)
+        if use_my:
+            self.tnn = TransformerEncoderLayer(input_size, 1, hidden_size, dropout=dp, batch_first=True)
         else:
-            self.se = SELayer(122, reduction=reduction)
-            self.has_avg_pool = False
-
-        self.gru = nn.GRU(input_size=100, hidden_size=50,
-                          num_layers=2, dropout=dropout_rate,
-                          batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
+            self.tnn = nn.TransformerEncoderLayer(input_size, 1, hidden_size, dropout=dp, batch_first=True)
 
     def forward(self, iqs, aps):
-        if self.channel_mode:
-            x = torch.concat([iqs, aps], dim=1)
-        else:
-            x = torch.concat([iqs, aps], dim=2)
-        x = self.conv_net(x)
-        if self.has_avg_pool:
-            x = self.avg_pool_layer(x)
-        x = torch.squeeze(x, dim=2)
-        c_x = torch.transpose(x, 1, 2)
+        x = torch.concat([iqs, aps], dim=1)
+        c_fea = self.cnn(x)
+        c_fea = torch.transpose(c_fea, 1, 2)
+        fea = self.tnn(c_fea)
 
-        se_w = self.se(c_x)
-        x, _ = self.gru(c_x)
-        x = torch.mul(x, se_w)
-
-        if self.skip_connection:
-            x = x + c_x
-
-        x = torch.sum(x, dim=1)
-
-        return x
+        return torch.sum(fea, dim=1)

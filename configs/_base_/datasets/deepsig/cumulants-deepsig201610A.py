@@ -7,10 +7,9 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadCumulants'),
+            dict(type='Cumulants'),
             dict(type='LoadAnnotations', target_info={target_name: 'float32'}),
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
@@ -19,7 +18,6 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Cumulants'),
@@ -27,13 +25,12 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', )
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),
     test=dict(
         type=dataset_type,
         ann_file='test.json',
-
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='Cumulants'),
@@ -41,10 +38,10 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', )
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
-        save=[
-            dict(type='SaveModulationPrediction', )
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),
 )

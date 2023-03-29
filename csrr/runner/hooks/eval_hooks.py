@@ -79,7 +79,6 @@ class EvalHook(Hook):
         eval_res = self.dataloader.dataset.evaluate(
             results, logger=runner.logger, **self.eval_kwargs)
         for name, val in eval_res.items():
-            # if 'confusion_matrix'
             runner.log_buffer.output[name] = val
         runner.log_buffer.ready = True
 

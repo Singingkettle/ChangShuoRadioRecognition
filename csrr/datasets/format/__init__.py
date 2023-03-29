@@ -1,5 +1,5 @@
-from .amc import (FormatSingleHeadClassifierWithSNR)
+from .amc import (FormatSingleHeadClassifierWithSNR, FormatMLDNN)
 
 __all__ = [
-    'FormatSingleHeadClassifierWithSNR',
+    'FormatSingleHeadClassifierWithSNR', 'FormatMLDNN'
 ]

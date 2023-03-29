@@ -37,7 +37,7 @@ data = dict(
         evaluate=[
             dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
-        save=[
+        format=[
             dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),

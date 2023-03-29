@@ -9,7 +9,7 @@ import numpy as np
 from ..builder import PIPELINES
 
 
-def normalize_iq_or_ap(x):
+def normalize_data(x):
     x = (x - np.mean(x, axis=1).reshape(2, 1)) / np.std(x, axis=1).reshape(2, 1)
     return x
 
@@ -85,7 +85,7 @@ class LoadIQFromFile:
         file_path = osp.join(results['data_root'], results['iq_folder'], results['file_name'])
         iq = np.load(file_path)
         if self.to_norm:
-            iq = normalize_iq_or_ap(iq)
+            iq = normalize_data(iq)
         if self.to_float32:
             iq = iq.astype(np.float32)
 
@@ -116,7 +116,7 @@ class LoadAPFromFile:
         file_path = osp.join(results['data_root'], results['ap_folder'], results['file_name'])
         ap = np.load(file_path)
         if self.to_norm:
-            ap = normalize_iq_or_ap(ap)
+            ap = normalize_data(ap)
         if self.to_float32:
             ap = ap.astype(np.float32)
 
@@ -212,7 +212,7 @@ class LoadIQFromCache:
         idx = self.cache_data['lookup_table'][results['file_name']]
         iq = self.cache_data['data'][idx]
         if self.to_norm:
-            iq = normalize_iq_or_ap(iq)
+            iq = normalize_data(iq)
         if self.to_float32:
             iq = iq.astype(np.float32)
 
@@ -250,7 +250,7 @@ class LoadAPFromCache:
         idx = self.cache_data['lookup_table'][results['file_name']]
         ap = self.cache_data['data'][idx]
         if self.to_norm:
-            ap = normalize_iq_or_ap(ap)
+            ap = normalize_data(ap)
         if self.to_float32:
             ap = ap.astype(np.float32)
 
@@ -323,7 +323,7 @@ class LoadIQFromHDF5:
         idx = self.lookup_table[results['file_name']]
         iq = self.hdf5_data[idx, :, :]
         if self.to_norm:
-            iq = normalize_iq_or_ap(iq)
+            iq = normalize_data(iq)
         if self.to_float32:
             iq = iq.astype(np.float32)
 
@@ -364,7 +364,7 @@ class LoadAPFromHDF5:
         idx = self.lookup_table[results['file_name']]
         ap = self.hdf5_data[idx, :, :]
         if self.to_norm:
-            ap = normalize_iq_or_ap(ap)
+            ap = normalize_data(ap)
         if self.to_float32:
             ap = ap.astype(np.float32)
 
@@ -424,7 +424,7 @@ class LoadConstellationFromIQCache:
 
 
 @PIPELINES.register_module()
-class LoadFTFromIQ:
+class LoadFFTromIQ:
     def __init__(self,
                  is_squeeze=False,
                  to_float32=False,
@@ -434,13 +434,15 @@ class LoadFTFromIQ:
         self.to_norm = to_norm
 
     def __call__(self, results):
-        iq = results['iqs']
-        iq = iq[0, :, :]
+        iq = results['inputs']['iqs']
         iq = iq[0, :] + 1j * iq[1, :]
         ft = np.fft.fft(iq)
+        ft = np.fft.fftshift(ft)
         amplitude = np.abs(ft)
         phase = np.angle(ft)
         ft = np.vstack((amplitude, phase))
+        if self.to_norm:
+            ft = normalize_data(ft)
         if self.to_float32:
             ft = ft.astype(np.float32)
 
@@ -454,6 +456,79 @@ class LoadFTFromIQ:
         repr_str = (f'{self.__class__.__name__}('
                     f'data_root={self.data_root},'
                     f'file_name={self.file_name},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadAPFromIQ:
+    def __init__(self,
+                 is_squeeze=False,
+                 to_float32=False,
+                 to_norm=False):
+        self.is_squeeze = is_squeeze
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+        self._cache = dict()
+
+    def __call__(self, results):
+        if results['file_name'] in self._cache:
+            results['inputs']['aps'] = self._cache[results['file_name']]
+        else:
+            iq = results['inputs']['iqs']
+            iq = np.squeeze(iq)
+            amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
+            phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
+            ap = np.vstack((amplitude, phase))
+            if self.to_float32:
+                ap = ap.astype(np.float32)
+
+            if not self.is_squeeze:
+                # make the iq as a three-dimensional tensor [1, 2, L]
+                ap = np.expand_dims(ap, axis=0)
+            self._cache[results['file_name']] = ap
+            results['inputs']['aps'] = ap
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'is_squeeze={self.is_squeeze},'
+                    f'to_float32={self.to_float32}, '
+                    f'to_norm={self.to_norm}, )')
+        return repr_str
+
+
+@PIPELINES.register_module()
+class LoadDerivativeFromIQ:
+    def __init__(self,
+                 is_squeeze=False,
+                 to_float32=False,
+                 to_norm=False):
+        self.is_squeeze = is_squeeze
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+        self._cache = dict()
+
+    def __call__(self, results):
+        if results['file_name'] in self._cache:
+            results['inputs']['des'] = self._cache[results['file_name']]
+        else:
+            iq = results['inputs']['iqs']
+            de = iq - np.roll(iq, 1, axis=1)
+            if self.to_float32:
+                de = de.astype(np.float32)
+
+            if not self.is_squeeze:
+                # make the iq as a three-dimensional tensor [1, 2, L]
+                de = np.expand_dims(de, axis=0)
+            self._cache[results['file_name']] = de
+            results['inputs']['des'] = de
+        return results
+
+    def __repr__(self):
+        repr_str = (f'{self.__class__.__name__}('
+                    f'is_squeeze={self.is_squeeze},'
                     f'to_float32={self.to_float32}, '
                     f'to_norm={self.to_norm}, )')
         return repr_str
@@ -488,6 +563,14 @@ class LoadAnnotations:
         repr_str += f'(targets={self.target_info})'
 
         return repr_str
+
+
+@PIPELINES.register_module()
+class LoadSNRs:
+    def __call__(self, results):
+        results['snrs'] = results['snr']
+
+        return results
 
 
 @PIPELINES.register_module()

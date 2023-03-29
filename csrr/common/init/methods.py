@@ -1,0 +1,544 @@
+import math
+import warnings
+from typing import List, Optional, Union
+
+import numpy as np
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+from .utils import INITIALIZERS, update_init_info
+
+
+def constant_init(module: nn.Module, val: float, bias: float = 0) -> None:
+    if hasattr(module, 'weight') and module.weight is not None:
+        nn.init.constant_(module.weight, val)
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)
+
+
+def xavier_init(module: nn.Module,
+                gain: float = 1,
+                bias: float = 0,
+                distribution: str = 'normal') -> None:
+    assert distribution in ['uniform', 'normal']
+    if hasattr(module, 'weight') and module.weight is not None:
+        if distribution == 'uniform':
+            nn.init.xavier_uniform_(module.weight, gain=gain)
+        else:
+            nn.init.xavier_normal_(module.weight, gain=gain)
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)
+
+
+def normal_init(module: nn.Module,
+                mean: float = 0,
+                std: float = 1,
+                bias: float = 0) -> None:
+    if hasattr(module, 'weight') and module.weight is not None:
+        nn.init.normal_(module.weight, mean, std)
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)
+
+
+def trunc_normal_init(module: nn.Module,
+                      mean: float = 0,
+                      std: float = 1,
+                      a: float = -2,
+                      b: float = 2,
+                      bias: float = 0) -> None:
+    if hasattr(module, 'weight') and module.weight is not None:
+        trunc_normal_(module.weight, mean, std, a, b)  # type: ignore
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)  # type: ignore
+
+
+def uniform_init(module: nn.Module,
+                 a: float = 0,
+                 b: float = 1,
+                 bias: float = 0) -> None:
+    if hasattr(module, 'weight') and module.weight is not None:
+        nn.init.uniform_(module.weight, a, b)
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)
+
+
+def kaiming_init(module: nn.Module,
+                 a: float = 0,
+                 mode: str = 'fan_out',
+                 nonlinearity: str = 'relu',
+                 bias: float = 0,
+                 distribution: str = 'normal') -> None:
+    assert distribution in ['uniform', 'normal']
+    if hasattr(module, 'weight') and module.weight is not None:
+        if distribution == 'uniform':
+            nn.init.kaiming_uniform_(
+                module.weight, a=a, mode=mode, nonlinearity=nonlinearity)
+        else:
+            nn.init.kaiming_normal_(
+                module.weight, a=a, mode=mode, nonlinearity=nonlinearity)
+    if hasattr(module, 'bias') and module.bias is not None:
+        nn.init.constant_(module.bias, bias)
+
+
+def caffe2_xavier_init(module: nn.Module, bias: float = 0) -> None:
+    # `XavierFill` in Caffe2 corresponds to `kaiming_uniform_` in PyTorch
+    # Acknowledgment to FAIR's internal code
+    kaiming_init(
+        module,
+        a=1,
+        mode='fan_in',
+        nonlinearity='leaky_relu',
+        bias=bias,
+        distribution='uniform')
+
+
+def rnn_init(module: nn.Module, gain: float) -> None:
+    for name, param in module.named_parameters():
+        if 'weight_ih' in name:
+            for ih in param.chunk(gain, 0):
+                nn.init.xavier_uniform_(ih)
+        elif 'weight_hh' in name:
+            for hh in param.chunk(gain, 0):
+                nn.init.orthogonal_(hh)
+        elif 'bias_ih' in name:
+            nn.init.zeros_(param)
+        elif 'bias_hh' in name:
+            nn.init.zeros_(param)
+
+
+def bias_init_with_prob(prior_prob: float) -> float:
+    """initialize conv/fc bias value according to a given probability value."""
+    bias_init = float(-np.log((1 - prior_prob) / prior_prob))
+    return bias_init
+
+
+def _get_bases_name(m: nn.Module) -> List[str]:
+    return [b.__name__ for b in m.__class__.__bases__]
+
+
+def _no_grad_trunc_normal_(tensor: Tensor, mean: float, std: float, a: float,
+                           b: float) -> Tensor:
+    # Method based on
+    # https://people.sc.fsu.edu/~jburkardt/presentations/truncated_normal.pdf
+    # Modified from
+    # https://github.com/pytorch/pytorch/blob/master/torch/nn/init.py
+    def norm_cdf(x):
+        # Computes standard normal cumulative distribution function
+        return (1. + math.erf(x / math.sqrt(2.))) / 2.
+
+    if (mean < a - 2 * std) or (mean > b + 2 * std):
+        warnings.warn(
+            'mean is more than 2 std from [a, b] in nn.init.trunc_normal_. '
+            'The distribution of values may be incorrect.',
+            stacklevel=2)
+
+    with torch.no_grad():
+        # Values are generated by using a truncated uniform distribution and
+        # then using the inverse CDF for the normal distribution.
+        # Get upper and lower cdf values
+        lower = norm_cdf((a - mean) / std)
+        upper = norm_cdf((b - mean) / std)
+
+        # Uniformly fill tensor with values from [lower, upper], then translate
+        # to [2lower-1, 2upper-1].
+        tensor.uniform_(2 * lower - 1, 2 * upper - 1)
+
+        # Use inverse cdf transform for normal distribution to get truncated
+        # standard normal
+        tensor.erfinv_()
+
+        # Transform to proper mean, std
+        tensor.mul_(std * math.sqrt(2.))
+        tensor.add_(mean)
+
+        # Clamp to ensure it's in the proper range
+        tensor.clamp_(min=a, max=b)
+        return tensor
+
+
+def trunc_normal_(tensor: Tensor,
+                  mean: float = 0.,
+                  std: float = 1.,
+                  a: float = -2.,
+                  b: float = 2.) -> Tensor:
+    r"""Fills the input Tensor with values drawn from a truncated normal
+    distribution. The values are effectively drawn from the normal distribution
+    :math:`\mathcal{N}(\text{mean}, \text{std}^2)` with values outside
+    :math:`[a, b]` redrawn until they are within the bounds. The method used
+    for generating the random values works best when :math:`a \leq \text{mean}
+    \leq b`.
+    Modified from
+    https://github.com/pytorch/pytorch/blob/master/torch/nn/init.py
+    Args:
+        tensor (``torch.Tensor``): an n-dimensional `torch.Tensor`.
+        mean (float): the mean of the normal distribution.
+        std (float): the standard deviation of the normal distribution.
+        a (float): the minimum cutoff value.
+        b (float): the maximum cutoff value.
+    """
+    return _no_grad_trunc_normal_(tensor, mean, std, a, b)
+
+
+class BaseInit:
+
+    def __init__(self,
+                 *,
+                 bias: float = 0,
+                 bias_prob: Optional[float] = None,
+                 layer: Union[str, List, None] = None):
+        self.wholemodule = False
+        if not isinstance(bias, (int, float)):
+            raise TypeError(f'bias must be a number, but got a {type(bias)}')
+
+        if bias_prob is not None:
+            if not isinstance(bias_prob, float):
+                raise TypeError(f'bias_prob type must be float, \
+                    but got {type(bias_prob)}')
+
+        if layer is not None:
+            if not isinstance(layer, (str, list)):
+                raise TypeError(f'layer must be a str or a list of str, \
+                    but got a {type(layer)}')
+        else:
+            layer = []
+
+        if bias_prob is not None:
+            self.bias = bias_init_with_prob(bias_prob)
+        else:
+            self.bias = bias
+        self.layer = [layer] if isinstance(layer, str) else layer
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Constant')
+class ConstantInit(BaseInit):
+    """Initialize module parameters with constant values.
+    Args:
+        val (int | float): the value to fill the weights in the module with
+        bias (int | float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self, val: Union[int, float], **kwargs):
+        super().__init__(**kwargs)
+        self.val = val
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                constant_init(m, self.val, self.bias)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    constant_init(m, self.val, self.bias)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}: val={self.val}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Xavier')
+class XavierInit(BaseInit):
+    r"""Initialize module parameters with values according to the method
+    described in `Understanding the difficulty of training deep feedforward.
+    neural networks - Glorot, X. & Bengio, Y. (2010).
+    <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
+    Args:
+        gain (int | float): an optional scaling factor. Defaults to 1.
+        bias (int | float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        distribution (str): distribution either be ``'normal'``
+            or ``'uniform'``. Defaults to ``'normal'``.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self,
+                 gain: float = 1,
+                 distribution: str = 'normal',
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.gain = gain
+        self.distribution = distribution
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                xavier_init(m, self.gain, self.bias, self.distribution)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    xavier_init(m, self.gain, self.bias, self.distribution)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}: gain={self.gain}, ' \
+               f'distribution={self.distribution}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Normal')
+class NormalInit(BaseInit):
+    r"""Initialize module parameters with the values drawn from the normal
+    distribution :math:`\mathcal{N}(\text{mean}, \text{std}^2)`.
+    Args:
+        mean (int | float):the mean of the normal distribution. Defaults to 0.
+        std (int | float): the standard deviation of the normal distribution.
+            Defaults to 1.
+        bias (int | float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self, mean: float = 0, std: float = 1, **kwargs):
+        super().__init__(**kwargs)
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                normal_init(m, self.mean, self.std, self.bias)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    normal_init(m, self.mean, self.std, self.bias)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}: mean={self.mean},' \
+               f' std={self.std}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='TruncNormal')
+class TruncNormalInit(BaseInit):
+    r"""Initialize module parameters with the values drawn from the normal
+    distribution :math:`\mathcal{N}(\text{mean}, \text{std}^2)` with values
+    outside :math:`[a, b]`.
+    Args:
+        mean (float): the mean of the normal distribution. Defaults to 0.
+        std (float):  the standard deviation of the normal distribution.
+            Defaults to 1.
+        a (float): The minimum cutoff value.
+        b ( float): The maximum cutoff value.
+        bias (float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self,
+                 mean: float = 0,
+                 std: float = 1,
+                 a: float = -2,
+                 b: float = 2,
+                 **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.mean = mean
+        self.std = std
+        self.a = a
+        self.b = b
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                trunc_normal_init(m, self.mean, self.std, self.a, self.b,
+                                  self.bias)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    trunc_normal_init(m, self.mean, self.std, self.a, self.b,
+                                      self.bias)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self):
+        info = f'{self.__class__.__name__}: a={self.a}, b={self.b},' \
+               f' mean={self.mean}, std={self.std}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Uniform')
+class UniformInit(BaseInit):
+    r"""Initialize module parameters with values drawn from the uniform
+    distribution :math:`\mathcal{U}(a, b)`.
+    Args:
+        a (int | float): the lower bound of the uniform distribution.
+            Defaults to 0.
+        b (int | float): the upper bound of the uniform distribution.
+            Defaults to 1.
+        bias (int | float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self, a: float = 0., b: float = 1., **kwargs):
+        super().__init__(**kwargs)
+        self.a = a
+        self.b = b
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                uniform_init(m, self.a, self.b, self.bias)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    uniform_init(m, self.a, self.b, self.bias)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}: a={self.a},' \
+               f' b={self.b}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Kaiming')
+class KaimingInit(BaseInit):
+    r"""Initialize module parameters with the values according to the method
+    described in `Delving deep into rectifiers: Surpassing human-level.
+    performance on ImageNet classification - He, K. et al. (2015).
+    <https://www.cv-foundation.org/openaccess/content_iccv_2015/
+    papers/He_Delving_Deep_into_ICCV_2015_paper.pdf>`_
+    Args:
+        a (int | float): the negative slope of the rectifier used after this
+            layer (only used with ``'leaky_relu'``). Defaults to 0.
+        mode (str):  either ``'fan_in'`` or ``'fan_out'``. Choosing
+            ``'fan_in'`` preserves the magnitude of the variance of the weights
+            in the forward pass. Choosing ``'fan_out'`` preserves the
+            magnitudes in the backwards pass. Defaults to ``'fan_out'``.
+        nonlinearity (str): the non-linear function (`nn.functional` name),
+            recommended to use only with ``'relu'`` or ``'leaky_relu'`` .
+            Defaults to 'relu'.
+        bias (int | float): the value to fill the bias. Defaults to 0.
+        bias_prob (float, optional): the probability for bias initialization.
+            Defaults to None.
+        distribution (str): distribution either be ``'normal'`` or
+            ``'uniform'``. Defaults to ``'normal'``.
+        layer (str | list[str], optional): the layer will be initialized.
+            Defaults to None.
+    """
+
+    def __init__(self,
+                 a: float = 0,
+                 mode: str = 'fan_out',
+                 nonlinearity: str = 'relu',
+                 distribution: str = 'normal',
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.a = a
+        self.mode = mode
+        self.nonlinearity = nonlinearity
+        self.distribution = distribution
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                kaiming_init(m, self.a, self.mode, self.nonlinearity,
+                             self.bias, self.distribution)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    kaiming_init(m, self.a, self.mode, self.nonlinearity,
+                                 self.bias, self.distribution)
+
+        module.apply(init)
+        if hasattr(module, '_params_init_info'):
+            update_init_info(module, init_info=self._get_init_info())
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}: a={self.a}, mode={self.mode}, ' \
+               f'nonlinearity={self.nonlinearity}, ' \
+               f'distribution ={self.distribution}, bias={self.bias}'
+        return info
+
+
+@INITIALIZERS.register_module(name='Caffe2Xavier')
+class Caffe2XavierInit(KaimingInit):
+    # `XavierFill` in Caffe2 corresponds to `kaiming_uniform_` in PyTorch
+    # Acknowledgment to FAIR's internal code
+    def __init__(self, **kwargs):
+        super().__init__(
+            a=1,
+            mode='fan_in',
+            nonlinearity='leaky_relu',
+            distribution='uniform',
+            **kwargs)
+
+    def __call__(self, module: nn.Module) -> None:
+        super().__call__(module)
+
+
+@INITIALIZERS.register_module(name='RNN')
+class RNNInit:
+    def __init__(self,
+                 gain: float,
+                 layer: Union[str, List, None] = None):
+        self.gain = gain
+
+        if layer is not None:
+            if not isinstance(layer, (str, list)):
+                raise TypeError(f'layer must be a str or a list of str, \
+                    but got a {type(layer)}')
+        else:
+            layer = []
+
+        self.layer = [layer] if isinstance(layer, str) else layer
+
+    def __call__(self, module: nn.Module) -> None:
+
+        def init(m):
+            if self.wholemodule:
+                rnn_init(m, self.gain)
+            else:
+                layername = m.__class__.__name__
+                basesname = _get_bases_name(m)
+                if len(set(self.layer) & set([layername] + basesname)):
+                    rnn_init(m, self.gain)
+
+        module.apply(init)
+
+    def _get_init_info(self) -> str:
+        info = f'{self.__class__.__name__}, gain={self.gain}'
+        return info

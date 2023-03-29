@@ -25,8 +25,8 @@
 #
 # data = dict()
 # print(recurrence_copy_dict(data, results, keys1))
-import torch.nn as nn
 import torch
+import torch.nn as nn
 
 m = nn.Conv1d(16, 33, 3, stride=2)
 input = torch.randn(20, 16, 50)

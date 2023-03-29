@@ -78,7 +78,7 @@ plot = dict(
             ],
         ),
 
-        # deepsig 201610A for cnn gru1
+        # deepsig 201610A for init gru1
         dict(
             type='AccuracyF1Plot',
             name='motivation_cg1_deepsig_201610A.pdf',
@@ -97,7 +97,7 @@ plot = dict(
                 ),
             ],
         ),
-        # deepsig 201610A for cnn gru2
+        # deepsig 201610A for init gru2
         dict(
             type='AccuracyF1Plot',
             name='motivation_cg2_deepsig_201610A.pdf',

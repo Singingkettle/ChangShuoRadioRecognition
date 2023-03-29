@@ -1,21 +1,25 @@
-# Copyright (c) Open-MMLab. All rights reserved.
+# Copyright (c) OpenMMLab. All rights reserved.
+import copy
 import logging
-import os
 import os.path as osp
 import warnings
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
+from typing import (Any, Callable, Dict, List, Optional, Tuple, Union,
+                    no_type_check)
 
 import torch
 from torch.optim import Optimizer
+from torch.utils.data import DataLoader
 
+import csrr
+from ..common.parallel import is_module_wrapper
 from .checkpoint import load_checkpoint
 from .dist_utils import get_dist_info
-from .hooks import HOOKS, Hook, IterTimerHook
+from .hooks import HOOKS, Hook
 from .log_buffer import LogBuffer
-from .priority import get_priority
+from .priority import Priority, get_priority
 from .utils import get_time_str
-from ..common.parallel import is_module_wrapper
-from ..common.utils import is_str, build_from_cfg
 
 
 class BaseRunner(metaclass=ABCMeta):
@@ -36,7 +40,7 @@ class BaseRunner(metaclass=ABCMeta):
         optimizer (dict or :obj:`torch.optim.Optimizer`): It can be either an
             optimizer (in most cases) or a dict of optimizers (in models that
             requires more than one optimizer, e.g., GAN).
-        work_dir (str, optional): The working directory to format checkpoints
+        work_dir (str, optional): The working directory to save checkpoints
             and logs. Defaults to None.
         logger (:obj:`logging.Logger`): Logger used during training.
              Defaults to None. (The default value is just for backward
@@ -49,20 +53,22 @@ class BaseRunner(metaclass=ABCMeta):
     """
 
     def __init__(self,
-                 model,
-                 batch_processor=None,
-                 optimizer=None,
-                 work_dir=None,
-                 logger=None,
-                 meta=None,
-                 max_iters=None,
-                 max_epochs=None):
+                 model: torch.nn.Module,
+                 batch_processor: Optional[Callable] = None,
+                 optimizer: Union[Dict, torch.optim.Optimizer, None] = None,
+                 work_dir: Optional[str] = None,
+                 logger: Optional[logging.Logger] = None,
+                 meta: Optional[Dict] = None,
+                 max_iters: Optional[int] = None,
+                 max_epochs: Optional[int] = None) -> None:
         if batch_processor is not None:
             if not callable(batch_processor):
                 raise TypeError('batch_processor must be callable, '
                                 f'but got {type(batch_processor)}')
-            warnings.warn('batch_processor is deprecated, please implement '
-                          'train_step() and val_step() in the model instead.')
+            warnings.warn(
+                'batch_processor is deprecated, please implement '
+                'train_step() and val_step() in the model instead.',
+                DeprecationWarning)
             # raise an error is `batch_processor` is not None and
             # `model.train_step()` exists.
             if is_module_wrapper(model):
@@ -103,12 +109,10 @@ class BaseRunner(metaclass=ABCMeta):
         self.optimizer = optimizer
         self.logger = logger
         self.meta = meta
-
         # create work_dir
-        if is_str(work_dir):
-            self.work_dir = osp.abspath(work_dir)
-            if not osp.isdir(self.work_dir):
-                os.makedirs(self.work_dir)
+        if isinstance(work_dir, str):
+            self.work_dir: Optional[str] = osp.abspath(work_dir)
+            csrr.mkdir_or_exist(self.work_dir)
         elif work_dir is None:
             self.work_dir = None
         else:
@@ -122,8 +126,8 @@ class BaseRunner(metaclass=ABCMeta):
 
         self._rank, self._world_size = get_dist_info()
         self.timestamp = get_time_str()
-        self.mode = None
-        self._hooks = []
+        self.mode: Optional[str] = None
+        self._hooks: List[Hook] = []
         self._epoch = 0
         self._iter = 0
         self._inner_iter = 0
@@ -137,39 +141,43 @@ class BaseRunner(metaclass=ABCMeta):
         # TODO: Redesign LogBuffer, it is not flexible and elegant enough
         self.log_buffer = LogBuffer()
 
+        self.outputs = None
+        self.data_loader = None
+        self.data_batch = None
+
     @property
-    def model_name(self):
+    def model_name(self) -> str:
         """str: Name of the model, usually the module class name."""
         return self._model_name
 
     @property
-    def rank(self):
+    def rank(self) -> int:
         """int: Rank of current process. (distributed training)"""
         return self._rank
 
     @property
-    def world_size(self):
+    def world_size(self) -> int:
         """int: Number of processes participating in the job.
         (distributed training)"""
         return self._world_size
 
     @property
-    def hooks(self):
+    def hooks(self) -> List[Hook]:
         """list[:obj:`Hook`]: A list of registered hooks."""
         return self._hooks
 
     @property
-    def epoch(self):
+    def epoch(self) -> int:
         """int: Current epoch."""
         return self._epoch
 
     @property
-    def iter(self):
+    def iter(self) -> int:
         """int: Current iteration."""
         return self._iter
 
     @property
-    def inner_iter(self):
+    def inner_iter(self) -> int:
         """int: Iteration in an epoch."""
         return self._inner_iter
 
@@ -184,7 +192,7 @@ class BaseRunner(metaclass=ABCMeta):
         return self._max_iters
 
     @abstractmethod
-    def train(self):
+    def train(self, *args):
         pass
 
     @abstractmethod
@@ -192,26 +200,28 @@ class BaseRunner(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self, data_loaders, workflow, **kwargs):
+    def run(self, data_loaders: List[DataLoader],
+            workflow: List[Tuple[str, int]], **kwargs) -> Any:
         pass
 
     @abstractmethod
     def save_checkpoint(self,
-                        out_dir,
-                        file_name_tmpl,
-                        save_optimizer=True,
-                        meta=None,
-                        create_symlink=True):
+                        out_dir: str,
+                        filename_tmpl: str,
+                        save_optimizer: bool = True,
+                        meta: Optional[Dict] = None,
+                        create_symlink: bool = True) -> None:
         pass
 
-    def current_lr(self):
+    def current_lr(self) -> Union[List[float], Dict[str, List[float]]]:
         """Get current learning rates.
 
         Returns:
             list[float] | dict[str, list[float]]: Current learning rates of all
-                param groups. If the runner has a dict of optimizers, this
-                method will return a dict.
+            param groups. If the runner has a dict of optimizers, this method
+            will return a dict.
         """
+        lr: Union[List[float], Dict[str, List[float]]]
         if isinstance(self.optimizer, torch.optim.Optimizer):
             lr = [group['lr'] for group in self.optimizer.param_groups]
         elif isinstance(self.optimizer, dict):
@@ -223,13 +233,13 @@ class BaseRunner(metaclass=ABCMeta):
                 'lr is not applicable because optimizer does not exist.')
         return lr
 
-    def current_momentum(self):
+    def current_momentum(self) -> Union[List[float], Dict[str, List[float]]]:
         """Get current momentums.
 
         Returns:
             list[float] | dict[str, list[float]]: Current momentums of all
-                param groups. If the runner has a dict of optimizers, this
-                method will return a dict.
+            param groups. If the runner has a dict of optimizers, this method
+            will return a dict.
         """
 
         def _get_momentum(optimizer):
@@ -254,7 +264,9 @@ class BaseRunner(metaclass=ABCMeta):
                 momentums[name] = _get_momentum(optim)
         return momentums
 
-    def register_hook(self, hook, priority='NORMAL'):
+    def register_hook(self,
+                      hook: Hook,
+                      priority: Union[int, str, Priority] = 'NORMAL') -> None:
         """Register a hook into the hook list.
 
         The hook will be inserted into a priority queue, with the specified
@@ -271,34 +283,34 @@ class BaseRunner(metaclass=ABCMeta):
         if hasattr(hook, 'priority'):
             raise ValueError('"priority" is a reserved attribute for hooks')
         priority = get_priority(priority)
-        hook.priority = priority
+        hook.priority = priority  # type: ignore
         # insert the hook to a sorted list
         inserted = False
         for i in range(len(self._hooks) - 1, -1, -1):
-            if priority >= self._hooks[i].priority:
+            if priority >= self._hooks[i].priority:  # type: ignore
                 self._hooks.insert(i + 1, hook)
                 inserted = True
                 break
         if not inserted:
             self._hooks.insert(0, hook)
 
-    def register_hook_from_cfg(self, hook_cfg):
+    def register_hook_from_cfg(self, hook_cfg: Dict) -> None:
         """Register a hook from its cfg.
 
         Args:
-            hook_cfg (dict): Hook figure_configs. It should have at least keys 'type'
+            hook_cfg (dict): Hook config. It should have at least keys 'type'
               and 'priority' indicating its type and priority.
 
-        Notes:
+        Note:
             The specific hook class to register should not use 'type' and
             'priority' arguments during initialization.
         """
         hook_cfg = hook_cfg.copy()
         priority = hook_cfg.pop('priority', 'NORMAL')
-        hook = build_from_cfg(hook_cfg, HOOKS)
+        hook = csrr.build_from_cfg(hook_cfg, HOOKS)
         self.register_hook(hook, priority=priority)
 
-    def call_hook(self, fn_name):
+    def call_hook(self, fn_name: str) -> None:
         """Call all hooks.
 
         Args:
@@ -308,15 +320,49 @@ class BaseRunner(metaclass=ABCMeta):
         for hook in self._hooks:
             getattr(hook, fn_name)(self)
 
-    def load_checkpoint(self, file_name, map_location='cpu', strict=False):
-        self.logger.info('load checkpoint from %s', file_name)
-        return load_checkpoint(self.model, file_name, map_location, strict,
-                               self.logger)
+    def get_hook_info(self) -> str:
+        # Get hooks info in each stage
+        stage_hook_map: Dict[str, list] = {stage: [] for stage in Hook.stages}
+        for hook in self.hooks:
+            try:
+                priority = Priority(hook.priority).name  # type: ignore
+            except ValueError:
+                priority = hook.priority  # type: ignore
+            classname = hook.__class__.__name__
+            hook_info = f'({priority:<12}) {classname:<35}'
+            for trigger_stage in hook.get_triggered_stages():
+                stage_hook_map[trigger_stage].append(hook_info)
 
+        stage_hook_infos = []
+        for stage in Hook.stages:
+            hook_infos = stage_hook_map[stage]
+            if len(hook_infos) > 0:
+                info = f'{stage}:\n'
+                info += '\n'.join(hook_infos)
+                info += '\n -------------------- '
+                stage_hook_infos.append(info)
+        return '\n'.join(stage_hook_infos)
+
+    def load_checkpoint(
+        self,
+        filename: str,
+        map_location: Union[str, Callable] = 'cpu',
+        strict: bool = False,
+        revise_keys: List = [(r'^module.', '')],
+    ) -> Union[Dict, OrderedDict]:
+        return load_checkpoint(
+            self.model,
+            filename,
+            map_location,
+            strict,
+            self.logger,
+            revise_keys=revise_keys)
+
+    @no_type_check
     def resume(self,
-               checkpoint,
-               resume_optimizer=True,
-               map_location='default'):
+               checkpoint: str,
+               resume_optimizer: bool = True,
+               map_location: Union[str, Callable] = 'default') -> None:
         if map_location == 'default':
             if torch.cuda.is_available():
                 device_id = torch.cuda.current_device()
@@ -331,6 +377,28 @@ class BaseRunner(metaclass=ABCMeta):
 
         self._epoch = checkpoint['meta']['epoch']
         self._iter = checkpoint['meta']['iter']
+        if self.meta is None:
+            self.meta = {}
+        self.meta.setdefault('hook_msgs', {})
+        # load `last_ckpt`, `best_score`, `best_ckpt`, etc. for hook messages
+        self.meta['hook_msgs'].update(checkpoint['meta'].get('hook_msgs', {}))
+
+        # Re-calculate the number of iterations when resuming
+        # models with different number of GPUs
+        if 'config' in checkpoint['meta']:
+            config = csrr.Config.fromstring(
+                checkpoint['meta']['config'], file_format='.py')
+            previous_gpu_ids = config.get('gpu_ids', None)
+            if previous_gpu_ids and len(previous_gpu_ids) > 0 and len(
+                    previous_gpu_ids) != self.world_size:
+                self._iter = int(self._iter * len(previous_gpu_ids) /
+                                 self.world_size)
+                self.logger.info('the iteration number is changed due to '
+                                 'change of GPU number')
+
+        # resume meta information meta
+        self.meta = checkpoint['meta']
+
         if 'optimizer' in checkpoint and resume_optimizer:
             if isinstance(self.optimizer, Optimizer):
                 self.optimizer.load_state_dict(checkpoint['optimizer'])
@@ -345,8 +413,10 @@ class BaseRunner(metaclass=ABCMeta):
 
         self.logger.info('resumed epoch %d, iter %d', self.epoch, self.iter)
 
-    def register_lr_hook(self, lr_config):
-        if isinstance(lr_config, dict):
+    def register_lr_hook(self, lr_config: Union[Dict, Hook, None]) -> None:
+        if lr_config is None:
+            return
+        elif isinstance(lr_config, dict):
             assert 'policy' in lr_config
             policy_type = lr_config.pop('policy')
             # If the type of policy is all in lower case, e.g., 'cyclic',
@@ -359,12 +429,13 @@ class BaseRunner(metaclass=ABCMeta):
                 policy_type = policy_type.title()
             hook_type = policy_type + 'LrUpdaterHook'
             lr_config['type'] = hook_type
-            hook = build_from_cfg(lr_config, HOOKS)
+            hook = csrr.build_from_cfg(lr_config, HOOKS)
         else:
             hook = lr_config
-        self.register_hook(hook)
+        self.register_hook(hook, priority='VERY_HIGH')
 
-    def register_momentum_hook(self, momentum_config):
+    def register_momentum_hook(
+            self, momentum_config: Union[Dict, Hook, None]) -> None:
         if momentum_config is None:
             return
         if isinstance(momentum_config, dict):
@@ -380,60 +451,120 @@ class BaseRunner(metaclass=ABCMeta):
                 policy_type = policy_type.title()
             hook_type = policy_type + 'MomentumUpdaterHook'
             momentum_config['type'] = hook_type
-            hook = build_from_cfg(momentum_config, HOOKS)
+            hook = csrr.build_from_cfg(momentum_config, HOOKS)
         else:
             hook = momentum_config
-        self.register_hook(hook)
+        self.register_hook(hook, priority='HIGH')
 
-    def register_optimizer_hook(self, optimizer_config):
+    def register_optimizer_hook(
+            self, optimizer_config: Union[Dict, Hook, None]) -> None:
         if optimizer_config is None:
             return
         if isinstance(optimizer_config, dict):
             optimizer_config.setdefault('type', 'OptimizerHook')
-            hook = build_from_cfg(optimizer_config, HOOKS)
+            hook = csrr.build_from_cfg(optimizer_config, HOOKS)
         else:
             hook = optimizer_config
-        self.register_hook(hook)
+        self.register_hook(hook, priority='ABOVE_NORMAL')
 
-    def register_checkpoint_hook(self, checkpoint_config):
+    def register_checkpoint_hook(
+            self, checkpoint_config: Union[Dict, Hook, None]) -> None:
         if checkpoint_config is None:
             return
         if isinstance(checkpoint_config, dict):
             checkpoint_config.setdefault('type', 'CheckpointHook')
-            hook = build_from_cfg(checkpoint_config, HOOKS)
+            hook = csrr.build_from_cfg(checkpoint_config, HOOKS)
         else:
             hook = checkpoint_config
-        self.register_hook(hook)
+        self.register_hook(hook, priority='NORMAL')
 
-    def register_logger_hooks(self, log_config):
+    def register_logger_hooks(self, log_config: Optional[Dict]) -> None:
         if log_config is None:
             return
         log_interval = log_config['interval']
         for info in log_config['hooks']:
-            logger_hook = build_from_cfg(
+            logger_hook = csrr.build_from_cfg(
                 info, HOOKS, default_args=dict(interval=log_interval))
             self.register_hook(logger_hook, priority='VERY_LOW')
 
-    def register_training_hooks(self,
-                                lr_config,
-                                optimizer_config=None,
-                                checkpoint_config=None,
-                                log_config=None,
-                                momentum_config=None):
-        """Register default hooks for training.
+    def register_timer_hook(
+        self,
+        timer_config: Union[Dict, Hook, None],
+    ) -> None:
+        if timer_config is None:
+            return
+        if isinstance(timer_config, dict):
+            timer_config_ = copy.deepcopy(timer_config)
+            hook = csrr.build_from_cfg(timer_config_, HOOKS)
+        else:
+            hook = timer_config
+        self.register_hook(hook, priority='LOW')
 
-        Default hooks include:
+    def register_custom_hooks(
+            self, custom_config: Union[List, Dict, Hook, None]) -> None:
+        if custom_config is None:
+            return
 
-        - LrUpdaterHook
-        - MomentumUpdaterHook
-        - OptimizerStepperHook
-        - CheckpointSaverHook
-        - IterTimerHook
-        - LoggerHook(s)
+        if not isinstance(custom_config, list):
+            custom_config = [custom_config]
+
+        for item in custom_config:
+            if isinstance(item, dict):
+                self.register_hook_from_cfg(item)
+            else:
+                self.register_hook(item, priority='NORMAL')
+
+    def register_profiler_hook(
+        self,
+        profiler_config: Union[Dict, Hook, None],
+    ) -> None:
+        if profiler_config is None:
+            return
+        if isinstance(profiler_config, dict):
+            profiler_config.setdefault('type', 'ProfilerHook')
+            hook = csrr.build_from_cfg(profiler_config, HOOKS)
+        else:
+            hook = profiler_config
+        self.register_hook(hook)
+
+    def register_training_hooks(
+            self,
+            lr_config: Union[Dict, Hook, None],
+            optimizer_config: Union[Dict, Hook, None] = None,
+            checkpoint_config: Union[Dict, Hook, None] = None,
+            log_config: Optional[Dict] = None,
+            momentum_config: Union[Dict, Hook, None] = None,
+            timer_config: Union[Dict, Hook] = dict(type='IterTimerHook'),
+            custom_hooks_config: Union[List, Dict, Hook, None] = None) -> None:
+        """Register default and custom hooks for training.
+
+        Default and custom hooks include:
+
+        +----------------------+-------------------------+
+        | Hooks                | Priority                |
+        +======================+=========================+
+        | LrUpdaterHook        | VERY_HIGH (10)          |
+        +----------------------+-------------------------+
+        | MomentumUpdaterHook  | HIGH (30)               |
+        +----------------------+-------------------------+
+        | OptimizerStepperHook | ABOVE_NORMAL (40)       |
+        +----------------------+-------------------------+
+        | CheckpointSaverHook  | NORMAL (50)             |
+        +----------------------+-------------------------+
+        | IterTimerHook        | LOW (70)                |
+        +----------------------+-------------------------+
+        | LoggerHook(s)        | VERY_LOW (90)           |
+        +----------------------+-------------------------+
+        | CustomHook(s)        | defaults to NORMAL (50) |
+        +----------------------+-------------------------+
+
+        If custom hooks have same priority with default hooks, custom hooks
+        will be triggered after default hooks.
         """
         self.register_lr_hook(lr_config)
         self.register_momentum_hook(momentum_config)
         self.register_optimizer_hook(optimizer_config)
         self.register_checkpoint_hook(checkpoint_config)
-        self.register_hook(IterTimerHook())
+        self.register_timer_hook(timer_config)
         self.register_logger_hooks(log_config)
+        self.register_custom_hooks(custom_hooks_config)

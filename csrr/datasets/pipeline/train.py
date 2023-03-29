@@ -16,11 +16,10 @@ class RebaseModLabelBySNR:
     def __call__(self, results):
         snr = results['snr']
         gt = results['modulation']
-        target = (1 - 1.0 / self.num_class) * (
-                1.0 / (1 + math.exp(-self.alpha * (snr + self.beta)))) + 1.0 / self.num_class
+        target = (1 - 1.0 / self.num_class) / (1 + math.exp(-self.alpha * (snr + self.beta))) + 1.0 / self.num_class
         label = np.zeros(self.num_class, dtype=np.float32)
         label[gt] = target
-        results['targets']['modulation'] = label
+        results['targets']['modulations'] = label
         return results
 
     def __repr__(self):

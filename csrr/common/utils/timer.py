@@ -24,7 +24,7 @@ class Timer:
     >>>     # simulate a code block that will run for 1s
     >>>     time.sleep(1)
     it takes 1.0 seconds
-    >>> timer = mmcv.Timer()
+    >>> timer = CSRR.Timer()
     >>> time.sleep(0.5)
     >>> print(timer.since_start())
     0.500

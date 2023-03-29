@@ -1,28 +1,26 @@
-import logging
-
 import torch
 import torch.nn as nn
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 class _CNN(nn.Module):
 
-    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5, padding=(0, 0)):
         super(_CNN, self).__init__()
         if has_stride:
             stride = 2
         else:
             stride = 1
         self.conv_net = nn.Sequential(
-            nn.Conv2d(depth, 256, kernel_size=(1, 3), stride=(1, stride), bias=False),
+            nn.Conv2d(depth, 256, kernel_size=(1, 3), stride=(1, stride), padding=padding),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-            nn.Conv2d(256, 256, kernel_size=(1, 3), stride=(1, stride), bias=False),
+            nn.Conv2d(256, 256, kernel_size=(1, 3), stride=(1, stride), padding=padding),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-            nn.Conv2d(256, input_size, kernel_size=(1, 3), stride=(1, stride), bias=False),
+            nn.Conv2d(256, input_size, kernel_size=(1, 3), stride=(1, stride), padding=padding),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
         )
@@ -44,10 +42,10 @@ class _CNN(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNet(nn.Module):
+class HCGNet(BaseBackbone):
 
-    def __init__(self, heads, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNet, self).__init__()
+    def __init__(self, heads, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNet, self).__init__(init_cfg)
         self.heads = heads
         if len(heads) < 2:
             assert ValueError('The CHGNet must have multi heads!')
@@ -56,39 +54,6 @@ class HCGNet(nn.Module):
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
 
     def forward(self, iqs):
         outs = dict()
@@ -107,20 +72,11 @@ class HCGNet(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetCNN(nn.Module):
+class HCGNetCNN(BaseBackbone):
 
-    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetCNN, self).__init__()
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetCNN, self).__init__(init_cfg)
         self.cnn = _CNN(depth=depth, input_size=input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -129,25 +85,12 @@ class HCGNetCNN(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetGRU1(nn.Module):
+class HCGNetGRU1(BaseBackbone):
 
-    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetGRU1, self).__init__()
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetGRU1, self).__init__(init_cfg)
         self.cnn = _CNN(depth=depth, input_size=input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                elif isinstance(m, nn.LSTM):
-                    m.reset_parameters()
-                elif isinstance(m, nn.GRU):
-                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -157,27 +100,14 @@ class HCGNetGRU1(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetGRU2(nn.Module):
+class HCGNetGRU2(BaseBackbone):
 
-    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetGRU2, self).__init__()
+    def __init__(self, depth=2, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetGRU2, self).__init__(init_cfg)
         self.cnn = _CNN(depth=depth, input_size=input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                elif isinstance(m, nn.LSTM):
-                    m.reset_parameters()
-                elif isinstance(m, nn.GRU):
-                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -189,25 +119,12 @@ class HCGNetGRU2(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetCG1(nn.Module):
+class HCGNetCG1(BaseBackbone):
 
-    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetCG1, self).__init__()
+    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetCG1, self).__init__(init_cfg)
         self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                elif isinstance(m, nn.LSTM):
-                    m.reset_parameters()
-                elif isinstance(m, nn.GRU):
-                    m.reset_parameters()
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -217,48 +134,13 @@ class HCGNetCG1(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetCG2(nn.Module):
-    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetCG2, self).__init__()
+class HCGNetCG2(BaseBackbone):
+    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetCG2, self).__init__(init_cfg)
         self.cnn = _CNN(avg_pool=avg_pool, input_size=input_size, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)
@@ -270,48 +152,13 @@ class HCGNetCG2(nn.Module):
 
 
 @BACKBONES.register_module()
-class HCGNetG1G2(nn.Module):
-    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5):
-        super(HCGNetG1G2, self).__init__()
+class HCGNetG1G2(BaseBackbone):
+    def __init__(self, input_size=80, avg_pool=None, has_stride=False, dp=0.5, init_cfg=None):
+        super(HCGNetG1G2, self).__init__(init_cfg)
         self.cnn = _CNN(input_size, avg_pool=avg_pool, has_stride=has_stride, dp=dp)
         self.gru1 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(dp)
         self.gru2 = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.LSTM):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(4, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(4, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
 
     def forward(self, iqs):
         c_fea = self.cnn(iqs)

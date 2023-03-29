@@ -22,6 +22,23 @@ from matplotlib.transforms import Affine2D
 plt.rcParams["font.family"] = "Times New Roman"
 
 
+def mscatter(x, y, ax=None, m=None, **kw):
+    import matplotlib.markers as mmarkers
+    sc = ax.scatter(x, y, **kw)
+    if (m is not None) and (len(m) == len(x)):
+        paths = []
+        for marker in m:
+            if isinstance(marker, mmarkers.MarkerStyle):
+                marker_obj = marker
+            else:
+                marker_obj = mmarkers.MarkerStyle(marker)
+            path = marker_obj.get_path().transformed(
+                marker_obj.get_transform())
+            paths.append(path)
+        sc.set_paths(paths)
+    return sc
+
+
 def get_new_fig(fn, fig_size=None):
     """ Init graphics """
     if fig_size is None:

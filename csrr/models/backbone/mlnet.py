@@ -1,11 +1,9 @@
-import logging
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 class SELayer(nn.Module):
@@ -101,37 +99,14 @@ class SingleBranch(nn.Module):
 
 
 @BACKBONES.register_module()
-class MLNet(nn.Module):
+class MLNet(BaseBackbone):
 
-    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=False,
-                 is_BIGRU=False, fusion_method='', gradient_truncation=False):
-        super(MLNet, self).__init__()
+    def __init__(self, dropout_rate=0.5, avg_pool=None, use_GRU=False, is_BIGRU=False, fusion_method='',
+                 gradient_truncation=False, init_cfg=None):
+        super(MLNet, self).__init__(init_cfg)
         self.iq_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method)
         self.ap_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method)
         self.gradient_truncation = gradient_truncation
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.xavier_uniform_(m.weight)
-                    if m.bias is not None:
-                        nn.init.constant_(m.bias, 0)
-                elif isinstance(m, nn.GRU):
-                    for name, param in m.named_parameters():
-                        if 'weight_ih' in name:
-                            for ih in param.chunk(3, 0):
-                                nn.init.xavier_uniform_(ih)
-                        elif 'weight_hh' in name:
-                            for hh in param.chunk(3, 0):
-                                nn.init.orthogonal_(hh)
-                        elif 'bias_ih' in name:
-                            nn.init.zeros_(param)
-                        elif 'bias_hh' in name:
-                            nn.init.zeros_(param)
 
     def forward(self, iqs, aps):
         low = self.iq_net(iqs)

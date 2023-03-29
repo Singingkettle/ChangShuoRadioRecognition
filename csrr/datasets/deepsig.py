@@ -15,8 +15,8 @@ class DeepSigDataset(CustomDataset):
     SNRS = None
 
     def __init__(self, ann_file, pipeline, data_root=None, test_mode=False,
-                 preprocess=None, evaluate=None, save=None):
-        super(DeepSigDataset, self).__init__(ann_file, pipeline, data_root, test_mode, preprocess, evaluate, save)
+                 preprocess=None, evaluate=None, format=None):
+        super(DeepSigDataset, self).__init__(ann_file, pipeline, data_root, test_mode, preprocess, evaluate, format)
 
         self.CLASSES = self.data_infos['modulations']
         self.SNRS = self.data_infos['snrs']

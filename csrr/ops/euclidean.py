@@ -12,7 +12,7 @@ class Euclidean(nn.Module):
     out_features: int
     weight: Tensor
 
-    def __init__(self, in_features: int, out_features: int, bias: bool = True,
+    def __init__(self, in_features: int, out_features: int,
                  device=None, dtype=None) -> None:
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(Euclidean, self).__init__()
@@ -25,7 +25,7 @@ class Euclidean(nn.Module):
         nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
 
     def forward(self, input: Tensor) -> Tensor:
-        return -1 * torch.cdist(input, self.weight, p=2)
+        return torch.cdist(input, self.weight, p=2)
 
     def extra_repr(self) -> str:
         return 'in_features={}, out_features={}'.format(

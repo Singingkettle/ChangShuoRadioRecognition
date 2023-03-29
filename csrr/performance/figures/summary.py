@@ -10,11 +10,10 @@ Email: chagshuo@bupt.edu.cn
 
 import os
 
-from .utils import load_amc_evaluation_results, get_classification_accuracy_and_f1_for_plot
-from ..builder import SUMMARIES
+from ..builder import TABLES
 
 
-@SUMMARIES.register_module()
+@TABLES.register_module()
 class ModulationSummary:
     def __init__(self, name, dataset, log_dir, config_legend_map, config_method_map):
         self.name = name

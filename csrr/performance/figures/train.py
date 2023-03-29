@@ -1,5 +1,3 @@
-import os
-
 from .base import BaseDraw
 from ..builder import FIGURES
 

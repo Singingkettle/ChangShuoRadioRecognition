@@ -1,6 +1,7 @@
-import random
 import os
+import random
 import shutil
+
 import numpy as np
 import torch
 import torch.distributed as dist
@@ -9,8 +10,8 @@ from ..common import get_root_logger
 from ..common.parallel import CSDataParallel, CSDistributedDataParallel
 from ..common.utils import build_from_cfg
 from ..datasets import build_dataloader, build_dataset
-from ..runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner, OptimizerHook, build_optimizer,
-                      EvalHook, DistEvalHook, get_dist_info, find_latest_checkpoint)
+from ..runner import (HOOKS, DistSamplerSeedHook, build_runner, OptimizerHook, build_optimizer,
+                      EvalHook, DistEvalHook, get_dist_info, find_latest_checkpoint, Fp16OptimizerHook)
 
 
 def init_random_seed(seed=None, device='cuda'):
@@ -94,26 +95,42 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
 
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)
-    runner = EpochBasedRunner(
-        model,
-        optimizer=optimizer,
-        work_dir=cfg.work_dir,
-        logger=logger,
-        meta=meta)
+    runner = build_runner(
+        cfg.runner,
+        default_args=dict(
+            model=model,
+            batch_processor=None,
+            optimizer=optimizer,
+            work_dir=cfg.work_dir,
+            logger=logger,
+            meta=meta))
     # an ugly workaround to make .log and .log.json file_names the same
     runner.timestamp = timestamp
 
+    # fp16 setting
+    fp16_cfg = cfg.get('fp16', None)
+
     # Optimizer figure_configs
-    if distributed and 'type' not in cfg.optimizer_config:
+    if fp16_cfg is not None:
+        optimizer_config = Fp16OptimizerHook(
+            **cfg.optimizer_config,
+            loss_scale=fp16_cfg['loss_scale'],
+            distributed=distributed)
+    elif distributed and 'type' not in cfg.optimizer_config:
         optimizer_config = OptimizerHook(**cfg.optimizer_config)
     else:
         optimizer_config = cfg.optimizer_config
 
     # register hooks
-    runner.register_training_hooks(cfg.lr_config, optimizer_config,
-                                   cfg.checkpoint_config, cfg.log_config,
-                                   cfg.get('momentum_config', None))
-    if distributed:
+    runner.register_training_hooks(
+        cfg.lr_config,
+        optimizer_config,
+        cfg.checkpoint_config,
+        cfg.log_config,
+        cfg.get('momentum_config', None),
+        custom_hooks_config=cfg.get('custom_hooks', None)
+    )
+    if distributed and cfg.runner['type'] == 'EpochBasedRunner':
         runner.register_hook(DistSamplerSeedHook())
 
     # register eval hooks
@@ -165,4 +182,4 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
                     shutil.rmtree(file_path)
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
-    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+    runner.run(data_loaders, cfg.workflow)

@@ -10,15 +10,11 @@ from tqdm import tqdm
 
 from csrr.common.fileio import load as IOLoad
 
-# _DATA_VERSION = ['201801A', '201610A', '201604C', '201610B']
-
-_DATA_VERSION = ['201610A', '201801A']
-
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate DeepSig Dataset')
+    parser = argparse.ArgumentParser(description='Cache AMC Dataset')
     parser.add_argument('--data_root', type=str,
-                        help='data root to deepsig data')
+                        help='data root to data')
     args = parser.parse_args()
 
     return args
@@ -69,8 +65,9 @@ def run(dataset_folder, json_file):
 
 def main():
     args = parse_args()
-    for version in _DATA_VERSION:
-        dataset_folder = osp.join(args.data_root, version)
+    versions = next(os.walk(args.data_root))[1]
+    for version in versions:
+        dataset_folder = os.path.join(args.data_root, version)
         print(dataset_folder)
         # cache val data
         run(dataset_folder, 'validation.json')

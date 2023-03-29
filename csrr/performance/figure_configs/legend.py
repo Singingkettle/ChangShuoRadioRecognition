@@ -1,29 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .configs import _COLORS, _MARKERS, _LINES
+
 
 class LegendConfig:
     def __init__(self, num_methods, seed=None):
-        self.colors = [
-            'black', 'red', 'blue', 'green', 'saddlebrown', 'darkslategray',
-            'dodgerblue', 'purple', 'cyan', 'brown', 'olive', 'springgreen',
-            'indigo', 'deeppink', 'navy', 'sienna', 'gray', 'darkgreen', 'mediumslateblue',
-            'cornflowerblue', 'darkolivegreen', 'steelblue', 'darkviolet', 'darkgoldenrod', 'cadetblue',
-            'grey', 'indianred', 'tomato', 'palegreen', 'seagreen', 'deepskyblue', 'slategray', 'royalblue',
-            'magenta', 'palevioletred', 'gold', 'fuchsia', 'lawngreen', 'blueviolet', 'peru', 'peachpuff',
-            'rosybrown', 'darkkhaki', 'tan'
-        ]
-        # if seed is None:
-        #     random.Random(34).shuffle(self.colors)
-        # else:
-        #     random.Random(2).shuffle(self.colors)
-        self.colors = self.colors * num_methods
-        self.linestyles = ['-', '--', '-.', ':'] * num_methods
-        self.markers = [
-                           '.', 'o', 'v', '^', '<', '>',
-                           '1', '2', '3', '4', '8', 'P', 'p',
-                           '*', 'h', 'H', '+', 'x', 'X', 's', 'd'
-                       ] * num_methods
+        self.colors = _COLORS * num_methods
+        self.linestyles = _MARKERS * num_methods
+        self.markers = _LINES * num_methods
 
         self.legend_configs = list()
         for i in range(num_methods):

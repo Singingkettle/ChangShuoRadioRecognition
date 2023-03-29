@@ -50,7 +50,7 @@ class SSNNTwoStage(BaseDNN):
         losses = dict(loss_Mod=mod_losses['loss_Final'], loss_band=band_losses['loss_Final'])
         return losses
 
-    def simple_test(self, inputs, input_metas, **kwargs):
+    def forward_test(self, inputs, input_metas, **kwargs):
         iqs = inputs['iqs']
         iqs_ = inputs['iqs_']
         iqs = iqs.view(-1, 1, 2, 1025)
@@ -92,7 +92,7 @@ class SSNNSingleStage(BaseClassifier):
         super(SSNNSingleStage, self).__init__(backbone, classifier_head, vis_fea, method_name)
         self.num_mod = num_mod
 
-    def simple_test(self, inputs, input_metas, **kwargs):
+    def forward_test(self, inputs, input_metas, **kwargs):
         x = self.extract_feat(**inputs)
         outs = self.classifier_head(x, self.vis_fea, True)
 

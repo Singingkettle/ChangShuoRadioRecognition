@@ -24,3 +24,5 @@ model = dict(
         ),
     ),
 )
+evaluation = dict(interval=10)
+checkpoint_config = dict(interval=10)

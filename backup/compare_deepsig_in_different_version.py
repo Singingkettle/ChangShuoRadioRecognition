@@ -1,5 +1,6 @@
-from csrr.common.fileio import load as IOLoad
 import numpy as np
+
+from csrr.common.fileio import load as IOLoad
 
 iq1 = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201801A/cache/train_and_validation_iq.pkl'
 iq1 = IOLoad(iq1)

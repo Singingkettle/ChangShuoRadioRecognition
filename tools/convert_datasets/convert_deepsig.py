@@ -2,7 +2,7 @@
 
 import argparse
 
-from deepsig.data_class import DeepSigA, DeepSigB, DeepSigC, DeepSigD
+from datasets import DeepSigA, DeepSigB, DeepSigC, DeepSigD
 
 # _DATA_VERSION = ['201610A', '201801A', '201604C', '201610B']
 

@@ -1,10 +1,10 @@
-from abc import ABCMeta, abstractmethod
 import os.path as osp
+from abc import ABCMeta, abstractmethod
 
 import numpy as np
 from torch.utils.data import Dataset
 
-from .builder import DATASETS, build_preprocess, build_evaluate, build_save
+from .builder import DATASETS, build_preprocess, build_evaluate, build_format
 from .pipeline import Compose
 from ..common.fileio import load as IOLoad
 
@@ -20,7 +20,7 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
 
     """
 
-    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None, save=None):
+    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None, format=None):
         self.ann_file = ann_file
         self.pipeline = pipeline
         self.data_root = data_root
@@ -35,10 +35,10 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
         else:
             self.eval = None
 
-        if save is not None:
-            self.save = build_save(save)
+        if format is not None:
+            self.format = build_format(format)
         else:
-            self.save = None
+            self.format = None
 
         if self.data_root is not None:
             if not osp.isabs(self.ann_file):
@@ -134,7 +134,7 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.format(len(results), len(self)))
-        for process in self.save:
+        for process in self.format:
             process(out_dir, results, self.data_infos)
 
     def evaluate(self, results, logger=None):

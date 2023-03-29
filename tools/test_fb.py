@@ -1,57 +1,81 @@
 import argparse
+import os
+import time
 
-import numpy as np
-
-from csrr.common.utils import Config, mkdir_or_exist
+from csrr.common.fileio import dump as IODump
+from csrr.common.utils import Config, setup_multi_processes
 from csrr.datasets import build_dataset
-from csrr.models import build_fb
+from csrr.models import build_method
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='ChangShuoRadioRecognition test (and eval) a model')
     parser.add_argument('config', help='test config file path')
-    parser.add_argument('model', help='model file')
+    parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
-        '--format-out',
-        type=str,
-        default=None,
-        help='the dir to format output result file in json format')
+        '--work_dir',
+        help='the directory to format the file containing evaluation figures, results in pickle format, '
+             'and format data to upload into test server')
+    parser.add_argument('--out', action='store_true', help='output result file in pickle format')
+    parser.add_argument(
+        '--format_only',
+        action='store_true',
+        help='Format the output results without perform evaluation. It is'
+             'useful when you want to format the result to a specific format and '
+             'submit it to the test server')
+    parser.add_argument(
+        '--eval',
+        action='store_true',
+        help='evaluation on the dataset')
+
     args = parser.parse_args()
+
     return args
 
 
 def main():
     args = parse_args()
 
+    assert args.out or args.eval or args.format_only, \
+        ('Please specify at least one operation (format/eval/format the '
+         'results / format the results) with the argument "--out", "--eval"'
+         ', "--format-only"')
+
     cfg = Config.fromfile(args.config)
 
-    # format_out is determined in this priority: CLI > segment in file > file_name
-    if args.format_out is not None:
-        # update figure_configs according to CLI args if args.format_out is not None
-        cfg.format_out = args.format_out
-    elif cfg.get('format_out', None) is None:
-        # use figure_configs file_name as default format_out if cfg.format_out is None
-        cfg.format_out = './format_out'
+    # set multi-process settings
+    setup_multi_processes(cfg)
 
     # build the dataloader
     dataset = build_dataset(cfg.data.test)
 
+    inputs = []
+    for signal in dataset:
+        inputs.append(signal['inputs'][cfg.x])
+
     # build the model and load checkpoint
-    cfg.model['model_path'] = args.model
+    cfg.model['model_path'] = args.checkpoint
     cfg.model['mode'] = 'test'
-    model = build_fb(cfg.model)
+    model = build_method(cfg.model)
+    outputs = model(inputs)
 
-    data = []
-    for idx in range(len(dataset)):
-        data.append(dataset[idx][cfg.x])
+    # allows not to create
+    # mkdir_or_exist(os.path.abspath(args.work_dir))
 
-    data = np.concatenate(data)
-
-    outputs = model(data)
-    mkdir_or_exist(cfg.format_out)
-    dataset.format_out(cfg.format_out, outputs)
-    print(dataset.evaluate(outputs))
+    if args.out:
+        print(f'\nwriting results to {args.work_dir}')
+        IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
+    if args.format_only:
+        dataset.format_results(args.work_dir, outputs)
+    if args.eval:
+        metric = dataset.evaluate(outputs)
+        print(metric)
+        metric_dict = dict(config=args.config, metric=metric)
+        if args.work_dir is not None:
+            timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+            json_file = os.path.join(args.work_dir, f'eval_{timestamp}.json')
+            IODump(metric_dict, json_file)
 
 
 if __name__ == '__main__':

@@ -106,6 +106,34 @@ class EvaluateHCGDNN:
         res = get_classification_eval_with_snr(pps, gts, snrs, data_infos['modulations'], self.metrics)
         eval_results.update(res)
         return eval_results
+
+
+@EVALUATES.register_module()
+class EvaluateFastMLDNN:
+    def __init__(self, target_name: str, metrics: str = None):
+        if metrics is None:
+            metrics = ['ACC', 'FeaDistribution']
+        self.target_name = target_name
+        self.metrics = metrics
+
+    def __call__(self, results, data_infos):
+        gts = []
+        snrs = []
+        for annotation in data_infos['annotations']:
+            gt = data_infos[f'{self.target_name}s'].index(annotation[self.target_name])
+            gts.append(gt)
+            snrs.append(annotation['snr'])
+        results = list_dict_to_dict_list(results)
+
+        gts = np.array(gts, dtype=np.float64)
+        pps = np.stack(results['pre'], axis=0)
+        snrs = np.array(snrs, dtype=np.int64)
+        eval_results = get_classification_eval_with_snr(pps, gts, snrs, data_infos[f'{self.target_name}s'],
+                                                        self.metrics, feas=np.stack(results['fea'], axis=0),
+                                                        centers=results['center'][0])
+
+        return eval_results
+
 #
 #
 # @EVALUATES.register_module()

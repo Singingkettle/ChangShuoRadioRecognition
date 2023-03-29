@@ -1,15 +1,13 @@
-import torch.nn as nn
-
 from .amc_head import AMCHead
-from .euclidean_head import EuclideanHead
 from .base_head import BaseHead
+from .euclidean_head import EuclideanHead
 from ..builder import HEADS
 
 
 @HEADS.register_module()
 class HCGDNNHead(BaseHead):
-    def __init__(self, num_classes, heads=None, in_size=80, out_size=256, loss_cls=None, use_eh=False):
-        super(HCGDNNHead, self).__init__()
+    def __init__(self, num_classes, heads=None, in_size=80, out_size=256, loss_cls=None, use_eh=False, init_cfg=None):
+        super(HCGDNNHead, self).__init__(init_cfg)
         if loss_cls is None:
             loss_cls = dict(
                 type='CrossEntropyLoss',
@@ -23,13 +21,6 @@ class HCGDNNHead(BaseHead):
                 self.add_module(layer_name, EuclideanHead(num_classes, in_size, out_size, loss_cls=loss_cls))
             else:
                 self.add_module(layer_name, AMCHead(num_classes, in_size, out_size, loss_cls))
-
-    def init_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Linear):
-                nn.init.kaiming_normal_(
-                    m.weight, mode='fan_in', nonlinearity='relu')
-                nn.init.constant_(m.bias, 0)
 
     def loss(self, inputs, targets, weight=None, **kwargs):
         loss = dict()

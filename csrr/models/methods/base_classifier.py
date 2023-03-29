@@ -6,8 +6,8 @@ from ...common.utils import outs2result
 @METHODS.register_module()
 class BaseClassifier(BaseDNN):
 
-    def __init__(self, backbone, classifier_head, vis_fea=False, method_name=None):
-        super(BaseClassifier, self).__init__()
+    def __init__(self, backbone, classifier_head, vis_fea=False, method_name=None, init_cfg=None):
+        super(BaseClassifier, self).__init__(init_cfg)
         self.backbone = build_backbone(backbone)
         self.classifier_head = build_head(classifier_head)
         self.vis_fea = vis_fea
@@ -16,33 +16,18 @@ class BaseClassifier(BaseDNN):
         else:
             self.method_name = method_name
 
-        # init weights
-        self.init_weights()
-
-    def init_weights(self, pre_trained=None):
-        """Initialize the weights in method.
-
-        Args:
-            pre_trained (str, optional): Path to pre-trained weights.
-                Defaults to None.
-        """
-        super(BaseClassifier, self).init_weights(pre_trained)
-        self.backbone.init_weights(pre_trained=pre_trained)
-
-        self.classifier_head.init_weights()
-
     def extract_feat(self, inputs):
         """Directly extract features from the backbone."""
         x = self.backbone(**inputs)
         return x
 
-    def forward_train(self, inputs, input_metas, targets, **kwargs):
+    def forward_train(self, inputs, targets, **kwargs):
         x = self.extract_feat(inputs)
         losses = self.classifier_head.forward_train(x, targets, **kwargs)
 
         return losses
 
-    def simple_test(self, inputs, input_metas, **kwargs):
+    def forward_test(self, inputs, **kwargs):
         x = self.extract_feat(inputs)
         outs = self.classifier_head(x, self.vis_fea, True)
 

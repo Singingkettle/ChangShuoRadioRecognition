@@ -34,11 +34,15 @@ class TextLoggerHook(LoggerHook):
                  interval=10,
                  ignore_last=True,
                  reset_flag=False,
+                 skip_tag=None,
                  interval_exp_name=1000):
         super(TextLoggerHook, self).__init__(interval, ignore_last, reset_flag,
                                              by_epoch)
+        if skip_tag is None:
+            skip_tag = ['FeaDistribution']
         self.by_epoch = by_epoch
         self.time_sec_tot = 0
+        self.skip_tag = skip_tag
         self.interval_exp_name = interval_exp_name
 
     def before_run(self, runner):
@@ -107,9 +111,8 @@ class TextLoggerHook(LoggerHook):
 
         log_items = []
         for name, val in log_dict.items():
-            # TODO: resolve this hack
             # these items have been in log_str
-            if 'figure' in name:
+            if name in self.skip_tag:
                 continue
             if name in [
                 'mode', 'Epoch', 'iter', 'lr', 'time', 'data_time',
@@ -127,7 +130,7 @@ class TextLoggerHook(LoggerHook):
         # dump log in json format
         json_log = OrderedDict()
         for k, v in log_dict.items():
-            if 'figure' in k:
+            if k in self.skip_tag:
                 continue
             json_log[k] = self._round_float(v)
         # only append log at last line

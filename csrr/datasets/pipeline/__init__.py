@@ -1,12 +1,15 @@
 from .compose import Compose
-from .features import LoadCumulants
+from .features import Cumulants
 from .formatting import Collect
 from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       LoadAPFromCache, LoadIQFromCache, LoadConstellationFromCache,
                       LoadAPFromHDF5, LoadIQFromHDF5,
                       LoadConstellationFromIQFile, LoadConstellationFromIQCache,
-                      LoadFTFromIQ,
+                      LoadFFTromIQ,
+                      LoadAPFromIQ,
+                      LoadDerivativeFromIQ,
                       LoadAnnotations,
+                      LoadSNRs,
                       MLDNNSNRLabel)
 from .train import RebaseModLabelBySNR, SigmoidLossWeight, ASSMaskWeight
 from .transform import (ChannelMode, NormalizeAP, NormalizeIQ,
@@ -14,7 +17,7 @@ from .transform import (ChannelMode, NormalizeAP, NormalizeIQ,
 
 __all__ = [
     'Compose',
-    'LoadCumulants',
+    'Cumulants',
     'Collect',
     'LoadAPFromFile',
     'LoadIQFromFile',
@@ -27,7 +30,9 @@ __all__ = [
     'LoadConstellationFromIQFile',
     'LoadConstellationFromIQCache',
     'LoadAPFromIQ',
-    'LoadFTFromIQ',
+    'LoadFFTromIQ',
+    'LoadDerivativeFromIQ',
+    'LoadSNRs',
     'LoadAnnotations',
     'MLDNNSNRLabel',
     'ChannelMode',

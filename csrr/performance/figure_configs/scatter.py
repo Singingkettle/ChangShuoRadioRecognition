@@ -1,20 +1,13 @@
 import random
 
+from .configs import _MARKERS, _COLORS
+
 
 class ScatterConfig:
     def __init__(self, labels):
-        self.colors = [
-            'black', 'red', 'saddlebrown', 'orange', 'green', 'darkslategray',
-            'dodgerblue', 'blue', 'purple', 'pink', 'cyan', 'brown', 'olive', 'springgreen',
-            'indigo', 'deeppink', 'navy', 'sienna', 'yellow', 'gray', 'darkgreen', 'mediumslateblue',
-            'cornflowerblue', 'darkolivegreen', 'steelblue', 'darkviolet', 'darkgoldenrod', 'cadetblue'
-        ]
+        self.colors = _COLORS
         random.Random(3).shuffle(self.colors)
-        self.markers = [
-                           '.', 'o', 'v', '^', '<', '>',
-                           '1', '2', '3', '4', '8', 'P', 'p',
-                           '*', 'h', 'H', '+', 'x', 'X', 's', 'd'
-                       ] * len(labels)
+        self.markers = _MARKERS * len(labels)
 
         self.scatter_config = dict()
         label_index = 0

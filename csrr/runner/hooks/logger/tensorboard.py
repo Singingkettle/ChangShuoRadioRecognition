@@ -1,7 +1,6 @@
 # Copyright (c) Open-MMLab. All rights reserved.
 import os.path as osp
 
-import matplotlib.pyplot as plt
 import torch
 
 from .base import LoggerHook
@@ -60,14 +59,8 @@ class TensorboardLoggerHook(LoggerHook):
         tags = self.get_loggable_tags(runner, allow_text=True)
         tags = flatten_dict(tags)
         for tag, val in tags.items():
-            if 'figure' in tag:
-                fig_number = val.number
-                if plt.fignum_exists(fig_number):
-                    self.writer.add_figure(tag, val, self.get_step(runner))
-                    plt.close(fig_number)
-                else:
-                    raise ValueError(
-                        'The figure of confusion matrix {} is wrong. Please the code'.format(tag))
+            if 'FeaDistribution' in tag:
+                self.writer.add_image(tag, val, self.get_step(runner))
             elif isinstance(val, str):
                 self.writer.add_text(tag, val, self.get_step(runner))
             else:

@@ -32,10 +32,12 @@ class DecisionTree:
             self.save_model()
             return True
         elif self.mode == 'test':
-            label = []
+            inputs = []
             for item in tqdm(data):
                 item = np.reshape(item, (1, -1))
-                label.append({'Final': self.tree.predict(item)})
-            return label
+                inputs.append(item)
+            inputs = np.concatenate(inputs, axis=0)
+            pres = self.tree.predict_proba(inputs)
+            return pres
         else:
             return None

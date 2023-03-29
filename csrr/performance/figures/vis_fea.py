@@ -14,10 +14,12 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
-from tsnecuda import TSNE
 
-from .utils import load_annotation
-from ..builder import VISFEATURES
+try:
+    from tsnecuda import TSNE
+except ImportError:
+    from sklearn.manifold import TSNE
+from ..builder import FIGURES
 from ...common.utils import glob
 
 
@@ -58,7 +60,7 @@ def plot_fea_distribution(fea, label_names, scatter_config, save_path, fig_size=
     plt.close(fig)
 
 
-@VISFEATURES.register_module()
+@FIGURES.register_module()
 class VisFea:
     def __init__(self, name, method, log_dir, scatter_config, tool='tsne'):
         self.name = name
@@ -113,16 +115,18 @@ class VisFea:
             print(e)
             raise ValueError('Something wrong with TSNE! Please check your input fea!')
 
-    def origin(self, x):
-        if x.shape[1] == 2:
-            return x
-        else:
-            raise ValueError('The origin fea must be a N*2 matrix!')
 
-    def plot(self, save_dir):
-        for fea in self.fea_dict:
-            save_path = os.path.join(save_dir, fea + '_' + self.name)
-            plot_fea_distribution(self.fea_dict[fea], self.label_names, self.scatter_config, save_path=save_path)
+def origin(self, x):
+    if x.shape[1] == 2:
+        return x
+    else:
+        raise ValueError('The origin fea must be a N*2 matrix!')
+
+
+def plot(self, save_dir):
+    for fea in self.fea_dict:
+        save_path = os.path.join(save_dir, fea + '_' + self.name)
+        plot_fea_distribution(self.fea_dict[fea], self.label_names, self.scatter_config, save_path=save_path)
 
 
 if __name__ == '__main__':

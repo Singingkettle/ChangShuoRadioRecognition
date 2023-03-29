@@ -4,7 +4,7 @@ from ..builder import PIPELINES
 
 
 @PIPELINES.register_module()
-class LoadCumulants:
+class Cumulants:
     def __init__(self):
         pass
 

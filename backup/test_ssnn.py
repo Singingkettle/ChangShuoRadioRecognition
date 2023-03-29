@@ -1,6 +1,7 @@
 import os
-import scipy.io as sio
+
 import numpy as np
+import scipy.io as sio
 
 file_prefixes = ['val']
 mod_labels = []

@@ -14,7 +14,7 @@ PIPELINES = Registry('pipeline')
 PREPROCESSES = Registry('preprocess')
 EVALUATES = Registry('evaluate')
 MERGES = Registry('merge')
-SAVES = Registry('save')
+FORMATS = Registry('format')
 
 
 def build(cfg, registry, default_args=None):
@@ -64,8 +64,8 @@ def build_evaluate(cfg, default_args=None):
     return evaluate
 
 
-def build_save(cfg, default_args=None):
-    save = build(cfg, SAVES, default_args)
+def build_format(cfg, default_args=None):
+    save = build(cfg, FORMATS, default_args)
 
     return save
 
@@ -102,7 +102,7 @@ def build_dataloader(dataset,
     rank, world_size = get_dist_info()
     if dist:
         # DistributedGroupSampler will definitely shuffle the data to satisfy
-        # that images on each GPU are in the same group
+        # that signals on each GPU are in the same group
         if shuffle:
             sampler = DistributedGroupSampler(dataset, samples_per_gpu,
                                               world_size, rank)

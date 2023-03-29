@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from .classification_head import ClassificationHead
 from .base_head import BaseHead
+from .classification_head import ClassificationHead
 from .mm_head import MMHead
 from ..builder import HEADS, build_loss, build_head
 

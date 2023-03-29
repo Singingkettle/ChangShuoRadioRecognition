@@ -146,9 +146,10 @@ def main():
     meta['exp_name'] = osp.basename(args.config)
 
     model = build_method(cfg.model)
+    model.init_weights()
 
     # log network structure
-    logger.info(f'Network Structure:\n{model}')
+    logger.info(f'Network Configures:\n{model}')
 
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:

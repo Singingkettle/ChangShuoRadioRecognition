@@ -11,8 +11,8 @@ from .hcgnet import (HCGNet, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
 from .mctnet import MCTNet
 from .mlnet import MLNet
 from .resnet import ResNet
-from .vggnet import VGGNet
 from .ssnet import SSNet
+from .vggnet import VGGNet
 
 __all__ = [
     'AlexNet',

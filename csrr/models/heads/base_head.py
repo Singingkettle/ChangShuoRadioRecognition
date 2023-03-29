@@ -1,13 +1,17 @@
 from abc import ABCMeta, abstractmethod
 
-import torch.nn as nn
+from ...runner import BaseModule
 
 
-class BaseHead(nn.Module, metaclass=ABCMeta):
+class BaseHead(BaseModule, metaclass=ABCMeta):
     """Base class for ClassifierHeads."""
 
-    def __init__(self):
-        super(BaseHead, self).__init__()
+    def __init__(self, init_cfg=None):
+        if init_cfg is None:
+            init_cfg = [
+                dict(type='Kaiming', layer='Linear', mode='fan_in', nonlinearity='relu'),
+            ]
+        super(BaseHead, self).__init__(init_cfg)
 
     @abstractmethod
     def loss(self, inputs, targets, **kwargs):

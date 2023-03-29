@@ -1,11 +1,10 @@
-import logging
 from typing import Type, Callable, Union, List, Optional
 
 import torch.nn as nn
 from torch import Tensor
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
@@ -127,7 +126,7 @@ class Bottleneck(nn.Module):
 
 
 @BACKBONES.register_module()
-class ResNet(nn.Module):
+class ResNet(BaseBackbone):
 
     def __init__(
             self,
@@ -137,9 +136,10 @@ class ResNet(nn.Module):
             groups: int = 1,
             width_per_group: int = 64,
             replace_stride_with_dilation: Optional[List[bool]] = None,
-            norm_layer: Optional[Callable[..., nn.Module]] = None
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
+            init_cfg: Optional[dict] = None
     ) -> None:
-        super(ResNet, self).__init__()
+        super(ResNet, self).__init__(init_cfg)
         # Default ResNet50
         if block is None:
             block = Bottleneck
@@ -174,28 +174,6 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-                elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
-                    nn.init.constant_(m.weight, 1)
-                    nn.init.constant_(m.bias, 0)
-
-            # Zero-initialize the last BN in each residual branch,
-            # so that the residual branch starts with zeros, and each residual block behaves like an identity.
-            # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
-            if self.zero_init_residual:
-                for m in self.modules():
-                    if isinstance(m, Bottleneck):
-                        nn.init.constant_(m.bn3.weight, 0)  # type: ignore[arg-type]
-                    elif isinstance(m, BasicBlock):
-                        nn.init.constant_(m.bn2.weight, 0)  # type: ignore[arg-type]
 
     def _make_layer(self, block: Type[Union[BasicBlock, Bottleneck]], planes: int, blocks: int,
                     stride: int = 1, dilate: bool = False) -> nn.Sequential:

@@ -2,12 +2,13 @@ import logging
 
 import torch.nn as nn
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
 from ...runner import load_checkpoint
 
 
 @BACKBONES.register_module()
-class AlexNet(nn.Module):
+class AlexNet(BaseBackbone):
 
     def __init__(self) -> None:
         super(AlexNet, self).__init__()
@@ -15,14 +16,14 @@ class AlexNet(nn.Module):
             nn.Conv2d(1, 64, kernel_size=(11, 11), stride=(4, 4), padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 192, kernel_size=(11, 11), padding=2),
+            nn.Conv2d(64, 192, kernel_size=(5, 5), padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(192, 384, kernel_size=(11, 11), padding=1),
+            nn.Conv2d(192, 384, kernel_size=(3, 3), padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=(11, 11), padding=1),
+            nn.Conv2d(384, 256, kernel_size=(3, 3), padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=(11, 11), padding=1),
+            nn.Conv2d(256, 256, kernel_size=(3, 3), padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
         )

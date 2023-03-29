@@ -25,7 +25,7 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+            dict(type='EvaluateFastMLDNN', target_name=target_name)
         ],
     ),
     test=dict(
@@ -38,10 +38,10 @@ data = dict(
         ],
         data_root=data_root,
         evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+            dict(type='EvaluateFastMLDNN', target_name=target_name)
         ],
-        save=[
-            dict(type='SaveModulationPrediction', )
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', )
         ],
     ),
 )

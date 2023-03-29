@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List, Callable, Any
 
 import torch
@@ -6,8 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
+from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 class Inception(nn.Module):
@@ -112,10 +111,10 @@ class BasicConv2d(nn.Module):
 
 
 @BACKBONES.register_module()
-class GoogleNet(nn.Module):
+class GoogleNet(BaseBackbone):
 
-    def __init__(self):
-        super(GoogleNet, self).__init__()
+    def __init__(self, init_cfg=None):
+        super(GoogleNet, self).__init__(init_cfg)
         blocks = [BasicConv2d, Inception]
         conv_block = blocks[0]
         inception_block = blocks[1]
@@ -140,23 +139,6 @@ class GoogleNet(nn.Module):
         self.inception5a = inception_block(832, 256, 160, 320, 32, 128, 128)
         self.inception5b = inception_block(832, 384, 192, 384, 48, 128, 128)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
-    def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                    import scipy.stats as stats
-                    X = stats.truncnorm(-2, 2, scale=0.01)
-                    values = torch.as_tensor(X.rvs(m.weight.numel()), dtype=m.weight.dtype)
-                    values = values.view(m.weight.size())
-                    with torch.no_grad():
-                        m.weight.copy_(values)
-                elif isinstance(m, nn.BatchNorm2d):
-                    nn.init.constant_(m.weight, 1)
-                    nn.init.constant_(m.bias, 0)
 
     def forward(self, cos):
         x = self.conv1(cos)

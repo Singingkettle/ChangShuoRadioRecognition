@@ -1,4 +1,4 @@
-from .builder import DATASETS, build_preprocess, build_evaluate, build_save
+from .builder import DATASETS, build_preprocess, build_evaluate, build_format
 from .custom import CustomDataset
 from ..common.fileio import load as IOLoad
 
@@ -35,7 +35,7 @@ class CSRRDataset(CustomDataset):
         if save is None:
             self.save = None
         else:
-            self.save = build_save(save)
+            self.save = build_format(save)
 
     def load_annotations(self, ann_file):
         data_infos = IOLoad(ann_file)
