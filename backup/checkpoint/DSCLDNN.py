@@ -82,7 +82,7 @@ from csrr.common.utils import Config
 from csrr.models import build_method
 from csrr.runner.checkpoint import weights_to_cpu, get_state_dict
 
-cfg = Config.fromfile('configs/dscldnn/dscldnn_iq-ap-deepsig201610A.py')
+cfg = Config.fromfile('configs/dscldnn/dscldnn_iq-data_ap-deepsig201610A.py')
 model = build_method(cfg.model)
 
 print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')

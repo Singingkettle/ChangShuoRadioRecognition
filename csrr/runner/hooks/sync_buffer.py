@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 from .hook import HOOKS, Hook
 from ..dist_utils import allreduce_params
 

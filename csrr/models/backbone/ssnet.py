@@ -62,7 +62,7 @@ class SSNet(nn.Module):
 
     def forward(self, iqs):
         N, S, W, L = iqs.shape
-        iqs = iqs.view(N*S, W, L)
+        iqs = iqs.view(N * S, W, L)
         x = self.block1(iqs)
         x = self.block2(x)
         x = self.block3(x)

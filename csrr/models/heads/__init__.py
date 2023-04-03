@@ -6,6 +6,7 @@ from .cosine_head import CosineHead
 from .dscldnn_head import DSCLDNNHead
 from .euclidean_head import EuclideanHead
 from .fast_mldnn_head import FastMLDNNHead
+from .fsdnn_head import FSDNNHead
 from .gb_head import GBBCEHead, GBIndHead, GBDetHead
 from .hcgdnn_head import HCGDNNHead
 from .mldnn_head import MergeAMCHead, MLDNNHead
@@ -13,6 +14,7 @@ from .mm_head import ASDHead, ASSHead
 from .sednn_head import SEDNNHead
 from .shrinkage_head import ShrinkageHead
 from .ss_head import SSHead
+from .ssrcnn_head import SSRCNNHead
 
 __all__ = [
     'BaseHead',
@@ -22,6 +24,7 @@ __all__ = [
     'CosineHead',
     'DSCLDNNHead',
     'FastMLDNNHead',
+    'FSDNNHead',
     'GBBCEHead', 'GBIndHead', 'GBDetHead',
     'HCGDNNHead',
     'MergeAMCHead',
@@ -31,5 +34,6 @@ __all__ = [
     'ASDHead',
     'ASSHead',
     'SSHead',
+    'SSRCNNHead',
     'EuclideanHead'
 ]

@@ -1,6 +1,6 @@
 _base_ = [
     './schedule.py',
-    '../_base_/default_runtime.py',
+    './default_runtime.py',
     './data_iq-ap-channel-deepsig201610A.py'
 ]
 
@@ -12,12 +12,20 @@ model = dict(
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
+        use_group=True,
+        dp=0,
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='/home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/fastmldnn_iq-ap-channel-deepsig201610A_v2/epoch_1391.pth',
+            prefix='backbone'
+        )
     ),
     classifier_head=dict(
-        type='AMCHead',
+        type='FastMLDNNHead',
         num_classes=11,
         in_size=in_size,
         out_size=out_size,
+        balance=0,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1
@@ -28,7 +36,7 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=3200)
+runner = dict(type='EpochBasedRunner', max_epochs=100)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.00044)
@@ -37,5 +45,5 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[800, 1200]
+    step=[40, 80]
 )

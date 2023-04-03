@@ -410,7 +410,7 @@ class PetrelBackend(BaseStorageBackend):
                     absolute_path = self.join_path(dir_path, path)
                     rel_path = absolute_path[len(root):]
                     if (suffix is None
-                            or rel_path.endswith(suffix)) and list_file:
+                        or rel_path.endswith(suffix)) and list_file:
                         yield rel_path
 
         return _list_dir_or_file(dir_path, list_dir, list_file, suffix,
@@ -696,7 +696,7 @@ class HardDiskBackend(BaseStorageBackend):
                 if not entry.name.startswith('.') and entry.is_file():
                     rel_path = osp.relpath(entry.path, root)
                     if (suffix is None
-                            or rel_path.endswith(suffix)) and list_file:
+                        or rel_path.endswith(suffix)) and list_file:
                         yield rel_path
                 elif osp.isdir(entry.path):
                     if list_dir:

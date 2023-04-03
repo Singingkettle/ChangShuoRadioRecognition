@@ -1,6 +1,7 @@
 from .binary_cross_entropy_loss import BinaryCrossEntropyLoss, binary_cross_entropy
 from .binary_focal_loss import BinaryFocalLoss
 from .center_loss import CenterLoss
+from .circle_loss import CircleLoss
 from .contrastive_loss import ContrastiveLoss
 from .cross_entropy_loss import CrossEntropyLoss, cross_entropy
 from .focal_loss import FocalLoss, sigmoid_focal_loss
@@ -23,4 +24,5 @@ __all__ = [
     'NLLLoss', 'nll',
     'ShrinkageLoss',
     'reduce_loss', 'weight_reduce_loss', 'weighted_loss',
+    'CircleLoss'
 ]

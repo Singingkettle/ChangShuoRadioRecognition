@@ -123,4 +123,3 @@ class BaseDNN(BaseModule, metaclass=ABCMeta):
             loss=loss, log_vars=log_vars, num_samples=len(data['input_metas']))
 
         return outputs
-

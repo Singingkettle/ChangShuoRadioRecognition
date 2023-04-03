@@ -1,6 +1,6 @@
 _base_ = [
     './schedule.py',
-    '../_base_/default_runtime.py',
+    './default_runtime.py',
     './data_iq-ap-channel-deepsig201610A.py'
 ]
 

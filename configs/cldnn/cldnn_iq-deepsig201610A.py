@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/datasets/deepsig/iq-deepsig201610A.py',
-    '../_base_/schedules/schedule.py',
+    './schedule.py',
     '../_base_/default_runtime.py'
 ]
 

@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 def list_from_file(file_name, prefix='', offset=0, max_num=0):
     """Load a text file and parse the content as a list of strings.
 

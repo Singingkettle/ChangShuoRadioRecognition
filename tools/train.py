@@ -112,7 +112,7 @@ def main():
         if cfg.resume_from is None and not cfg.auto_resume:
             redir_and_exist(cfg.work_dir)
 
-    # dump figure_configs
+    # dump configs
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
     # init the logger before other steps
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
@@ -146,7 +146,8 @@ def main():
     meta['exp_name'] = osp.basename(args.config)
 
     model = build_method(cfg.model)
-    model.init_weights()
+    if rank == 0:
+        model.init_weights()
 
     # log network structure
     logger.info(f'Network Configures:\n{model}')

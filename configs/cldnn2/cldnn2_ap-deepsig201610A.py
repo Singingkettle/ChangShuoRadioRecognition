@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/deepsig/ap-deepsig201610A.py',
+    './data_ap-deepsig201610A.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]

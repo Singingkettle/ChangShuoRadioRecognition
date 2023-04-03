@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/default_runtime.py',
+    './default_runtime.py',
     './data_iq-ap-channel-deepsig201801A.py'
 ]
 

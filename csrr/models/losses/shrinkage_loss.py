@@ -34,7 +34,7 @@ class ShrinkageLoss(nn.Module):
         """
         super(ShrinkageLoss, self).__init__()
         self.reduction = reduction
-        self.temperature_reciprocal = 1.0/temperature
+        self.temperature_reciprocal = 1.0 / temperature
         self.loss_weight = loss_weight
         if self.temperature_reciprocal >= 1:
             raise ValueError('The temperature of reciprocal should be < 1. '

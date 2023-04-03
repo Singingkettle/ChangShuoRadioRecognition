@@ -140,6 +140,19 @@ class GoogleNet(BaseBackbone):
         self.inception5b = inception_block(832, 384, 192, 384, 48, 128, 128)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                import scipy.stats as stats
+                X = stats.truncnorm(-2, 2, scale=0.01)
+                values = torch.as_tensor(X.rvs(m.weight.numel()), dtype=m.weight.dtype)
+                values = values.view(m.weight.size())
+                with torch.no_grad():
+                    m.weight.copy_(values)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
     def forward(self, cos):
         x = self.conv1(cos)
         x = self.maxpool1(x)

@@ -53,4 +53,3 @@ class EuclideanHead(BaseHead):
         else:
             pre = self.classifier(x)
             return pre
-

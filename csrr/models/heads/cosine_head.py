@@ -54,4 +54,3 @@ class CosineHead(BaseHead):
         else:
             pre = self.classifier(x)
             return pre
-

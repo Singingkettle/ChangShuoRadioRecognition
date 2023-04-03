@@ -8,7 +8,7 @@ from ..builder import PIPELINES
 @PIPELINES.register_module()
 class RebaseModLabelBySNR:
 
-    def __init__(self, alpha=0.1, beta=10, num_class=11):
+    def __init__(self, alpha=0.25, beta=1, num_class=11):
         self.alpha = alpha
         self.beta = beta
         self.num_class = num_class
@@ -17,9 +17,11 @@ class RebaseModLabelBySNR:
         snr = results['snr']
         gt = results['modulation']
         target = (1 - 1.0 / self.num_class) / (1 + math.exp(-self.alpha * (snr + self.beta))) + 1.0 / self.num_class
-        label = np.zeros(self.num_class, dtype=np.float32)
-        label[gt] = target
-        results['targets']['modulations'] = label
+        no_target = (1 - target) / (self.num_class - 1)
+        label = np.ones(self.num_class, dtype=np.float32) * no_target
+        label[gt] = 0
+        label[gt] = 1 - np.sum(label)
+        results['targets']['rl_modulations'] = label
         return results
 
     def __repr__(self):

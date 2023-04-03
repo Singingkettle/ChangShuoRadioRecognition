@@ -38,9 +38,14 @@ class DoctorHeDataset(Dataset):
             data_files = glob(osp.join(self.data_root, self.case, self.data_info), '.mat')
             for data_file in data_files:
                 data_key = osp.basename(data_file).split('.')[0]
-                data[data_key] = loadmat(osp.join(self.data_root, self.case, self.data_info))
+                data_key = data_key.split('_')
+                data_key = data_key[[idx for idx, s in enumerate(data_key) if 'dB' in s][0]]
+                data[data_key] = loadmat(data_file)
         else:
-            data[self.data_info.split('.')[0]] = loadmat(osp.join(self.data_root, self.case, self.data_info))
+            data_key = self.data_info.split('.')[0]
+            data_key = data_key.split('_')
+            data_key = data_key[[idx for idx, s in enumerate(data_key) if 'dB' in s][0]]
+            data[data_key] = loadmat(osp.join(self.data_root, self.case, self.data_info))
 
         keys = []
         for data_key in data:
@@ -55,15 +60,23 @@ class DoctorHeDataset(Dataset):
         x = dict()
         y = dict()
         for key in keys:
-            x[f'{key[0]}+{key[1]}'] = np.squeeze(data[key[0]][key[1]])
-            y[f'{key[0]}+{key[1]}'] = copy.deepcopy(label)
+            if 'train' in key[1]:
+                tmp = 'train'
+            elif 'valid' in key[1]:
+                tmp = 'valid'
+            elif '2tp' in key[1]:
+                tmp = '2tp'
+            else:
+                tmp = '5tp'
+            x[f'{tmp}/{key[0]}'] = np.squeeze(data[key[0]][key[1]])
+            y[f'{tmp}/{key[0]}'] = copy.deepcopy(label)
 
             start = len(self.look_table)
-            for i in range(x[f'{key[0]}+{key[1]}'].size):
-                item = dict(index=i, key=f'{key[0]}+{key[1]}')
+            for i in range(x[f'{tmp}/{key[0]}'].size):
+                item = dict(index=i, key=f'{tmp}/{key[0]}')
                 self.look_table.append(item)
-            end = start + x[f'{key[0]}+{key[1]}'].size
-            self.look_table_range[f'{key[0]}+{key[1]}'] = [start, end]
+            end = start + x[f'{tmp}/{key[0]}'].size
+            self.look_table_range[f'{tmp}/{key[0]}'] = [start, end]
 
         return x, y
 
@@ -142,4 +155,14 @@ class DoctorHeDataset(Dataset):
                 results[self.look_table_range[key][0]:self.look_table_range[key][1]], self.y[key], self.CLASSES)
             eval_results[f'{key}_ACC'] = performance_generator.ACC
 
+        acc_2tp = 0.0
+        acc_5tp = 0.0
+        for key in eval_results:
+            if '2tp' in key:
+                acc_2tp += eval_results[key]
+            else:
+                acc_5tp += eval_results[key]
+
+        eval_results['ACC_2tp'] = 0.5 * acc_2tp / len(eval_results)
+        eval_results['ACC_5tp'] = 0.5 * acc_5tp / len(eval_results)
         return eval_results

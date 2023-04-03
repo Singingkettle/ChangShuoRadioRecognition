@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/deepsig/iq-deepsig201610A.py',
+    '../_base_/datasets/ucsd/iq-ucsdrml22.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
@@ -17,10 +17,15 @@ model = dict(
         rnn_mode='GRU',
     ),
     classifier_head=dict(
-        type='FastMLDNNHead',
+        type='DSCLDNNHead',
+        num_classes=10,
         in_size=50,
-        out_size=256,
-        num_classes=11,
-        is_reg=False,
-    )
+        loss_cls=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1.0,
+        ),
+    ),
 )
+
+optimizer = dict(type='Adam', lr=0.0001)
+evaluation = dict(interval=1)

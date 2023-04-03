@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 from ...common.utils import Registry, is_method_overridden
 
 HOOKS = Registry('hook')

@@ -6,30 +6,34 @@ from .utils import weight_reduce_loss
 from ..builder import LOSSES
 
 
-def cross_entropy(pred,
-                  label,
-                  weight=None,
-                  reduction='mean',
-                  avg_factor=None,
-                  class_weight=None,
-                  **kwargs):
-    """Calculate the CrossEntropy loss.
+def circle_loss(x,
+                label,
+                m,
+                gama,
+                weight=None,
+                reduction='mean',
+                avg_factor=None,
+                **kwargs):
+    similarity_matrix = x @ x.T  # need gard here
+    label_matrix = label.unsqueeze(1) == label.unsqueeze(0)
+    negative_matrix = label_matrix.logical_not()
+    positive_matrix = label_matrix.fill_diagonal_(False)
 
-    Args:
-        pred (torch.Tensor): The prediction with shape (N, C), C is the number
-            of classes.
-        label (torch.Tensor): The learning label of the prediction.
-        weight (torch.Tensor, optional): Sample-wise loss weight.
-        reduction (str, optional): The method used to reduce the loss.
-        avg_factor (int, optional): Average factor that is used to average
-            the loss. Defaults to None.
-        class_weight (list[float], optional): The weight for each class.
+    sp = torch.where(positive_matrix, similarity_matrix, torch.zeros_like(similarity_matrix))
+    sn = torch.where(negative_matrix, similarity_matrix, torch.zeros_like(similarity_matrix))
 
-    Returns:
-        torch.Tensor: The calculated loss
-    """
-    # element-wise losses
-    loss = F.cross_entropy(pred, label, weight=class_weight, reduction='none')
+    ap = torch.clamp_min(1 + m - sp.detach(), min=0.)
+    an = torch.clamp_min(sn.detach() + m, min=0.)
+
+    dp = 1 - m
+    dn = m
+    logit_p = -gama * ap * (sp - dp)
+    logit_n = gama * an * (sn - dn)
+
+    logit_p = torch.where(positive_matrix, logit_p, torch.zeros_like(logit_p))
+    logit_n = torch.where(negative_matrix, logit_n, torch.zeros_like(logit_n))
+
+    loss = F.softplus(torch.logsumexp(logit_p, dim=1) + torch.logsumexp(logit_n, dim=1))
 
     # apply weights and do the reduction
     if weight is not None:
@@ -44,58 +48,34 @@ def cross_entropy(pred,
 class CircleLoss(nn.Module):
 
     def __init__(self,
+                 m=0.25,
+                 gama=10,
                  reduction='mean',
-                 class_weight=None,
                  loss_weight=1.0):
-        """CrossEntropyLoss.
-
-        Args:
-            Defaults to False.
-            reduction (str, optional): . Defaults to 'mean'.
-                Options are "none", "mean" and "sum".
-            class_weight (list[float], optional): Weight of each class.
-                Defaults to None.
-            loss_weight (float, optional): Weight of the loss. Defaults to 1.0.
-        """
         super(CircleLoss, self).__init__()
+        self.m = m
+        self.gama = gama
         self.reduction = reduction
         self.loss_weight = loss_weight
-        self.class_weight = class_weight
-        self.cls_criterion = cross_entropy
+        self.circle_criterion = circle_loss
 
     def forward(self,
-                cls_score,
+                x,
                 label,
                 weight=None,
                 avg_factor=None,
                 reduction_override=None,
                 **kwargs):
-        """Forward function.
-
-        Args:
-            cls_score (torch.Tensor): The prediction.
-            label (torch.Tensor): The learning label of the prediction.
-            weight (torch.Tensor, optional): Sample-wise loss weight.
-            avg_factor (int, optional): Average factor that is used to average
-                the loss. Defaults to None.
-            reduction_override (str, optional): The method used to reduce the loss.
-                Options are "none", "mean" and "sum".
-        Returns:
-            torch.Tensor: The calculated loss
-        """
         assert reduction_override in (None, 'none', 'mean', 'sum')
         reduction = (
             reduction_override if reduction_override else self.reduction)
-        if self.class_weight is not None:
-            class_weight = cls_score.new_tensor(self.class_weight)
-        else:
-            class_weight = None
-        loss_cls = self.loss_weight * self.cls_criterion(
-            cls_score,
+        loss_circle = self.loss_weight * self.circle_criterion(
+            x,
             label,
+            self.m,
+            self.gama,
             weight,
-            class_weight=class_weight,
             reduction=reduction,
             avg_factor=avg_factor,
             **kwargs)
-        return loss_cls
+        return loss_circle

@@ -19,6 +19,7 @@ from .pointdnn import PointDNN
 from .rescnn import ResCNN
 from .resnet import ResNet
 from .ssnn import SSNNTwoStage, SSNNSingleStage
+from .ssrcnn import SSRCNN
 from .svm import SVM
 from .vggnet import VGGNet
 
@@ -44,6 +45,7 @@ __all__ = [
     'ResNet',
     'BaseClassifier',
     'SSNNTwoStage', 'SSNNSingleStage',
+    'SSRCNN',
     'SVM',
     'VGGNet'
 ]

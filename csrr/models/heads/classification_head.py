@@ -53,4 +53,3 @@ class ClassificationHead(BaseHead):
         else:
             pre = self.classifier(x)
             return pre
-

@@ -91,6 +91,7 @@ class MMHead(nn.Module):
 
         self.main_name = main_name
         self.minor_name = minor_name
+
     def forward(self, x):
         x = torch.unsqueeze(x, dim=2)
         main_pre = self.main_classifier(x)
@@ -209,7 +210,7 @@ class CASHead(BaseHead):
                     m.weight, mode='fan_in', nonlinearity='relu')
                 nn.init.constant_(m.bias, 0)
 
-    def loss(self, x, channel_labels=None, mod_labels=None,  mask_weight=None):
+    def loss(self, x, channel_labels=None, mod_labels=None, mask_weight=None):
         losses = dict()
         mask_weight = mask_weight.view(-1)
         amc = torch.reshape(x['AMC'], [-1, self.amc_cls_num])

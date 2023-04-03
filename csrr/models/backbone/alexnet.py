@@ -1,10 +1,7 @@
-import logging
-
 import torch.nn as nn
 
 from .base import BaseBackbone
 from ..builder import BACKBONES
-from ...runner import load_checkpoint
 
 
 @BACKBONES.register_module()
@@ -30,13 +27,9 @@ class AlexNet(BaseBackbone):
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
     def init_weights(self, pre_trained=None):
-        if isinstance(pre_trained, str):
-            logger = logging.getLogger()
-            load_checkpoint(self, pre_trained, strict=False, logger=logger)
-        elif pre_trained is None:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d):
-                    nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
 
     def forward(self, cos):
         x = self.features(cos)
