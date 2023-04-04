@@ -87,7 +87,7 @@ def initialize(module: nn.Module, init_cfg: Union[Dict, List[dict]]) -> None:
     Args:
         module (``torch.nn.Module``): the module will be initialized.
         init_cfg (dict | list[dict]): initialization configuration dict to
-            define initializer. OpenMMLab has implemented 6 initializers
+            define initializer. CSRRLab has implemented 6 initializers
             including ``Constant``, ``Xavier``, ``Normal``, ``Uniform``,
             ``Kaiming``, and ``Pretrained``.
     Example:
@@ -119,7 +119,7 @@ def initialize(module: nn.Module, init_cfg: Union[Dict, List[dict]]) -> None:
         >>> initialize(model, init_cfg)
         >>> # Initialize weights of a sub-module with the specific part of
         >>> # a pretrained model by using "prefix".
-        >>> url = 'http://download.openmmlab.com/mmdetection/v2.0/retinanet/'\
+        >>> url = 'http://download.CSRRLab.com/mmdetection/v2.0/retinanet/'\
         >>>     'retinanet_r50_fpn_1x_coco/'\
         >>>     'retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth'
         >>> init_cfg = dict(type='Pretrained',

@@ -13,7 +13,7 @@ model = dict(
         type='FMLNet',
         input_size=in_size,
         use_group=True,
-        dp=0,
+        dp=0.05,
         init_cfg=dict(
             type='Pretrained',
             checkpoint='/home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/fastmldnn_iq-ap-channel-deepsig201610A_v2/epoch_1391.pth',
@@ -25,21 +25,21 @@ model = dict(
         num_classes=11,
         in_size=in_size,
         out_size=out_size,
-        balance=1.5,
+        balance=0.5,
         loss_cls=dict(
             type='CrossEntropyLoss',
             loss_weight=1
         ),
         init_cfg=[
-            dict(type='TruncNormal', layer='Linear', std=0.02, bias=0.),
+            dict(type='TruncNormal', layer='Linear', std=0.016, bias=0.),
         ],
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='EpochBasedRunner', max_epochs=300)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='Adam', lr=0.00044)
+optimizer = dict(type='Adam', lr=0.00010)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(

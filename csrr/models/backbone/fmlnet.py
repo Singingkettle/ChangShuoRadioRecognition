@@ -3,6 +3,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 
 from .base import BaseBackbone
 from ..builder import BACKBONES
@@ -13,29 +14,33 @@ from ...runner import Sequential
 class FMLNet(BaseBackbone):
 
     def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
-                 use_group=False, is_freeze=False):
+                 use_group=False, is_freeze=False, has_stride=False):
         super(FMLNet, self).__init__(init_cfg)
+        if has_stride:
+            stride = 2
+        else:
+            stride = 1
         if use_group:
             self.cnn = Sequential(
-                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2),
+                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=16),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=16, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=4),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=4, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
             )
         else:
             self.cnn = Sequential(
-                nn.Conv1d(depth, hidden_size, kernel_size=3),
+                nn.Conv1d(depth, hidden_size, kernel_size=3, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, hidden_size, kernel_size=3),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, input_size, kernel_size=3),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
             )
@@ -62,28 +67,21 @@ class FMLNet(BaseBackbone):
             self._freeze_layers()
 
 
-from torch.nn.parameter import Parameter
-
-
 @BACKBONES.register_module()
-class FMLNetV2(BaseBackbone):
+class FasterMLNet(BaseBackbone):
 
-    def __init__(self, depth=4, input_size=80, dp=0.2, init_cfg=None,
+    def __init__(self, depth=2, input_size=80, dp=0.2, init_cfg=None,
                  is_freeze=False, is_residual=False, device=None, dtype=None):
         factory_kwargs = {'device': device, 'dtype': dtype}
-        super(FMLNetV2, self).__init__(init_cfg)
-        self.cnn1 = Sequential(
-            nn.Conv1d(depth, input_size, kernel_size=3, groups=2, padding=1),
+        super(FasterMLNet, self).__init__(init_cfg)
+        self.cnn = Sequential(
+            nn.Conv1d(depth, 256, kernel_size=3, groups=2, padding=1),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-        )
-        self.cnn2 = Sequential(
-            nn.Conv1d(input_size, input_size, kernel_size=3, groups=16, padding=1),
+            nn.Conv1d(256, 256, kernel_size=3, groups=16, padding=1),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
-        )
-        self.cnn3 = Sequential(
-            nn.Conv1d(input_size, input_size, kernel_size=3, groups=4, padding=1),
+            nn.Conv1d(256, input_size, kernel_size=3, groups=4, padding=1),
             nn.ReLU(inplace=True),
             nn.Dropout(dp),
         )
@@ -110,12 +108,8 @@ class FMLNetV2(BaseBackbone):
             for param in m.parameters():
                 param.requires_grad = False
 
-    def forward(self, iqs, aps):
-        x = torch.concat([iqs, aps], dim=1)
-        fea1 = self.cnn1(x)
-        fea2 = self.cnn2(fea1)
-        fea3 = self.cnn3(fea2 + fea1)
-        fea = fea1 + fea2 + fea3
+    def forward(self, iqs):
+        fea = self.cnn(iqs)
         fea = fea.transpose(1, 2)
         fea = fea.transpose(0, 1)
 
@@ -141,6 +135,6 @@ class FMLNetV2(BaseBackbone):
         return torch.sum(fea.transpose(1, 0), dim=1)
 
     def train(self, mode=True):
-        super(FMLNetV2, self).train(mode)
+        super(FasterMLNet, self).train(mode)
         if self.is_freeze:
             self._freeze_layers()

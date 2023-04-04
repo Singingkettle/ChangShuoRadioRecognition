@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) CSRRLab. All rights reserved.
 import functools
 from collections import abc
 from inspect import getfullargspec

@@ -574,6 +574,21 @@ class LoadSNRs:
 
 
 @PIPELINES.register_module()
+class loadSSMatData:
+    def __init__(self, snrs=None, mods=None, bws=None, channels=None, is_cache=False):
+        self.snrs = snrs
+        self.mods = mods
+        self.bws = bws
+        self.channels = channels
+        self.is_cache = is_cache
+    def __call__(self, results):
+        file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
+        mat = np.load(file_path)
+
+
+
+
+@PIPELINES.register_module()
 class MLDNNSNRLabel:
     def __init__(self, snr_threshold=0):
         self.snr_threshold = snr_threshold

@@ -28,3 +28,6 @@ optimizer = dict(type='Adam', lr=0.00001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='fixed')
+evaluation = dict(interval=1)
+checkpoint_config = dict(interval=1)
+runner = dict(type='EpochBasedRunner', max_epochs=100)

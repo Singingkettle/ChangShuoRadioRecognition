@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) CSRRLab. All rights reserved.
 import torch
 
 

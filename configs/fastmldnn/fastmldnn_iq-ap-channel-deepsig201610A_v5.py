@@ -13,7 +13,7 @@ model = dict(
         type='FMLNet',
         input_size=in_size,
         use_group=True,
-        dp=0,
+        dp=0.06,
         init_cfg=dict(
             type='Pretrained',
             checkpoint='/home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/fastmldnn_iq-ap-channel-deepsig201610A_v2/epoch_1391.pth',
@@ -36,14 +36,14 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='EpochBasedRunner', max_epochs=300)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='Adam', lr=0.00044)
+optimizer = dict(type='Adam', lr=0.00010)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[100]
+    step=[40, 80]
 )

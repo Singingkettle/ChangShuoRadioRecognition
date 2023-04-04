@@ -42,7 +42,7 @@ class FastMLDNNHead(BaseHead):
     def loss(self, inputs, targets, weight=None, **kwargs):
         if self.balance > 0.0:
             p = sim_matrix(self.pre[1].weight, self.pre[1].weight) * self.balance
-            loss_reg = self.loss_cls(p, targets['modulations'].new_tensor(np.arange(inputs['pre'].shape[1])))
+            loss_reg = self.loss_cls(p, targets['modulations'].new_tensor(np.arange(inputs.shape[1])))
             loss_cls = self.loss_cls(inputs, targets['modulations'], weight=weight)
             return dict(loss_cls=loss_cls, loss_reg=loss_reg)
         else:

@@ -50,6 +50,8 @@ class DoctorHeDataset(Dataset):
         keys = []
         for data_key in data:
             for key in data[data_key]:
+                # if 'train' in key or 'valid' in key:
+                #     keys.append((data_key, key))
                 if self.test_mode:
                     if 'test' in key:
                         keys.append((data_key, key))
@@ -156,13 +158,19 @@ class DoctorHeDataset(Dataset):
             eval_results[f'{key}_ACC'] = performance_generator.ACC
 
         acc_2tp = 0.0
+        num_2tp = 0.0
         acc_5tp = 0.0
+        num_5tp = 0.0
         for key in eval_results:
             if '2tp' in key:
                 acc_2tp += eval_results[key]
+                num_2tp += 1
             else:
                 acc_5tp += eval_results[key]
+                num_5tp += 1
 
-        eval_results['ACC_2tp'] = 0.5 * acc_2tp / len(eval_results)
-        eval_results['ACC_5tp'] = 0.5 * acc_5tp / len(eval_results)
+        if num_2tp > 0.0:
+            eval_results['ACC_2tp'] = acc_2tp / num_2tp
+        if num_5tp > 0.0:
+            eval_results['ACC_5tp'] = acc_5tp / num_5tp
         return eval_results
