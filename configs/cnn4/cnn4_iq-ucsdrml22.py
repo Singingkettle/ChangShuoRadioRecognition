@@ -25,4 +25,5 @@ model = dict(
     ),
 )
 optimizer = dict(type='Adam', lr=0.0001)
+checkpoint_config = dict(interval=1)
 evaluation = dict(interval=1)

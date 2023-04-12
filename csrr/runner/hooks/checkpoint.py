@@ -93,9 +93,9 @@ class CheckpointHook(Hook):
         if self.by_epoch or not self.every_n_iters(runner, self.interval):
             return
 
-        runner.logger.info(
-            f'Saving checkpoint at {runner.iter + 1} iterations')
         if self.sync_buffer:
             allreduce_params(runner.model.buffers())
         if self.start is not None and runner.iter >= self.start:
             self._save_checkpoint(runner)
+            runner.logger.info(
+                f'Saving checkpoint at {runner.iter + 1} iterations')

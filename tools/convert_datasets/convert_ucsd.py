@@ -19,7 +19,7 @@ def build_deepsig_class(version, data_root, data_ratios):
 def parse_args():
     parser = argparse.ArgumentParser(description='Convert UCSD Dataset')
     parser.add_argument('--data_root', type=str,
-                        help='data root to deepsig data')
+                        help='data root to csrr data')
     args = parser.parse_args()
 
     return args

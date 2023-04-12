@@ -76,7 +76,8 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
             # cfg.gpus will be ignored if distributed
             len(cfg.gpu_id),
             dist=distributed,
-            seed=cfg.seed) for ds in dataset
+            seed=cfg.seed,
+            is_det=cfg.is_det) for ds in dataset
     ]
 
     # put model on gpus
@@ -141,10 +142,15 @@ def train_method(model, dataset, cfg, distributed=False, validate=False, timesta
             samples_per_gpu=cfg.data.samples_per_gpu,
             workers_per_gpu=4,
             dist=distributed,
-            shuffle=False)
+            shuffle=False,
+            is_det=cfg.is_det)
         eval_cfg = cfg.get('evaluation', {})
+        eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
         eval_hook = DistEvalHook if distributed else EvalHook
-        runner.register_hook(eval_hook(val_dataloader, **eval_cfg))
+        # In this PR (https://github.com/open-mmlab/mmcv/pull/1193), the
+        # priority of IterTimerHook has been modified from 'NORMAL' to 'LOW'.
+        runner.register_hook(
+            eval_hook(val_dataloader, **eval_cfg), priority='LOW')
 
     # user-defined hooks
     if cfg.get('custom_hooks', None):

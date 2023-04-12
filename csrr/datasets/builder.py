@@ -3,6 +3,7 @@ from functools import partial
 
 import numpy as np
 from torch.utils.data import DataLoader
+from mmengine.dataset import pseudo_collate
 
 from .samplers import GroupSampler, DistributedGroupSampler, DistributedSampler
 from ..common.parallel import collate
@@ -77,6 +78,7 @@ def build_dataloader(dataset,
                      dist=False,
                      shuffle=True,
                      seed=None,
+                     is_det=True,
                      **kwargs):
     """Build PyTorch DataLoader.
 
@@ -120,15 +122,26 @@ def build_dataloader(dataset,
         worker_init_fn, num_workers=num_workers, rank=rank,
         seed=seed) if seed is not None else None
 
-    data_loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        sampler=sampler,
-        num_workers=num_workers,
-        collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
-        pin_memory=False,
-        worker_init_fn=init_fn,
-        **kwargs)
+    if is_det:
+        data_loader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            sampler=sampler,
+            num_workers=num_workers,
+            collate_fn=partial(pseudo_collate, samples_per_gpu=samples_per_gpu),
+            pin_memory=False,
+            worker_init_fn=init_fn,
+            **kwargs)
+    else:
+        data_loader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            sampler=sampler,
+            num_workers=num_workers,
+            collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
+            pin_memory=False,
+            worker_init_fn=init_fn,
+            **kwargs)
 
     return data_loader
 

@@ -1,6 +1,7 @@
 from .alexnet import AlexNet
 from .base import BaseDNN
 from .base_classifier import BaseClassifier
+from .base_detector import BaseDetector
 from .cgdnn2 import CGDNN2
 from .cldnn import CLDNN
 from .cldnn2 import CLDNN2
@@ -26,6 +27,7 @@ from .vggnet import VGGNet
 __all__ = [
     'AlexNet',
     'BaseDNN',
+    'BaseDetector',
     'CGDNN2',
     'CLDNN',
     'CLDNN2',

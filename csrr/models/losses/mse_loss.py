@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .utils import weighted_loss
 from ..builder import LOSSES
+from .utils import weighted_loss
 
 
 @weighted_loss
@@ -22,11 +22,16 @@ class MSELoss(nn.Module):
     """
 
     def __init__(self, reduction='mean', loss_weight=1.0):
-        super(MSELoss, self).__init__()
+        super().__init__()
         self.reduction = reduction
         self.loss_weight = loss_weight
 
-    def forward(self, pred, target, weight=None, avg_factor=None):
+    def forward(self,
+                pred,
+                target,
+                weight=None,
+                avg_factor=None,
+                reduction_override=None):
         """Forward function of loss.
 
         Args:
@@ -36,14 +41,16 @@ class MSELoss(nn.Module):
                 prediction. Defaults to None.
             avg_factor (int, optional): Average factor that is used to average
                 the loss. Defaults to None.
+            reduction_override (str, optional): The reduction method used to
+                override the original reduction method of the loss.
+                Defaults to None.
 
         Returns:
             torch.Tensor: The calculated loss
         """
+        assert reduction_override in (None, 'none', 'mean', 'sum')
+        reduction = (
+            reduction_override if reduction_override else self.reduction)
         loss = self.loss_weight * mse_loss(
-            pred,
-            target,
-            weight,
-            reduction=self.reduction,
-            avg_factor=avg_factor)
+            pred, target, weight, reduction=reduction, avg_factor=avg_factor)
         return loss

@@ -1,7 +1,7 @@
 from scipy.io import loadmat
 import scipy.io as spio
 
-data = loadmat('/home/citybuster/Data/SignalProcessing/SignalRecognition/ChangShuo/SS2023/data/015000.mat')
+data = loadmat('/home/citybuster/Data/SignalProcessing/SignalRecognition/ChangShuo/CSRR2023/sequence_data/iq/015000.mat')
 def _check_keys(dict):
     '''
     checks if entries in dictionary are mat-objects. If yes

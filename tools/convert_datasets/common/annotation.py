@@ -14,7 +14,6 @@ def update_annotations(annotations, file_name, snr, modulation):
 
 
 def combine_two_annotations(annotations1, annotations2):
-    assert annotations1['filter_config'] == annotations2['filter_config']
     combine_annotation = copy.deepcopy(annotations1)
     update_list = ['annotations']
     for key_name in update_list:

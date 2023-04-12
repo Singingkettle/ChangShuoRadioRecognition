@@ -1,5 +1,4 @@
 import json
-import json
 import multiprocessing
 import os
 import os.path as osp

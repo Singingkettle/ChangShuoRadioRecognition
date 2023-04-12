@@ -60,7 +60,7 @@ class IterBasedRunner(BaseRunner):
         data_batch = next(data_loader)
         self.data_batch = data_batch
         self.call_hook('before_train_iter')
-        outputs = self.model.train_step(data_batch, self.optimizer, **kwargs)
+        outputs = self.model.train_step(data_batch,  **kwargs)
         if not isinstance(outputs, dict):
             raise TypeError('model.train_step() must return a dict')
         if 'log_vars' in outputs:

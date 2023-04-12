@@ -1,4 +1,4 @@
-from .classification_head import ClassificationHead
+from .classifier_head import ClassificationHead
 from ..builder import HEADS
 
 

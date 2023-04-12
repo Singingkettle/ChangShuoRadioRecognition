@@ -40,3 +40,12 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
             os.makedirs(constellation_dir)
         constellation_path = osp.join(constellation_dir, item['file_name'])
         np.save(constellation_path, constellation)
+
+
+def save_seq(item, sequence_data_dir):
+    # Save sequence data of In-phase/Quadrature
+    iq_dir = osp.join(sequence_data_dir, 'iq')
+    if not osp.isdir(iq_dir):
+        os.makedirs(iq_dir)
+    iq_path = osp.join(iq_dir, item['file_name'])
+    np.save(iq_path, item['data'])

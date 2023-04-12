@@ -5,6 +5,7 @@ from typing import Dict
 
 import h5py
 import numpy as np
+from scipy.io import loadmat
 
 from ..builder import PIPELINES
 
@@ -535,6 +536,30 @@ class LoadDerivativeFromIQ:
 
 
 @PIPELINES.register_module()
+class LoadIQofCSRR:
+    def __init__(self, is_cache=False, is_squeeze=False, to_float32=False, to_norm=False):
+        self.is_cache = is_cache
+        self.is_squeeze = is_squeeze
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
+
+    def __call__(self, results):
+        file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
+        x = loadmat(file_path)['signal_data']
+        iq = np.sum(x, axis=0)
+        if self.to_norm:
+            iq = normalize_data(iq)
+        if self.to_float32:
+            iq = iq.astype(np.float32)
+
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            iq = np.expand_dims(iq, axis=0)
+        results['inputs']['iqs'] = iq
+        return results
+
+
+@PIPELINES.register_module()
 class LoadAnnotations:
     def __init__(self, target_info: Dict[str, np.dtype]):
         self.target_info = target_info
@@ -565,27 +590,60 @@ class LoadAnnotations:
         return repr_str
 
 
+from mmengine.structures import InstanceData
+
+from mmdet.structures import DetDataSample
+from mmdet.structures.bbox import get_box_type
+import torch
+
+
+@PIPELINES.register_module()
+class LoadCSRRTrainAnnotations:
+    def __init__(self, amc_cfg=None):
+        self.amc_cfg = amc_cfg
+        self.bbox_type = 'hbox'
+
+    def __call__(self, results):
+        # overall bandwidth is: [-fs/2, fs/2]
+        sr = results['sample_rate']
+        sn = results['sample_num']
+
+        bboxes = []
+        for i in range(len(results['center_frequency'])):
+            x = (results['center_frequency'][i] + 0.5 * results['bandwidth'] + 0.5 * sr) / sr * sn
+            w = results['bandwidth'][i] / sr * sn
+            bboxes.append([x, 0, x + w, 1])
+        if self.amc_cfg is not None:
+            labels = results['targets']['modulations']
+        else:
+            labels = [1] * len(results['targets']['modulations'])
+
+        _, box_type_cls = get_box_type(self.box_type)
+        bboxes = box_type_cls(bboxes, dtype=torch.float32)
+        labels = np.array(labels, dtype=np.int64)
+
+        data_sample = DetDataSample()
+        instance_data = InstanceData()
+        ignore_instance_data = InstanceData()
+        data_sample.gt_instances = instance_data
+        data_sample.ignored_instances = ignore_instance_data
+
+        signal_metas = dict(img_id=0, img_path='', sample_num=sn, sample_rate=sr)
+        data_sample.set_metainfo(signal_metas)
+
+        instance_data['bboxes'] = bboxes
+        instance_data['labels'] = labels
+        results['targets']['data_samples'] = data_sample
+
+        return results
+
+
 @PIPELINES.register_module()
 class LoadSNRs:
     def __call__(self, results):
         results['snrs'] = results['snr']
 
         return results
-
-
-@PIPELINES.register_module()
-class loadSSMatData:
-    def __init__(self, snrs=None, mods=None, bws=None, channels=None, is_cache=False):
-        self.snrs = snrs
-        self.mods = mods
-        self.bws = bws
-        self.channels = channels
-        self.is_cache = is_cache
-    def __call__(self, results):
-        file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
-        mat = np.load(file_path)
-
-
 
 
 @PIPELINES.register_module()

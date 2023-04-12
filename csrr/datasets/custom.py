@@ -25,6 +25,14 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
         self.pipeline = pipeline
         self.data_root = data_root
         self.test_mode = test_mode
+
+        if self.data_root is not None:
+            if not osp.isabs(self.ann_file):
+                self.ann_file = osp.join(self.data_root, self.ann_file)
+
+        # load annotations
+        self.data_infos = self.load_annotations(self.ann_file)
+
         if preprocess is not None:
             preprocess = build_preprocess(preprocess)
             for process in preprocess:
@@ -39,13 +47,6 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             self.format = build_format(format)
         else:
             self.format = None
-
-        if self.data_root is not None:
-            if not osp.isabs(self.ann_file):
-                self.ann_file = osp.join(self.data_root, self.ann_file)
-
-        # load annotations
-        self.data_infos = self.load_annotations(self.ann_file)
 
         # set group flag for the sampler
         if not self.test_mode:

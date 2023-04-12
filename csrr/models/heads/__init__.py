@@ -1,8 +1,9 @@
 from .amc_head import AMCHead
 from .base_head import BaseHead
 from .center_head import CenterHead
-from .classification_head import ClassificationHead
+from .classifier_head import ClassificationHead
 from .cosine_head import CosineHead
+from .detector_head import SignalDetectionHead
 from .dscldnn_head import DSCLDNNHead
 from .euclidean_head import EuclideanHead
 from .fast_mldnn_head import FastMLDNNHead
@@ -22,6 +23,7 @@ __all__ = [
     'CenterHead',
     'ClassificationHead',
     'CosineHead',
+    'SignalDetectionHead',
     'DSCLDNNHead',
     'FastMLDNNHead',
     'FSDNNHead',

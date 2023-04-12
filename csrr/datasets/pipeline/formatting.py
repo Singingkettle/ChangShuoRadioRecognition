@@ -10,10 +10,12 @@ def recurrence_copy_dict(data, results, keys):
         for k, v in keys.items():
             data[k] = dict()
             return recurrence_copy_dict(data[k], results[k], v)
-    elif isinstance(keys, list):
+    elif isinstance(keys, list) or isinstance(keys, tuple):
         for k in keys:
             recurrence_copy_dict(data, results, k)
         return data
+    else:
+        raise TypeError(f'Unsupported keys type {type(keys)}')
 
 
 @PIPELINES.register_module()

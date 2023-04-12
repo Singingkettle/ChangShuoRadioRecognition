@@ -14,7 +14,7 @@ from ...runner import Sequential
 class FMLNet(BaseBackbone):
 
     def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
-                 use_group=False, is_freeze=False, has_stride=False):
+                 use_group=False, is_freeze=False, has_stride=False, groups=(16, 4)):
         super(FMLNet, self).__init__(init_cfg)
         if has_stride:
             stride = 2
@@ -25,10 +25,10 @@ class FMLNet(BaseBackbone):
                 nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2, stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=16, stride=stride),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
-                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=4, stride=stride),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=groups[1], stride=stride),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dp),
             )

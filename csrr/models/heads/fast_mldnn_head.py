@@ -11,7 +11,7 @@ from ...runner import Sequential
 @HEADS.register_module()
 class FastMLDNNHead(BaseHead):
     def __init__(self, num_classes, alpha=-0.0001, beta=1, in_size=10560,
-                 out_size=256, loss_cls=None, balance=0.0, init_cfg=None, is_shallow=False):
+                 out_size=256, loss_cls=None, balance=0.0, init_cfg=None, is_shallow=False, dp=0.5):
         super(FastMLDNNHead, self).__init__(init_cfg)
         if loss_cls is None:
             loss_cls = dict(
@@ -35,7 +35,7 @@ class FastMLDNNHead(BaseHead):
                 nn.ReLU(inplace=True),
             )
         self.pre = Sequential(
-            nn.Dropout(0.5),
+            nn.Dropout(dp),
             nn.Linear(self.out_size, self.num_classes),
         )
 

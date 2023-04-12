@@ -1,5 +1,5 @@
 from .alexnet import AlexNet
-from .cnnnet import CNNNet, ResCNN, DensCNN
+from .cnnnet import CNNNet, ResCNN, DensCNN, DetCNN
 from .cocnet import COCNetTiny
 from .crnet import CRNet
 from .ctnet import CTNet
@@ -20,7 +20,7 @@ __all__ = [
     'AlexNet',
     'CNNNet',
     'ResCNN',
-    'DensCNN',
+    'DensCNN', 'DetCNN',
     'COCNetTiny',
     'CRNet',
     'CTNet',

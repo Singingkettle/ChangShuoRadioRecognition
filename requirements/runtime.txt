@@ -21,3 +21,4 @@ timm
 einops
 lmdb
 mc.py
+pycocotools

@@ -13,3 +13,4 @@ auto_resume = None
 workflow = [('train', 1)]
 evaluation = dict(interval=1)
 dropout_alive = False
+is_det = False

@@ -1,7 +1,7 @@
 _base_ = [
     './schedule.py',
     './default_runtime.py',
-    './data_iq-data_ap-deepsig201610A.py'
+    './data_iq-ap-deepsig201610A.py'
 ]
 
 in_size = 100
