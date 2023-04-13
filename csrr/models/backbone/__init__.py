@@ -4,7 +4,7 @@ from .cocnet import COCNetTiny
 from .crnet import CRNet
 from .ctnet import CTNet
 from .dsclnet import DSCLNet
-from .fmlnet import FMLNet, FasterMLNet, FMLNetV2
+from .fmlnet import FMLNet, FasterMLNet, FMLNetV2, FMLNetV3
 from .fsnet import FSNet
 from .googlenet import GoogleNet
 from .hcgnet import (HCGNet, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
@@ -25,7 +25,7 @@ __all__ = [
     'CRNet',
     'CTNet',
     'DSCLNet',
-    'FMLNet', 'FasterMLNet', 'FMLNetV2',
+    'FMLNet', 'FasterMLNet', 'FMLNetV2', 'FMLNetV3',
     'FSNet',
     'GoogleNet',
     'HCGNet',

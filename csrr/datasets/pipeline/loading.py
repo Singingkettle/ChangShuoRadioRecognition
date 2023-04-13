@@ -610,13 +610,13 @@ class LoadCSRRTrainAnnotations:
 
         bboxes = []
         for i in range(len(results['center_frequency'])):
-            x = (results['center_frequency'][i] + 0.5 * results['bandwidth'] + 0.5 * sr) / sr * sn
+            x = (results['center_frequency'][i] + 0.5 * results['bandwidth'][i] + 0.5 * sr) / sr * sn
             w = results['bandwidth'][i] / sr * sn
             bboxes.append([x, 0, x + w, 1])
         if self.amc_cfg is not None:
-            labels = results['targets']['modulations']
+            labels = results['targets']['modulation']
         else:
-            labels = [1] * len(results['targets']['modulations'])
+            labels = [1] * len(results['targets']['modulation'])
 
         _, box_type_cls = get_box_type(self.box_type)
         bboxes = box_type_cls(bboxes, dtype=torch.float32)
