@@ -68,6 +68,81 @@ class FMLNet(BaseBackbone):
 
 
 @BACKBONES.register_module()
+class FMLNetV2(BaseBackbone):
+
+    def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
+                 use_group=False, is_freeze=False, has_stride=False, groups=(16, 4)):
+        super(FMLNetV2, self).__init__(init_cfg)
+        if has_stride:
+            stride = 2
+        else:
+            stride = 1
+        if use_group:
+            self.cnn1 = Sequential(
+                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2, stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp)
+            )
+            self.cnn2 = Sequential(
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp)
+            )
+            self.cnn3 = Sequential(
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=groups[1], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+            )
+        else:
+            self.cnn1 = Sequential(
+                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=2, stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp)
+            )
+            self.cnn2 = Sequential(
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp)
+            )
+            self.cnn3 = Sequential(
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=groups[1], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+            )
+
+        self.tnn = nn.TransformerEncoderLayer(input_size, 1, hidden_size, dropout=dp, batch_first=True)
+
+        self.is_freeze = is_freeze
+
+    def _freeze_layers(self):
+        for m in self.modules():
+            for param in m.parameters():
+                param.requires_grad = False
+
+    def forward(self, iqs, aps):
+        x = torch.concat([iqs, aps], dim=1)
+        c1 = self.cnn1(x)
+        c2 = self.cnn2(c1)
+        c3 = self.cnn3(c2)
+
+        f1 = torch.transpose(c1, 1, 2)
+        f2 = torch.transpose(c2, 1, 2)
+        f3 = torch.transpose(c3, 1, 2)
+        f4 = self.tnn(f3)
+
+        f1 = torch.sum(f1, dim=1)
+        f2 = torch.sum(f2, dim=1)
+        f3 = torch.sum(f3, dim=1)
+        f4 = torch.sum(f4, dim=1)
+        return (f1, f2, f3, f4)
+
+    def train(self, mode=True):
+        super(FMLNetV2, self).train(mode)
+        if self.is_freeze:
+            self._freeze_layers()
+
+
+@BACKBONES.register_module()
 class FasterMLNet(BaseBackbone):
 
     def __init__(self, depth=2, input_size=80, dp=0.2, init_cfg=None,

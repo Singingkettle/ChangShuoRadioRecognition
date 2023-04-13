@@ -6,7 +6,7 @@ from .cosine_head import CosineHead
 from .detector_head import SignalDetectionHead
 from .dscldnn_head import DSCLDNNHead
 from .euclidean_head import EuclideanHead
-from .fast_mldnn_head import FastMLDNNHead
+from .fast_mldnn_head import FastMLDNNHead, FastMLDNNHeadV2
 from .fsdnn_head import FSDNNHead
 from .gb_head import GBBCEHead, GBIndHead, GBDetHead
 from .hcgdnn_head import HCGDNNHead
@@ -25,7 +25,7 @@ __all__ = [
     'CosineHead',
     'SignalDetectionHead',
     'DSCLDNNHead',
-    'FastMLDNNHead',
+    'FastMLDNNHead', 'FastMLDNNHeadV2',
     'FSDNNHead',
     'GBBCEHead', 'GBIndHead', 'GBDetHead',
     'HCGDNNHead',

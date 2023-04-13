@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/datasets/ucsd/iq-ucsdrml22.py',
-    './schedule.py',
+    '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
