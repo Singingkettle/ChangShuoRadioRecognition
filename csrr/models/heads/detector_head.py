@@ -1,16 +1,14 @@
-import warnings
-from typing import List, Optional, Sequence, Tuple
-from typing import Union
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import warnings
 from mmdet.models.task_modules import AnchorGenerator, YOLOBBoxCoder
-from mmdet.models.utils import images_to_levels, multi_apply, filter_scores_and_topk
-from mmdet.utils import (InstanceList)
+from mmdet.models.utils import images_to_levels, multi_apply
 from mmengine.structures import InstanceData
 from torch import Tensor
 from torch.nn.modules.utils import _pair
+from typing import List, Optional, Tuple
+from typing import Union
 
 from .base_head import BaseHead
 from ..builder import HEADS, build_loss
