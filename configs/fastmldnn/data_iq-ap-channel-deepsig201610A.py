@@ -2,24 +2,19 @@ dataset_type = 'DeepSigDataset'
 data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 target_name = 'modulation'
 data = dict(
-    samples_per_gpu=1280,
+    samples_per_gpu=80,
     workers_per_gpu=0,
     train=dict(
-        type='RepeatDataset',
-        times=20,
-        dataset=dict(
-            type=dataset_type,
-            ann_file='train_and_validation.json',
-            pipeline=[
-                dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True,
-                     is_squeeze=True),
-                dict(type='LoadAPFromIQ', to_float32=True, is_squeeze=True),
-                dict(type='LoadSNRs'),
-                dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
-                dict(type='Collect', keys=['inputs', 'targets', 'snrs'])
-            ],
-            data_root=data_root,
-        )
+        type=dataset_type,
+        ann_file='train_and_validation.json',
+        pipeline=[
+            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True,
+                 is_squeeze=True),
+            dict(type='LoadAPFromIQ', to_float32=True, is_squeeze=True),
+            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
+            dict(type='Collect', keys=['inputs', 'targets', 'snrs'])
+        ],
+        data_root=data_root,
     ),
     val=dict(
         type=dataset_type,
