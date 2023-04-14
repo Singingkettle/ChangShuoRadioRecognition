@@ -1,7 +1,12 @@
+import copy
+import copy
+import warnings
+from typing import List, Union
+
 import numpy as np
 from torch.utils.data.dataset import ConcatDataset as _ConcatDataset
 
-from .builder import DATASETS
+from .builder import DATASETS, build_dataset
 from ..common import print_log
 
 
@@ -69,3 +74,47 @@ class ConcatDataset(_ConcatDataset):
                 total_eval_results.update({f'{dataset_idx}_{k}': v})
 
         return total_eval_results
+
+
+@DATASETS.register_module()
+class RepeatDataset:
+    """A wrapper of repeated dataset.
+
+    The length of repeated dataset will be `times` larger than the original
+    dataset. This is useful when the data loading time is long but the dataset
+    is small. Using RepeatDataset can reduce the data loading time between
+    epochs.
+
+    Note:
+        ``RepeatDataset`` should not inherit from ``BaseDataset`` since
+        ``get_subset`` and ``get_subset_`` could produce ambiguous meaning
+        sub-dataset which conflicts with original dataset. If you want to use
+        a sub-dataset of ``RepeatDataset``, you should set ``indices``
+        arguments for wrapped dataset which inherit from ``BaseDataset``.
+
+    Args:
+        dataset (BaseDataset or dict): The dataset to be repeated.
+        times (int): Repeat times.
+        lazy_init (bool): Whether to load annotation during
+            instantiation. Defaults to False.
+    """
+
+    def __init__(self,
+                 dataset,
+                 times: int):
+
+        self.times = times
+        self.dataset = build_dataset(dataset)
+        self.CLASSES = self.dataset.CLASSES
+        if hasattr(self.dataset, 'flag'):
+            flags = []
+            for i in range(self.times):
+                flags.append(self.dataset.flag)
+            self.flag = np.concatenate(flags)
+
+    def __len__(self):
+        return self.times * len(self.dataset)
+
+    def __getitem__(self, idx):
+        idx = idx % len(self.dataset)
+        return self.dataset[idx]

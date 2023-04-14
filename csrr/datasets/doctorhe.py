@@ -156,21 +156,35 @@ class DoctorHeDataset(Dataset):
             performance_generator = ClassificationMetricsForSingle(
                 results[self.look_table_range[key][0]:self.look_table_range[key][1]], self.y[key], self.CLASSES)
             eval_results[f'{key}_ACC'] = performance_generator.ACC
+            F1s = performance_generator.F1
+            for mod in F1s:
+                eval_results[f'{key}_F1_{mod}'] = F1s[mod]
+
 
         acc_2tp = 0.0
+        f1_2tp = 0.0
         num_2tp = 0.0
         acc_5tp = 0.0
+        f1_5tp = 0.0
         num_5tp = 0.0
         for key in eval_results:
             if '2tp' in key:
-                acc_2tp += eval_results[key]
+                if 'ACC' in key:
+                    acc_2tp += eval_results[key]
+                else:
+                    f1_2tp += eval_results[key]
                 num_2tp += 1
             else:
-                acc_5tp += eval_results[key]
+                if 'ACC' in key:
+                    acc_5tp += eval_results[key]
+                else:
+                    f1_5tp += eval_results[key]
                 num_5tp += 1
 
         if num_2tp > 0.0:
             eval_results['ACC_2tp'] = acc_2tp / num_2tp
+            eval_results['F1_2tp'] = f1_2tp / num_2tp
         if num_5tp > 0.0:
             eval_results['ACC_5tp'] = acc_5tp / num_5tp
+            eval_results['F1_5tp'] = f1_5tp / num_2tp
         return eval_results

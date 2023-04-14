@@ -3,7 +3,7 @@ from .builder import (PREPROCESSES, EVALUATES, DATASETS, FORMATS, build_preproce
 from .csrr import CSRRDataset
 from .csss import CSSSBCE, CSSSDetSingleStage, CSSSDetTwoStage, PureCSSS
 from .custom import CustomDataset
-from .dataset_wrappers import ConcatDataset
+from .dataset_wrappers import ConcatDataset, RepeatDataset
 from .deepsig import DeepSigDataset
 from .doctorhe import DoctorHeDataset
 from .evaluate import *
@@ -25,6 +25,7 @@ __all__ = [
     'build_format',
     'CustomDataset',
     'ConcatDataset',
+    'RepeatDataset',
     'DeepSigDataset',
     'DoctorHeDataset',
     'GBSenseBasic', 'GBSenseAdvanced',

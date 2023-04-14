@@ -1,7 +1,7 @@
 _base_ = [
     './schedule.py',
     './default_runtime.py',
-    './data_iq-ft-channel-deepsig201610A.py'
+    './data_iq-ap-channel-deepsig201610A.py'
 ]
 
 in_size = 100
@@ -10,13 +10,14 @@ num_classes = 11
 model = dict(
     type='FastMLDNN',
     backbone=dict(
-        type='FMLNetV3',
+        type='FMLNet',
         input_size=in_size,
+        use_group=True,
     ),
     classifier_head=dict(
-        type='FastMLDNNHeadV2',
+        type='AMCHead',
         num_classes=11,
-        levels=(256, 256, 100),
+        in_size=in_size,
         out_size=out_size,
         loss_cls=dict(
             type='CrossEntropyLoss',
@@ -28,7 +29,7 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=400)
+runner = dict(type='EpochBasedRunner', max_epochs=3200)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.00044)
@@ -37,5 +38,5 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[100, 300]
+    step=[800, 1200]
 )
