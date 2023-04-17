@@ -1,11 +1,13 @@
 # Copyright (c) cslab. All rights reserved.
 import copy
 import warnings
+import torch
+from typing import Dict, Optional, Tuple, Union
 from abc import ABCMeta
 from collections import defaultdict
 from logging import FileHandler
 from typing import Iterable, Optional
-
+from mmengine.model.base_model import BaseDataPreprocessor
 import torch.nn as nn
 
 from .dist_utils import master_only
@@ -161,6 +163,62 @@ class BaseModule(nn.Module, metaclass=ABCMeta):
                     f'\n{name} - {param.shape}: '
                     f"\n{self._params_init_info[param]['init_info']} \n ",
                     logger=logger_name)
+
+    def to(self, *args, **kwargs) -> nn.Module:
+        """Overrides this method to call :meth:`BaseDataPreprocessor.to`
+        additionally.
+
+        Returns:
+            nn.Module: The model itself.
+        """
+
+
+
+        device = torch._C._nn._parse_to(*args, **kwargs)[0]
+        if device is not None:
+            self._set_device(torch.device(device))
+        return super().to(*args, **kwargs)
+
+    def cuda(
+        self,
+        device: Optional[Union[int, str, torch.device]] = None,
+    ) -> nn.Module:
+        """Overrides this method to call :meth:`BaseDataPreprocessor.cuda`
+        additionally.
+
+        Returns:
+            nn.Module: The model itself.
+        """
+        if device is None or isinstance(device, int):
+            device = torch.device('cuda', index=device)
+        self._set_device(torch.device(device))
+        return super().cuda(device)
+
+    def cpu(self, *args, **kwargs) -> nn.Module:
+        """Overrides this method to call :meth:`BaseDataPreprocessor.cpu`
+        additionally.
+
+        Returns:
+            nn.Module: The model itself.
+        """
+        self._set_device(torch.device('cpu'))
+        return super().cpu()
+
+    def _set_device(self, device: torch.device) -> None:
+        """Recursively set device for `BaseDataPreprocessor` instance.
+
+        Args:
+            device (torch.device): the desired device of the parameters and
+                buffers in this module.
+        """
+
+        def apply_fn(module):
+            if not isinstance(module, BaseDataPreprocessor):
+                return
+            if device is not None:
+                module._device = device
+
+        self.apply(apply_fn)
 
     def __repr__(self):
         s = super().__repr__()

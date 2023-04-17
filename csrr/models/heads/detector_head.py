@@ -1,13 +1,14 @@
 import warnings
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Tuple
 from typing import Union
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from mmdet.models.task_modules import AnchorGenerator, YOLOBBoxCoder
-from mmdet.models.utils import images_to_levels, multi_apply, filter_scores_and_topk
-from mmdet.utils import (InstanceList)
+from mmdet.models.task_modules import GridAssigner, PseudoSampler
+from mmdet.models.utils import images_to_levels, multi_apply
+from mmdet.structures.bbox import BaseBoxes, HorizontalBoxes, get_box_tensor
 from mmengine.structures import InstanceData
 from torch import Tensor
 from torch.nn.modules.utils import _pair
@@ -16,7 +17,7 @@ from .base_head import BaseHead
 from ..builder import HEADS, build_loss
 
 
-class YOLOAnchorGenerator(AnchorGenerator):
+class SignalYOLOAnchorGenerator(AnchorGenerator):
     """Anchor generator for YOLO.
 
     Args:
@@ -31,7 +32,7 @@ class YOLOAnchorGenerator(AnchorGenerator):
                  base_sizes: List[List[Tuple[int, int]]],
                  use_box_type: bool = False) -> None:
         self.strides = [_pair(stride) for stride in strides]
-        self.centers = [(77.0, 0.5)]
+        self.centers = [(72.0, 0.5)]
         self.base_sizes = []
         num_anchor_per_level = len(base_sizes[0])
         for base_sizes_per_level in base_sizes:
@@ -95,10 +96,85 @@ class YOLOAnchorGenerator(AnchorGenerator):
         return base_anchors
 
 
+class SignalYOLOBBoxCoder(YOLOBBoxCoder):
+
+    def __init__(self, eps: float = 1e-6, **kwargs):
+        super().__init__(eps=eps, **kwargs)
+
+    def encode(self, bboxes: Union[Tensor, BaseBoxes],
+               gt_bboxes: Union[Tensor, BaseBoxes],
+               stride: Union[Tensor, int]) -> Tensor:
+        """Get box regression transformation deltas that can be used to
+        transform the ``bboxes`` into the ``gt_bboxes``.
+
+        Args:
+            bboxes (torch.Tensor or :obj:`BaseBoxes`): Source boxes,
+                e.g., anchors.
+            gt_bboxes (torch.Tensor or :obj:`BaseBoxes`): Target of the
+                transformation, e.g., ground-truth boxes.
+            stride (torch.Tensor | int): Stride of bboxes.
+
+        Returns:
+            torch.Tensor: Box transformation deltas
+        """
+        bboxes = get_box_tensor(bboxes)
+        gt_bboxes = get_box_tensor(gt_bboxes)
+        assert bboxes.size(0) == gt_bboxes.size(0)
+        assert bboxes.size(-1) == gt_bboxes.size(-1) == 4
+        x_center_gt = (gt_bboxes[..., 0] + gt_bboxes[..., 2]) * 0.5
+        # y_center_gt = (gt_bboxes[..., 1] + gt_bboxes[..., 3]) * 0.5
+        w_gt = gt_bboxes[..., 2] - gt_bboxes[..., 0]
+        h_gt = gt_bboxes[..., 3] - gt_bboxes[..., 1]
+        x_center = (bboxes[..., 0] + bboxes[..., 2]) * 0.5
+        # y_center = (bboxes[..., 1] + bboxes[..., 3]) * 0.5
+        w = bboxes[..., 2] - bboxes[..., 0]
+        # h = bboxes[..., 3] - bboxes[..., 1]
+        w_target = torch.log((w_gt / w).clamp(min=self.eps))
+        # h_target = torch.log((h_gt / h).clamp(min=self.eps))
+        x_center_target = ((x_center_gt - x_center) / stride + 0.5).clamp(
+            self.eps, 1 - self.eps)
+        # y_center_target = ((y_center_gt - y_center) / 1 + 0.5).clamp(
+        #     self.eps, 1 - self.eps)
+        # encoded_bboxes = torch.stack(
+        #     [x_center_target, y_center_target, w_target, h_target], dim=-1)
+        encoded_bboxes = torch.stack(
+            [x_center_target, w_target], dim=-1)
+        return encoded_bboxes
+
+    def decode(self, bboxes: Union[Tensor, BaseBoxes], pred_bboxes: Tensor,
+               stride: Union[Tensor, int]) -> Union[Tensor, BaseBoxes]:
+        """Apply transformation `pred_bboxes` to `boxes`.
+
+        Args:
+            boxes (torch.Tensor or :obj:`BaseBoxes`): Basic boxes,
+                e.g. anchors.
+            pred_bboxes (torch.Tensor): Encoded boxes with shape
+            stride (torch.Tensor | int): Strides of bboxes.
+
+        Returns:
+            Union[torch.Tensor, :obj:`BaseBoxes`]: Decoded boxes.
+        """
+        bboxes = get_box_tensor(bboxes)
+        assert pred_bboxes.size(-1) == bboxes.size(-1) == 4
+        xy_centers = (bboxes[..., :2] + bboxes[..., 2:]) * 0.5 + (
+                pred_bboxes[..., :2] - 0.5) * stride
+        whs = (bboxes[..., 2:] -
+               bboxes[..., :2]) * 0.5 * pred_bboxes[..., 2:].exp()
+        decoded_bboxes = torch.stack(
+            (xy_centers[..., 0] - whs[..., 0], xy_centers[..., 1] -
+             whs[..., 1], xy_centers[..., 0] + whs[..., 0],
+             xy_centers[..., 1] + whs[..., 1]),
+            dim=-1)
+
+        if self.use_box_type:
+            decoded_bboxes = HorizontalBoxes(decoded_bboxes)
+        return decoded_bboxes
+
+
 @HEADS.register_module()
 class SignalDetectionHead(BaseHead):
-    def __init__(self, num_anchors=3, in_size=256, feamap_strides=[16],
-                 loss_bw=None, loss_cf=None, loss_cls=None, init_cfg=None):
+    def __init__(self, num_anchors=2, in_size=256, featmap_strides=[16],
+                 loss_bw=None, loss_cf=None, loss_conf=None, init_cfg=None):
         super(SignalDetectionHead, self).__init__(init_cfg)
         if loss_bw is None:
             loss_bw = dict(
@@ -113,8 +189,8 @@ class SignalDetectionHead(BaseHead):
                 loss_weight=1.0,
                 reduction='sum'
             )
-        if loss_cls is None:
-            loss_cls = dict(
+        if loss_conf is None:
+            loss_conf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
                 loss_weight=1.0,
@@ -123,12 +199,14 @@ class SignalDetectionHead(BaseHead):
 
         self.loss_bw = build_loss(loss_bw)
         self.loss_cf = build_loss(loss_cf)
-        self.loss_cls = build_loss(loss_cls)
+        self.loss_conf = build_loss(loss_conf)
 
-        self.feamap_strides = feamap_strides
-        self.head = nn.Conv1d(in_size, num_anchors * 3, kernel_size=1)
-        self.bbox_coder = YOLOBBoxCoder()
-        self.prior_generator = YOLOAnchorGenerator(base_sizes=[[(121, 1), (93, 1)]], strides=[(16, 1)])
+        self.featmap_strides = featmap_strides
+        self.head = nn.Conv2d(in_size, num_anchors * 3, kernel_size=1)
+        self.bbox_coder = SignalYOLOBBoxCoder()
+        self.prior_generator = SignalYOLOAnchorGenerator(base_sizes=[[(121, 1), (93, 1)]], strides=[(16, 1)])
+        self.assigner = GridAssigner(pos_iou_thr=0.5, neg_iou_thr=0.5, min_pos_iou=0)
+        self.sampler = PseudoSampler()
 
     @property
     def num_levels(self) -> int:
@@ -142,87 +220,69 @@ class SignalDetectionHead(BaseHead):
 
         return 3
 
-    def loss(self, pred_maps, targets, input_metas=None, weight=None, **kwargs):
+    def loss(self, pred_maps, data_samples, input_metas=None, weight=None, **kwargs):
         num_signals = len(input_metas)
         device = pred_maps[0][0].device
 
         featmap_sizes = [
-            (pred_maps[i].shape[-1], 1) for i in range(self.num_levels)
+            pred_maps[i].shape[-2:] for i in range(self.num_levels)
         ]
 
         mlvl_anchors = self.prior_generator.grid_priors(
             featmap_sizes, device=pred_maps[0].device)
         anchor_list = [mlvl_anchors for _ in range(num_signals)]
 
+        batch_gt_instances = []
+        for data_sample in data_samples:
+            batch_gt_instances.append(data_sample.gt_instances)
+
         responsible_flag_list = []
         for id in range(num_signals):
             responsible_flag_list.append(
-                self.responsible_flags(featmap_sizes, targets['targets']['data_sample'].gt_instances[id].bboxes,
+                self.responsible_flags(featmap_sizes, batch_gt_instances[id].bboxes,
                                        device))
 
         target_maps_list, neg_maps_list = self.get_targets(
-            anchor_list, responsible_flag_list, targets['segments'], targets['labels'])
+            anchor_list, responsible_flag_list, batch_gt_instances)
 
-        losses_cls, losses_conf, losses_xy, losses_wh = multi_apply(
+        losses_conf, losses_x, losses_w = multi_apply(
             self.loss_by_feat_single, pred_maps, target_maps_list,
             neg_maps_list)
 
         return dict(
-            loss_cls=losses_cls,
             loss_conf=losses_conf,
-            loss_xy=losses_xy,
-            loss_wh=losses_wh)
+            loss_cf=losses_x,
+            loss_bw=losses_w)
 
     def loss_by_feat_single(self, pred_map: Tensor, target_map: Tensor,
                             neg_map: Tensor) -> tuple:
-        """Calculate the loss of a single scale level based on the features
-        extracted by the detection head.
-
-        Args:
-            pred_map (Tensor): Raw predictions for a single level.
-            target_map (Tensor): The Ground-Truth target for a single level.
-            neg_map (Tensor): The negative masks for a single level.
-
-        Returns:
-            tuple:
-                loss_cls (Tensor): Classification loss.
-                loss_conf (Tensor): Confidence loss.
-                loss_xy (Tensor): Regression loss of x, y coordinate.
-                loss_wh (Tensor): Regression loss of w, h coordinate.
-        """
-
         num_imgs = len(pred_map)
         pred_map = pred_map.permute(0, 2, 3,
                                     1).reshape(num_imgs, -1, self.num_attrib)
         neg_mask = neg_map.float()
-        pos_mask = target_map[..., 4]
+        pos_mask = target_map[..., 2]
         pos_and_neg_mask = neg_mask + pos_mask
-        pos_mask = pos_mask.unsqueeze(dim=-1)
         if torch.max(pos_and_neg_mask) > 1.:
             warnings.warn('There is overlap between pos and neg sample.')
             pos_and_neg_mask = pos_and_neg_mask.clamp(min=0., max=1.)
 
-        pred_xy = pred_map[..., :2]
-        pred_wh = pred_map[..., 2:4]
-        pred_conf = pred_map[..., 4]
-        pred_label = pred_map[..., 5:]
+        pred_cf = pred_map[..., 0]
+        pred_bw = pred_map[..., 1]
+        pred_conf = pred_map[..., 2]
 
-        target_xy = target_map[..., :2]
-        target_wh = target_map[..., 2:4]
-        target_conf = target_map[..., 4]
-        target_label = target_map[..., 5:]
+        target_cf = target_map[..., 0]
+        target_bw = target_map[..., 1]
+        target_conf = target_map[..., 2]
 
-        loss_cls = self.loss_cls(pred_label, target_label, weight=pos_mask)
-        loss_conf = self.loss_conf(
-            pred_conf, target_conf, weight=pos_and_neg_mask)
-        loss_xy = self.loss_xy(pred_xy, target_xy, weight=pos_mask)
-        loss_wh = self.loss_wh(pred_wh, target_wh, weight=pos_mask)
+        loss_conf = self.loss_conf(pred_conf, target_conf, weight=pos_and_neg_mask)
+        loss_x = self.loss_cf(pred_cf, target_cf, weight=pos_mask)
+        loss_w = self.loss_bw(pred_bw, target_bw, weight=pos_mask)
 
-        return loss_cls, loss_conf, loss_xy, loss_wh
+        return loss_conf, loss_x, loss_w
 
     def forward(self, x, vis_fea=False, is_test=False):
         pred_maps = self.head(x)
-        pred_maps = (pred_maps)
+        pred_maps = (pred_maps, )
         if is_test:
             pass
             # self.predict_by_feat(pred_maps)
@@ -377,7 +437,6 @@ class SignalDetectionHead(BaseHead):
                     shape (num_total_anchors,)
         """
         gt_bboxes = gt_instances.bboxes
-        gt_labels = gt_instances.labels
         anchor_strides = []
         for i in range(len(anchors)):
             anchor_strides.append(
@@ -399,20 +458,11 @@ class SignalDetectionHead(BaseHead):
         target_map = concat_anchors.new_zeros(
             concat_anchors.size(0), self.num_attrib)
 
-        target_map[sampling_result.pos_inds, :4] = self.bbox_coder.encode(
+        target_map[sampling_result.pos_inds, :2] = self.bbox_coder.encode(
             sampling_result.pos_priors, sampling_result.pos_gt_bboxes,
             anchor_strides[sampling_result.pos_inds])
 
-        target_map[sampling_result.pos_inds, 4] = 1
-
-        gt_labels_one_hot = F.one_hot(
-            gt_labels, num_classes=self.num_classes).float()
-        if self.one_hot_smoother != 0:  # label smooth
-            gt_labels_one_hot = gt_labels_one_hot * (
-                    1 - self.one_hot_smoother
-            ) + self.one_hot_smoother / self.num_classes
-        target_map[sampling_result.pos_inds, 5:] = gt_labels_one_hot[
-            sampling_result.pos_assigned_gt_inds]
+        target_map[sampling_result.pos_inds, 2] = 1
 
         neg_map = concat_anchors.new_zeros(
             concat_anchors.size(0), dtype=torch.uint8)
@@ -435,16 +485,19 @@ class SignalDetectionHead(BaseHead):
         """
         assert self.num_levels == len(featmap_sizes)
         multi_level_responsible_flags = []
+
         for i in range(self.num_levels):
             anchor_stride = self.prior_generator.strides[i]
             feat_h, feat_w = featmap_sizes[i]
-            gt_cx = ((gt_bboxes[:, 0] + gt_bboxes[:, 2]) * 0.5).to(device)
-            gt_cy = ((gt_bboxes[:, 1] + gt_bboxes[:, 3]) * 0.5).to(device)
+
+            gt_cx = ((gt_bboxes[:, 0] + gt_bboxes[:, 2]) * 0.5 - 72).to(device)
+            gt_cx = torch.clamp(gt_cx, min=0, max=1056)
+            gt_cy = ((gt_bboxes[:, 1] + gt_bboxes[:, 3]) * 0.5 - 0.5).to(device)
             gt_grid_x = torch.floor(gt_cx / anchor_stride[0]).long()
             gt_grid_y = torch.floor(gt_cy / anchor_stride[1]).long()
+
             # row major indexing
             gt_bboxes_grid_idx = gt_grid_y * feat_w + gt_grid_x
-
             responsible_grid = torch.zeros(
                 feat_h * feat_w, dtype=torch.uint8, device=device)
             responsible_grid[gt_bboxes_grid_idx] = 1
@@ -452,6 +505,6 @@ class SignalDetectionHead(BaseHead):
             responsible_grid = responsible_grid[:, None].expand(
                 responsible_grid.size(0),
                 self.prior_generator.num_base_priors[i]).contiguous().view(-1)
-
             multi_level_responsible_flags.append(responsible_grid)
+
         return multi_level_responsible_flags

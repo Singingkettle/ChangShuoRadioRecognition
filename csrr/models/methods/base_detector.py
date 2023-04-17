@@ -1,5 +1,32 @@
+import torch
+
 from .base import BaseDNN
 from ..builder import METHODS, build_backbone, build_head
+from mmdet.models.utils.misc import samplelist_boxtype2tensor
+from mmengine.model.base_model import BaseDataPreprocessor
+
+class DetDataPreprocessor(BaseDataPreprocessor):
+
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, data: dict, training: bool = False) -> dict:
+        """Perform normalization、padding and bgr2rgb conversion based on
+        ``BaseDataPreprocessor``.
+
+        Args:
+            data (dict): Data sampled from dataloader.
+            training (bool): Whether to enable training time augmentation.
+
+        Returns:
+            dict: Data in the same format as the model input.
+        """
+        data = super().forward(data=data, training=training)
+        inputs, data_samples = data['inputs'], data['data_samples']
+        inputs = torch.stack(inputs)
+        samplelist_boxtype2tensor(data_samples)
+
+        return {'inputs': inputs, 'data_samples': data_samples}
 
 
 @METHODS.register_module()
@@ -10,19 +37,22 @@ class BaseDetector(BaseDNN):
         self.backbone = build_backbone(backbone)
         self.detector_head = build_head(detector_head)
         self.test_cfg = test_cfg
+        self.data_preprocessor = DetDataPreprocessor()
         if method_name is None:
             raise ValueError('You should give a method name when using this method class!')
         else:
             self.method_name = method_name
 
-    def extract_feat(self, inputs):
+    def extract_feat(self, iqs):
         """Directly extract features from the backbone."""
-        x = self.backbone(**inputs)
+        x = self.backbone(iqs)
         return x
 
     def forward_train(self, inputs, targets, **kwargs):
-        x = self.extract_feat(inputs)
-        losses = self.detector_head.forward_train(x, targets, **kwargs)
+        data = dict(inputs=inputs['iqs'], data_samples=targets['data_samples'])
+        data = self.data_preprocessor(data)
+        x = self.extract_feat(data['inputs'])
+        losses = self.detector_head.forward_train(x, data['data_samples'], **kwargs)
 
         return losses
 

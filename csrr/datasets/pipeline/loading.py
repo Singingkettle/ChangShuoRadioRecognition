@@ -2,7 +2,7 @@ import os.path as osp
 import pickle
 import zlib
 from typing import Dict
-
+from mmcv.transforms import to_tensor
 import h5py
 import numpy as np
 from scipy.io import loadmat
@@ -537,24 +537,30 @@ class LoadDerivativeFromIQ:
 
 @PIPELINES.register_module()
 class LoadIQofCSRR:
-    def __init__(self, is_cache=False, is_squeeze=False, to_float32=False, to_norm=False):
-        self.is_cache = is_cache
+    def __init__(self, is_squeeze=False, to_float32=False, to_norm=False):
         self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
+        self._cache = dict()
 
     def __call__(self, results):
-        file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
-        x = loadmat(file_path)['signal_data']
-        iq = np.sum(x, axis=0)
-        if self.to_norm:
-            iq = normalize_data(iq)
-        if self.to_float32:
-            iq = iq.astype(np.float32)
+        if results['file_name'] in self._cache:
+            iq = self._cache[results['file_name']]
+        else:
+            file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
+            x = loadmat(file_path)['signal_data']
+            iq = np.sum(x, axis=0)
+            if self.to_norm:
+                iq = normalize_data(iq)
+            if self.to_float32:
+                iq = iq.astype(np.float32)
 
-        if not self.is_squeeze:
-            # make the iq as a three-dimensional tensor [1, 2, L]
-            iq = np.expand_dims(iq, axis=0)
+            if not self.is_squeeze:
+                # make the iq as a three-dimensional tensor [1, 2, L]
+                iq = np.expand_dims(iq, axis=0)
+            iq = np.ascontiguousarray(iq)
+
+        iq = to_tensor(iq).contiguous()
         results['inputs']['iqs'] = iq
         return results
 
@@ -610,29 +616,28 @@ class LoadCSRRTrainAnnotations:
 
         bboxes = []
         for i in range(len(results['center_frequency'])):
-            x = (results['center_frequency'][i] + 0.5 * results['bandwidth'][i] + 0.5 * sr) / sr * sn
+            x = (results['center_frequency'][i] / sr + 0.5) * sn
             w = results['bandwidth'][i] / sr * sn
-            bboxes.append([x, 0, x + w, 1])
+            bboxes.append([x, 0.5, w, 1])
         if self.amc_cfg is not None:
-            labels = results['targets']['modulation']
+            labels = results['modulation']
         else:
-            labels = [1] * len(results['targets']['modulation'])
+            labels = [1] * len(results['modulation'])
 
-        _, box_type_cls = get_box_type(self.box_type)
-        bboxes = box_type_cls(bboxes, dtype=torch.float32)
+        _, box_type_cls = get_box_type(self.bbox_type)
+        bboxes = box_type_cls(bboxes, dtype=torch.float32, in_mode='cxcywh')
         labels = np.array(labels, dtype=np.int64)
 
         data_sample = DetDataSample()
         instance_data = InstanceData()
         ignore_instance_data = InstanceData()
+        instance_data['bboxes'] = bboxes
+        instance_data['labels'] = to_tensor(labels)
+
         data_sample.gt_instances = instance_data
         data_sample.ignored_instances = ignore_instance_data
-
         signal_metas = dict(img_id=0, img_path='', sample_num=sn, sample_rate=sr)
         data_sample.set_metainfo(signal_metas)
-
-        instance_data['bboxes'] = bboxes
-        instance_data['labels'] = labels
         results['targets']['data_samples'] = data_sample
 
         return results

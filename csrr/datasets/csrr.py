@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 import tempfile
 import warnings
@@ -29,39 +30,39 @@ class CSRRDataset(CustomDataset):
         coco_style_dataset = dict(info='A CoCo style signal detection data', licenses='None',
                                   images=[], annotations=[], categories=[])
 
-        global_anno_id = 0
-        for id, item in enumerate(self.data_infos['annotations']):
-            signal = dict(license=4, file_name=item['file_name'], coco_url='',
-                          height=3, width=128, data_captured='', flickr_url='', id=id)
-            coco_style_dataset['images'].append(signal)
-            item_annotations = []
-            for anno_id in range(len(item['modulation'])):
-                anno = dict()
-                anno['iscrowd'] = 0
-                anno['image_id'] = id
-                anno['id'] = global_anno_id
-                if CLASSES is None:
-                    anno['category_id'] = 'signal'
-                else:
-                    anno['category_id'] = self.CLASSES.index(item['modulation'][anno_id])
-                x = item['center_frequency'][anno_id] + 0.5 * item['bandwidth'][anno_id] + \
-                    0.5 * self.data_infos['sample_rate']
-                w = item['bandwidth'][anno_id]
-                x = x / self.data_infos['sample_rate'] * self.data_infos['sample_num']
-                w = w / self.data_infos['sample_rate'] * self.data_infos['sample_num']
-                anno['bbox'] = [x, 0, w, 1]
-                anno['area'] = 1 * w
-                anno['segmentation'] = [[x, 0, x, 0+1, x + w, 0+1, x + w, 0]]
-                anno['snr'] = item['snr'][anno_id]
-                item_annotations.append(anno)
-                global_anno_id += 1
-            coco_style_dataset['annotations'].extend(item_annotations)
-        for mod in self.data_infos['modulations']:
-            coco_style_dataset['categories'].append(
-                dict(supercategory='signal', id=self.CLASSES.index(mod), name=mod))
-        tmp_dir = tempfile.TemporaryDirectory()
-        outfile_path = osp.join(tmp_dir.name, 'coco.json')
-        dump(coco_style_dataset, outfile_path)
+        outfile_path = osp.join(self.data_root, f'coco-{ann_file}')
+        if not os.path.isfile(outfile_path):
+            global_anno_id = 0
+            for id, item in enumerate(self.data_infos['annotations']):
+                signal = dict(license=4, file_name=item['file_name'], coco_url='',
+                              height=3, width=128, data_captured='', flickr_url='', id=id)
+                coco_style_dataset['images'].append(signal)
+                item_annotations = []
+                for anno_id in range(len(item['modulation'])):
+                    anno = dict()
+                    anno['iscrowd'] = 0
+                    anno['image_id'] = id
+                    anno['id'] = global_anno_id
+                    if CLASSES is None:
+                        anno['category_id'] = 'signal'
+                    else:
+                        anno['category_id'] = self.CLASSES.index(item['modulation'][anno_id])
+                    x = item['center_frequency'][anno_id] + 0.5 * item['bandwidth'][anno_id] + \
+                        0.5 * self.data_infos['sample_rate']
+                    w = item['bandwidth'][anno_id]
+                    x = x / self.data_infos['sample_rate'] * self.data_infos['sample_num']
+                    w = w / self.data_infos['sample_rate'] * self.data_infos['sample_num']
+                    anno['bbox'] = [x, 0, w, 1]
+                    anno['area'] = 1 * w
+                    anno['segmentation'] = [[x, 0, x, 0+1, x + w, 0+1, x + w, 0]]
+                    anno['snr'] = item['snr'][anno_id]
+                    item_annotations.append(anno)
+                    global_anno_id += 1
+                coco_style_dataset['annotations'].extend(item_annotations)
+            for mod in self.data_infos['modulations']:
+                coco_style_dataset['categories'].append(
+                    dict(supercategory='signal', id=self.CLASSES.index(mod), name=mod))
+            dump(coco_style_dataset, outfile_path)
 
         self._coco_api = COCO(outfile_path)
 

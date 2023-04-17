@@ -46,7 +46,7 @@ class Collect:
                 input_metas[key] = results[key]
             else:
                 input_metas[key] = 0
-        data['input_metas'] = DC(input_metas, cpu_only=True)
+        results['input_metas'] = DC(input_metas, cpu_only=True)
 
         data = recurrence_copy_dict(data, results, self.keys)
         return data
