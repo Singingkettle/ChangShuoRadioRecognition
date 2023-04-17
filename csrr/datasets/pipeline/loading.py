@@ -536,7 +536,7 @@ class LoadDerivativeFromIQ:
 
 
 @PIPELINES.register_module()
-class LoadIQofCSRR:
+class LoadFFTofCSRR:
     def __init__(self, is_squeeze=False, to_float32=False, to_norm=False):
         self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
@@ -550,6 +550,11 @@ class LoadIQofCSRR:
             file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
             x = loadmat(file_path)['signal_data']
             iq = np.sum(x, axis=0)
+            ft = np.fft.fft(iq)
+            ft = np.fft.fftshift(ft)
+            amplitude = np.abs(ft)
+            phase = np.angle(ft)
+            iq = np.vstack((amplitude, phase))
             if self.to_norm:
                 iq = normalize_data(iq)
             if self.to_float32:
