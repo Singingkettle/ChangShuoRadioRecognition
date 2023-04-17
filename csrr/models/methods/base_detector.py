@@ -58,7 +58,7 @@ class BaseDetector(BaseDNN):
 
     def forward_test(self, inputs, input_metas=None, **kwargs):
         x = self.extract_feat(inputs)
-        results = self.detector_head(x, True)
+        results = self.detector_head(x, True, input_metas=input_metas)
         return results
 
     def forward_dummy(self, inputs):

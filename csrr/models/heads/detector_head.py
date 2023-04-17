@@ -4,10 +4,10 @@ from typing import Union
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from mmcv.ops import batched_nms
 from mmdet.models.task_modules import AnchorGenerator, YOLOBBoxCoder
 from mmdet.models.task_modules import GridAssigner, PseudoSampler
-from mmdet.models.utils import images_to_levels, multi_apply
+from mmdet.models.utils import images_to_levels, multi_apply, filter_scores_and_topk
 from mmdet.structures.bbox import BaseBoxes, HorizontalBoxes, get_box_tensor
 from mmengine.structures import InstanceData
 from torch import Tensor
@@ -155,17 +155,16 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
             Union[torch.Tensor, :obj:`BaseBoxes`]: Decoded boxes.
         """
         bboxes = get_box_tensor(bboxes)
-        assert pred_bboxes.size(-1) == bboxes.size(-1) == 4
-        xy_centers = (bboxes[..., :2] + bboxes[..., 2:]) * 0.5 + (
-                pred_bboxes[..., :2] - 0.5) * stride
-        whs = (bboxes[..., 2:] -
-               bboxes[..., :2]) * 0.5 * pred_bboxes[..., 2:].exp()
+        x_centers = (bboxes[..., 0] + bboxes[..., 2]) * 0.5 + (
+                pred_bboxes[..., 0] - 0.5) * stride
+        ws = (bboxes[..., 2] - bboxes[..., 0]) * 0.5 * pred_bboxes[..., 1].exp()
         decoded_bboxes = torch.stack(
-            (xy_centers[..., 0] - whs[..., 0], xy_centers[..., 1] -
-             whs[..., 1], xy_centers[..., 0] + whs[..., 0],
-             xy_centers[..., 1] + whs[..., 1]),
+            (x_centers[..., 0] - ws[..., 0], x_centers[..., 0] - ws[..., 0], x_centers[..., 0] + ws[..., 0],
+             x_centers[..., 0] + ws[..., 0]),
             dim=-1)
 
+        decoded_bboxes[..., 1] = 0
+        decoded_bboxes[..., 3] = 1
         if self.use_box_type:
             decoded_bboxes = HorizontalBoxes(decoded_bboxes)
         return decoded_bboxes
@@ -173,7 +172,7 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
 
 @HEADS.register_module()
 class SignalDetectionHead(BaseHead):
-    def __init__(self, num_anchors=2, in_size=256, featmap_strides=[16],
+    def __init__(self, num_anchors=2, in_size=256, featmap_strides=[16], cfg=None,
                  loss_bw=None, loss_cf=None, loss_conf=None, init_cfg=None):
         super(SignalDetectionHead, self).__init__(init_cfg)
         if loss_bw is None:
@@ -193,10 +192,11 @@ class SignalDetectionHead(BaseHead):
             loss_conf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
-                loss_weight=1.0,
+                loss_weight=10,
                 reduction='sum'
             )
 
+        self.cfg = cfg
         self.loss_bw = build_loss(loss_bw)
         self.loss_cf = build_loss(loss_cf)
         self.loss_conf = build_loss(loss_conf)
@@ -280,103 +280,72 @@ class SignalDetectionHead(BaseHead):
 
         return loss_conf, loss_x, loss_w
 
-    def forward(self, x, vis_fea=False, is_test=False):
+    def forward(self, x, is_test=False, input_metas=None):
         pred_maps = self.head(x)
-        pred_maps = (pred_maps, )
+        pred_maps = (pred_maps,)
         if is_test:
-            pass
-            # self.predict_by_feat(pred_maps)
+            self.predict_by_feat(pred_maps, input_metas)
         else:
             return pred_maps
 
-    # def predict_by_feat(self,
-    #                     pred_maps: Sequence[Tensor]) -> InstanceList:
-    #     """Transform a batch of output features extracted from the head into
-    #     bbox results. It has been accelerated since PR #5991.
-    #
-    #     Args:
-    #         pred_maps (Sequence[Tensor]): Raw predictions for a batch of
-    #             images.
-    #         batch_img_metas (list[dict], Optional): Batch image meta info.
-    #             Defaults to None.
-    #         cfg (:obj:`ConfigDict` or dict, optional): Test / postprocessing
-    #             configuration, if None, test_cfg would be used.
-    #             Defaults to None.
-    #         rescale (bool): If True, return boxes in original image space.
-    #             Defaults to False.
-    #         with_nms (bool): If True, do nms before return boxes.
-    #             Defaults to True.
-    #
-    #     Returns:
-    #         list[:obj:`InstanceData`]: Object detection results of each image
-    #         after the post process. Each item usually contains following keys.
-    #
-    #         - scores (Tensor): Classification scores, has a shape
-    #           (num_instance, )
-    #         - labels (Tensor): Labels of bboxes, has a shape
-    #           (num_instances, ).
-    #         - bboxes (Tensor): Has a shape (num_instances, 4),
-    #           the last dimension 4 arrange as (x1, y1, x2, y2).
-    #     """
-    #     assert len(pred_maps) == self.num_levels
-    #     cfg = self.test_cfg if cfg is None else cfg
-    #     cfg = copy.deepcopy(cfg)
-    #
-    #     num_imgs = len(batch_img_metas)
-    #     featmap_sizes = [pred_map.shape[-2:] for pred_map in pred_maps]
-    #
-    #     mlvl_anchors = self.prior_generator.grid_priors(
-    #         featmap_sizes, device=pred_maps[0].device)
-    #     flatten_preds = []
-    #     flatten_strides = []
-    #     for pred, stride in zip(pred_maps, self.featmap_strides):
-    #         pred = pred.permute(0, 2, 3, 1).reshape(num_imgs, -1,
-    #                                                 self.num_attrib)
-    #         pred[..., :2].sigmoid_()
-    #         flatten_preds.append(pred)
-    #         flatten_strides.append(
-    #             pred.new_tensor(stride).expand(pred.size(1)))
-    #
-    #     flatten_preds = torch.cat(flatten_preds, dim=1)
-    #     flatten_bbox_preds = flatten_preds[..., :4]
-    #     flatten_objectness = flatten_preds[..., 4].sigmoid()
-    #     flatten_cls_scores = flatten_preds[..., 5:].sigmoid()
-    #     flatten_anchors = torch.cat(mlvl_anchors)
-    #     flatten_strides = torch.cat(flatten_strides)
-    #     flatten_bboxes = self.bbox_coder.decode(flatten_anchors,
-    #                                             flatten_bbox_preds,
-    #                                             flatten_strides.unsqueeze(-1))
-    #     results_list = []
-    #     for (bboxes, scores, objectness,
-    #          img_meta) in zip(flatten_bboxes, flatten_cls_scores,
-    #                           flatten_objectness, batch_img_metas):
-    #         # Filtering out all predictions with conf < conf_thr
-    #         conf_thr = cfg.get('conf_thr', -1)
-    #         if conf_thr > 0:
-    #             conf_inds = objectness >= conf_thr
-    #             bboxes = bboxes[conf_inds, :]
-    #             scores = scores[conf_inds, :]
-    #             objectness = objectness[conf_inds]
-    #
-    #         score_thr = cfg.get('score_thr', 0)
-    #         nms_pre = cfg.get('nms_pre', -1)
-    #         scores, labels, keep_idxs, _ = filter_scores_and_topk(
-    #             scores, score_thr, nms_pre)
-    #
-    #         results = InstanceData(
-    #             scores=scores,
-    #             labels=labels,
-    #             bboxes=bboxes[keep_idxs],
-    #             score_factors=objectness[keep_idxs],
-    #         )
-    #         results = self._bbox_post_process(
-    #             results=results,
-    #             cfg=cfg,
-    #             rescale=rescale,
-    #             with_nms=with_nms,
-    #             img_meta=img_meta)
-    #         results_list.append(results)
-    #     return results_list
+    def predict_by_feat(self, pred_maps, input_metas):
+
+        assert len(pred_maps) == self.num_levels
+
+        num_imgs = len(pred_maps[0])
+        featmap_sizes = [pred_map.shape[-2:] for pred_map in pred_maps]
+
+        mlvl_anchors = self.prior_generator.grid_priors(
+            featmap_sizes, device=pred_maps[0].device)
+        flatten_preds = []
+        flatten_strides = []
+        for pred, stride in zip(pred_maps, self.featmap_strides):
+            pred = pred.permute(0, 2, 3, 1).reshape(num_imgs, -1,
+                                                    self.num_attrib)
+            pred[..., 0].sigmoid_()
+            flatten_preds.append(pred)
+            flatten_strides.append(
+                pred.new_tensor(stride).expand(pred.size(1)))
+
+        flatten_preds = torch.cat(flatten_preds, dim=1)
+        flatten_bbox_preds = flatten_preds[..., :2]
+        flatten_objectness = flatten_preds[..., 2].sigmoid()
+        flatten_anchors = torch.cat(mlvl_anchors)
+        flatten_strides = torch.cat(flatten_strides)
+        flatten_bboxes = self.bbox_coder.decode(flatten_anchors,
+                                                flatten_bbox_preds,
+                                                flatten_strides.unsqueeze(-1))
+        results_list = []
+        for (bboxes, objectness, img_meta) in zip(flatten_bboxes, flatten_objectness, input_metas):
+            score_thr = self.cfg['score_thr']
+            nms_pre = self.cfg['nms_pre']
+            scores, labels, keep_idxs, _ = filter_scores_and_topk(objectness, score_thr, nms_pre)
+
+            results = InstanceData(
+                scores=scores,
+                labels=labels,
+                bboxes=bboxes[keep_idxs],
+                score_factors=objectness[keep_idxs],
+            )
+            results = self._bbox_post_process(results=results)
+            results_list.append(results)
+        return results_list
+
+    def _bbox_post_process(self,
+                           results: InstanceData,
+                           with_nms: bool = True) -> InstanceData:
+
+        # TODO: deal with `with_nms` and `nms_cfg=None` in test_cfg
+        if with_nms and results.bboxes.numel() > 0:
+            bboxes = get_box_tensor(results.bboxes)
+            det_bboxes, keep_idxs = batched_nms(bboxes, results.scores,
+                                                results.labels, self.cfg['nms'])
+            results = results[keep_idxs]
+            # some nms would reweight the score, such as softnms
+            results.scores = det_bboxes[:, -1]
+            results = results[:self.cfg['max_per_img']]
+
+        return results
 
     def get_targets(self, anchor_list: List[List[Tensor]],
                     responsible_flag_list: List[List[Tensor]],
