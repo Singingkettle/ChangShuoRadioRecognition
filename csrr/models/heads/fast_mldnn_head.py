@@ -4,33 +4,26 @@ import torch.nn as nn
 
 from .base_head import BaseHead
 from ..builder import HEADS, build_loss
-import torch.nn.functional as F
+from ...ops import sim_matrix
 from ...runner import Sequential
 
 
 @HEADS.register_module()
 class FastMLDNNHead(BaseHead):
-    def __init__(self, num_classes, alpha=-0.6, beta=1.1, in_size=10560,
-                 out_size=256, loss_cls=None, loss_se=None, init_cfg=None, is_shallow=False, dp=0.5):
+    def __init__(self, num_classes, in_size=10560,
+                 out_size=256, loss_cls=None, balance=0.5, init_cfg=None, is_shallow=False, dp=0.5):
         super(FastMLDNNHead, self).__init__(init_cfg)
         if loss_cls is None:
             loss_cls = dict(
                 type='CrossEntropyLoss',
                 weight=1
             )
-        if loss_se is None:
-            loss_se = dict(
-                type='CrossEntropyLoss',
-                weight=0.1
-            )
 
         self.num_classes = num_classes
-        self.alpha = alpha
-        self.beta = beta
         self.in_size = in_size
         self.out_size = out_size
         self.loss_cls = build_loss(loss_cls)
-        self.loss_se = build_loss(loss_se)
+        self.balance = balance
         if is_shallow:
             self.fea = nn.Identity()
         else:
@@ -45,12 +38,10 @@ class FastMLDNNHead(BaseHead):
 
     def loss(self, inputs, targets, weight=None, **kwargs):
 
+        p = sim_matrix(self.pre[1].weight, self.pre[1].weight) * self.balance
+        loss_reg = self.loss_cls(p, targets['modulations'].new_tensor(np.arange(inputs.shape[1])))
         loss_cls = self.loss_cls(inputs, targets['modulations'], weight=weight)
-
-        mask = F.one_hot(targets['modulations'], num_classes=inputs.shape[1])
-        inputs = self.beta + (self.alpha - self.beta) * mask + inputs
-        loss_se = self.loss_se(inputs, targets['modulations'], weight=weight)
-        return dict(loss_cls=loss_cls, loss_se=loss_se)
+        return dict(loss_cls=loss_cls, loss_reg=loss_reg)
 
     def forward(self, x, vis_fea=False, is_test=False):
         x = x.reshape(-1, self.in_size)
