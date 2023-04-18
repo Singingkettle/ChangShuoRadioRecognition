@@ -160,7 +160,6 @@ class DoctorHeDataset(Dataset):
             for mod in F1s:
                 eval_results[f'{key}_F1_{mod}'] = F1s[mod]
 
-
         acc_2tp = 0.0
         f1_2tp = 0.0
         num_2tp = 0.0

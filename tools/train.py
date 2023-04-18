@@ -106,11 +106,6 @@ def main():
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))
 
-    # If not reuse from history checkpoint and there
-    # are history checkpoint files, then remove the whole work_dir
-    if rank == 0:
-        if cfg.resume_from is None and not cfg.auto_resume:
-            redir_and_exist(cfg.work_dir)
 
     # dump configs
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))

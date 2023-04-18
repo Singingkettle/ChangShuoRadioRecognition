@@ -69,7 +69,7 @@ def cast_tensor_type(inputs, src_type: torch.dtype, dst_type: torch.dtype):
 def auto_fp16(
         apply_to: Optional[Iterable] = None,
         out_fp32: bool = False,
-        supported_types: tuple = (nn.Module, ),
+        supported_types: tuple = (nn.Module,),
 ) -> Callable:
     """Decorator to enable fp16 training automatically.
 
@@ -349,7 +349,7 @@ class LossScaler:
     """
 
     def __init__(self,
-                 init_scale: float = 2**32,
+                 init_scale: float = 2 ** 32,
                  mode: str = 'dynamic',
                  scale_factor: float = 2.,
                  scale_window: int = 1000):

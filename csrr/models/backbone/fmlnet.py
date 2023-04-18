@@ -62,6 +62,3 @@ class FMLNet(BaseBackbone):
         super(FMLNet, self).train(mode)
         if self.is_freeze:
             self._freeze_layers()
-
-
-

@@ -20,7 +20,8 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
 
     """
 
-    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None, format=None):
+    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None,
+                 format=None):
         self.ann_file = ann_file
         self.pipeline = pipeline
         self.data_root = data_root

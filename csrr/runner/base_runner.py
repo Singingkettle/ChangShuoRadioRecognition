@@ -344,11 +344,11 @@ class BaseRunner(metaclass=ABCMeta):
         return '\n'.join(stage_hook_infos)
 
     def load_checkpoint(
-        self,
-        filename: str,
-        map_location: Union[str, Callable] = 'cpu',
-        strict: bool = False,
-        revise_keys: List = [(r'^module.', '')],
+            self,
+            filename: str,
+            map_location: Union[str, Callable] = 'cpu',
+            strict: bool = False,
+            revise_keys: List = [(r'^module.', '')],
     ) -> Union[Dict, OrderedDict]:
         return load_checkpoint(
             self.model,
@@ -488,8 +488,8 @@ class BaseRunner(metaclass=ABCMeta):
             self.register_hook(logger_hook, priority='VERY_LOW')
 
     def register_timer_hook(
-        self,
-        timer_config: Union[Dict, Hook, None],
+            self,
+            timer_config: Union[Dict, Hook, None],
     ) -> None:
         if timer_config is None:
             return
@@ -515,8 +515,8 @@ class BaseRunner(metaclass=ABCMeta):
                 self.register_hook(item, priority='NORMAL')
 
     def register_profiler_hook(
-        self,
-        profiler_config: Union[Dict, Hook, None],
+            self,
+            profiler_config: Union[Dict, Hook, None],
     ) -> None:
         if profiler_config is None:
             return

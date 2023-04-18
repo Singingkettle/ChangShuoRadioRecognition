@@ -462,7 +462,6 @@ class PureCSSS(Dataset):
         return eval_results
 
 
-
 @DATASETS.register_module()
 class CSSSDetSingleStageV2(BaseCSSS):
     def __init__(self, file_info, data_root=None, test_mode=False):

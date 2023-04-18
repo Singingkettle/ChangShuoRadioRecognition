@@ -145,7 +145,7 @@ class TextLoggerHook(LoggerHook):
             if 'time' in log_dict.keys():
                 self.time_sec_tot += (log_dict['time'] * self.interval)
                 time_sec_avg = self.time_sec_tot / (
-                    runner.iter - self.start_iter + 1)
+                        runner.iter - self.start_iter + 1)
                 eta_sec = time_sec_avg * (runner.max_iters - runner.iter - 1)
                 eta_str = str(datetime.timedelta(seconds=int(eta_sec)))
                 log_str += f'eta: {eta_str}, '
@@ -161,7 +161,7 @@ class TextLoggerHook(LoggerHook):
             # by iter: Iter[val] [1000]
             if self.by_epoch:
                 log_str = f'Epoch({log_dict["mode"]}) ' \
-                    f'[{log_dict["epoch"]}][{log_dict["iter"]}]\t'
+                          f'[{log_dict["epoch"]}][{log_dict["iter"]}]\t'
             else:
                 log_str = f'Iter({log_dict["mode"]}) [{log_dict["iter"]}]\t'
 
@@ -170,8 +170,8 @@ class TextLoggerHook(LoggerHook):
             # TODO: resolve this hack
             # these items have been in log_str
             if name in [
-                    'mode', 'Epoch', 'iter', 'lr', 'time', 'data_time',
-                    'memory', 'epoch'
+                'mode', 'Epoch', 'iter', 'lr', 'time', 'data_time',
+                'memory', 'epoch'
             ]:
                 continue
             if isinstance(val, float):

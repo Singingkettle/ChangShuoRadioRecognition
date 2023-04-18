@@ -95,7 +95,7 @@ class OnlineDataset(CustomDataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-                format(len(results), len(self)))
+            format(len(results), len(self)))
         results = format_results(results)
         for process in self.save:
             process(out_dir, results, self.data_infos, self.CLASSES, self.SNRS)
