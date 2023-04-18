@@ -537,33 +537,39 @@ class LoadDerivativeFromIQ:
 
 @PIPELINES.register_module()
 class LoadFFTofCSRR:
-    def __init__(self, is_squeeze=False, to_float32=False, to_norm=False):
+    def __init__(self, data_root, file_name, is_squeeze=False, to_float32=False, to_norm=False):
         self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
         self._cache = dict()
+        self.cache_data = pickle.load(open(osp.join(data_root, 'cache', file_name), 'rb'))
+        self.is_squeeze = is_squeeze
+        self.to_float32 = to_float32
+        self.to_norm = to_norm
 
     def __call__(self, results):
         if results['file_name'] in self._cache:
             iq = self._cache[results['file_name']]
         else:
-            file_path = osp.join(results['data_root'], results['data_folder'], results['file_name'])
-            x = loadmat(file_path)['signal_data']
-            iq = np.sum(x, axis=0)
+            idx = self.cache_data['lookup_table'][results['file_name']]
+            iq = self.cache_data['data'][idx]
+            iq = np.squeeze(iq)
+            iq = iq[0, :] + 1j * iq[1, :]
             ft = np.fft.fft(iq)
             ft = np.fft.fftshift(ft)
             amplitude = np.abs(ft)
             phase = np.angle(ft)
             iq = np.vstack((amplitude, phase))
-            if self.to_norm:
-                iq = normalize_data(iq)
-            if self.to_float32:
-                iq = iq.astype(np.float32)
+            self._cache[results['file_name']] = iq
+        if self.to_norm:
+            iq = normalize_data(iq)
+        if self.to_float32:
+            iq = iq.astype(np.float32)
 
-            if not self.is_squeeze:
-                # make the iq as a three-dimensional tensor [1, 2, L]
-                iq = np.expand_dims(iq, axis=0)
-            iq = np.ascontiguousarray(iq)
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            iq = np.expand_dims(iq, axis=0)
+        iq = np.ascontiguousarray(iq)
 
         iq = to_tensor(iq).contiguous()
         results['inputs']['iqs'] = iq

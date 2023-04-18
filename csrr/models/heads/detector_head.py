@@ -131,8 +131,9 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
         # h = bboxes[..., 3] - bboxes[..., 1]
         w_target = torch.log((w_gt / w).clamp(min=self.eps))
         # h_target = torch.log((h_gt / h).clamp(min=self.eps))
-        x_center_target = ((x_center_gt - x_center) / stride + 0.5).clamp(
+        x_center_target = ((x_center_gt - x_center) / (2 * stride) + 0.5).clamp(
             self.eps, 1 - self.eps)
+        # x_center_target = ((x_center_gt - x_center) / 1200)
         # y_center_target = ((y_center_gt - y_center) / 1 + 0.5).clamp(
         #     self.eps, 1 - self.eps)
         # encoded_bboxes = torch.stack(
@@ -185,14 +186,14 @@ class SignalDetectionHead(BaseHead):
             loss_cf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
-                loss_weight=1.0,
+                loss_weight=1,
                 reduction='sum'
             )
         if loss_conf is None:
             loss_conf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
-                loss_weight=10,
+                loss_weight=1,
                 reduction='sum'
             )
 

@@ -23,10 +23,7 @@ def parse_args():
 def run(dataset_folder, json_file):
     mode = json_file.split('.')[0]
     annotations = IOLoad(osp.join(dataset_folder, json_file))
-    cache_data = {'sequence_data/ap': {'data': [], 'shape': None, 'dtype': None},
-                  'sequence_data/iq': {'data': [], 'shape': None, 'dtype': None},
-                  'constellation_data/filter_size_0.020_stride_0.020': {'data': [], 'shape': None, 'dtype': None},
-                  'constellation_data/filter_size_0.050_stride_0.050': {'data': [], 'shape': None, 'dtype': None},
+    cache_data = {'sequence_data/iq': {'data': [], 'shape': None, 'dtype': None},
                   }
     file_name_index = dict()
     idx = 0

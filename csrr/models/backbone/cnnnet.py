@@ -216,56 +216,54 @@ class DetCNN(BaseBackbone):
         self.conv1 = nn.Sequential(
             nn.Conv2d(2, 16, kernel_size=(1, 6), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(16),
+
             nn.Conv2d(16, 16, kernel_size=(1, 5), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(16),
+
             nn.Conv2d(16, 16, kernel_size=(1, 4), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(16),
+
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv2 = nn.Sequential(
             nn.Conv2d(16, 32, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(32),
+
             nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(32),
+
             nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(32),
+
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(64),
+
             nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(64),
+
             nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(64),
+
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv4 = nn.Sequential(
             nn.Conv2d(64, 128, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(128),
+
             nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(128),
+
             nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(128),
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
 
         self.conv5 = nn.Sequential(
             nn.Conv2d(128, 256, kernel_size=(1, 3), padding=0),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(256),
         )
 
     def forward(self, iqs):
