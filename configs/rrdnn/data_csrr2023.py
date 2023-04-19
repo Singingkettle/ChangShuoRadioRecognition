@@ -1,9 +1,9 @@
 dataset_type = 'CSRRDataset'
-data_root = '/home/xinghuijun/Data/SignalProcessing/SignalRecognition/ChangShuo/CSRR2023'
+data_root = '/home/citybuster/Data/SignalProcessing/SignalRecognition/ChangShuo/CSRR2023'
 target_name = 'modulation'
 data = dict(
-    samples_per_gpu=24,
-    workers_per_gpu=4,
+    samples_per_gpu=2,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
         ann_file='train_and_validation.json',

@@ -1,5 +1,5 @@
 dataset_type = 'DeepSigDataset'
-data_root = '/home/xinghuijun/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
+data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DeepSig/201610A'
 target_name = 'modulation'
 data = dict(
     samples_per_gpu=80,

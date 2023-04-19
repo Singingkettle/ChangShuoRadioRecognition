@@ -12,6 +12,7 @@ model = dict(
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
+
         dp=0.07,
         init_cfg=dict(
             type='Pretrained',
@@ -35,10 +36,12 @@ model = dict(
     )
 )
 
+
+
 runner = dict(type='EpochBasedRunner', max_epochs=3200)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='Adam', lr=0.0001054)
+optimizer = dict(type='Adam', lr=0.0001068)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(

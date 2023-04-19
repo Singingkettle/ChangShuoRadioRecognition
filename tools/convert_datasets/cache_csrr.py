@@ -7,6 +7,7 @@ import zlib
 
 import numpy as np
 from tqdm import tqdm
+from scipy.io import loadmat
 
 from csrr.common.fileio import load as IOLoad
 
@@ -31,7 +32,8 @@ def run(dataset_folder, json_file):
         file_name = annotation['file_name']
         for key in cache_data:
             file_path = osp.join(dataset_folder, key, file_name)
-            data = np.load(file_path)
+            x = loadmat(file_path)['signal_data']
+            data = np.sum(x, axis=0)
             data = data.astype(np.float32)
             cache_data[key]['shape'] = data.shape
             cache_data[key]['dtype'] = data.dtype

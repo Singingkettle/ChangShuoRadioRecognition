@@ -157,7 +157,7 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
         """
         bboxes = get_box_tensor(bboxes)
         x_centers = (bboxes[..., 0] + bboxes[..., 2]) * 0.5 + (
-                pred_bboxes[..., 0] - 0.5) * stride
+                pred_bboxes[..., 0] - 0.5) * 2 * stride
         ws = (bboxes[..., 2] - bboxes[..., 0]) * 0.5 * pred_bboxes[..., 1].exp()
         decoded_bboxes = torch.stack(
             (x_centers[..., 0] - ws[..., 0], x_centers[..., 0] - ws[..., 0], x_centers[..., 0] + ws[..., 0],
