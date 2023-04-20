@@ -7,7 +7,7 @@ import torch.nn as nn
 from mmcv.ops import batched_nms
 from mmdet.models.task_modules import AnchorGenerator, YOLOBBoxCoder
 from mmdet.models.task_modules import GridAssigner, PseudoSampler
-from mmdet.models.utils import images_to_levels, multi_apply, filter_scores_and_topk
+from mmdet.models.utils import images_to_levels, multi_apply
 from mmdet.structures.bbox import BaseBoxes, HorizontalBoxes, get_box_tensor
 from mmengine.structures import InstanceData
 from torch import Tensor
@@ -15,6 +15,58 @@ from torch.nn.modules.utils import _pair
 
 from .base_head import BaseHead
 from ..builder import HEADS, build_loss
+from ...common.utils import outs2result
+
+
+def filter_scores_and_topk(scores, score_thr, topk, results=None):
+    """Filter results using score threshold and topk candidates.
+
+    Args:
+        scores (Tensor): The scores, shape (num_bboxes, K).
+        score_thr (float): The score filter threshold.
+        topk (int): The number of topk candidates.
+        results (dict or list or Tensor, Optional): The results to
+           which the filtering rule is to be applied. The shape
+           of each item is (num_bboxes, N).
+
+    Returns:
+        tuple: Filtered results
+
+            - scores (Tensor): The scores after being filtered, \
+                shape (num_bboxes_filtered, ).
+            - labels (Tensor): The class labels, shape \
+                (num_bboxes_filtered, ).
+            - anchor_idxs (Tensor): The anchor indexes, shape \
+                (num_bboxes_filtered, ).
+            - filtered_results (dict or list or Tensor, Optional): \
+                The filtered results. The shape of each item is \
+                (num_bboxes_filtered, N).
+    """
+    valid_mask = scores > score_thr
+    valid_mask[:, 0] = False
+    scores = scores[valid_mask]
+    valid_idxs = torch.nonzero(valid_mask)
+
+    num_topk = min(topk, valid_idxs.size(0))
+    # torch.sort is actually faster than .topk (at least on GPUs)
+    scores, idxs = scores.sort(descending=True)
+    scores = scores[:num_topk]
+    topk_idxs = valid_idxs[idxs[:num_topk]]
+    keep_idxs, labels = topk_idxs.unbind(dim=1)
+    labels[...] = 0
+
+    filtered_results = None
+    if results is not None:
+        if isinstance(results, dict):
+            filtered_results = {k: v[keep_idxs] for k, v in results.items()}
+        elif isinstance(results, list):
+            filtered_results = [result[keep_idxs] for result in results]
+        elif isinstance(results, torch.Tensor):
+            filtered_results = results[keep_idxs]
+        else:
+            raise NotImplementedError(f'Only supports dict or list or Tensor, '
+                                      f'but get {type(results)}.')
+    return scores, labels, keep_idxs, filtered_results
 
 
 class SignalYOLOAnchorGenerator(AnchorGenerator):
@@ -32,7 +84,8 @@ class SignalYOLOAnchorGenerator(AnchorGenerator):
                  base_sizes: List[List[Tuple[int, int]]],
                  use_box_type: bool = False) -> None:
         self.strides = [_pair(stride) for stride in strides]
-        self.centers = [(72.0, 0.5)]
+        # self.centers = [(72.0, 0.5)]
+        self.centers = [(8.0, 0.5)]
         self.base_sizes = []
         num_anchor_per_level = len(base_sizes[0])
         for base_sizes_per_level in base_sizes:
@@ -124,15 +177,17 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
         x_center_gt = (gt_bboxes[..., 0] + gt_bboxes[..., 2]) * 0.5
         # y_center_gt = (gt_bboxes[..., 1] + gt_bboxes[..., 3]) * 0.5
         w_gt = gt_bboxes[..., 2] - gt_bboxes[..., 0]
-        h_gt = gt_bboxes[..., 3] - gt_bboxes[..., 1]
+        # h_gt = gt_bboxes[..., 3] - gt_bboxes[..., 1]
         x_center = (bboxes[..., 0] + bboxes[..., 2]) * 0.5
         # y_center = (bboxes[..., 1] + bboxes[..., 3]) * 0.5
         w = bboxes[..., 2] - bboxes[..., 0]
         # h = bboxes[..., 3] - bboxes[..., 1]
         w_target = torch.log((w_gt / w).clamp(min=self.eps))
         # h_target = torch.log((h_gt / h).clamp(min=self.eps))
+
         x_center_target = ((x_center_gt - x_center) / stride + 0.5).clamp(
             self.eps, 1 - self.eps)
+        # x_center_target = ((x_center_gt - x_center) / 1200)
         # y_center_target = ((y_center_gt - y_center) / 1 + 0.5).clamp(
         #     self.eps, 1 - self.eps)
         # encoded_bboxes = torch.stack(
@@ -155,9 +210,9 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
             Union[torch.Tensor, :obj:`BaseBoxes`]: Decoded boxes.
         """
         bboxes = get_box_tensor(bboxes)
-        x_centers = (bboxes[..., 0] + bboxes[..., 2]) * 0.5 + (
-                pred_bboxes[..., 0] - 0.5) * stride
-        ws = (bboxes[..., 2] - bboxes[..., 0]) * 0.5 * pred_bboxes[..., 1].exp()
+        x_centers = (bboxes[..., :2] + bboxes[..., 2:]) * 0.5 + (
+                pred_bboxes[..., :2] - 0.5) * stride
+        ws = (bboxes[..., 2:] - bboxes[..., :2]) * 0.5 * pred_bboxes[..., :2].exp()
         decoded_bboxes = torch.stack(
             (x_centers[..., 0] - ws[..., 0], x_centers[..., 0] - ws[..., 0], x_centers[..., 0] + ws[..., 0],
              x_centers[..., 0] + ws[..., 0]),
@@ -185,28 +240,30 @@ class SignalDetectionHead(BaseHead):
             loss_cf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
-                loss_weight=1.0,
+                loss_weight=1,
                 reduction='sum'
             )
         if loss_conf is None:
             loss_conf = dict(
                 type='CrossEntropyLoss',
                 use_sigmoid=True,
-                loss_weight=10,
+                loss_weight=1,
                 reduction='sum'
             )
 
+        self.num_classes = 0
         self.cfg = cfg
         self.loss_bw = build_loss(loss_bw)
         self.loss_cf = build_loss(loss_cf)
         self.loss_conf = build_loss(loss_conf)
 
         self.featmap_strides = featmap_strides
-        self.head = nn.Conv2d(in_size, num_anchors * 3, kernel_size=1)
+        self.head = nn.Conv2d(in_size, num_anchors * self.num_attrib, kernel_size=1)
         self.bbox_coder = SignalYOLOBBoxCoder()
         self.prior_generator = SignalYOLOAnchorGenerator(base_sizes=[[(121, 1), (93, 1)]], strides=[(16, 1)])
         self.assigner = GridAssigner(pos_iou_thr=0.5, neg_iou_thr=0.5, min_pos_iou=0)
         self.sampler = PseudoSampler()
+
 
     @property
     def num_levels(self) -> int:
@@ -216,9 +273,9 @@ class SignalDetectionHead(BaseHead):
     @property
     def num_attrib(self):
         """int: number of attributes in pred_map, cf (1) +
-        bw (1) + is_signal (1)"""
+        bw (1) + is_signal (1) + labels"""
 
-        return 3
+        return 3 + self.num_classes
 
     def loss(self, pred_maps, data_samples, input_metas=None, weight=None, **kwargs):
         num_signals = len(input_metas)
@@ -284,7 +341,7 @@ class SignalDetectionHead(BaseHead):
         pred_maps = self.head(x)
         pred_maps = (pred_maps,)
         if is_test:
-            self.predict_by_feat(pred_maps, input_metas)
+            return self.predict_by_feat(pred_maps, input_metas)
         else:
             return pred_maps
 
@@ -292,15 +349,16 @@ class SignalDetectionHead(BaseHead):
 
         assert len(pred_maps) == self.num_levels
 
-        num_imgs = len(pred_maps[0])
+        num_signals = len(pred_maps[0])
         featmap_sizes = [pred_map.shape[-2:] for pred_map in pred_maps]
 
         mlvl_anchors = self.prior_generator.grid_priors(
             featmap_sizes, device=pred_maps[0].device)
+
         flatten_preds = []
         flatten_strides = []
         for pred, stride in zip(pred_maps, self.featmap_strides):
-            pred = pred.permute(0, 2, 3, 1).reshape(num_imgs, -1,
+            pred = pred.permute(0, 2, 3, 1).reshape(num_signals, -1,
                                                     self.num_attrib)
             pred[..., 0].sigmoid_()
             flatten_preds.append(pred)
@@ -319,7 +377,8 @@ class SignalDetectionHead(BaseHead):
         for (bboxes, objectness, img_meta) in zip(flatten_bboxes, flatten_objectness, input_metas):
             score_thr = self.cfg['score_thr']
             nms_pre = self.cfg['nms_pre']
-            scores, labels, keep_idxs, _ = filter_scores_and_topk(objectness, score_thr, nms_pre)
+            scores = torch.stack([1 - objectness, objectness], dim=1)
+            scores, labels, keep_idxs, _ = filter_scores_and_topk(scores, score_thr, nms_pre)
 
             results = InstanceData(
                 scores=scores,
@@ -328,6 +387,13 @@ class SignalDetectionHead(BaseHead):
                 score_factors=objectness[keep_idxs],
             )
             results = self._bbox_post_process(results=results)
+
+            bboxes = outs2result(results.bboxes)
+            labels = outs2result(results.labels)
+            scores = outs2result(results.scores)
+
+            results = dict(img_id=img_meta['image_id'], bboxes=bboxes, scores=scores, labels=labels)
+
             results_list.append(results)
         return results_list
 
@@ -343,7 +409,7 @@ class SignalDetectionHead(BaseHead):
             results = results[keep_idxs]
             # some nms would reweight the score, such as softnms
             results.scores = det_bboxes[:, -1]
-            results = results[:self.cfg['max_per_img']]
+            results = results[:self.cfg['max_per_sequence']]
 
         return results
 
@@ -459,9 +525,8 @@ class SignalDetectionHead(BaseHead):
             anchor_stride = self.prior_generator.strides[i]
             feat_h, feat_w = featmap_sizes[i]
 
-            gt_cx = ((gt_bboxes[:, 0] + gt_bboxes[:, 2]) * 0.5 - 72).to(device)
-            gt_cx = torch.clamp(gt_cx, min=0, max=1056)
-            gt_cy = ((gt_bboxes[:, 1] + gt_bboxes[:, 3]) * 0.5 - 0.5).to(device)
+            gt_cx = ((gt_bboxes[:, 0] + gt_bboxes[:, 2]) * 0.5).to(device)
+            gt_cy = ((gt_bboxes[:, 1] + gt_bboxes[:, 3]) * 0.5).to(device)
             gt_grid_x = torch.floor(gt_cx / anchor_stride[0]).long()
             gt_grid_y = torch.floor(gt_cy / anchor_stride[1]).long()
 

@@ -60,7 +60,7 @@ class IterBasedRunner(BaseRunner):
         data_batch = next(data_loader)
         self.data_batch = data_batch
         self.call_hook('before_train_iter')
-        outputs = self.model.train_step(data_batch,  **kwargs)
+        outputs = self.model.train_step(data_batch, **kwargs)
         if not isinstance(outputs, dict):
             raise TypeError('model.train_step() must return a dict')
         if 'log_vars' in outputs:
@@ -134,7 +134,7 @@ class IterBasedRunner(BaseRunner):
                 if not isinstance(mode, str) or not hasattr(self, mode):
                     raise ValueError(
                         'runner has no method named "{}" to run a workflow'.
-                            format(mode))
+                        format(mode))
                 iter_runner = getattr(self, mode)
                 for _ in range(iters):
                     if mode == 'train' and self.iter >= self._max_iters:

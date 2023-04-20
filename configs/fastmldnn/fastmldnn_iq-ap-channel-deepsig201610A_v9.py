@@ -39,13 +39,13 @@ model = dict(
 runner = dict(type='EpochBasedRunner', max_epochs=3200)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='Adam', lr=0.000106)
+optimizer = dict(type='Adam', lr=0.0001056)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[20, 80,400,600,1000]
+    step=[20, 80,400,600,760]
 )
 evaluation = dict(interval=1)
 checkpoint_config = dict(interval=1)

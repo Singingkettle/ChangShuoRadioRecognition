@@ -49,6 +49,7 @@ class Collect:
         results['input_metas'] = DC(input_metas, cpu_only=True)
 
         data = recurrence_copy_dict(data, results, self.keys)
+        data['input_metas'] = results['input_metas']
         return data
 
     def __repr__(self):

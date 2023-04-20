@@ -12,7 +12,7 @@ model = dict(
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
-        use_group=True,
+
     ),
     classifier_head=dict(
         type='AMCHead',

@@ -38,6 +38,3 @@ class DeepSigDataset(CustomDataset):
         results['co_folder'] = 'constellation_data'
         results['inputs'] = dict()
         return results
-
-
-

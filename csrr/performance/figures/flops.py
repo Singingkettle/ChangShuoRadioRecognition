@@ -38,7 +38,7 @@ class GetFlops:
         else:
             raise NotImplementedError(
                 'FLOPs counter is currently not currently supported with {}'.
-                    format(model.__class__.__name__))
+                format(model.__class__.__name__))
         # warm up
         for _ in range(1000):
             _, _, _ = get_model_complexity_info(model, input_shape,

@@ -304,7 +304,7 @@ class PetrelBackend(BaseStorageBackend):
     def get_local_path(
             self,
             filepath: Union[str,
-                            Path]) -> Generator[Union[str, Path], None, None]:
+            Path]) -> Generator[Union[str, Path], None, None]:
         """Download a file from ``filepath`` and return a temporary path.
 
         ``get_local_path`` is decorated by :meth:`contxtlib.contextmanager`. It
@@ -654,7 +654,7 @@ class HardDiskBackend(BaseStorageBackend):
     def get_local_path(
             self,
             filepath: Union[str,
-                            Path]) -> Generator[Union[str, Path], None, None]:
+            Path]) -> Generator[Union[str, Path], None, None]:
         """Only for unified API and do nothing."""
         yield filepath
 
@@ -1120,7 +1120,7 @@ class FileClient:
     def get_local_path(
             self,
             filepath: Union[str,
-                            Path]) -> Generator[Union[str, Path], None, None]:
+            Path]) -> Generator[Union[str, Path], None, None]:
         """Download data from ``filepath`` and write the data to local path.
 
         ``get_local_path`` is decorated by :meth:`contxtlib.contextmanager`. It

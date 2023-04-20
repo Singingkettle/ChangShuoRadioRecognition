@@ -20,7 +20,8 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
 
     """
 
-    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None, format=None):
+    def __init__(self, ann_file, pipeline, data_root=None, test_mode=False, preprocess=None, evaluate=None,
+                 format=None):
         self.ann_file = ann_file
         self.pipeline = pipeline
         self.data_root = data_root
@@ -119,9 +120,9 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             dict: Testing data after pipeline with new keys introduced by \
                 pipeline.
         """
-        file_name = self.data_infos['annotations'][idx]['file_name']
-        results = dict(file_name=file_name)
+        results = self.get_ann_info(idx)
         results = self.pre_pipeline(results)
+        results['targets'] = dict()
         return self.pipeline(results)
 
     def format_results(self, out_dir, results):

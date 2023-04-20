@@ -14,20 +14,19 @@ model = dict(
         type='SignalDetectionHead',
         cfg=dict(
             nms_pre=1000,
-            score_thr=0.005,
+            score_thr=0.05,
             nms=dict(iou_threshold=0.45),
-            max_pre_img=100,
+            max_per_sequence=9,
         )
     ),
 )
 
 is_det = True
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='EpochBasedRunner', max_epochs=600)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='AdamW', lr=0.003, weight_decay=0.0005)
-optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2, _delete_=True))
+optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.0005)
 # learning policy
 lr_config = dict(policy='fixed')
-evaluation = dict(interval=1)
-checkpoint_config = dict(interval=1)
+evaluation = dict(interval=10)
+checkpoint_config = dict(interval=10)
