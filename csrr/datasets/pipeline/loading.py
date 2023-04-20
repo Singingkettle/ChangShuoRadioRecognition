@@ -2,10 +2,10 @@ import os.path as osp
 import pickle
 import zlib
 from typing import Dict
-from mmcv.transforms import to_tensor
+
 import h5py
 import numpy as np
-from scipy.io import loadmat
+from mmcv.transforms import to_tensor
 
 from ..builder import PIPELINES
 
@@ -630,11 +630,7 @@ class LoadCSRRTrainAnnotations:
             x = (results['center_frequency'][i] / sr + 0.5) * sn
             w = results['bandwidth'][i] / sr * sn
             bboxes.append([x, 0.5, w, 1])
-        if self.amc_cfg is not None:
-            labels = results['modulation']
-        else:
-            labels = [1] * len(results['modulation'])
-
+        labels = results['label']
         _, box_type_cls = get_box_type(self.bbox_type)
         bboxes = box_type_cls(bboxes, dtype=torch.float32, in_mode='cxcywh')
         labels = np.array(labels, dtype=np.int64)

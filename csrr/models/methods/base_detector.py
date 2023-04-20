@@ -1,9 +1,10 @@
 import torch
+from mmdet.models.utils.misc import samplelist_boxtype2tensor
+from mmengine.model.base_model import BaseDataPreprocessor
 
 from .base import BaseDNN
 from ..builder import METHODS, build_backbone, build_head
-from mmdet.models.utils.misc import samplelist_boxtype2tensor
-from mmengine.model.base_model import BaseDataPreprocessor
+
 
 class DetDataPreprocessor(BaseDataPreprocessor):
 
@@ -52,12 +53,20 @@ class BaseDetector(BaseDNN):
         data = dict(inputs=inputs['iqs'], data_samples=targets['data_samples'])
         data = self.data_preprocessor(data)
         x = self.extract_feat(data['inputs'])
-        losses = self.detector_head.forward_train(x, data['data_samples'], **kwargs)
+        num_signal = len(kwargs['file_name'])
+        input_metas = [dict(file_name=kwargs['file_name'][i], image_id=kwargs['image_id'][i]) for i in
+                       range(num_signal)]
+        losses = self.detector_head.forward_train(x, data['data_samples'], input_metas=input_metas)
 
         return losses
 
     def forward_test(self, inputs, input_metas=None, **kwargs):
+        iqs = inputs['iqs']
+        inputs = torch.stack(iqs)
         x = self.extract_feat(inputs)
+        num_signal = len(kwargs['file_name'])
+        input_metas = [dict(file_name=kwargs['file_name'][i], image_id=kwargs['image_id'][i]) for i in
+                       range(num_signal)]
         results = self.detector_head(x, True, input_metas=input_metas)
         return results
 

@@ -40,6 +40,7 @@ def run(dataset_folder, json_file):
             cache_data[key]['dtype'] = data.dtype
             # it's not beneficial to compress sequence data
             if 'sequence_data' in key:
+                data = np.expand_dims(data, axis=0)
                 cache_data[key]['data'].append(data)
             else:
                 cdata = zlib.compress(data.tobytes())

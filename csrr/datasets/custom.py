@@ -120,9 +120,9 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             dict: Testing data after pipeline with new keys introduced by \
                 pipeline.
         """
-        file_name = self.data_infos['annotations'][idx]['file_name']
-        results = dict(file_name=file_name)
+        results = self.get_ann_info(idx)
         results = self.pre_pipeline(results)
+        results['targets'] = dict()
         return self.pipeline(results)
 
     def format_results(self, out_dir, results):

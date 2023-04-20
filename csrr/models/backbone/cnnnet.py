@@ -213,56 +213,116 @@ class DetCNN(BaseBackbone):
 
     def __init__(self, init_cfg=None):
         super(DetCNN, self).__init__(init_cfg)
+        # self.conv1 = nn.Sequential(
+        #     nn.Conv2d(2, 16, kernel_size=(1, 6), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(16, 16, kernel_size=(1, 5), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(16, 16, kernel_size=(1, 4), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
+        # )
+        # self.conv2 = nn.Sequential(
+        #     nn.Conv2d(16, 32, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
+        # )
+        # self.conv3 = nn.Sequential(
+        #     nn.Conv2d(32, 64, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
+        # )
+        # self.conv4 = nn.Sequential(
+        #     nn.Conv2d(64, 128, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #
+        #     nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        #     nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
+        # )
+        #
+        # self.conv5 = nn.Sequential(
+        #     nn.Conv2d(128, 256, kernel_size=(1, 3), padding=0),
+        #     nn.ReLU(inplace=True),
+        # )
         self.conv1 = nn.Sequential(
-            nn.Conv2d(2, 16, kernel_size=(1, 6), padding=0),
+            nn.Conv2d(2, 16, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(16, 16, kernel_size=(1, 5), padding=0),
+            nn.Conv2d(16, 16, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(16, 16, kernel_size=(1, 4), padding=0),
+            nn.Conv2d(16, 16, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
-
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(16, 32, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(32, 32, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(32, 32, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(32, 32, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv3 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(32, 64, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(64, 64, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(64, 64, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(64, 64, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
         self.conv4 = nn.Sequential(
-            nn.Conv2d(64, 128, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(64, 128, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(128, 128, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
-
-            nn.Conv2d(128, 128, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(128, 128, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
 
         self.conv5 = nn.Sequential(
-            nn.Conv2d(128, 256, kernel_size=(1, 3), padding=0),
+            nn.Conv2d(128, 256, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
+            nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
         )
 
