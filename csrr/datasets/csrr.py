@@ -140,7 +140,7 @@ class CSRRDataset(CustomDataset):
         dump(coco_style_dataset, outfile_path)
 
         self._coco_api = COCO(outfile_path)
-        self.proposal_nums = [5, 7, 9]
+        self.proposal_nums = [9, 18, 27]
         self.iou_thrs = np.linspace(.5, 0.95, int(np.round((0.95 - .5) / .05)) + 1, endpoint=True)
 
     def get_ann_info(self, idx):

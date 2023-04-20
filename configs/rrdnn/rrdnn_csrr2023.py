@@ -16,7 +16,7 @@ model = dict(
             nms_pre=1000,
             score_thr=0.05,
             nms=dict(iou_threshold=0.45),
-            max_per_sequence=9,
+            max_per_sequence=27,
         )
     ),
 )
