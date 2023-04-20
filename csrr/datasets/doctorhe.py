@@ -11,6 +11,9 @@ from ..common.utils.path import glob
 from ..performance import ClassificationMetricsForSingle
 
 
+data_format = dict(CD='cos', SQCD='cos', frequency_domain='iqs', time_domain='iqs')
+
+
 @DATASETS.register_module()
 class DoctorHeDataset(Dataset):
     CLASSES = ['BPSK', 'QPSK', '8PSK', '16PSK', '8QAM', '16QAM']
@@ -22,6 +25,7 @@ class DoctorHeDataset(Dataset):
         self.test_mode = test_mode
         self.look_table = []
         self.look_table_range = dict()
+        self.data_mode = data_format[data_info]
         self.x, self.y = self._load_input()
         self.data_num = None
 
@@ -106,7 +110,11 @@ class DoctorHeDataset(Dataset):
         """
         item_info = self.look_table[idx]
         results = dict(inputs=dict(), targets=dict(), input_metas=dict())
-        results['inputs']['cos'] = np.expand_dims(self.x[item_info['key']][item_info['index']], axis=0).astype(
+
+        x = self.x[item_info['key']][item_info['index']]
+        if self.data_mode == 'iqs':
+            x = x.T
+        results['inputs'][self.data_mode] = np.expand_dims(x, axis=0).astype(
             np.float32)
         results['targets']['modulations'] = np.array(self.y[item_info['key']][item_info['index']], dtype=np.int64)
         results['input_metas'] = DC(dict(file_name=idx), cpu_only=True)
@@ -124,7 +132,10 @@ class DoctorHeDataset(Dataset):
         """
         item_info = self.look_table[idx]
         results = dict(inputs=dict(), input_metas=dict())
-        results['inputs']['cos'] = np.expand_dims(self.x[item_info['key']][item_info['index']], axis=0).astype(
+        x = self.x[item_info['key']][item_info['index']]
+        if self.data_mode == 'iqs':
+            x = x.T
+        results['inputs'][self.data_mode] = np.expand_dims(x, axis=0).astype(
             np.float32)
         results['input_metas'] = DC(dict(file_name=idx), cpu_only=True)
         return results
