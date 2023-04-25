@@ -30,6 +30,10 @@ def parse_args():
              'useful when you want to format the result to a specific format and '
              'submit it to the test server')
     parser.add_argument(
+        '--paper',
+        action='store_true',
+        help='save res for paper')
+    parser.add_argument(
         '--eval',
         action='store_true',
         help='evaluation on the dataset')
@@ -68,7 +72,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    assert args.out or args.eval or args.format_only, \
+    assert args.out or args.eval or args.format_only or args.paper, \
         ('Please specify at least one operation (format/eval/format the '
          'results / format the results) with the argument "--out", "--eval"'
          ', "--format-only"')
