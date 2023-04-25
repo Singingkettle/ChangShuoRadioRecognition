@@ -173,28 +173,29 @@ class DoctorHeDataset(Dataset):
 
         acc_2tp = 0.0
         f1_2tp = 0.0
-        num_2tp = 0.0
+        num_acc = 0.0
         acc_5tp = 0.0
         f1_5tp = 0.0
-        num_5tp = 0.0
+        num_f1 = 0.0
         for key in eval_results:
             if '2tp' in key:
                 if 'ACC' in key:
                     acc_2tp += eval_results[key]
-                else:
+                    num_acc += 1
+                elif 'F1_AllClass' in key:
                     f1_2tp += eval_results[key]
-                num_2tp += 1
+                    num_f1 += 1
             else:
                 if 'ACC' in key:
                     acc_5tp += eval_results[key]
-                else:
+                elif 'F1_AllClass' in key:
                     f1_5tp += eval_results[key]
-                num_5tp += 1
 
-        if num_2tp > 0.0:
-            eval_results['ACC_2tp'] = acc_2tp / num_2tp
-            eval_results['F1_2tp'] = f1_2tp / num_2tp
-        if num_5tp > 0.0:
-            eval_results['ACC_5tp'] = acc_5tp / num_5tp
-            eval_results['F1_5tp'] = f1_5tp / num_2tp
+        if num_acc > 0.0:
+            eval_results['ACC_2tp'] = acc_2tp / num_acc
+            eval_results['ACC_5tp'] = acc_5tp / num_acc
+
+        if num_f1 > 0.0:
+            eval_results['F1_2tp'] = f1_2tp / num_f1
+            eval_results['F1_5tp'] = f1_5tp / num_f1
         return eval_results
