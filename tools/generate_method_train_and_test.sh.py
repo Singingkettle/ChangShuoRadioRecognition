@@ -1,0 +1,63 @@
+import argparse
+
+import torch
+
+from csrr.common.utils import Config, filter_config
+from csrr import glob
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='ChangShuoRadioRecognition Generate Test.sh File')
+    parser.add_argument('method', help='performance config file path')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+    print('Command Line Args:', args)
+
+    #
+
+    cfg = Config.fromfile(args.config)
+    print(cfg.pretty_text)
+
+    test_sh_name = cfg.plot['figure_configs'] + '_test.sh'
+
+    train_configs = filter_config(cfg, is_regeneration=args.is_regeneration, mode='test')
+
+    base_master_port = 29547
+    with open(test_sh_name, 'w') as f:
+        method_index = 0
+        for config, epoch in train_configs.items():
+            if epoch == 0:
+                continue
+            if epoch == -1:
+                python_sh = 'python tools/test_fb.py'
+            else:
+                python_sh = 'python -m torch.distributed.launch --nproc_per_node={} \
+                --master_port={} tools/test.py'.format(
+                    torch.cuda.device_count(), base_master_port + method_index)
+            config_sh = './figure_configs/{}/{}'.format(
+                config.split('_')[0], config + '.py')
+
+            if epoch == -1:
+                checkpoint_sh = cfg.log_dir + '/{}/model.fb'.format(config)
+            else:
+                checkpoint_sh = cfg.log_dir + '/{}/epoch_{}.pth'.format(config, epoch)
+            format_out_sh = cfg.log_dir + '/{}/format'.format(config)
+
+            if epoch == -1:
+                test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
+                          '--work_dir ' + format_out_sh + ' --format_only\n\n\n'
+            else:
+                test_sh = python_sh + ' ' + config_sh + ' ' + checkpoint_sh + ' ' + \
+                          '--work_dir ' + format_out_sh + ' --format_only --launcher pytorch\n\n\n'
+            start_info = 'echo \"Start Test: {}\"\n'.format(config_sh)
+            f.write(start_info)
+            f.write(test_sh)
+            method_index += 1
+
+
+if __name__ == '__main__':
+    main()

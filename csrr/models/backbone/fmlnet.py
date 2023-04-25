@@ -10,19 +10,32 @@ from ...runner import Sequential
 class FMLNet(BaseBackbone):
 
     def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
-                 is_freeze=False, groups=(2, 16, 4), stride=1, tnn='t', merge='sum'):
+                 is_freeze=False, groups=(2, 16, 4), stride=1, tnn='t', merge='sum', channle_mode=True):
         super(FMLNet, self).__init__(init_cfg)
-        self.cnn = Sequential(
-            nn.Conv1d(depth, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
-            nn.ReLU(inplace=True),
-            nn.Dropout(dp),
-            nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=groups[1], stride=stride),
-            nn.ReLU(inplace=True),
-            nn.Dropout(dp),
-            nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=groups[2], stride=stride),
-            nn.ReLU(inplace=True),
-            nn.Dropout(dp),
-        )
+        if channle_mode:
+            self.cnn = Sequential(
+                nn.Conv1d(depth, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=3, groups=groups[1], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+                nn.Conv1d(hidden_size, input_size, kernel_size=3, groups=groups[2], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+            )
+        else:
+            self.cnn = Sequential(
+                nn.Conv2d(depth//2, hidden_size, kernel_size=(1, 3), groups=groups[0], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+                nn.Conv2d(hidden_size, hidden_size, kernel_size=(1, 3), groups=groups[1], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+                nn.Conv2d(hidden_size, input_size, kernel_size=(2, 3), groups=groups[2], stride=stride),
+                nn.ReLU(inplace=True),
+                nn.Dropout(dp),
+            )
 
         self.merge = merge
         if tnn == 't':
