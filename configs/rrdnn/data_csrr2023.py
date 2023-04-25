@@ -1,5 +1,5 @@
 dataset_type = 'CSRRDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/SignalRecognition/ChangShuo/CSRR2023'
+data_root = './data/ChangShuo/CSRR2023'
 target_name = 'modulation'
 data = dict(
     samples_per_gpu=24,
