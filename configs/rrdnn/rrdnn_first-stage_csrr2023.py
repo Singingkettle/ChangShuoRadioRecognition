@@ -21,16 +21,12 @@ model = dict(
 )
 
 is_det = True
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='IterBasedRunner', max_iters=200000)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
-lr_config = dict(
-    policy='step',
-    gamma=0.3,
-    step=[10, 30]
-)
-evaluation = dict(interval=1)
-checkpoint_config = dict(interval=1)
+lr_config = dict(policy='fixed',)
+evaluation = dict(interval=100)
+checkpoint_config = dict(interval=100)

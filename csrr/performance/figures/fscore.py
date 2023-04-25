@@ -25,15 +25,17 @@ def reorder_f1score(methods, f1s, classes):
 
 @FIGURES.register_module()
 class ClassVsF1ScorePlot(BaseDraw):
-    def __init__(self, dataset, plot_config=None, has_SNR=True):
+    def __init__(self, dataset, plot_config=None, has_SNR=True, legend_config=None, scatter_config=None):
         super().__init__(dataset, plot_config)
         if plot_config is None:
             self.plot_config = dict(loc='lower left', prop={'size': 14, 'weight': 'bold'})
         else:
             self.plot_config = plot_config
         self.has_SNR = has_SNR
+        self.legend_config = legend_config
+        self.scatter_config = scatter_config
 
-    def __call__(self, performances, save_dir, legend_config):
+    def __call__(self, performances, save_dir):
         for dataset_name in self.dataset:
             for set_name in self.dataset[dataset_name]:
                 if self.has_SNR:
@@ -70,14 +72,14 @@ class ClassVsF1ScorePlot(BaseDraw):
                         data, xs = reorder_f1score(methods[snr], f1s[snr], CLASSES)
                         save_path = os.path.join(save_dir,
                                                  f'ClassVsF1Score_{snr:02d}dB_{set_name}_{dataset_name}_plot.pdf')
-                        self._draw_plot(data, legend_config, xs, 'Modulation', 'F1 Score', 'Modulation Vs. F1 Score',
-                                        save_path)
+                        self._draw_plot(data, self.legend_config, xs, 'Modulation', 'F1 Score',
+                                        'Modulation Vs. F1 Score', save_path)
                         save_path = os.path.join(save_dir,
                                                  f'ClassVsF1Score_{snr:02d}dB_{set_name}_{dataset_name}_radar.pdf')
-                        self._draw_radar(data, legend_config, xs, 'Modulation Vs. F1 Score', save_path)
+                        self._draw_radar(data, self.legend_config, xs, 'Modulation Vs. F1 Score', save_path)
                 else:
                     save_path = os.path.join(save_dir, f'ClassVsF1Score_{set_name}_{dataset_name}_plot.pdf')
-                    self._draw_plot(methods, legend_config, CLASSES, 'Modulation', 'F1 Score',
+                    self._draw_plot(methods, self.legend_config, CLASSES, 'Modulation', 'F1 Score',
                                     'Modulation Vs. F1 Score', save_path)
                     save_path = os.path.join(save_dir, f'ClassVsF1Score_{set_name}_{dataset_name}_radar.pdf')
-                    self._draw_radar(methods, legend_config, CLASSES, 'Modulation Vs. F1 Score', save_path)
+                    self._draw_radar(methods, self.legend_config, CLASSES, 'Modulation Vs. F1 Score', save_path)

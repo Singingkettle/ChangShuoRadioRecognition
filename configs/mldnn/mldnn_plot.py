@@ -28,13 +28,13 @@ performance = dict(
                         ]
                     )
                 ],
-                deepsig201801A=[
-                    dict(
-                        iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                        ],
-                    )
-                ]
+                # deepsig201801A=[
+                #     dict(
+                #         iq_ap=[
+                #             'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                #         ],
+                #     )
+                # ]
             ),
         ),
         dict(
@@ -50,14 +50,32 @@ performance = dict(
                         ]
                     )
                 ],
-                deepsig201801A=[
-                    dict(
-                        iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                        ],
-                    )
-                ]
+                # deepsig201801A=[
+                #     dict(
+                #         iq_ap=[
+                #             'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                #         ],
+                #     )
+                # ]
             ),
+        )
+    ],
+    Tables=[
+        dict(
+            type='GetFlops',
+            dataset=dict(
+                deepsig201610A=[
+                    'MLDNN',
+                ],
+            )
+        ),
+        dict(
+            type='Summary',
+            dataset=dict(
+                deepsig201610A=[
+                    'MLDNN'
+                ],
+            )
         )
     ]
 )

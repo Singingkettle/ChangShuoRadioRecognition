@@ -6,7 +6,7 @@ from ..builder import FIGURES
 
 @FIGURES.register_module()
 class ConfusionMap(BaseDraw):
-    def __init__(self, dataset, has_SNR=True):
+    def __init__(self, dataset, has_SNR=True, legend_config=None, scatter_config=None):
         super().__init__(dataset)
         self.has_SNR = has_SNR
 

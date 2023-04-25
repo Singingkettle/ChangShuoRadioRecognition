@@ -12,7 +12,7 @@ from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_method
 from csrr.runner import (get_dist_info, init_dist, load_checkpoint, wrap_fp16_model)
 
-checkpoint = 'work_dirs/rrdnn_first-stage_csrr2023/epoch_20.pth'
+checkpoint = 'work_dirs/rrdnn_first-stage_csrr2023/googlenet.pth'
 cfg_path = 'configs/rrdnn/rrdnn_first-stage_csrr2023.py'
 
 cfg = Config.fromfile(cfg_path)

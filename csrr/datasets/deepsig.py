@@ -44,7 +44,7 @@ class DeepSigDataset(CustomDataset):
         results['inputs'] = dict()
         return results
 
-    def paper(self, save_dir, results):
+    def paper(self, save_dir, results, cfg):
         gts = []
         snrs = []
         for annotation in self.data_infos['annotations']:
@@ -56,5 +56,5 @@ class DeepSigDataset(CustomDataset):
         pps = np.stack(results, axis=0)
         snrs = np.array(snrs, dtype=np.int64)
 
-        res = dict(gts=gts, pps=pps, snrs=snrs, classes=self.CLASSES)
+        res = dict(gts=gts, pps=pps, snrs=snrs, classes=self.CLASSES, cfg=cfg)
         pickle.dump(res, open(os.path.join(save_dir, 'paper.pkl'), 'wb'), protocol=4)

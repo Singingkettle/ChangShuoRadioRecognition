@@ -82,7 +82,7 @@ from csrr.common.utils import Config
 from csrr.models import build_method
 from csrr.runner.checkpoint import weights_to_cpu, get_state_dict
 
-cfg = Config.fromfile('configs/dscldnn/dscldnn_iq-data_ap-deepsig201610A.py')
+cfg = Config.fromfile('configs/mldnn/mldnn_iq-ap-deepsig201801A.py')
 model = build_method(cfg.model)
 
 print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
@@ -91,7 +91,7 @@ for key in list(new_dict.keys()):
        print(key)
        print(new_dict[key].shape)
 
-checkpoint = torch.load('/home/citybuster/Data/SignalProcessing/Workdir/dscldnn_iq-ap-deepsig201610A/dscldnn.pth',
+checkpoint = torch.load('work_dirs/mldnn_iq-ap-deepsig201801A/epoch_380.pth',
                         map_location='cpu')
 
 state_dict = checkpoint['state_dict']
@@ -118,12 +118,12 @@ for key in list(state_dict.keys()):
        del checkpoint['state_dict'][key]
 
 
-with open('/home/citybuster/Data/SignalProcessing/Workdir/mldnn_iq-ap-deepsig201610A/mldnn.pth', 'wb') as f:
+with open('work_dirs/mldnn_iq-ap-deepsig201801A/mldnn.pth', 'wb') as f:
        torch.save(checkpoint, f)
        f.flush()
 
 
-checkpoint = torch.load('/home/citybuster/Data/SignalProcessing/Workdir/mldnn_iq-ap-deepsig201610A/mldnn.pth',
+checkpoint = torch.load('work_dirs/mldnn_iq-ap-deepsig201801A/mldnn.pth',
                         map_location='cpu')
 
 state_dict = checkpoint['state_dict']

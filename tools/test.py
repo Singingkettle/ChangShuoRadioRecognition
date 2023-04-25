@@ -147,7 +147,7 @@ def main():
         if args.format_only:
             dataset.format_results(args.work_dir, outputs)
         if args.paper:
-            dataset.paper(args.work_dir, outputs)
+            dataset.paper(args.work_dir, outputs, cfg)
         if args.eval:
             metric = dataset.evaluate(outputs)
             print(metric)

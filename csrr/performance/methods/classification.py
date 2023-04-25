@@ -1,9 +1,9 @@
 import os
+
 from .base import BasePerformance
 from ..builder import PERFORMANCES, build_figure, build_table
-from ..method_info import AMCMethodInfo
 from ..figure_configs import LegendConfig, ScatterConfig
-from ..figures import  ConfusionMap, SNRVsAccuracy, ClassVsF1ScorePlot
+from ..method_info import AMCMethodInfo
 from ..metrics import ClassificationMetricsWithSNRForSingle
 from ...common.fileio import load as IOLoad
 
@@ -23,7 +23,8 @@ class Classification(BasePerformance):
         for datasetname in self.publish:
             for method in self.publish[datasetname]:
                 res = IOLoad(os.path.join(self.work_dir, self.publish[datasetname][method], 'res/paper.pkl'))
-                self.performances[method] = ClassificationMetricsWithSNRForSingle(res['pts'], res['gts'], res['snrs'], res['classes'])
+                self.performances[method] = ClassificationMetricsWithSNRForSingle(res['pts'], res['gts'], res['snrs'],
+                                                                                  res['classes'], res['cfg'])
 
         self.draw_handles = []
         if Figures is not None:
