@@ -13,7 +13,6 @@ build/
 work_dirs/
 develop-eggs/
 dist/
-work_dirs/
 downloads/
 eggs/
 .eggs/
