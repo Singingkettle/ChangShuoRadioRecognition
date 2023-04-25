@@ -13,14 +13,14 @@ from time import sleep
 
 import torch
 
-from ..builder import PERFORMANCES
+from ..builder import TABLES
 from ...common.utils import Config
 from ...common.utils.flops_counter import get_model_complexity_info, flops_to_string, params_to_string, \
     inference_time_to_string
 from ...models import build_method
 
 
-@PERFORMANCES.register_module()
+@TABLES.register_module()
 class GetFlops:
     def __init__(self, method, log_dir):
         self.method = method

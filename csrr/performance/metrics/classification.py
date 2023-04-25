@@ -16,7 +16,7 @@ from ..figures.utils import get_new_fig
 
 
 class ClassificationMetricsForSingle:
-    """Calculate different figures figures for classification,
+    """Calculate different figures for classification,
     which are only legal for the methods of one class for one data."""
 
     def __init__(self, pps: np.ndarray, gts: np.ndarray, classes: List[str], feas: np.ndarray = None,

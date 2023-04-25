@@ -6,8 +6,8 @@ from ..builder import FIGURES
 
 @FIGURES.register_module()
 class SNRVsAccuracy(BaseDraw):
-    def __init__(self, dataset, config):
-        super().__init__(dataset, config)
+    def __init__(self, dataset):
+        super().__init__(dataset)
 
     def __call__(self, performances, save_dir, legend_config):
         for dataset_name in self.dataset:

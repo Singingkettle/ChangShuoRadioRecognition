@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
-
+from ..method_info import AMCMethodInfo
 
 class BasePerformance(metaclass=ABCMeta):
     """Base class for performance."""
 
     def __init__(self):
         super(BasePerformance, self).__init__()
+
 
     @abstractmethod
     def generate_figures(self, data):
