@@ -12,22 +12,16 @@ model = dict(
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
-
-        dp=0.07,
-        init_cfg=dict(
-            type='Pretrained',
-            checkpoint='/home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/fastmldnn_iq-ap-channel-deepsig201610A_v2/epoch_1391.pth',
-            prefix='backbone'
-        )
+        groups=[1, 1, 1],
+        tnn='g',
     ),
     classifier_head=dict(
-        type='FastMLDNNHead',
+        type='AMCHead',
         num_classes=11,
         in_size=in_size,
         out_size=out_size,
-        balance=0.5,
         loss_cls=dict(
-            type='FocalLoss',
+            type='CrossEntropyLoss',
             loss_weight=1
         ),
         init_cfg=[
@@ -36,17 +30,14 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=3200)
+runner = dict(type='EpochBasedRunner', max_epochs=400)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='Adam', lr=0.000106)
+optimizer = dict(type='Adam', lr=0.00044)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[20, 80,400,600,1000]
+    step=[800, 1200]
 )
-evaluation = dict(interval=1)
-checkpoint_config = dict(interval=1)
-seed = 0

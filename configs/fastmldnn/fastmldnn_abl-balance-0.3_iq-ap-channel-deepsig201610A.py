@@ -24,7 +24,7 @@ model = dict(
         num_classes=11,
         in_size=in_size,
         out_size=out_size,
-        balance=0.5,
+        balance=0.3,
         loss_cls=dict(
             type='FocalLoss',
             loss_weight=1
@@ -35,7 +35,7 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=3200)
+runner = dict(type='EpochBasedRunner', max_epochs=100)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.0001054)
@@ -44,7 +44,7 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='step',
     gamma=0.3,
-    step=[20, 80, 400, 600, 760]
+    step=[20, 80,400,600,760]
 )
 evaluation = dict(interval=1)
 checkpoint_config = dict(interval=1)
