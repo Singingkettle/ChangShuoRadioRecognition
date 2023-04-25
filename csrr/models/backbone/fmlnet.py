@@ -61,8 +61,8 @@ class FMLNet(BaseBackbone):
     def forward(self, iqs, aps):
         x = torch.concat([iqs, aps], dim=1)
         c_fea = self.cnn(x)
-        c_fea = torch.transpose(c_fea, 1, 2)
         c_fea = torch.squeeze(c_fea)
+        c_fea = torch.transpose(c_fea, 1, 2)
         if self.is_rnn:
             fea, _ = self.tnn(c_fea)
         else:
