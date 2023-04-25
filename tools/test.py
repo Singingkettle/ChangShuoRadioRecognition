@@ -142,6 +142,8 @@ def main():
             IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
         if args.format_only:
             dataset.format_results(args.work_dir, outputs)
+        if args.paper:
+            dataset.paper(args.work_dir, outputs)
         if args.eval:
             metric = dataset.evaluate(outputs)
             print(metric)
