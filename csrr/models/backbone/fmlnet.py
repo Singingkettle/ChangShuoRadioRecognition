@@ -10,9 +10,9 @@ from ...runner import Sequential
 class FMLNet(BaseBackbone):
 
     def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
-                 is_freeze=False, groups=(2, 16, 4), stride=1, tnn='t', merge='sum', channle_mode=True):
+                 is_freeze=False, groups=(2, 16, 4), stride=1, tnn='t', merge='sum', channel_mode=True):
         super(FMLNet, self).__init__(init_cfg)
-        if channle_mode:
+        if channel_mode:
             self.cnn = Sequential(
                 nn.Conv1d(depth, hidden_size, kernel_size=3, groups=groups[0], stride=stride),
                 nn.ReLU(inplace=True),
@@ -38,16 +38,17 @@ class FMLNet(BaseBackbone):
             )
 
         self.merge = merge
+        self.is_rnn = False if tnn == 't' else True
         if tnn == 't':
             self.tnn = nn.TransformerEncoderLayer(input_size, 1, hidden_size, dropout=dp, batch_first=True)
         elif tnn == 'l':
-            self.tnn = nn.GRU(input_size=input_size, hidden_size=hidden_size // 2, batch_first=True, bidirectional=True)
+            self.tnn = nn.GRU(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
             self.merge = 'last'
         elif tnn == 'g':
-            self.tnn = nn.LSTM(input_size=input_size, hidden_size=hidden_size // 2, batch_first=True, bidirectional=True)
+            self.tnn = nn.LSTM(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
             self.merge = 'last'
         elif tnn == 'r':
-            self.tnn = nn.RNN(input_size=input_size, hidden_size=hidden_size // 2, batch_first=True, bidirectional=True)
+            self.tnn = nn.RNN(input_size=input_size, hidden_size=input_size // 2, batch_first=True, bidirectional=True)
             self.merge = 'last'
 
         self.is_freeze = is_freeze
@@ -61,7 +62,11 @@ class FMLNet(BaseBackbone):
         x = torch.concat([iqs, aps], dim=1)
         c_fea = self.cnn(x)
         c_fea = torch.transpose(c_fea, 1, 2)
-        fea = self.tnn(c_fea)
+        c_fea = torch.squeeze(c_fea)
+        if self.is_rnn:
+            fea, _ = self.tnn(c_fea)
+        else:
+            fea = self.tnn(c_fea)
         if self.merge == 'sum':
             return torch.sum(fea, dim=1)  # this is best
         elif self.merge == 'mean':
