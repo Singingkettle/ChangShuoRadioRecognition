@@ -1,12 +1,16 @@
+import copy
+import os.path
 import os.path as osp
 import tempfile
 from collections import OrderedDict
 from typing import List
 from typing import Sequence
-
+import pickle
+from tqdm import tqdm
 import numpy as np
 from mmdet.datasets.api_wrappers import COCO
 from pycocotools.cocoeval import COCOeval as _COCOeval
+import json
 
 from .builder import DATASETS
 from .custom import CustomDataset
@@ -300,3 +304,76 @@ class CSRRDataset(CustomDataset):
                     f'{ap[4]:.3f} {ap[5]:.3f}')
 
         return eval_results
+
+
+    def two_stage(self, results, amc_iou=0.5):
+        ann_file = os.path.basename(self.ann_file)
+        self.cache_data = pickle.load(open(osp.join(self.data_root, 'cache', ann_file.replace('.json', '_iq.pkl')), 'rb'))
+        tmp_dir = tempfile.TemporaryDirectory()
+        outfile_prefix = osp.join(tmp_dir.name, 'preds')
+        self.cat_ids = self._coco_api.get_cat_ids(cat_names=self.CLASSES)
+        self.img_ids = self._coco_api.get_img_ids()
+        result_files = self.results2json(results, outfile_prefix)
+        eval_results = OrderedDict()
+        iou_type = 'bbox'
+        metric = 'bbox'
+        predictions = load(result_files['bbox'])
+        coco_dt = self._coco_api.loadRes(predictions)
+        coco_eval = COCOeval(self._coco_api, coco_dt, iou_type)
+        coco_eval.params.catIds = self.cat_ids
+        coco_eval.params.imgIds = self.img_ids
+        coco_eval.params.maxDets = list(self.proposal_nums)
+        coco_eval.params.iouThrs = self.iou_thrs
+        coco_eval.params.areaRng = [[0, 140], [0, 95], [95, 105], [105, 140]]
+        coco_eval.evaluate()
+
+
+
+        annotations = {'modulations': self.data_infos['modulations'], 'snrs': self.data_infos['snrs'], 'annotations': []}
+        global_iq_id = 0
+        for i in tqdm(range(len(self))):
+            ann_info = self.get_ann_info(i)
+            idx = self.cache_data['lookup_table'][ann_info['file_name']]
+            iq = self.cache_data['data'][idx]
+            iq = np.squeeze(iq)
+            iq = iq[0, :] + 1j * iq[1, :]
+            ft = np.fft.fft(iq)
+            ft = np.fft.fftshift(ft)
+            for bi in range(results[i]['bboxes'].shape[0]):
+                x1 = results[i]['bboxes'][bi, 0]
+                x2 = results[i]['bboxes'][bi, 2]
+                x1 = int(max(np.floor(x1), 0))
+                x2 = int(min(np.round(x2), 1199))
+                aft = copy.deepcopy(ft)
+                aft[:x1] = 0
+                aft[x2:] = 0
+                iq_ft = np.fft.ifftshift(aft)
+                iq = np.fft.ifft(iq_ft)
+                i_seq = np.real(iq)
+                q_seq = np.imag(iq)
+                iq = np.vstack((i_seq, q_seq))
+                max_iou = np.max(coco_eval.ious[(i, 0)][bi, :])
+                max_iou_index = np.argmax(coco_eval.ious[(i, 0)][bi, :])
+                iq_file_name = 'ts-{:0>12d}.npy'.format(global_iq_id)
+                iq_path = osp.join(self.data_root, 'sequence_data/iq', iq_file_name)
+                np.save(iq_path, iq)
+                ann = dict()
+                ann['file_name'] = iq_file_name
+                if max_iou >= amc_iou:
+                    ann['modulation'] = self.data_infos['annotations'][idx]['modulation'][max_iou_index]
+                    ann['snr'] = self.data_infos['annotations'][idx]['snr'][max_iou_index]
+                else:
+                    ann['modulation'] = 'none'
+                    ann['snr'] = min(self.data_infos['snrs'])
+                annotations['annotations'].append(ann)
+                global_iq_id += 1
+        annotations['modulations'].append('none')
+        json.dump(annotations, open(f'{self.data_root}/ts-{ann_file}', 'w'), indent=4, sort_keys=True)
+
+
+
+
+
+
+
+

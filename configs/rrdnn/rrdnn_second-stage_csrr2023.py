@@ -25,8 +25,8 @@ is_det = True
 runner = dict(type='EpochBasedRunner', max_epochs=600)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.0005)
+optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.0001)
 # learning policy
 lr_config = dict(policy='fixed')
-evaluation = dict(interval=10)
-checkpoint_config = dict(interval=10)
+evaluation = dict(interval=1)
+checkpoint_config = dict(interval=1)
