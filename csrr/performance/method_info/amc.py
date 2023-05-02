@@ -1,5 +1,5 @@
 class AMCMethodInfo:
-    work_dir = '/home/citybuster/Data/SignalProcessing/Workdir'
+    work_dir = './data/Workdir'
 
     methods = {
         'DecisionTree-FB': 0,

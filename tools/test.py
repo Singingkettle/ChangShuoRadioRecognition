@@ -101,15 +101,16 @@ def main():
         init_dist(args.launcher, **cfg.dist_params)
 
     # build the dataloader
-    samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 4)
-    workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 4)
+    samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 1)
+    workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 0)
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=samples_per_gpu,
         workers_per_gpu=workers_per_gpu,
         dist=distributed,
-        shuffle=False)
+        shuffle=False,
+        is_det=False)
 
     # build the model and load checkpoint
     model = build_method(cfg.model)

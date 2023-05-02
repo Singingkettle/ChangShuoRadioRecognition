@@ -28,6 +28,10 @@ def parse_args():
         '--eval',
         action='store_true',
         help='evaluation on the dataset')
+    parser.add_argument(
+        '--paper',
+        action='store_true',
+        help='save res for paper')
 
     args = parser.parse_args()
 
@@ -68,6 +72,8 @@ def main():
         IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
     if args.format_only:
         dataset.format_results(args.work_dir, outputs)
+    if args.paper:
+        dataset.paper(args.work_dir, outputs, cfg)
     if args.eval:
         metric = dataset.evaluate(outputs)
         print(metric)

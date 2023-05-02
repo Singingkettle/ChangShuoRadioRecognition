@@ -1,4 +1,4 @@
-work_dir = '/home/citybuster/Data/SignalProcessing/Workdir'
+work_dir = './work_dirs'
 
 legend = {
     'DecisionTree-FB': 0,
@@ -116,49 +116,39 @@ publish = dict(
         MLDNN_V8='mldnn_abl-bigru-last-gradient-truncation-mtlh_iq-ap-deepsig201610A',
         MLDNN_V9='mldnn_abl-bigru-add-gradient-truncation-mtlh_iq-ap-deepsig201610A',
 
-        FastMLDNN='fastmldnn_iq-ap-channel-deepsig201610A',
-        FastMLDNN_V1='fastmldnn_abl-cross-entropy_iq-ap-deepsig201610A',
-        FastMLDNN_V2='fastmldnn_abl-cross-entropy_iq-ap-channel-deepsig201610A',
-        FastMLDNN_V3='fastmldnn_abl-focal_iq-ap-channel-deepsig201610A',
-        FastMLDNN_V4='fastmldnn_abl-skip-focal_iq-ap-channel-deepsig201610A',
-        FastMLDNN_V5='fastmldnn_abl-skip-cross-entropy_iq-ap-channel-deepsig201610A',
-        FastMLDNN_V6='fastmldnn_abl-skip-cross-entropy-shrinkage_iq-ap-channel-deepsig201610A',
-
-        HCGDNN='hcgdnn_iq-channel-deepsig201610A',
-        HCGDNN_V1='hcgdnn_abl-cnn_iq-channel-deepsig201610A',
-        HCGDNN_V2='hcgdnn_abl-bigru1_iq-channel-deepsig201610A',
-        HCGDNN_V3='hcgdnn_abl-bigru2_iq-channel-deepsig201610A',
-        HCGDNN_V4='hcgdnn_abl-init-bigru1_iq-channel-deepsig201610A',
-        HCGDNN_V5='hcgdnn_abl-init-bigru2_iq-channel-deepsig201610A',
-        HCGDNN_V6='hcgdnn_abl-bigru1-bigru2_iq-channel-deepsig201610A',
+        # FastMLDNN='fastmldnn_iq-ap-channel-deepsig201610A',
+        # FastMLDNN_V1='fastmldnn_abl-cross-entropy_iq-ap-deepsig201610A',
+        # FastMLDNN_V2='fastmldnn_abl-cross-entropy_iq-ap-channel-deepsig201610A',
+        # FastMLDNN_V3='fastmldnn_abl-focal_iq-ap-channel-deepsig201610A',
+        # FastMLDNN_V4='fastmldnn_abl-skip-focal_iq-ap-channel-deepsig201610A',
+        # FastMLDNN_V5='fastmldnn_abl-skip-cross-entropy_iq-ap-channel-deepsig201610A',
+        # FastMLDNN_V6='fastmldnn_abl-skip-cross-entropy-shrinkage_iq-ap-channel-deepsig201610A',
+        #
+        # HCGDNN='hcgdnn_iq-channel-deepsig201610A',
+        # HCGDNN_V1='hcgdnn_abl-cnn_iq-channel-deepsig201610A',
+        # HCGDNN_V2='hcgdnn_abl-bigru1_iq-channel-deepsig201610A',
+        # HCGDNN_V3='hcgdnn_abl-bigru2_iq-channel-deepsig201610A',
+        # HCGDNN_V4='hcgdnn_abl-init-bigru1_iq-channel-deepsig201610A',
+        # HCGDNN_V5='hcgdnn_abl-init-bigru2_iq-channel-deepsig201610A',
+        # HCGDNN_V6='hcgdnn_abl-bigru1-bigru2_iq-channel-deepsig201610A',
     ),
-    # deepsig201801A=dict(
-    #     DecisionTree_FB='decisiontree_feature-based_cumulants-deepsig201801A',
-    #     SVM_FB='svm_feature-based_cumulants-deepsig201801A',
-    #
-    #     AlexNet='alexnet_co-deepsig201801A',
-    #     GoogleNet='googlenet_co-deepsig201801A',
-    #     VGGNet='vggnet_co-deepsig201801A',
-    #     ResNet='resnet_co-deepsig201801A',
-    #
-    #     CNN2='cnn2_iq-deepsig201801A',
-    #     CNN3='cnn3_iq-deepsig201801A',
-    #     CNN3_ap='cnn3_ap-deepsig201801A',
-    #     CNN4='cnn4_iq-deepsig201801A',
-    #     DensCNN='denscnn_iq-deepsig201801A',
-    #     ResCNN='rescnn_iq-deepsig201801A',
-    #
-    #     CGDNN2='cgdnn2_iq-deepsig201801A',
-    #     CGDNN2_ap='cgdnn2_ap-deepsig201801A',
-    #     CLDNN='cldnn_iq-deepsig201801A',
-    #     CLDNN_ap='cldnn_ap-deepsig201801A',
-    #     CLDNN2='cldnn2_iq-deepsig201801A',
-    #     CLDNN2_ap='cldnn2_ap-deepsig201801A',
-    #
-    #     DSCLDNN='dscldnn_iq-ap-deepsig201801A',
-    #
-    #     MLDNN='mldnn_iq-ap-deepsig201801A',
-    #
-    #     FastMLDNN='fastmldnn_iq-ap-channel-deepsig201801A',
-    # ),
+    deepsig201801A=dict(
+        DecisionTree_FB='decisiontree_feature-based_cumulants-deepsig201801A',
+        SVM_FB='svm_feature-based_cumulants-deepsig201801A',
+
+        AlexNet='alexnet_co-deepsig201801A',
+        GoogleNet='googlenet_co-deepsig201801A',
+        VGGNet='vggnet_co-deepsig201801A',
+        ResNet='resnet_co-deepsig201801A',
+
+        CNN4='cnn4_iq-deepsig201801A',
+        DensCNN='denscnn_iq-deepsig201801A',
+        ResCNN='rescnn_iq-deepsig201801A',
+
+        CLDNN='cldnn_iq-deepsig201801A',
+
+        DSCLDNN='dscldnn_iq-ap-deepsig201801A',
+        MLDNN='mldnn_iq-ap-deepsig201801A',
+
+    ),
 )

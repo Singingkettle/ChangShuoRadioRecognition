@@ -1,5 +1,5 @@
 dataset_type = 'PureCSSS'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/CSSS/pure'
+data_root = './data/ModulationClassification/CSSS/pure'
 snr_start = -8
 snr_end = 32
 data = dict(

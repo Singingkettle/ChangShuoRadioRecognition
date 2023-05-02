@@ -1,5 +1,5 @@
 dataset_type = 'DeepSigDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/UCSD/RML22'
+data_root = './data/ModulationClassification/UCSD/RML22'
 target_name = 'modulation'
 data = dict(
     samples_per_gpu=80,

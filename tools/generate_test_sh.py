@@ -22,7 +22,7 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg.pretty_text)
 
-    test_sh_name = cfg.plot['figure_configs'] + '_test.sh'
+    test_sh_name = 'test.sh'
 
     train_configs = filter_config(cfg, is_regeneration=args.is_regeneration, mode='test')
 
@@ -44,7 +44,7 @@ def main():
             if epoch == -1:
                 checkpoint_sh = cfg.log_dir + '/{}/model.fb'.format(config)
             else:
-                checkpoint_sh = cfg.log_dir + '/{}/epoch_{}.pth'.format(config, epoch)
+                checkpoint_sh = cfg.log_dir + f'/{config}/{epoch}'
             format_out_sh = cfg.log_dir + '/{}/format'.format(config)
 
             if epoch == -1:

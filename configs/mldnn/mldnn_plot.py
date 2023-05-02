@@ -20,6 +20,10 @@ performance = dict(
             dataset=dict(
                 deepsig201610A=[
                     dict(
+                        abl=[
+                            'CNN3', 'CNN3_ap', 'MLDNN', 'MLDNN_V3', 'MLDNN_V4',
+                            'MLDNN_V5', 'MLDNN_V6', 'MLDNN_V7', 'MLDNN_V8', 'MLDNN_V9'
+                        ],
                         iq_ap=[
                             'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
                         ],
@@ -28,13 +32,13 @@ performance = dict(
                         ]
                     )
                 ],
-                # deepsig201801A=[
-                #     dict(
-                #         iq_ap=[
-                #             'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                #         ],
-                #     )
-                # ]
+                deepsig201801A=[
+                    dict(
+                        iq_ap=[
+                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                        ],
+                    )
+                ]
             ),
         ),
         dict(
@@ -50,13 +54,13 @@ performance = dict(
                         ]
                     )
                 ],
-                # deepsig201801A=[
-                #     dict(
-                #         iq_ap=[
-                #             'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                #         ],
-                #     )
-                # ]
+                deepsig201801A=[
+                    dict(
+                        iq_ap=[
+                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                        ],
+                    )
+                ]
             ),
         )
     ],

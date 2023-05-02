@@ -3,7 +3,7 @@ _base_ = [
 ]
 # 0.01, 0.45, 0.54
 dataset_type = 'GBSenseBasic'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/GBSense/2022/Basic'
+data_root = './data/ModulationClassification/GBSense/2022/Basic'
 data = dict(
     samples_per_gpu=640,
     workers_per_gpu=20,

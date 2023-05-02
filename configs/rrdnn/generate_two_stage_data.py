@@ -12,7 +12,7 @@ from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_method
 from csrr.runner import (get_dist_info, init_dist, load_checkpoint, wrap_fp16_model)
 
-checkpoint = 'work_dirs/rrdnn_first-stage_csrr2023/googlenet.pth'
+checkpoint = 'work_dirs/rrdnn_first-stage_csrr2023/epoch_10.pth'
 cfg_path = 'configs/rrdnn/rrdnn_first-stage_csrr2023.py'
 
 cfg = Config.fromfile(cfg_path)
@@ -32,9 +32,10 @@ elif isinstance(cfg.data.test, list):
         ds_cfg.test_mode = True
 
 # build the dataloader
-samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 4)
-workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 0)
-dataset = build_dataset(cfg.data.test)
+cfg.data.train['pipeline'][3]['keys'].pop(1)
+samples_per_gpu = cfg.data.train.pop('samples_per_gpu', 4)
+workers_per_gpu = cfg.data.train.pop('workers_per_gpu', 0)
+dataset = build_dataset(cfg.data.train)
 data_loader = build_dataloader(
     dataset,
     samples_per_gpu=samples_per_gpu,
@@ -58,4 +59,19 @@ model = CSDataParallel(model, device_ids=[0])
 outputs = single_gpu_test(model, data_loader, cfg.dropout_alive)
 
 
-dataset.two_stage(outputs, amc_iou=0.5)
+dataset.two_stage(outputs, amc_iou=0.5, mode='train_and_val')
+
+
+samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 4)
+workers_per_gpu = cfg.data.test.pop('workers_per_gpu', 0)
+dataset = build_dataset(cfg.data.test)
+data_loader = build_dataloader(
+    dataset,
+    samples_per_gpu=samples_per_gpu,
+    workers_per_gpu=workers_per_gpu,
+    dist=False,
+    shuffle=False)
+outputs = single_gpu_test(model, data_loader, cfg.dropout_alive)
+
+
+dataset.two_stage(outputs, amc_iou=0.5, mode='test')

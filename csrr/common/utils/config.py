@@ -752,18 +752,18 @@ def filter_config(cfg, is_regeneration=False, mode='test'):
     for dataset in cfg.publish:
         for method_name in cfg.publish[dataset]:
             config_name = cfg.publish[dataset][method_name]
+            official_model = osp.join(cfg.work_dir, config_name, f'{method_name}.pth')
             config_file_path = osp.join(cfg.work_dir, config_name, f'{config_name}.py')
-            if osp.isfile(config_file_path):
+            if osp.isfile(config_file_path) or osp.isfile(official_model):
                 if 'feature-based' in config_name:
-                    train_configs[config_name] = -1
+                    train_configs[config_name] = f'{method_name}.pth'
                 else:
-                    best_epoch = get_the_best_checkpoint(cfg.work_dir, config_name)
-                    if best_epoch > 0:
-                        train_configs[config_name] = best_epoch
-                        if not osp.isfile(osp.join(cfg.work_dir, config_name, 'format/res.pkl')):
-                            no_test_configs[config_name] = best_epoch
-                        else:
-                            test_configs.append(config_name)
+                    best_epoch = get_the_best_checkpoint(cfg.work_dir, config_name, method_name)
+                    train_configs[config_name] = best_epoch
+                    if not osp.isfile(osp.join(cfg.work_dir, config_name, 'format/res.pkl')):
+                        no_test_configs[config_name] = best_epoch
+                    else:
+                        test_configs.append(config_name)
 
             configs.append(config_name)
 
@@ -810,32 +810,35 @@ def get_total_epoch(log_file):
     return 0
 
 
-def get_the_best_checkpoint(work_dir, config_name):
-    json_paths = glob(os.path.join(work_dir, config_name), 'json')
+def get_the_best_checkpoint(work_dir, config_name, method_name):
+    if osp.isfile(osp.join(work_dir, config_name, f'{method_name}.pth')):
+        best_epoch = f'{method_name}.pth'
+    else:
+        json_paths = glob(os.path.join(work_dir, config_name), 'json')
 
-    best_epoch = 0
-    if len(json_paths) > 0:
-        json_paths = sorted(json_paths)
-        max_epoch = 0
-        final_metric = 'ACC'
-        total_epoch = get_total_epoch(json_paths[-1].replace('.json', ''))
-        merge_log = {i + 1: 0 for i in range(total_epoch)}
-        for json_path in json_paths:
-            log_dict = load_json_log(json_path)
-            epochs = list(log_dict.keys())
-            if len(epochs) == 0:
-                continue
-            if max(epochs) > max_epoch:
-                max_epoch = max(epochs)
-            for epoch in epochs:
-                try:
-                    if log_dict[epoch]['mode'][-1] == 'val':
-                        merge_log[epoch] = log_dict[epoch][final_metric][0]
-                except:
-                    max_epoch = 0
-                    break
-        best_epoch = max(merge_log, key=merge_log.get)
-        if total_epoch != max_epoch:
-            best_epoch = 0
-
+        best_epoch = 0
+        if len(json_paths) > 0:
+            json_paths = sorted(json_paths)
+            max_epoch = 0
+            final_metric = 'ACC'
+            total_epoch = get_total_epoch(json_paths[-1].replace('.json', ''))
+            merge_log = {i + 1: 0 for i in range(total_epoch)}
+            for json_path in json_paths:
+                log_dict = load_json_log(json_path)
+                epochs = list(log_dict.keys())
+                if len(epochs) == 0:
+                    continue
+                if max(epochs) > max_epoch:
+                    max_epoch = max(epochs)
+                for epoch in epochs:
+                    try:
+                        if log_dict[epoch]['mode'][-1] == 'val':
+                            merge_log[epoch] = log_dict[epoch][final_metric][0]
+                    except:
+                        max_epoch = 0
+                        break
+            best_epoch = max(merge_log, key=merge_log.get)
+            if total_epoch != max_epoch:
+                best_epoch = 0
+            best_epoch = f'epoch_{best_epoch}.pth'
     return best_epoch

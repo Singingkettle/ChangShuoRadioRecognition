@@ -1,5 +1,5 @@
 dataset_type = 'DoctorHeDataset'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/DoctorHe/2023.03.A'
+data_root = './data/ModulationClassification/DoctorHe/2023.03.A'
 case = 'case2'
 data_info = 'Graymat_SQCD_11dB_shift1step_sybnum4.mat'
 data = dict(

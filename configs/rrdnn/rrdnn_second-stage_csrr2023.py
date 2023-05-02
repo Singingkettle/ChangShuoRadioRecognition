@@ -1,31 +1,36 @@
 _base_ = [
-    './data_csrr2023.py',
+    './data_second-stage-csrr2023.py',
     '../_base_/schedules/schedule.py',
     '../_base_/default_runtime.py'
 ]
 
+in_size = 100
+out_size = 288
 model = dict(
-    type='BaseDetector',
-    method_name='RRDNN',
+    type='CGDNN2',
     backbone=dict(
-        type='DetCNN',
+        type='HCGNetGRU2',
+        input_size=in_size,
     ),
-    detector_head=dict(
-        type='SignalDetectionHead',
-        cfg=dict(
-            nms_pre=1000,
-            score_thr=0.05,
-            nms=dict(iou_threshold=0.45),
-            max_per_sequence=27,
-        )
-    ),
+    classifier_head=dict(
+        type='AMCHead',
+        num_classes=6,
+        in_size=in_size,
+        out_size=out_size,
+        loss_cls=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        ),
+        init_cfg=[
+            dict(type='TruncNormal', layer='Linear', std=0.02, bias=0.),
+        ],
+    )
 )
 
-is_det = True
-runner = dict(type='EpochBasedRunner', max_epochs=600)
+runner = dict(type='EpochBasedRunner', max_epochs=100)
 # Optimizer
 # for flops calculation
-optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.0001)
+optimizer = dict(type='AdamW', lr=0.001, weight_decay=0.00005)
 # learning policy
 lr_config = dict(policy='fixed')
 evaluation = dict(interval=1)

@@ -306,7 +306,7 @@ class CSRRDataset(CustomDataset):
         return eval_results
 
 
-    def two_stage(self, results, amc_iou=0.5):
+    def two_stage(self, results, amc_iou=0.5, mode=None):
         ann_file = os.path.basename(self.ann_file)
         self.cache_data = pickle.load(open(osp.join(self.data_root, 'cache', ann_file.replace('.json', '_iq.pkl')), 'rb'))
         tmp_dir = tempfile.TemporaryDirectory()
@@ -354,7 +354,7 @@ class CSRRDataset(CustomDataset):
                 iq = np.vstack((i_seq, q_seq))
                 max_iou = np.max(coco_eval.ious[(i, 0)][bi, :])
                 max_iou_index = np.argmax(coco_eval.ious[(i, 0)][bi, :])
-                iq_file_name = 'ts-{:0>12d}.npy'.format(global_iq_id)
+                iq_file_name = 'ts-{}-{:0>12d}.npy'.format(mode, global_iq_id)
                 iq_path = osp.join(self.data_root, 'sequence_data/iq', iq_file_name)
                 np.save(iq_path, iq)
                 ann = dict()
@@ -369,9 +369,6 @@ class CSRRDataset(CustomDataset):
                 global_iq_id += 1
         annotations['modulations'].append('none')
         json.dump(annotations, open(f'{self.data_root}/ts-{ann_file}', 'w'), indent=4, sort_keys=True)
-
-
-
 
 
 

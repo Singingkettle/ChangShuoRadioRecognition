@@ -29,7 +29,7 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=3200)
+runner = dict(type='EpochBasedRunner', max_epochs=400)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.00044)

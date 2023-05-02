@@ -1,5 +1,5 @@
 dataset_type = 'CSSSDetTwoStage'
-data_root = '/home/citybuster/Data/SignalProcessing/ModulationClassification/CSSS/data'
+data_root = './data/ModulationClassification/CSSS/data'
 snr_start = -8
 snr_end = 32
 data = dict(
