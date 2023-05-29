@@ -62,7 +62,7 @@ def get_model_complexity_info(model,
 
     Args:
         model (nn.Module): The model for complexity calculation.
-        input_shape (list[tuple]): Input shape list used for calculation.
+        input_shape (Dict[str, tuple]): Input shape list used for calculation.
         print_per_layer_state (bool): Whether to print complexity information
             for each layer in a model. Default: True.
         as_strings (bool): Output FLOPs and params counts in a string form.
@@ -76,7 +76,7 @@ def get_model_complexity_info(model,
             FLOPs, parameter counts and inference time in a string format. otherwise, it will
             return those in a float number format.
     """
-    assert type(input_shape) is list
+    assert type(input_shape) is dict
     assert isinstance(model, nn.Module)
     flops_model = add_flops_counting_methods(model)
     flops_model.eval()
@@ -96,13 +96,13 @@ def get_model_complexity_info(model,
             data = torch.ones(()).new_empty((1, *shape))
         return data
 
-    inputs = list()
-    for shape in input_shape:
-        inputs.append(generate_input_tensor(shape))
+    inputs = dict()
+    for name in input_shape:
+        inputs[name] = generate_input_tensor(input_shape[name])
 
     # starting time
     start = time.time()
-    _ = flops_model(*inputs)
+    _ = flops_model(inputs)
     # end time
     end = time.time()
     inference_time = end - start

@@ -3,7 +3,7 @@ import os
 import time
 
 from csrr.common.fileio import dump as IODump
-from csrr.common.utils import Config, setup_multi_processes
+from csrr.common.utils import Config, mkdir_or_exist, setup_multi_processes
 from csrr.datasets import build_dataset
 from csrr.models import build_method
 
@@ -41,7 +41,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    assert args.out or args.eval or args.format_only, \
+    assert args.out or args.eval or args.format_only or args.paper, \
         ('Please specify at least one operation (format/eval/format the '
          'results / format the results) with the argument "--out", "--eval"'
          ', "--format-only"')
@@ -65,7 +65,7 @@ def main():
     outputs = model(inputs)
 
     # allows not to create
-    # mkdir_or_exist(os.path.abspath(args.work_dir))
+    mkdir_or_exist(os.path.abspath(args.work_dir))
 
     if args.out:
         print(f'\nwriting results to {args.work_dir}')

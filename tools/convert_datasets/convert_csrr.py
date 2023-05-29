@@ -4,17 +4,6 @@ import argparse
 
 from datasets import CSRRData
 
-_DATA_VERSION = ['CSRR2023']
-
-_CSRR_CLASSES = {
-    'CSRR2023': CSRRData,
-}
-
-
-def build_csrr_class(version, data_root, data_ratios):
-    csrr_class = _CSRR_CLASSES[version]
-    return csrr_class(data_root, version, data_ratios)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Convert CSRR Dataset')
@@ -28,9 +17,8 @@ def parse_args():
 def main():
     args = parse_args()
     data_ratios = [0.6, 0.2, 0.2]
-    for version in _DATA_VERSION:
-        data_generator = build_csrr_class(
-            version, args.data_root, data_ratios)
+    for version in range(1, 55):
+        data_generator = CSRRData(args.data_root, f'v{version}', data_ratios)
         data_generator.generate()
 
 

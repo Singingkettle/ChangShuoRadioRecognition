@@ -227,7 +227,7 @@ class SignalYOLOBBoxCoder(YOLOBBoxCoder):
 
 @HEADS.register_module()
 class SignalDetectionHead(BaseHead):
-    def __init__(self, num_anchors=2, in_size=256, featmap_strides=[16], cfg=None,
+    def __init__(self, num_anchors=2, in_size=128, featmap_strides=[16], cfg=None,
                  loss_bw=None, loss_cf=None, loss_conf=None, init_cfg=None):
         super(SignalDetectionHead, self).__init__(init_cfg)
         if loss_bw is None:
@@ -260,8 +260,8 @@ class SignalDetectionHead(BaseHead):
         self.featmap_strides = featmap_strides
         self.head = nn.Conv2d(in_size, num_anchors * self.num_attrib, kernel_size=1)
         self.bbox_coder = SignalYOLOBBoxCoder()
-        self.prior_generator = SignalYOLOAnchorGenerator(base_sizes=[[(121, 1), (93, 1)]], strides=[(16, 1)])
-        self.assigner = GridAssigner(pos_iou_thr=0.5, neg_iou_thr=0.5, min_pos_iou=0)
+        self.prior_generator = SignalYOLOAnchorGenerator(base_sizes=[[(125, 1), (95, 1)]], strides=[(8, 1)])
+        self.assigner = GridAssigner(pos_iou_thr=0.9, neg_iou_thr=0.4, min_pos_iou=0.5)
         self.sampler = PseudoSampler()
 
 

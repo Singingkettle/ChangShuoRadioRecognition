@@ -5,10 +5,11 @@ _base_ = [
 ]
 
 in_size = 100
-out_size = 288
+out_size = 2
 num_classes = 11
 model = dict(
     type='FastMLDNN',
+    vis_fea=True,
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
@@ -24,7 +25,7 @@ model = dict(
         num_classes=11,
         in_size=in_size,
         out_size=out_size,
-        balance=0.8,
+        balance=0.5,
         loss_cls=dict(
             type='FocalLoss',
             loss_weight=1
@@ -35,7 +36,7 @@ model = dict(
     )
 )
 
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='EpochBasedRunner', max_epochs=3200)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.0001054)
@@ -49,3 +50,4 @@ lr_config = dict(
 evaluation = dict(interval=1)
 checkpoint_config = dict(interval=1)
 seed = 0
+input_shape = [4, 1, 128]

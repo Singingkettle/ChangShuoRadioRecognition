@@ -1,5 +1,4 @@
 _base_ = [
-    './schedule.py',
     './data_iq-channel-deepsig201610A.py',
 ]
 

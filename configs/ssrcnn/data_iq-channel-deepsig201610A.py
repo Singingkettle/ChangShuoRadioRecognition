@@ -34,14 +34,14 @@ data = dict(
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='ChannelMode', ),
-            dict(type='Collect', keys=['iqs', ])
+            dict(type='Collect', keys=['inputs', ])
         ],
         data_root=data_root,
         evaluate=[
             dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
         format=[
-            dict(type='FormatSingleHeadClassifierWithSNROfHCGDNN', merge=dict(type='Optimization'))
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),
 )

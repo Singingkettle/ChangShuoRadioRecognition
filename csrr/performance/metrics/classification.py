@@ -1,19 +1,14 @@
+import copy
 from itertools import combinations
 from typing import Union, Dict, Tuple, Any, List
 
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
+from sklearn.manifold import TSNE
 from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc
 from sklearn.preprocessing import label_binarize
-from csrr.common.utils import Config
 
-try:
-    from tsnecuda import TSNE
-except ImportError:
-    from sklearn.manifold import TSNE
-from ..figure_configs import _COLORS, _MARKERS
-from ..figures.utils import get_new_fig
+from csrr.common.utils import Config
 
 
 class ClassificationMetricsForSingle:
@@ -57,48 +52,23 @@ class ClassificationMetricsForSingle:
         self._roc = None
         self._cache_roc = False
 
-    def _FeaDistribution(self, feas, centers) -> np.ndarray:
+    def _FeaDistribution(self) -> Dict:
 
-        fig, ax = get_new_fig('Curve', [8, 8])
-
-        points = np.concatenate([feas, centers], axis=0)
+        points = np.concatenate([self.feas, self.centers], axis=0)
         if points.shape[1] > 2:
-            points = TSNE(n_components=2, perplexity=15, learning_rate=10).fit_transform(points)
-            feas = points[feas.shape[0], :]
-            centers = points[centers.shape[0], :]
+            points = TSNE(n_components=2, perplexity=15, learning_rate=10, verbose=1, n_jobs=12).fit_transform(
+                points)
+            feas = points[:self.feas.shape[0], :]
+            centers = points[feas.shape[0]:, :]
+            for class_index in range(self.num_class):
+                centers[class_index, :] = np.mean(feas[self.gts == class_index, :], axis=0)
+        else:
+            feas = self.feas
+            centers = self.centers
 
-        x1 = np.round(np.min(points[:, 0]))
-        x2 = np.ceil(np.max(points[:, 0]))
+        fea_info = dict(classes=self.classes, feas=feas, gts=self.gts, centers=centers)
 
-        y1 = np.round(np.min(points[:, 1]))
-        y2 = np.ceil(np.max(points[:, 1]))
-
-        ax.set_xlim(x1, x2)
-        ax.set_ylim(y1, y2)
-
-        center_colors = _COLORS[:centers.shape[0]]
-        center_markers = _MARKERS[:centers.shape[0]]
-        for class_id in range(centers.shape[0]):
-            ax.scatter(centers[class_id, 0], centers[class_id, 1], s=2, c=center_colors[class_id],
-                       marker=center_markers[class_id], alpha=1, label=self.classes[class_id])
-
-        for class_id in range(centers.shape[0]):
-            index = np.where(self.gts == class_id)[0]
-            ax.scatter(feas[index[:6], 0], feas[index[:6], 1], s=1,
-                       c=center_colors[class_id], m=center_markers[class_id])
-
-        leg = ax.legend(loc='lower right', prop={'size': 14, 'weight': 'bold'})
-        leg.get_frame().set_edgecolor('black')
-        plt.tight_layout()
-
-        fig.canvas.draw()  # draw the canvas, cache the renderer
-
-        image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
-        image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-        plt.close(fig)
-        image = np.transpose(image, [2, 0, 1])
-
-        return image
+        return fea_info
 
     def _confusion_matrix(self, pps, tps) -> np.ndarray:
         num_class = self.num_class
@@ -146,7 +116,7 @@ class ClassificationMetricsForSingle:
         tp_fp = confusion_matrix[-1, :-1]
         f1_score = 2 * np.diag(confusion_matrix[:-1, :-1]) / (tp_fn + tp_fp)
         f1_score = {self.classes[index]: f1 for index, f1 in enumerate(f1_score)}
-        f1_score['AllClass'] = 1.0 * sum(f1_score.values()) / len(f1_score)
+        f1_score['Mean'] = 1.0 * sum(f1_score.values()) / len(f1_score)
 
         return f1_score
 
@@ -307,78 +277,47 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
         self.num_snr = len(snr_to_index)
         self.snr_to_index = snr_to_index
 
-    def _FeaDistribution(self, feas, centers, snrs) -> np.ndarray:
-
-        fig, ax = get_new_fig('Curve', [8, 8])
-
-        points = np.concatenate([feas, centers], axis=0)
-        if points.shape[1] > 2:
-            points = TSNE(n_components=2, perplexity=15, learning_rate=10).fit_transform(points)
-            feas = points[:feas.shape[0], :]
-            centers = points[feas.shape[0]:, :]
-
-        x1 = np.round(np.min(points[:, 0]))
-        x2 = np.ceil(np.max(points[:, 0]))
-
-        y1 = np.round(np.min(points[:, 1]))
-        y2 = np.ceil(np.max(points[:, 1]))
-
-        ax.set_xlim(x1, x2)
-        ax.set_ylim(y1, y2)
-
-        center_colors = _COLORS[:centers.shape[0]]
-        center_markers = _MARKERS[:centers.shape[0]]
-
-        for class_id in range(centers.shape[0]):
-            ax.scatter(centers[class_id, 0], centers[class_id, 1], s=30, c=center_colors[class_id],
-                       marker=center_markers[class_id], alpha=1, label=self.classes[class_id])
-
-        alpha_size = 0.9
-        dalpha = alpha_size / len(self.snr_set)
-        snr_dict = {self.snr_set[i]: i for i in range(len(self.snr_set))}
-
-        for snr in self.snr_set:
-            for class_id in range(centers.shape[0]):
-                index = np.where((self.snrs == snr) & (self.gts == class_id))[0]
-                ax.scatter(feas[index[:6], 0], feas[index[:6], 1], s=15, c=center_colors[class_id],
-                           marker=center_markers[class_id], alpha=snr_dict[snr] * dalpha + 1 - alpha_size)
-
-        leg = ax.legend(loc='lower right', prop={'size': 14, 'weight': 'bold'})
-        leg.get_frame().set_edgecolor('black')
-
-        plt.tight_layout()
-
-        fig.canvas.draw()  # draw the canvas, cache the renderer
-
-        image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
-        image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-        plt.close(fig)
-        image = np.transpose(image, [2, 0, 1])
-        return image
-
-    @property
-    def FeaDistribution(self) -> Dict[str, np.ndarray]:
-        if not self._cache_fd:
-            image = self._FeaDistribution(self.feas, self.centers, self.snrs)
-            self._fd = {'Image/FeaDistribution': image}
-            self._cache_fd = True
-
-        return self._fd
-
     @property
     def confusion_matrix(self) -> Dict[str, np.ndarray]:
         if not self._cache_cm:
             confusion_matrix = dict()
             for snr in self.snr_to_index:
-                confusion_matrix[f'{snr:02d}dB'] = self._confusion_matrix(self.pps_along_snr[snr],
-                                                                          self.tps_along_snr[snr])
+                confusion_matrix[f'{snr:d}dB'] = self._confusion_matrix(self.pps_along_snr[snr],
+                                                                        self.tps_along_snr[snr])
             # Add All SNR together
-            confusion_matrix['AllSNR'] = self._confusion_matrix(self.pps, self.tps)
+            confusion_matrix['All SNRs'] = self._confusion_matrix(self.pps, self.tps)
 
             self._cm = confusion_matrix
             self._cache_cm = True
 
         return self._cm
+
+    def _FeaDistribution(self) -> Dict:
+        feas_along_snr = {snr: self.feas[self.snrs == snr, :] for snr in self.snr_to_index}
+
+        fea_info = dict()
+        for snr in range(12, 14, 2):
+            feas = copy.deepcopy(feas_along_snr[snr])
+            gts = copy.deepcopy(self.gts_along_snr[snr])
+            if feas.shape[1] > 2:
+                feas = TSNE(n_components=2, perplexity=int(feas.shape[0] / self.num_class),
+                            learning_rate=200, verbose=1, n_jobs=12).fit_transform(feas)
+                centers = np.zeros((self.num_class, feas.shape[1]))
+                for class_index in range(self.num_class):
+                    centers[class_index, :] = np.mean(feas[gts == class_index, :], axis=0)
+            else:
+                centers = self.centers
+            fea_info[snr] = dict(classes=self.classes, feas=feas, gts=gts, centers=centers)
+        return fea_info
+
+    @property
+    def FeaDistribution(self) -> Dict:
+        if not self._cache_fd:
+            fd = self._FeaDistribution()
+            self._fd = fd
+            self._cache_fd = True
+
+        return self._fd
 
     @property
     def ACC(self) -> Dict[Union[str, Any], float]:
@@ -386,9 +325,9 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             accuracy = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                accuracy[f'{snr:02d}dB'] = self._accuracy(confusion_matrix[f'{snr:02d}dB'])
+                accuracy[f'{snr:d}dB'] = self._accuracy(confusion_matrix[f'{snr:d}dB'])
             # For All SNR
-            accuracy['AllSNR'] = self._accuracy(confusion_matrix['AllSNR'])
+            accuracy['All SNRs'] = self._accuracy(confusion_matrix['All SNRs'])
             self._as = accuracy
             self._cache_as = True
 
@@ -400,8 +339,8 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             f1_score = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                f1_score[f'{snr:02d}dB'] = self._f1_score(confusion_matrix[f'{snr:02d}dB'])
-            f1_score['AllSNR'] = self._f1_score(confusion_matrix['AllSNR'])
+                f1_score[f'{snr:d}dB'] = self._f1_score(confusion_matrix[f'{snr:d}dB'])
+            f1_score['All SNRs'] = self._f1_score(confusion_matrix['All SNRs'])
             self._fs = f1_score
             self._cache_fs = True
 

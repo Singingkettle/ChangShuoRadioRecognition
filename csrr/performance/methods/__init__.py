@@ -1,5 +1,4 @@
-from ..figure_configs.legend import LegendConfig
-
+from .classification import Classification
 __all__ = [
-    'LegendConfig'
+    'Classification'
 ]

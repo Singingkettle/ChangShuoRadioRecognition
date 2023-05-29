@@ -1,3 +1,4 @@
+import copy
 import os
 import pickle
 
@@ -5,7 +6,8 @@ import numpy as np
 
 from .builder import DATASETS
 from .custom import CustomDataset
-
+from .utils import list_dict_to_dict_list
+from ..performance.metrics import get_classification_eval_with_snr
 
 @DATASETS.register_module()
 class DeepSigDataset(CustomDataset):
@@ -48,13 +50,23 @@ class DeepSigDataset(CustomDataset):
         gts = []
         snrs = []
         for annotation in self.data_infos['annotations']:
-            gt = self.data_infos[f'{self.target_name}s'].index(annotation[self.target_name])
+            gt = self.data_infos['modulations'].index(annotation['modulation'])
             gts.append(gt)
             snrs.append(annotation['snr'])
-
         gts = np.array(gts, dtype=np.float64)
-        pps = np.stack(results, axis=0)
         snrs = np.array(snrs, dtype=np.int64)
+        if isinstance(results[0], dict):
+            results = list_dict_to_dict_list(results)
+            pps = np.stack(copy.deepcopy(results['pre']), axis=0)
+            feas = np.stack(copy.deepcopy(results['fea']), axis=0)
+            centers = copy.deepcopy(results['center'][0])
+        else:
+            pps = np.stack(results, axis=0)
+            feas = None
+            centers = None
 
-        res = dict(gts=gts, pps=pps, snrs=snrs, classes=self.CLASSES, cfg=cfg)
+        res = dict(gts=gts, pps=pps, snrs=snrs, classes=self.CLASSES, cfg=cfg, feas=feas, centers=centers)
+
+        eval_results = get_classification_eval_with_snr(pps, gts, snrs, self.CLASSES, ['ACC'])
+        print(eval_results)
         pickle.dump(res, open(os.path.join(save_dir, 'paper.pkl'), 'wb'), protocol=4)

@@ -56,7 +56,7 @@ class COCOeval(_COCOeval):
 
         def _summarizeDets():
             stats = np.zeros((12,))
-            stats[0] = _summarize(1)
+            stats[0] = _summarize(1, maxDets=self.params.maxDets[2])
             stats[1] = _summarize(1, iouThr=.5, maxDets=self.params.maxDets[2])
             stats[2] = _summarize(1, iouThr=.75, maxDets=self.params.maxDets[2])
             stats[3] = _summarize(1, areaRng='small', maxDets=self.params.maxDets[2])
@@ -144,7 +144,7 @@ class CSRRDataset(CustomDataset):
         dump(coco_style_dataset, outfile_path)
 
         self._coco_api = COCO(outfile_path)
-        self.proposal_nums = [9, 18, 27]
+        self.proposal_nums = [5, 6, 7]
         self.iou_thrs = np.linspace(.5, 0.95, int(np.round((0.95 - .5) / .05)) + 1, endpoint=True)
 
     def get_ann_info(self, idx):
@@ -271,10 +271,10 @@ class CSRRDataset(CustomDataset):
         coco_eval.params.imgIds = self.img_ids
         coco_eval.params.maxDets = list(self.proposal_nums)
         coco_eval.params.iouThrs = self.iou_thrs
-        coco_eval.params.areaRng = [[0, 140], [0, 95], [95, 105], [105, 140]]
+        coco_eval.params.areaRng = [[0, 130], [0, 90], [90, 110], [110, 130]]
 
         # mapping of cocoEval.stats
-        metric_items = ['mAP', 'mAP_50', 'mAP_75']
+
         coco_metric_names = {
             'mAP': 0,
             'mAP_50': 1,
@@ -290,18 +290,19 @@ class CSRRDataset(CustomDataset):
             'AR_l@1000': 11
         }
 
+        metric_items = coco_metric_names.keys()
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
         for metric_item in metric_items:
             key = f'{metric}_{metric_item}'
             val = coco_eval.stats[coco_metric_names[metric_item]]
-            eval_results[key] = float(f'{round(val, 3)}')
+            eval_results[key] = float(f'{round(val, 4)}')
 
         ap = coco_eval.stats[:6]
-        logger.info(f'{metric}_mAP_copypaste: {ap[0]:.3f} '
-                    f'{ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} '
-                    f'{ap[4]:.3f} {ap[5]:.3f}')
+        logger.info(f'{metric}_mAP_copypaste: {ap[0]:.4f} '
+                    f'{ap[1]:.4f} {ap[2]:.4f} {ap[3]:.4f} '
+                    f'{ap[4]:.4f} {ap[5]:.4f}')
 
         return eval_results
 
@@ -324,10 +325,8 @@ class CSRRDataset(CustomDataset):
         coco_eval.params.imgIds = self.img_ids
         coco_eval.params.maxDets = list(self.proposal_nums)
         coco_eval.params.iouThrs = self.iou_thrs
-        coco_eval.params.areaRng = [[0, 140], [0, 95], [95, 105], [105, 140]]
+        coco_eval.params.areaRng = [[0, 120], [120, ], [105, 140]]
         coco_eval.evaluate()
-
-
 
         annotations = {'modulations': self.data_infos['modulations'], 'snrs': self.data_infos['snrs'], 'annotations': []}
         global_iq_id = 0

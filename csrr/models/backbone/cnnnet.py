@@ -311,26 +311,26 @@ class DetCNN(BaseBackbone):
             nn.Conv2d(128, 128, kernel_size=(1, 3), padding=(0, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
+            #nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2)),
         )
 
-        self.conv5 = nn.Sequential(
-            nn.Conv2d(128, 256, kernel_size=(1, 3), padding=(0, 1)),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-        )
+        # self.conv5 = nn.Sequential(
+        #     nn.Conv2d(128, 256, kernel_size=(1, 3), padding=(0, 1)),
+        #     nn.BatchNorm2d(256),
+        #     nn.ReLU(inplace=True),
+        #     nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
+        #     nn.BatchNorm2d(256),
+        #     nn.ReLU(inplace=True),
+        #     nn.Conv2d(256, 256, kernel_size=(1, 3), padding=(0, 1)),
+        #     nn.BatchNorm2d(256),
+        #     nn.ReLU(inplace=True),
+        # )
 
     def forward(self, iqs):
         x1 = self.conv1(iqs)
         x2 = self.conv2(x1)
         x3 = self.conv3(x2)
         x4 = self.conv4(x3)
-        x5 = self.conv5(x4)
+        #x5 = self.conv5(x4)
 
-        return x5
+        return x4

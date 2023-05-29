@@ -9,6 +9,7 @@ out_size = 288
 num_classes = 11
 model = dict(
     type='FastMLDNN',
+    vis_fea=True,
     backbone=dict(
         type='FMLNet',
         input_size=in_size,

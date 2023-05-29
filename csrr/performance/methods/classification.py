@@ -1,35 +1,39 @@
 import os
 
-from .base import BasePerformance
 from ..builder import PERFORMANCES, build_figure, build_table
-from ..figure_configs import LegendConfig, ScatterConfig
+from ..figure_configs import generate_legend_config, generate_scatter_config
 from ..method_info import AMCMethodInfo
 from ..metrics import ClassificationMetricsWithSNRForSingle
 from ...common.fileio import load as IOLoad
 
 
 @PERFORMANCES.register_module()
-class Classification(BasePerformance):
-    def __init__(self, Figures=None, Tables=None):
-        super().__init__()
-
+class Classification:
+    def __init__(self, save_dir, Figures=None, Tables=None):
+        self.save_dir = save_dir
         self.work_dir = AMCMethodInfo.work_dir
         self.methods = AMCMethodInfo.methods
-        self.legend = LegendConfig(len(self.methods))
-        self.scatter = ScatterConfig(len(self.methods))
+        self.legend = generate_legend_config(self.methods)
+        self.scatter = generate_scatter_config(self.methods)
         self.publish = AMCMethodInfo.publish
 
         self.performances = dict()
-        for datasetname in self.publish:
-            for method in self.publish[datasetname]:
-                res = IOLoad(os.path.join(self.work_dir, self.publish[datasetname][method], 'res/paper.pkl'))
-                self.performances[method] = ClassificationMetricsWithSNRForSingle(res['pts'], res['gts'], res['snrs'],
-                                                                                  res['classes'], res['cfg'])
+        for dataset_name in self.publish:
+            self.performances[dataset_name] = dict()
+            for method in self.publish[dataset_name]:
+                res = IOLoad(os.path.join(self.work_dir, self.publish[dataset_name][method], 'res/paper.pkl'))
+                self.performances[dataset_name][method] = ClassificationMetricsWithSNRForSingle(res['pps'], res['gts'],
+                                                                                                res['snrs'],
+                                                                                                res['classes'],
+                                                                                                feas=res.get('feas'),
+                                                                                                centers=res.get(
+                                                                                                    'centers'),
+                                                                                                cfg=res.get('cfg'))
 
         self.draw_handles = []
         if Figures is not None:
             for figure in Figures:
-                self.draw_handles.append(build_figure(figure))
+                self.draw_handles.append(build_figure(figure, legend=self.legend, scatter=self.scatter))
 
         if Tables is not None:
             for table in Tables:
@@ -38,6 +42,4 @@ class Classification(BasePerformance):
 
     def draw(self):
         for draw in self.draw_handles:
-            draw(self.performances, self.work_dir)
-
-
+            draw(self.performances, self.save_dir)

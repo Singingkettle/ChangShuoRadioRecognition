@@ -40,3 +40,4 @@ lr_config = dict(
     gamma=0.3,
     step=[800, 1200]
 )
+input_shape = dict(iqs=[2, 1, 128], aps=[2, 1, 128])

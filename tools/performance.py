@@ -22,6 +22,7 @@ def main():
     print(cfg.pretty_text)
 
     performance = build_performance(cfg.performance)
+    performance.draw()
 
 if __name__ == '__main__':
     main()

@@ -116,7 +116,7 @@ publish = dict(
         MLDNN_V8='mldnn_abl-bigru-last-gradient-truncation-mtlh_iq-ap-deepsig201610A',
         MLDNN_V9='mldnn_abl-bigru-add-gradient-truncation-mtlh_iq-ap-deepsig201610A',
 
-        # FastMLDNN='fastmldnn_iq-ap-channel-deepsig201610A',
+        FastMLDNN='fastmldnn_iq-ap-channel-deepsig201610A',
         # FastMLDNN_V1='fastmldnn_abl-cross-entropy_iq-ap-deepsig201610A',
         # FastMLDNN_V2='fastmldnn_abl-cross-entropy_iq-ap-channel-deepsig201610A',
         # FastMLDNN_V3='fastmldnn_abl-focal_iq-ap-channel-deepsig201610A',

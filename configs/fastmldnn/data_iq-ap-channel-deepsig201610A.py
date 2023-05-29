@@ -44,7 +44,7 @@ data = dict(
             dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
         ],
         format=[
-            dict(type='FormatSingleHeadClassifierWithSNR', )
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
         ],
     ),
 )

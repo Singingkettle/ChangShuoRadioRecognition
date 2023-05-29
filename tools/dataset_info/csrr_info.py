@@ -5,17 +5,19 @@ import numpy as np
 
 from csrr.common.fileio import load as IOLoad
 
-data_root = './data/ChangShuo/CSRR2023'
+data_root = './data/ChangShuo/v1'
 json_name = ['validation.json', 'test.json', 'train.json', 'train_and_validation.json']
 
 bws = []
 nums = []
-for json in json_name:
-    json_path = osp.join(data_root, json)
-    annos = IOLoad(json_path)
-    for anno in annos['annotations']:
-        bws.extend(anno['bandwidth'])
-        nums.append(len(anno['bandwidth']))
+for version in range(1, 2):
+    data_root = f'./data/ChangShuo/v{version:d}'
+    for json in json_name:
+        json_path = osp.join(data_root, json)
+        annos = IOLoad(json_path)
+        for anno in annos['annotations']:
+            bws.extend(anno['bandwidth'])
+            nums.append(len(anno['bandwidth']))
 
 nums = np.array(nums)
 plt.hist(nums)

@@ -64,9 +64,8 @@ def run(dataset_folder, json_file):
 
 def main():
     args = parse_args()
-    versions = next(os.walk(args.data_root))[1]
-    for version in versions:
-        dataset_folder = os.path.join(args.data_root, version)
+    for version in range(1, 55):
+        dataset_folder = os.path.join(args.data_root, f'v{version:d}')
         print(dataset_folder)
         # cache val data
         run(dataset_folder, 'validation.json')

@@ -74,6 +74,8 @@ class MLDNNHead(BaseHead):
         for key in inputs:
             outputs[key] = getattr(self, key)(inputs[key])
         outputs = getattr(self, 'merge')(outputs)
+        if is_test:
+            outputs = outputs['merge']
         if vis_fea:
             raise NotImplementedError('The vis fea for MLDNN is not supported!')
 

@@ -56,7 +56,7 @@ class FastMLDNNHead(BaseHead):
         if vis_fea:
             if is_test:
                 pre = torch.softmax(pre, dim=1)
-            return dict(fea=fea, pre=pre)
+            return dict(fea=fea, pre=pre, center=self.pre[-1].weight)
         else:
             if is_test:
                 pre = torch.softmax(pre, dim=1)

@@ -1,19 +1,14 @@
-import argparse
-import os
-import time
-
 import torch
 
-from csrr.apis import multi_gpu_test, single_gpu_test
-from csrr.common.fileio import dump as IODump
-from csrr.common.parallel import CSDataParallel, CSDistributedDataParallel
-from csrr.common.utils import Config, DictAction, fuse_conv_bn, mkdir_or_exist, setup_multi_processes
+from csrr.apis import single_gpu_test
+from csrr.common.parallel import CSDataParallel
+from csrr.common.utils import Config, setup_multi_processes
 from csrr.datasets import build_dataloader, build_dataset
 from csrr.models import build_method
-from csrr.runner import (get_dist_info, init_dist, load_checkpoint, wrap_fp16_model)
+from csrr.runner import (load_checkpoint, wrap_fp16_model)
 
 checkpoint = 'work_dirs/rrdnn_first-stage_csrr2023/epoch_10.pth'
-cfg_path = 'configs/rrdnn/rrdnn_first-stage_csrr2023.py'
+cfg_path = 'configs/rrdnn/rrdnn_first-stage_csrr2023_v1.py'
 
 cfg = Config.fromfile(cfg_path)
 

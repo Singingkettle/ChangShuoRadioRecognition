@@ -1,14 +1,20 @@
 from abc import ABCMeta, abstractmethod
 
+import matplotlib as mpl
+import matplotlib.cm as cm
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sn
 from matplotlib.collections import QuadMesh
 from pandas import DataFrame
+from sklearn.metrics import silhouette_score, silhouette_samples
 
 from .utils import get_new_fig, radar_factory
 from ..builder import FIGURES
+
+mpl.rc('font', family='Times New Roman')
+plt.rcParams["font.family"] = "Times New Roman"
 
 
 def config_cell_text_and_colors(array_df, lin, col, o_text, face_colors, position, fz, show_null_values=0):
@@ -115,7 +121,7 @@ def insert_totals(df_cm):
     df_cm.loc['Precision'] = sum_col
 
 
-def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Oranges", fmt='.2f', fz=9,
+def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap='Oranges', fmt='.2f', fz=9,
                                  lw=0.5, cbar=False, fig_size=None, show_null_values=0, pred_val_axis='x'):
     """
       print conf matrix with default layout (like matlab)
@@ -143,12 +149,7 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
     # create "Total" column
     insert_totals(df_cm)
 
-    # this is for print always in the same window
-    if snr is None:
-        fig, ax1 = get_new_fig(
-            'Confusion Matrix of All SNRs', fig_size)
-    else:
-        fig, ax1 = get_new_fig('Confusion Matrix of %ddB' % snr, fig_size)
+    fig, ax1 = get_new_fig(f'Confusion Matrix of {snr}', fig_size)
 
     # thanks for seaborn
     ax = sn.heatmap(df_cm, annot=annot, annot_kws={"size": fz}, linewidths=lw, ax=ax1,
@@ -189,6 +190,10 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
         text_add.extend(txt_res[0])
         text_del.extend(txt_res[1])
 
+    x = np.arange(0, 1 + len(df_cm.index), 1)
+    y = np.arange(0, 1 + len(df_cm.index), 1)
+    face_colors = np.reshape(face_colors, [len(df_cm.index), len(df_cm.index), 4])
+    ax.pcolormesh(x, y, face_colors, edgecolors='black')
     # remove the old ones
     for item in text_del:
         item.remove()
@@ -197,14 +202,9 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap="Orange
         ax.text(item['x'], item['y'], item['text'], **item['kw'])
 
     # titles and legends
-    if snr is None:
-        ax.set_title('Confusion Matrix of All SNRs',
-                     fontsize=18, fontweight='bold')
-    else:
-        ax.set_title('Confusion Matrix of %ddB' %
-                     snr, fontsize=18, fontweight='bold')
-    ax.set_xlabel(xlbl, fontsize=18, fontweight='bold')
-    ax.set_ylabel(ylbl, fontsize=18, fontweight='bold')
+    ax.set_title(f'Confusion Matrix of {snr}', fontsize=22, fontweight='bold')
+    ax.set_xlabel(xlbl, fontsize=22, fontweight='bold')
+    ax.set_ylabel(ylbl, fontsize=22, fontweight='bold')
     ax.tick_params(which='major', bottom=True,
                    top=False, left=True, right=False)
     plt.tight_layout()  # set layout slim
@@ -220,15 +220,110 @@ class BaseDraw(metaclass=ABCMeta):
             self.plot_config = dict(loc='lower right', prop={'size': 14, 'weight': 'bold'})
         else:
             self.plot_config = plot_config
+        self.xticklabel_rotation = 50
 
     @abstractmethod
     def __call__(self, *args, **kwargs):
         pass
 
-    def _draw_plot(self, methods, legend_config, xs, x_label, y_label, title, save_path):
-        fig, ax = get_new_fig('Curve', [8, 10])
+    def _draw_fea_distribution(self, classes, feas, gts, centers, save_path, method_name):
+        print('Save: ' + save_path)
+        num_class = len(classes)
+
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        fig.set_size_inches(18, 7)
+
+        ax1.set_xlim([-1, 1])
+        # The (n_clusters+1)*10 is for inserting blank space between silhouette
+        # plots of individual clusters, to demarcate them clearly.
+        ax1.set_ylim([0, len(feas) + (num_class + 1) * 10])
+
+        silhouette_avg = silhouette_score(feas, gts)
+        sample_silhouette_values = silhouette_samples(feas, gts)
+
+        y_lower = 10
+        for class_index in range(num_class):
+            ith_cluster_silhouette_values = sample_silhouette_values[gts == class_index]
+
+            ith_cluster_silhouette_values.sort()
+
+            size_cluster_i = ith_cluster_silhouette_values.shape[0]
+            y_upper = y_lower + size_cluster_i
+
+            color = cm.nipy_spectral(float(class_index) / num_class)
+            ax1.fill_betweenx(
+                np.arange(y_lower, y_upper),
+                0,
+                ith_cluster_silhouette_values,
+                facecolor=color,
+                edgecolor=color,
+                alpha=0.7,
+                label=f'{class_index:d}-{classes[class_index]}'
+            )
+
+            # Label the silhouette plots with their cluster numbers at the middle
+            ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(class_index))
+
+            # Compute the new y_lower for next plot
+            y_lower = y_upper + 10  # 10 for the 0 samples
+
+        ax1.set_title("The silhouette plot for the various modulations.", fontsize=22, fontweight="bold")
+        ax1.set_xlabel("The silhouette coefficient values", fontsize=22, fontweight="bold")
+        ax1.set_ylabel("Modulation label", fontsize=22, fontweight="bold")
+
+        # The vertical line for average silhouette score of all the values
+        ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
+
+        ax1.set_yticks([])  # Clear the yaxis labels / ticks
+        ax1.set_xticks([float(f'{v / 10:.1f}') for v in np.arange(-10, 11, 1)])
+
+        # 2nd Plot showing the actual clusters formed
+        colors = cm.nipy_spectral(gts.astype(float) / num_class)
+        ax2.scatter(
+            feas[:, 0], feas[:, 1], marker=".", s=30, lw=0, alpha=0.7, c=colors, edgecolor="k",
+        )
+
+        # Draw white circles at cluster centers
+        ax2.scatter(
+            centers[:, 0],
+            centers[:, 1],
+            marker="o",
+            c="white",
+            alpha=1,
+            s=200,
+            edgecolor="k",
+        )
+
+        for class_index in range(num_class):
+            color = cm.nipy_spectral(float(class_index) / num_class)
+            color = np.array([color])
+            c = centers[class_index, :]
+            ax2.scatter(c[0], c[1], marker="$%d$" % class_index, alpha=1, s=50, edgecolor="k",
+                        c=color, label=f'{class_index:d}-{classes[class_index]}')
+
+        ax2.set_title("The visualization of the feature data.", fontsize=22, fontweight="bold")
+        ax2.set_xlabel("Feature space for the 1st feature", fontsize=22, fontweight="bold")
+        ax2.set_ylabel("Feature space for the 2nd feature", fontsize=22, fontweight="bold")
+
+        plt.suptitle(
+            f'Silhouette analysis for {method_name} at 12dB on RadioML.2016.10A, '
+            f'and Average Silhouette Score = {silhouette_avg:.2f}',
+            fontsize=24,
+            fontweight="bold",
+        )
+
+        handles, labels = ax1.get_legend_handles_labels()
+        fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, -0.05),
+                   prop={'size': 14, 'weight': 'bold'}, ncol=num_class, edgecolor='black')
+        plt.tight_layout()
+        plt.savefig(save_path, bbox_inches='tight')
+        plt.close(fig)
+
+    def _draw_plot(self, methods, legend, xs, x_label, y_label, title, save_path):
+        print('Save: ' + save_path)
+        fig, ax = get_new_fig('Curve', [10, 10])
+        xs_str = ['%9s' % i for i in xs]
         xs = np.array([i for i in range(len(xs))]) / (len(xs) - 1)
-        xs_str = ['%9d' % i for i in xs]
         ax.set_xticks(xs)  # values
         ax.set_xticklabels(xs_str)  # labels
 
@@ -248,19 +343,21 @@ class BaseDraw(metaclass=ABCMeta):
             legend_name = name + ' [{:.4f}]'.format(score)
 
             ax.plot(
-                xs, ys, label=legend_name, linewidth=0.5,
-                color=legend_config[name]['color'],
-                linestyle=legend_config[name]['linestyle'],
-                marker=legend_config[name]['marker'],
-                markersize=3,
+                xs, ys, label=legend_name, linewidth=1,
+                color=legend[name]['color'],
+                linestyle=legend[name]['linestyle'],
+                marker=legend[name]['marker'],
+                markersize=6,
             )
 
         leg = ax.legend(**self.plot_config)
 
         leg.get_frame().set_edgecolor('black')
-        ax.set_xlabel(x_label, fontsize=18, fontweight='bold')
-        ax.set_ylabel(y_label, fontsize=18, fontweight='bold')
-        ax.set_title(title, fontsize=18, fontweight='bold')
+        plt.setp(leg.texts, family='Times New Roman')
+
+        ax.set_xlabel(x_label, fontsize=22, fontweight='bold')
+        ax.set_ylabel(y_label, fontsize=22, fontweight='bold')
+        ax.set_title(title, fontsize=22, fontweight='bold')
 
         # Don't allow the axis to be on top of your data
         ax.set_axisbelow(True)
@@ -269,7 +366,7 @@ class BaseDraw(metaclass=ABCMeta):
         ax.minorticks_on()
 
         # Customize the major grid
-        ax.grid(b=True, which='major', linestyle='-',
+        ax.grid(visible=True, which='major', linestyle='-',
                 linewidth='0.5', color='black', alpha=0.2)
         # # Customize the minor grid
         # ax.grid(b=True, which='minor', linestyle=':',
@@ -284,46 +381,46 @@ class BaseDraw(metaclass=ABCMeta):
                        top=False, left=False, right=False)
         ax.tick_params(which='major', bottom=True,
                        top=False, left=True, right=False)
-        plt.setp(ax.get_xticklabels(), rotation=50,
+        plt.setp(ax.get_xticklabels(), rotation=self.xticklabel_rotation,
                  horizontalalignment='right')
         plt.tight_layout()  # set layout slim
         plt.savefig(save_path, bbox_inches='tight')
         plt.close(fig)
 
-    def _draw_radar(self, methods, legend_config, xs, title, save_path):
+    def _draw_radar(self, methods, scatter, xs, title, save_path):
+        print('Save: ' + save_path)
         theta = radar_factory(len(xs), frame='polygon')
         fig, ax = plt.subplots(figsize=(8, 8), nrows=1, ncols=1, subplot_kw=dict(projection='radar'))
         fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9)
 
         f1s_list = []
-        legend_list = []
         for method in methods:
             name = method['name']
             point = method['point']
             score = method['score']
             legend_name = name + ' [{:.3f}]'.format(score)
             f1s_list.append(score)
-            legend_list.append(legend_name)
-            ax.plot(theta, point, color=legend_config[name]['color'], linewidth=0.1)
-            ax.fill(theta, point, facecolor=legend_config[name]['color'], alpha=0.25)
-        ax.set_rgrids([0.2, 0.4, 0.6, 0.8, 1.0], angle=-45, fontsize=18)
+            ax.plot(theta, point, label=legend_name, color=scatter[name]['color'], linewidth=0.1)
+            ax.fill(theta, point, facecolor=scatter[name]['color'], alpha=0.25)
+        ax.set_rgrids([0.1, 0.3, 0.5, 0.7, 0.9], angle=-45, fontsize=18)
         ax.set_thetagrids(np.degrees(theta), xs, fontsize=18)
-        leg = ax.legend(legend_list, loc='upper center', bbox_to_anchor=(0.5, -0.05),
+        leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
                         prop={'size': 18, 'weight': 'bold'}, handletextpad=0.2,
-                        markerscale=20, ncol=4, columnspacing=0.2)
+                        markerscale=20, ncol=2, columnspacing=0.2)
         leg.get_frame().set_edgecolor('black')
+        plt.setp(leg.texts, family='Times New Roman')
         ax.set_title(title, fontsize=24, fontweight='bold')
         plt.tight_layout()  # set layout slim
         plt.savefig(save_path, bbox_inches='tight')
         plt.close(fig)
 
-    def _draw_confusion_map(self, conf, save_path, classes):
+    def _draw_confusion_map(self, conf, snr, save_path, classes):
 
         fig_size = [int(len(classes) / 11 * 7), int(len(classes) / 11 * 7)]
         # get pandas dataframe
         df_cm = DataFrame(conf, index=classes, columns=classes)
         # colormap: see this and choose your more dear
-        pretty_plot_confusion_matrix(df_cm, None, save_path, fig_size=fig_size)
+        pretty_plot_confusion_matrix(df_cm, snr, save_path, fig_size=fig_size)
 
-    def _draw_train(self, methods, legend_config, title, save_path):
+    def _draw_train(self, methods, legend, title, save_path):
         pass

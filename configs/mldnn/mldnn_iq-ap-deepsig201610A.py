@@ -63,4 +63,4 @@ model = dict(
 )
 
 # for flops calculation
-input_shape = [(1, 2, 128), (1, 2, 128), (1, 128, 128)]
+input_shape = dict(iqs=(1, 2, 128), aps=(1, 2, 128))

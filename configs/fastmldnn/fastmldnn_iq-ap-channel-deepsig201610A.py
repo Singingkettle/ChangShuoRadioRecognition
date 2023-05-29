@@ -9,6 +9,7 @@ out_size = 288
 num_classes = 11
 model = dict(
     type='FastMLDNN',
+    vis_fea=True,
     backbone=dict(
         type='FMLNet',
         input_size=in_size,
@@ -49,3 +50,4 @@ lr_config = dict(
 evaluation = dict(interval=1)
 checkpoint_config = dict(interval=1)
 seed = 0
+input_shape = dict(iqs=[2, 1, 128], aps=[2, 1, 128])
