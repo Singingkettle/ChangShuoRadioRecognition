@@ -2,9 +2,9 @@ clc
 clear
 close all
 % Generate train data
-spses = [12, 15, 16];        % Set of samples per symbol
+spses = [10, 12, 15];        % Set of samples per symbol
 spf = 1200;                  % Samples per frame
-sr = 150e3;                  % Sample rate
+sr = 900e6;                  % Sample rate
 
 % Modulation set
 modulationTypes = ["BPSK", "QPSK", "8PSK", "16QAM", "64QAM"];

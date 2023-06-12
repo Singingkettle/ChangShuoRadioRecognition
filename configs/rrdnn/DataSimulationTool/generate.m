@@ -2,7 +2,7 @@ clc
 clear
 close all
 % Generate train data
-spses = [12, 15, 16];        % Set of samples per symbol
+spses = [10, 12, 15];        % Set of samples per symbol
 spf = 1200;                  % Samples per frame
 sr = 150e3;                  % Sample rate
 
@@ -31,7 +31,7 @@ channels.rayleigh = rayleigh_channel;
 channels.rician = rician_channel;
 frequency_shifter = comm.PhaseFrequencyOffset('SampleRate', sr);
 
-for i=1:10000
+for i=1:1000
     fprintf('Generate data of number %05d.\n', i);
     y = simulate_transmitter(-sr/2, sr/2, sr, spf, spses, modulationTypes);
     y = pass_channels(y, channels, frequency_shifter);
@@ -42,12 +42,12 @@ end
 
 function y = pass_channels(x, channels, frequency_shifter)
 
-static_speed = 0;
-pedestrian_speed = 1.1;
-car_speed = 12;
+% static_speed = 0;
+% pedestrian_speed = 1.1;
+% car_speed = 12;
 
-speeds = [static_speed pedestrian_speed car_speed];
-snrs = -6:2:20;
+speeds = 0:2:12;
+snrs = 12:2:30;
 
 % Res
 y = {};
@@ -69,15 +69,15 @@ y = {new};
 % =========================================================================
 c = channels.rician;
 for i=1:length(speeds)
-    for k=1:10
+    for k=5:5
         new = {};
         c.KFactor = k;
         for sub_signal_index=1:length(x)
             new_sub = x{sub_signal_index};
-            c.MaximumDopplerShift = abs(new_sub.center_frequency) * speeds(i) / 3e8;
+            c.MaximumDopplerShift =  900e6 * speeds(i) / 3e8;
             new_sub.snr = 'infdB';
             new_sub.data = c(new_sub.data);
-            new_sub.channel = sprintf('rician_MaximumDopplerShift-%02d_KFactor-%02d', c.MaximumDopplerShift, c.KFactor);
+            new_sub.channel = sprintf('rician_speed_%d', speeds(i));
             new = [new, new_sub];
             release(c);
         end
@@ -94,10 +94,10 @@ for i=1:length(speeds)
     new = {};
     for sub_signal_index=1:length(x)
         new_sub = x{sub_signal_index};
-        c.MaximumDopplerShift = abs(new_sub.center_frequency) * speeds(i) / 3e8;
+        c.MaximumDopplerShift =  900e6 * speeds(i) / 3e8;
         new_sub.snr = 'infdB';
         new_sub.data = c(new_sub.data);
-        new_sub.channel = sprintf('rayleigh_MaximumDopplerShift-%02d', c.MaximumDopplerShift);
+        new_sub.channel = sprintf('rayleigh_speed_%d', speeds(i));
         new = [new, new_sub];
         release(c);
     end
@@ -110,11 +110,11 @@ end
 % =========================================================================
 for i=1:length(snrs)
     new = {};
+    dB = snrs(i);
     for sub_signal_index=1:length(x)
         new_sub = x{sub_signal_index};
-        dB = snrs(i);
         new_sub.data = awgn(new_sub.data, dB);
-        new_sub.channel = sprintf('awgn-%02ddB', dB);
+        new_sub.channel = sprintf('awgn-%ddB', dB);
         new_sub.snr = sprintf('%ddB', dB);
         new = [new, new_sub];
     end
@@ -133,7 +133,7 @@ for maxOffset=1:2:9
         new_sub.data = add_clock_offset(new_sub.data, maxOffset, ...
             new_sub.sample_rate, frequency_shifter, ...
             abs(new_sub.center_frequency));
-        new_sub.channel = sprintf('clockOffset_maxOffset-%02d', maxOffset);
+        new_sub.channel = sprintf('clockOffset_maxOffset-%d', maxOffset);
         new = [new, new_sub];
     end
     new = {new};
@@ -154,15 +154,12 @@ for sub_signal_index=1:length(x)
     speed = speeds(randi(length(speeds)));
     if cid==1
         c = channels.rician;
-        c.MaximumDopplerShift = abs(new_sub.center_frequency) * speed / 3e8;
-        c.KFactor = 4;
-        new_sub.channel = sprintf('rician_MaximumDopplerShift-%02d_KFactor-%02d', c.MaximumDopplerShift, c.KFactor);
+        c.KFactor = 5;
     else
         c = channels.rayleigh;
-        c.MaximumDopplerShift = abs(new_sub.center_frequency) * speed / 3e8;
-        new_sub.channel = sprintf('rayleigh_MaximumDopplerShift-%02d', c.MaximumDopplerShift);
     end
-    
+    c.MaximumDopplerShift =  900e6 * speed / 3e8;
+    new_sub.channel = 'real';
     dB = snrs(randi(length(snrs)));
     new_sub.snr = sprintf('%ddB', dB);
     data = c(new_sub.data);
@@ -174,6 +171,42 @@ for sub_signal_index=1:length(x)
 end
 new = {new};
 y = [y new];
+
+
+% =========================================================================
+% Real: 
+%      1）随机从瑞利信道和莱斯信道选择；
+%      2）物体的速度随机选择；
+%      3）物体的噪声固定选择；
+%      4）采用固定的clockOffset，由maxOffset=5得到
+% =========================================================================
+
+for i=1:length(snrs)
+    new = {};
+    dB = snrs(i);
+    for sub_signal_index=1:length(x)
+        new_sub = x{sub_signal_index};
+        cid = randi(2);
+        speed = speeds(randi(length(speeds)));
+        if cid==1
+            c = channels.rician;
+            c.KFactor = 5;
+        else
+            c = channels.rayleigh;
+        end
+        c.MaximumDopplerShift =  900e6 * speed / 3e8;
+        new_sub.channel = sprintf('real_awgn-%ddB', dB);
+        new_sub.snr = sprintf('%ddB', dB);
+        data = c(new_sub.data);
+        data = add_clock_offset(data, 5, new_sub.sample_rate, ...
+            frequency_shifter, abs(new_sub.center_frequency));
+        new_sub.data = awgn(data, dB);
+        new = [new, new_sub];
+        release(c);
+    end
+    new = {new};
+    y = [y new];
+end
 
 end
 

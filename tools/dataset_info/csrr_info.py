@@ -6,11 +6,11 @@ import numpy as np
 from csrr.common.fileio import load as IOLoad
 
 data_root = './data/ChangShuo/v1'
-json_name = ['validation.json', 'test.json', 'train.json', 'train_and_validation.json']
+json_name = ['test.json', 'train_and_validation.json']
 
 bws = []
 nums = []
-for version in range(1, 2):
+for version in range(1, 42):
     data_root = f'./data/ChangShuo/v{version:d}'
     for json in json_name:
         json_path = osp.join(data_root, json)
@@ -23,8 +23,8 @@ nums = np.array(nums)
 plt.hist(nums)
 plt.show()
 
-bws = np.array(bws) / 150000 * 1200
-plt.hist(bws)
+bws = np.array(bws) / 150e3 * 1200
+plt.hist(bws, bins = 8, density=True, cumulative = True,)
 plt.show()
 
 bws = np.reshape(bws, [-1, 1])

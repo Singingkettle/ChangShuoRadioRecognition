@@ -266,6 +266,12 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
         super(ClassificationMetricsWithSNRForSingle, self).__init__(pps, gts, classes, feas=feas, centers=centers, cfg=cfg)
         self.snrs = snrs
         self.snr_set = np.sort(np.unique(snrs))
+        snr_set = []
+        for snr in self.snr_set:
+            if isinstance(snr, str):
+                snr_set.append(snr)
+            else:
+                snr_set.append(str(snr))
         snr_to_index = {snr: index for index, snr in enumerate(self.snr_set)}
         pps_along_snr = {snr: self.pps[snrs == snr, :] for snr in snr_to_index}
         tps_along_snr = {snr: self.tps[snrs == snr, :] for snr in snr_to_index}
@@ -282,7 +288,7 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
         if not self._cache_cm:
             confusion_matrix = dict()
             for snr in self.snr_to_index:
-                confusion_matrix[f'{snr:d}dB'] = self._confusion_matrix(self.pps_along_snr[snr],
+                confusion_matrix[f'{snr}dB'] = self._confusion_matrix(self.pps_along_snr[snr],
                                                                         self.tps_along_snr[snr])
             # Add All SNR together
             confusion_matrix['All SNRs'] = self._confusion_matrix(self.pps, self.tps)
@@ -325,7 +331,7 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             accuracy = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                accuracy[f'{snr:d}dB'] = self._accuracy(confusion_matrix[f'{snr:d}dB'])
+                accuracy[f'{snr}dB'] = self._accuracy(confusion_matrix[f'{snr}dB'])
             # For All SNR
             accuracy['All SNRs'] = self._accuracy(confusion_matrix['All SNRs'])
             self._as = accuracy
@@ -339,7 +345,7 @@ class ClassificationMetricsWithSNRForSingle(ClassificationMetricsForSingle):
             f1_score = dict()
             confusion_matrix = self.confusion_matrix
             for snr in self.snr_to_index:
-                f1_score[f'{snr:d}dB'] = self._f1_score(confusion_matrix[f'{snr:d}dB'])
+                f1_score[f'{snr}dB'] = self._f1_score(confusion_matrix[f'{snr}dB'])
             f1_score['All SNRs'] = self._f1_score(confusion_matrix['All SNRs'])
             self._fs = f1_score
             self._cache_fs = True

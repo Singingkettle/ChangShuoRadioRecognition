@@ -1,16 +1,17 @@
 import copy
+import json
 import os.path
 import os.path as osp
+import pickle
 import tempfile
 from collections import OrderedDict
 from typing import List
 from typing import Sequence
-import pickle
-from tqdm import tqdm
+
 import numpy as np
 from mmdet.datasets.api_wrappers import COCO
 from pycocotools.cocoeval import COCOeval as _COCOeval
-import json
+from tqdm import tqdm
 
 from .builder import DATASETS
 from .custom import CustomDataset
@@ -144,7 +145,7 @@ class CSRRDataset(CustomDataset):
         dump(coco_style_dataset, outfile_path)
 
         self._coco_api = COCO(outfile_path)
-        self.proposal_nums = [5, 6, 7]
+        self.proposal_nums = [4, 5, 6]
         self.iou_thrs = np.linspace(.5, 0.95, int(np.round((0.95 - .5) / .05)) + 1, endpoint=True)
 
     def get_ann_info(self, idx):
@@ -259,6 +260,7 @@ class CSRRDataset(CustomDataset):
         outfile_prefix = osp.join(tmp_dir.name, 'preds')
         self.cat_ids = self._coco_api.get_cat_ids(cat_names=self.CLASSES)
         self.img_ids = self._coco_api.get_img_ids()
+        self.proposal_nums = [4, 5, 6]
         result_files = self.results2json(results, outfile_prefix)
         eval_results = OrderedDict()
         iou_type = 'bbox'
@@ -271,7 +273,7 @@ class CSRRDataset(CustomDataset):
         coco_eval.params.imgIds = self.img_ids
         coco_eval.params.maxDets = list(self.proposal_nums)
         coco_eval.params.iouThrs = self.iou_thrs
-        coco_eval.params.areaRng = [[0, 130], [0, 90], [90, 110], [110, 130]]
+        coco_eval.params.areaRng = [[0, 155], [0, 110], [110, 130], [130, 155]]
 
         # mapping of cocoEval.stats
 
@@ -282,12 +284,12 @@ class CSRRDataset(CustomDataset):
             'mAP_s': 3,
             'mAP_m': 4,
             'mAP_l': 5,
-            'AR@100': 6,
-            'AR@300': 7,
-            'AR@1000': 8,
-            'AR_s@1000': 9,
-            'AR_m@1000': 10,
-            'AR_l@1000': 11
+            'AR@4': 6,
+            'AR@5': 7,
+            'AR@6': 8,
+            'AR_s@6': 9,
+            'AR_m@6': 10,
+            'AR_l@6': 11
         }
 
         metric_items = coco_metric_names.keys()
@@ -306,10 +308,79 @@ class CSRRDataset(CustomDataset):
 
         return eval_results
 
+    def evaluate_merge(self, results):
+        tmp_dir = tempfile.TemporaryDirectory()
+        outfile_prefix = osp.join(tmp_dir.name, 'preds')
+        self.cat_ids = self._coco_api.get_cat_ids(cat_names=self.CLASSES)
+        self.img_ids = self._coco_api.get_img_ids()
+        self.proposal_nums = [4, 5, 6]
+        result_files = self.results2json(results, outfile_prefix)
+        eval_results = OrderedDict()
+        iou_type = 'bbox'
+        metric = 'bbox'
+        predictions = load(result_files['bbox'])
+        coco_dt = self._coco_api.loadRes(predictions)
+        coco_eval = COCOeval(self._coco_api, coco_dt, iou_type)
+
+        coco_eval.params.catIds = self.cat_ids
+        coco_eval.params.imgIds = self.img_ids
+        coco_eval.params.maxDets = list(self.proposal_nums)
+        coco_eval.params.iouThrs = self.iou_thrs
+        coco_eval.params.areaRng = [[0, 155], [0, 110], [110, 130], [130, 155]]
+
+        # mapping of cocoEval.stats
+
+        coco_metric_names = {
+            'mAP': 0,
+            'mAP_50': 1,
+            'mAP_75': 2,
+            'mAP_s': 3,
+            'mAP_m': 4,
+            'mAP_l': 5,
+            'AR@4': 6,
+            'AR@5': 7,
+            'AR@6': 8,
+            'AR_s@6': 9,
+            'AR_m@6': 10,
+            'AR_l@6': 11
+        }
+
+        metric_items = coco_metric_names.keys()
+        coco_eval.evaluate()
+        coco_eval.accumulate()
+        coco_eval.summarize()
+
+        results_per_category = []
+        precisions = coco_eval.eval['precision']
+        for idx, cat_id in enumerate(self.cat_ids):
+            t = []
+            # area range index 0: all area ranges
+            # max dets index -1: typically 100 per image
+            nm = self._coco_api.loadCats(cat_id)[0]
+            precision = precisions[:, :, idx, 0, -1]
+            precision = precision[precision > -1]
+            if precision.size:
+                ap = np.mean(precision)
+            else:
+                ap = float('nan')
+            t.append(f'{nm["name"]}')
+            t.append(f'{round(ap, 3)}')
+            eval_results[f'{nm["name"]}_precision'] = round(ap, 3)
+
+        for metric_item in metric_items:
+            key = f'{metric}_{metric_item}'
+            val = coco_eval.stats[coco_metric_names[metric_item]]
+            eval_results[key] = float(f'{round(val, 4)}')
+
+        print(eval_results)
+
+        return eval_results
 
     def two_stage(self, results, amc_iou=0.5, mode=None):
         ann_file = os.path.basename(self.ann_file)
-        self.cache_data = pickle.load(open(osp.join(self.data_root, 'cache', ann_file.replace('.json', '_iq.pkl')), 'rb'))
+        self.cache_data = pickle.load(
+            open(osp.join(self.data_root, 'cache', ann_file.replace('.json', '_iq.pkl')), 'rb'))
+        self.proposal_nums = [2, 4, 27]
         tmp_dir = tempfile.TemporaryDirectory()
         outfile_prefix = osp.join(tmp_dir.name, 'preds')
         self.cat_ids = self._coco_api.get_cat_ids(cat_names=self.CLASSES)
@@ -325,7 +396,7 @@ class CSRRDataset(CustomDataset):
         coco_eval.params.imgIds = self.img_ids
         coco_eval.params.maxDets = list(self.proposal_nums)
         coco_eval.params.iouThrs = self.iou_thrs
-        coco_eval.params.areaRng = [[0, 120], [120, ], [105, 140]]
+        coco_eval.params.areaRng = [[0, 155], [0, 110], [110, 130], [130, 155]]
         coco_eval.evaluate()
 
         annotations = {'modulations': self.data_infos['modulations'], 'snrs': self.data_infos['snrs'], 'annotations': []}
@@ -333,14 +404,14 @@ class CSRRDataset(CustomDataset):
         for i in tqdm(range(len(self))):
             ann_info = self.get_ann_info(i)
             idx = self.cache_data['lookup_table'][ann_info['file_name']]
-            iq = self.cache_data['data'][idx]
+            iq = copy.deepcopy(self.cache_data['data'][idx])
             iq = np.squeeze(iq)
             iq = iq[0, :] + 1j * iq[1, :]
             ft = np.fft.fft(iq)
             ft = np.fft.fftshift(ft)
             for bi in range(results[i]['bboxes'].shape[0]):
-                x1 = results[i]['bboxes'][bi, 0]
-                x2 = results[i]['bboxes'][bi, 2]
+                x1 = copy.deepcopy(results[i]['bboxes'][bi, 0])
+                x2 = copy.deepcopy(results[i]['bboxes'][bi, 2])
                 x1 = int(max(np.floor(x1), 0))
                 x2 = int(min(np.round(x2), 1199))
                 aft = copy.deepcopy(ft)
@@ -369,7 +440,133 @@ class CSRRDataset(CustomDataset):
         annotations['modulations'].append('none')
         json.dump(annotations, open(f'{self.data_root}/ts-{ann_file}', 'w'), indent=4, sort_keys=True)
 
+    def merge(self, det_results, amc_results):
 
+        final_results = []
+        global_iq_id = 0
+        for i in tqdm(range(len(self))):
+            bboxes = []
+            scores = []
+            labels = []
+            item = dict(img_id=det_results[i]['img_id'])
+            for bi in range(det_results[i]['bboxes'].shape[0]):
+                max_amc_index = np.argmax(amc_results[global_iq_id])
+                if max_amc_index != 5:
+                    bboxes.append(list(copy.deepcopy(det_results[i]['bboxes'][bi, :])))
+                    scores.append(copy.deepcopy(det_results[i]['scores'][bi]))
+                    labels.append(max_amc_index)
 
+                global_iq_id += 1
+            item['bboxes'] = np.array(bboxes)
+            item['scores'] = np.array(scores)
+            item['labels'] = np.array(labels)
+            final_results.append(copy.deepcopy(item))
 
+        eval_results = self.evaluate_merge(final_results)
 
+        return eval_results
+
+    def evaluate_merge_v55(self, results, snr_to_imgids):
+        tmp_dir = tempfile.TemporaryDirectory()
+        outfile_prefix = osp.join(tmp_dir.name, 'preds')
+        self.cat_ids = self._coco_api.get_cat_ids(cat_names=self.CLASSES)
+        self.img_ids = self._coco_api.get_img_ids()
+        self.proposal_nums = [4, 5, 6]
+        result_files = self.results2json(results, outfile_prefix)
+
+        iou_type = 'bbox'
+        metric = 'bbox'
+        predictions = load(result_files['bbox'])
+        coco_dt = self._coco_api.loadRes(predictions)
+        coco_eval = COCOeval(self._coco_api, coco_dt, iou_type)
+
+        data = []
+        rows = []
+        coco_metric_names = {
+            'mAP': 0,
+            'mAP_50': 1,
+            'mAP_75': 2,
+            'mAP_s': 3,
+            'mAP_m': 4,
+            'mAP_l': 5,
+            'AR@4': 6,
+            'AR@5': 7,
+            'AR@6': 8,
+            'AR_s@6': 9,
+            'AR_m@6': 10,
+            'AR_l@6': 11
+        }
+        cols = []
+        for idx, cat_id in enumerate(self.cat_ids):
+            nm = self._coco_api.loadCats(cat_id)[0]
+            cols.append(f'{nm["name"]}_precision')
+
+        cols.extend(list(coco_metric_names.keys()))
+
+        for snr in range(10, 32, 2):
+            snr_key = f'{snr:d}dB'
+            rows.append(snr_key)
+            coco_eval.params.catIds = self.cat_ids
+            coco_eval.params.imgIds = snr_to_imgids[snr_key]
+            coco_eval.params.maxDets = list(self.proposal_nums)
+            coco_eval.params.iouThrs = self.iou_thrs
+            coco_eval.params.areaRng = [[0, 155], [0, 110], [110, 130], [130, 155]]
+
+            # mapping of cocoEval.stats
+
+            metric_items = coco_metric_names.keys()
+            coco_eval.evaluate()
+            coco_eval.accumulate()
+            coco_eval.summarize()
+
+            results_per_category = []
+            precisions = coco_eval.eval['precision']
+
+            item = []
+            for idx, cat_id in enumerate(self.cat_ids):
+                t = []
+                # area range index 0: all area ranges
+                # max dets index -1: typically 100 per image
+                nm = self._coco_api.loadCats(cat_id)[0]
+                precision = precisions[:, :, idx, 0, -1]
+                precision = precision[precision > -1]
+                if precision.size:
+                    ap = np.mean(precision)
+                else:
+                    ap = float('nan')
+                t.append(f'{nm["name"]}')
+                t.append(f'{round(ap, 3)}')
+                item.append(round(ap, 3))
+
+            for metric_item in list(coco_metric_names.keys()):
+                key = f'{metric}_{metric_item}'
+                val = coco_eval.stats[coco_metric_names[metric_item]]
+                item.append(float(f'{round(val, 4)}'))
+            data.append(item)
+
+        return data, rows, cols
+
+    def merge_v55(self, det_results, amc_results, snr_to_imgids):
+        final_results = []
+        global_iq_id = 0
+        for i in tqdm(range(len(self))):
+            bboxes = []
+            scores = []
+            labels = []
+            item = dict(img_id=det_results[i]['img_id'])
+            for bi in range(det_results[i]['bboxes'].shape[0]):
+                max_amc_index = np.argmax(amc_results[global_iq_id])
+                if max_amc_index != 5:
+                    bboxes.append(list(copy.deepcopy(det_results[i]['bboxes'][bi, :])))
+                    scores.append(copy.deepcopy(det_results[i]['scores'][bi]))
+                    labels.append(max_amc_index)
+
+                global_iq_id += 1
+            item['bboxes'] = np.array(bboxes)
+            item['scores'] = np.array(scores)
+            item['labels'] = np.array(labels)
+            final_results.append(copy.deepcopy(item))
+
+        data, rows, cols = self.evaluate_merge_v55(final_results, snr_to_imgids)
+
+        return data, rows, cols

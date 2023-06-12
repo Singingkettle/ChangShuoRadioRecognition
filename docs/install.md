@@ -35,7 +35,24 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -v -e .  # or "python setup.py develop"
 ```
 
-f. Install "Times New Roman" for matplotlib, following
+f. Install mmdet for radio detection and radio recognition.
+
+```shell
+pip install -U openmim
+mim install mmengine
+mim install "mmcv>=2.0.0"
+mim install mmdet
+```
+
+
+g. Install build requirements and then install ChangShuoRadioRecognition.
+
+```shell
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -v -e .  # or "python setup.py develop"
+```
+
+h. Install "Times New Roman" for matplotlib, following
 the [link](https://blog.csdn.net/u014712482/article/details/80568540?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control)
 
 ```shell
@@ -44,4 +61,4 @@ sudo apt-get install ttf-mscorefonts-installer
 rm -rf ~/.cache/matplotlib
 ```
 
-g. Install tsnecuda from source, following the [link](https://github.com/CannyLab/tsne-cuda). 
+i. Install tsnecuda from source, following the [link](https://github.com/CannyLab/tsne-cuda). 

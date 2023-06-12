@@ -202,9 +202,9 @@ def pretty_plot_confusion_matrix(df_cm, snr, save_path, annot=True, cmap='Orange
         ax.text(item['x'], item['y'], item['text'], **item['kw'])
 
     # titles and legends
-    ax.set_title(f'Confusion Matrix of {snr}', fontsize=22, fontweight='bold')
-    ax.set_xlabel(xlbl, fontsize=22, fontweight='bold')
-    ax.set_ylabel(ylbl, fontsize=22, fontweight='bold')
+    ax.set_title(f'Confusion Matrix of {snr}', fontsize=24, fontweight='bold')
+    ax.set_xlabel(xlbl, fontsize=24, fontweight='bold')
+    ax.set_ylabel(ylbl, fontsize=24, fontweight='bold')
     ax.tick_params(which='major', bottom=True,
                    top=False, left=True, right=False)
     plt.tight_layout()  # set layout slim
@@ -217,7 +217,7 @@ class BaseDraw(metaclass=ABCMeta):
     def __init__(self, dataset, plot_config=None):
         self.dataset = dataset
         if plot_config is None:
-            self.plot_config = dict(loc='lower right', prop={'size': 14, 'weight': 'bold'})
+            self.plot_config = dict(loc='lower right', prop={'size': 16, 'weight': 'bold'})
         else:
             self.plot_config = plot_config
         self.xticklabel_rotation = 50
@@ -267,15 +267,16 @@ class BaseDraw(metaclass=ABCMeta):
             # Compute the new y_lower for next plot
             y_lower = y_upper + 10  # 10 for the 0 samples
 
-        ax1.set_title("The silhouette plot for the various modulations.", fontsize=22, fontweight="bold")
-        ax1.set_xlabel("The silhouette coefficient values", fontsize=22, fontweight="bold")
-        ax1.set_ylabel("Modulation label", fontsize=22, fontweight="bold")
+        ax1.set_title("The silhouette plot for the various modulations.", fontsize=24, fontweight="bold")
+        ax1.set_xlabel("The silhouette coefficient values", fontsize=24, fontweight="bold")
+        ax1.set_ylabel("Modulation label", fontsize=24, fontweight="bold")
 
         # The vertical line for average silhouette score of all the values
         ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
 
         ax1.set_yticks([])  # Clear the yaxis labels / ticks
         ax1.set_xticks([float(f'{v / 10:.1f}') for v in np.arange(-10, 11, 1)])
+        ax1.tick_params(axis='both', which='major', labelsize=14)
 
         # 2nd Plot showing the actual clusters formed
         colors = cm.nipy_spectral(gts.astype(float) / num_class)
@@ -301,10 +302,10 @@ class BaseDraw(metaclass=ABCMeta):
             ax2.scatter(c[0], c[1], marker="$%d$" % class_index, alpha=1, s=50, edgecolor="k",
                         c=color, label=f'{class_index:d}-{classes[class_index]}')
 
-        ax2.set_title("The visualization of the feature data.", fontsize=22, fontweight="bold")
-        ax2.set_xlabel("Feature space for the 1st feature", fontsize=22, fontweight="bold")
-        ax2.set_ylabel("Feature space for the 2nd feature", fontsize=22, fontweight="bold")
-
+        ax2.set_title("The visualization of the feature data.", fontsize=24, fontweight="bold")
+        ax2.set_xlabel("Feature space for the 1st feature", fontsize=24, fontweight="bold")
+        ax2.set_ylabel("Feature space for the 2nd feature", fontsize=24, fontweight="bold")
+        ax2.tick_params(axis='both', which='major', labelsize=14)
         plt.suptitle(
             f'Silhouette analysis for {method_name} at 12dB on RadioML.2016.10A, '
             f'and Average Silhouette Score = {silhouette_avg:.2f}',
@@ -355,9 +356,9 @@ class BaseDraw(metaclass=ABCMeta):
         leg.get_frame().set_edgecolor('black')
         plt.setp(leg.texts, family='Times New Roman')
 
-        ax.set_xlabel(x_label, fontsize=22, fontweight='bold')
-        ax.set_ylabel(y_label, fontsize=22, fontweight='bold')
-        ax.set_title(title, fontsize=22, fontweight='bold')
+        ax.set_xlabel(x_label, fontsize=24, fontweight='bold')
+        ax.set_ylabel(y_label, fontsize=24, fontweight='bold')
+        ax.set_title(title, fontsize=24, fontweight='bold')
 
         # Don't allow the axis to be on top of your data
         ax.set_axisbelow(True)
@@ -372,6 +373,7 @@ class BaseDraw(metaclass=ABCMeta):
         # ax.grid(b=True, which='minor', linestyle=':',
         #         linewidth='0.5', color='black', alpha=0.5)
 
+        ax.tick_params(axis='both', which='major', labelsize=14)
         plt.tick_params(which='minor', bottom=False,
                         top=False, left=False, right=False)
         plt.tick_params(which='major', bottom=True,

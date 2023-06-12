@@ -26,7 +26,11 @@ class EvaluateSingleHeadClassifierWithSNR:
 
         gts = np.array(gts, dtype=np.float64)
         pps = np.stack(results, axis=0)
-        snrs = np.array(snrs, dtype=np.int64)
+        if isinstance(snrs[0], str):
+            snrs = [snr.split('d')[0] for snr in snrs]
+            snrs = np.array(snrs)
+        else:
+            snrs = np.array(snrs, dtype=np.int64)
         eval_results = get_classification_eval_with_snr(pps, gts, snrs, data_infos[f'{self.target_name}s'],
                                                         self.metrics)
         return eval_results

@@ -34,7 +34,6 @@ class SNRVsAccuracy(BaseDraw):
                         method['point'].append(accuracy[f'{snr:d}dB'])
                     methods.append(method)
                 methods = [x for _, x in sorted(zip(accs, methods), key=lambda pair: pair[0], reverse=True)]
-                SNRS = [f'{snr:d}' for snr in SNRS]
                 save_path = os.path.join(save_dir, f'SNRVsAccuracy_{set_name}_{dataset_name}_plot.pdf')
                 self._draw_plot(methods, self.legend, SNRS, 'SNR', 'Accuracy', 'SNR Vs. Accuracy', save_path)
                 save_path = os.path.join(save_dir, f'SNRVsAccuracy_{set_name}_{dataset_name}_radar.pdf')

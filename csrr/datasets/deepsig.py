@@ -7,7 +7,7 @@ import numpy as np
 from .builder import DATASETS
 from .custom import CustomDataset
 from .utils import list_dict_to_dict_list
-from ..performance.metrics import get_classification_eval_with_snr
+from ..performance.metrics import get_classification_eval_with_snr, ClassificationMetricsForSingle
 
 @DATASETS.register_module()
 class DeepSigDataset(CustomDataset):
@@ -70,3 +70,29 @@ class DeepSigDataset(CustomDataset):
         eval_results = get_classification_eval_with_snr(pps, gts, snrs, self.CLASSES, ['ACC'])
         print(eval_results)
         pickle.dump(res, open(os.path.join(save_dir, 'paper.pkl'), 'wb'), protocol=4)
+
+    def rrdnn(self, results, cfg):
+        gts = []
+        for annotation in self.data_infos['annotations']:
+            gt = self.data_infos['modulations'].index(annotation['modulation'])
+            gts.append(gt)
+        gts = np.array(gts, dtype=np.float64)
+        if isinstance(results[0], dict):
+            results = list_dict_to_dict_list(results)
+            pps = np.stack(copy.deepcopy(results['pre']), axis=0)
+            feas = np.stack(copy.deepcopy(results['fea']), axis=0)
+            centers = copy.deepcopy(results['center'][0])
+        else:
+            pps = np.stack(results, axis=0)
+            feas = None
+            centers = None
+
+        res = dict(gts=gts, pps=pps, classes=self.CLASSES, cfg=cfg, feas=feas, centers=centers)
+        performance = ClassificationMetricsForSingle(res['pps'], res['gts'],
+                                                     res['classes'],
+                                                     feas=res.get('feas'),
+                                                     centers=res.get(
+                                                         'centers'),
+                                                     cfg=res.get('cfg'))
+
+        return performance

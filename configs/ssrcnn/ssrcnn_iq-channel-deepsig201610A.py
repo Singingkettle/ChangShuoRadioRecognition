@@ -19,6 +19,15 @@ model = dict(
             type='CrossEntropyLoss',
             loss_weight=1,
         ),
+        center_head=dict(
+            type='CenterHead',
+            in_size=out_size,  # keep the same as snr head
+            num_classes=11,
+            loss_center=dict(
+                type='CenterLoss',
+                loss_weight=0.003,
+            ),
+        )
     ),
 )
 

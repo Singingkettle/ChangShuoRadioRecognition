@@ -28,7 +28,7 @@ class ClassVsF1ScoreWithSNR(BaseDraw):
     def __init__(self, dataset, plot_config=None, legend=None, scatter=None):
         super().__init__(dataset, plot_config)
         if plot_config is None:
-            self.plot_config = dict(loc='lower left', prop={'size': 14, 'weight': 'bold'})
+            self.plot_config = dict(loc='lower left', prop={'size': 16, 'weight': 'bold'})
         else:
             self.plot_config = plot_config
         self.legend = legend
@@ -49,20 +49,19 @@ class ClassVsF1ScoreWithSNR(BaseDraw):
                         self.legend[method_name[1]] = self.legend[method_name[0]]
                     f1_score = performance.F1
                     for group_name in f1_score:
-                        if group_name == 'All SNRs':
-                            if isinstance(method_name, str):
-                                method = dict(score=f1_score[group_name]['Mean'], point=dict(), name=method_name)
-                            else:
-                                method = dict(score=f1_score[group_name]['Mean'], point=dict(), name=method_name[1])
-                            classes = performance.classes
-                            for class_name in classes:
-                                method['point'][class_name] = f1_score[group_name][class_name]
-                            if group_name in methods:
-                                methods[group_name].append(method)
-                                f1s[group_name].append(f1_score[group_name]['Mean'])
-                            else:
-                                methods[group_name] = [method]
-                                f1s[group_name] = [f1_score[group_name]['Mean']]
+                        if isinstance(method_name, str):
+                            method = dict(score=f1_score[group_name]['Mean'], point=dict(), name=method_name)
+                        else:
+                            method = dict(score=f1_score[group_name]['Mean'], point=dict(), name=method_name[1])
+                        classes = performance.classes
+                        for class_name in classes:
+                            method['point'][class_name] = f1_score[group_name][class_name]
+                        if group_name in methods:
+                            methods[group_name].append(method)
+                            f1s[group_name].append(f1_score[group_name]['Mean'])
+                        else:
+                            methods[group_name] = [method]
+                            f1s[group_name] = [f1_score[group_name]['Mean']]
 
                 for group_name in methods:
                     data, xs = reorder_f1score(methods[group_name], f1s[group_name], classes)

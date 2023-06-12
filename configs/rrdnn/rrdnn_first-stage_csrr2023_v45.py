@@ -6,7 +6,7 @@ dataset_type = 'CSRRDataset'
 data_root = './data/ChangShuo/v45'
 target_name = 'modulation'
 data = dict(
-    samples_per_gpu=48,
+    samples_per_gpu=12,
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
@@ -20,6 +20,12 @@ data = dict(
             dict(type='Collect', keys=['inputs', 'targets', 'input_metas', 'file_name', 'image_id'])
         ],
         data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
     ),
     val=dict(
         type=dataset_type,
@@ -30,6 +36,12 @@ data = dict(
             dict(type='Collect', keys=['inputs', 'input_metas', 'file_name', 'image_id'])
         ],
         data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
     ),
     test=dict(
         type=dataset_type,
@@ -40,6 +52,12 @@ data = dict(
             dict(type='Collect', keys=['inputs', 'input_metas', 'file_name', 'image_id'])
         ],
         data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
     ),
 )
 
@@ -61,7 +79,7 @@ model = dict(
 )
 
 is_det = True
-runner = dict(type='EpochBasedRunner', max_epochs=60)
+runner = dict(type='EpochBasedRunner', max_epochs=30)
 # Optimizer
 # for flops calculation
 optimizer = dict(type='Adam', lr=0.001)

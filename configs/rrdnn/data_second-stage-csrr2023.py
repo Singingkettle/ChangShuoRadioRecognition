@@ -16,6 +16,12 @@ data = dict(
             dict(type='Collect', keys=['inputs', 'targets'])
         ],
         data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
     ),
     val=dict(
         type=dataset_type,
@@ -39,5 +45,11 @@ data = dict(
             dict(type='Collect', keys=['inputs', 'input_metas', 'file_name', 'image_id'])
         ],
         data_root=data_root,
+        evaluate=[
+            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
+        format=[
+            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
+        ],
     ),
 )

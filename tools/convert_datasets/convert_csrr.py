@@ -17,7 +17,7 @@ def parse_args():
 def main():
     args = parse_args()
     data_ratios = [0.6, 0.2, 0.2]
-    for version in range(1, 55):
+    for version in range(1, 42):
         data_generator = CSRRData(args.data_root, f'v{version}', data_ratios)
         data_generator.generate()
 

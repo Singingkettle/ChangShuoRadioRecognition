@@ -45,7 +45,7 @@ performance = dict(
                     ],
                     iq_ap_co_fb=[
                         'FastMLDNN', 'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                        'DecisionTree_FB', 'SVM_FB', 'SSRCNN'
+                        'DecisionTree_FB', 'SVM_FB', 'SSRCNN', 'VGGNet', 'AlexNet', 'GoogleNet', 'ResNet',
                     ],
                 )
             ),
@@ -80,40 +80,20 @@ performance = dict(
                     ],
                     iq_ap_co_fb=[
                         'FastMLDNN', 'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
-                        'DecisionTree_FB', 'SVM_FB', 'SSRCNN'
+                        'DecisionTree_FB', 'SVM_FB', 'SSRCNN', 'VGGNet', 'AlexNet', 'GoogleNet', 'ResNet',
                     ],
                 )
             ),
         ),
-        # dict(
-        #     type='SNRVsAccuracy',
-        #     dataset=dict(
-        #         deepsig201610A=dict(
-        #             iq_ap_co_fb=[
-        #                 'FastMLDNN', 'MLDNN',
-        #             ],
-        #         )
-        #     ),
-        # ),
-        # dict(
-        #     type='ClassVsF1ScoreWithSNR',
-        #     dataset=dict(
-        #         deepsig201610A=dict(
-        #             iq_ap_co_fb=[
-        #                 'FastMLDNN', 'MLDNN',
-        #             ],
-        #         )
-        #     ),
-        # ),
-        # dict(
-        #     type='VisFea',
-        #     dataset=dict(
-        #         deepsig201610A=[
-        #             ['FastMLDNN_V14', r'$L_{ce}+\beta L_{de}$'],
-        #             ['FastMLDNN', r'$L_{ce}$']
-        #         ]
-        #     )
-        # )
+        dict(
+            type='VisFea',
+            dataset=dict(
+                deepsig201610A=[
+                    ['FastMLDNN_V14', r'$L_{ce}+\beta L_{de}$'],
+                    ['FastMLDNN', r'$L_{ce}$']
+                ]
+            )
+        )
     ],
     # Tables=[
     #     dict(
