@@ -50,7 +50,7 @@ model = dict(
             merge=dict(
                 type='MergeAMCHead',
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='NLLLoss',
                     loss_weight=1,
                 ),
             ),

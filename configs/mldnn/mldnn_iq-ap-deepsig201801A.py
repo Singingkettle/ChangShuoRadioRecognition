@@ -28,6 +28,9 @@ model = dict(
                     type='CrossEntropyLoss',
                     loss_weight=1,
                 ),
+                init_cfg=[
+                    dict(type='Kaiming', layer='Linear', mode='fan_in', nonlinearity='relu', bias=0., distribution='normal'),
+                ],
             ),
             # Low Head
             low=dict(
@@ -39,6 +42,9 @@ model = dict(
                     type='CrossEntropyLoss',
                     loss_weight=1,
                 ),
+                init_cfg=[
+                    dict(type='Kaiming', layer='Linear', mode='fan_in', nonlinearity='relu', bias=0., distribution='normal'),
+                ],
             ),
             # High Head
             high=dict(
@@ -50,15 +56,19 @@ model = dict(
                     type='CrossEntropyLoss',
                     loss_weight=1,
                 ),
+                init_cfg=[
+                    dict(type='Kaiming', layer='Linear', mode='fan_in', nonlinearity='relu', bias=0., distribution='normal'),
+                ],
             ),
             # Merge Head
             merge=dict(
                 type='MergeAMCHead',
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='NLLLoss',
                     loss_weight=1,
                 ),
             ),
         ),
     ),
 )
+optimizer = dict(type='Adam', lr=0.0001)
