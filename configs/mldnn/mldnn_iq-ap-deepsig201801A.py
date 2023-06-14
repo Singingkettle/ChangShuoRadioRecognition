@@ -25,7 +25,7 @@ model = dict(
                 in_size=100,
                 out_size=256,
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='NLLLoss',
                     loss_weight=1,
                 ),
                 init_cfg=[
@@ -39,7 +39,7 @@ model = dict(
                 in_size=100,
                 out_size=256,
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='NLLLoss',
                     loss_weight=1,
                 ),
                 init_cfg=[
@@ -53,7 +53,7 @@ model = dict(
                 in_size=100,
                 out_size=256,
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='NLLLoss',
                     loss_weight=1,
                 ),
                 init_cfg=[
