@@ -1,7 +1,7 @@
 _base_ = [
     '../_base_/default_runtime.py',
     './schedule.py',
-    './data_iq-ap-deepsig201801A.py'
+    './data_iq-ap-snr-[-20,20]-deepsig201801A.py'
 ]
 
 model = dict(
