@@ -41,7 +41,7 @@ class MergeAMCHead(BaseHead):
             merge = torch.where(merge > 0, merge, merge.new_tensor(1))
             merge = torch.log(merge)
 
-        return dict(snr=snr, low=low, high=high, merge=merge)
+        return dict(snr=x['snr'], low=x['low'], high=x['high'], merge=merge)
 
 
 @HEADS.register_module()
