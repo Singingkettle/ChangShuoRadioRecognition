@@ -78,7 +78,7 @@ class LoadIQFromFile:
                  is_squeeze=False,
                  to_float32=False,
                  to_norm=False):
-        self.is_squeeze = is_squeeze,
+        self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
 
