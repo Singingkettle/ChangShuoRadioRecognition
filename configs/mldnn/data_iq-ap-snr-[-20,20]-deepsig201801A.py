@@ -22,6 +22,9 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file='test.json',
+        pre_process=[
+            dict(type='FilterBySNR', snr_set=[snr for snr in range(-20, 22, 2)])
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
@@ -35,6 +38,9 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file='test.json',
+        pre_process=[
+            dict(type='FilterBySNR', snr_set=[snr for snr in range(-20, 22, 2)])
+        ],
         pipeline=[
             dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
             dict(type='LoadAPFromIQ'),
