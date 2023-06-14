@@ -11,7 +11,7 @@ data = dict(
           dict(type='FilterBySNR', snr_set=[snr for snr in range(-20, 22, 2)])
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='MLDNNSNRLabel'),
@@ -26,7 +26,7 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[snr for snr in range(-20, 22, 2)])
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -42,7 +42,7 @@ data = dict(
             dict(type='FilterBySNR', snr_set=[snr for snr in range(-20, 22, 2)])
         ],
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],

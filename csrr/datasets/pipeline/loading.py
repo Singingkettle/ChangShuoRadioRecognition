@@ -471,24 +471,19 @@ class LoadAPFromIQ:
         self.is_squeeze = is_squeeze
         self.to_float32 = to_float32
         self.to_norm = to_norm
-        self._cache = dict()
 
     def __call__(self, results):
-        if results['file_name'] in self._cache:
-            results['inputs']['aps'] = self._cache[results['file_name']]
-        else:
-            iq = results['inputs']['iqs']
-            iq = np.squeeze(iq)
-            amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
-            phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
-            ap = np.vstack((amplitude, phase))
-            if self.to_float32:
-                ap = ap.astype(np.float32)
+        iq = results['inputs']['iqs']
+        iq = np.squeeze(iq)
+        amplitude = np.sqrt(np.sum(np.power(iq, 2), axis=0))
+        phase = np.arctan(iq[0, :] / (iq[1, :] + np.finfo(np.float32).eps))
+        ap = np.vstack((amplitude, phase))
+        if self.to_float32:
+            ap = ap.astype(np.float32)
 
-            if not self.is_squeeze:
-                # make the iq as a three-dimensional tensor [1, 2, L]
-                ap = np.expand_dims(ap, axis=0)
-            self._cache[results['file_name']] = ap
+        if not self.is_squeeze:
+            # make the iq as a three-dimensional tensor [1, 2, L]
+            ap = np.expand_dims(ap, axis=0)
             results['inputs']['aps'] = ap
         return results
 

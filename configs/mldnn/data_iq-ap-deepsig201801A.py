@@ -8,7 +8,7 @@ data = dict(
         type=dataset_type,
         ann_file='train_and_validation.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
             dict(type='MLDNNSNRLabel'),
@@ -20,7 +20,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],
@@ -33,7 +33,7 @@ data = dict(
         type=dataset_type,
         ann_file='test.json',
         pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
+            dict(type='LoadIQFromFile', to_float32=True),
             dict(type='LoadAPFromIQ'),
             dict(type='Collect', keys=['inputs'])
         ],
