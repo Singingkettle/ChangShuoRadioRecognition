@@ -169,18 +169,23 @@ def get_extensions():
             define_macros += [('CSRR_WITH_CUDA', None)]
             cuda_args = os.getenv('CSRR_CUDA_ARGS')
             extra_compile_args['nvcc'] = [cuda_args] if cuda_args else []
-            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp') + \
-                       glob.glob('csrr/ops/csrc/pytorch/cpu/*.cpp') + \
-                       glob.glob('csrr/ops/csrc/pytorch/cuda/*.cu')
+            op_files = glob.glob('./csrr/ops/csrc/pytorch/*.cpp') + \
+                       glob.glob('./csrr/ops/csrc/pytorch/cpu/*.cpp') + \
+                       glob.glob('./csrr/ops/csrc/pytorch/cuda/*.cu') + \
+                       glob.glob('./csrr/ops/csrc/pytorch/cuda/*.cpp')
             extension = CUDAExtension
-            include_dirs.append(os.path.abspath('csrr/ops/csrc/common'))
-            include_dirs.append(os.path.abspath('csrr/ops/csrc/common/cuda'))
+            include_dirs.append(os.path.abspath('./csrr/ops/csrc/pytorch'))
+            include_dirs.append(os.path.abspath('./csrr/ops/csrc/common'))
+            include_dirs.append(os.path.abspath('./csrr/ops/csrc/common/cuda'))
         else:
             print(f'Compiling {ext_name} only with CPU')
             op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp') + \
                        glob.glob('csrr/ops/csrc/pytorch/cpu/*.cpp')
             extension = CppExtension
             include_dirs.append(os.path.abspath('csrr/ops/csrc/common'))
+
+        if 'nvcc' in extra_compile_args and platform.system() != 'Windows':
+            extra_compile_args['nvcc'] += ['-std=c++14']
 
         ext_ops = extension(
             name=ext_name,

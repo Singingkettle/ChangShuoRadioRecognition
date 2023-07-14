@@ -1,3 +1,4 @@
+#include <torch/extension.h>
 #include "pytorch_cpp_helper.hpp"
 
 std::string get_compiler_version();
