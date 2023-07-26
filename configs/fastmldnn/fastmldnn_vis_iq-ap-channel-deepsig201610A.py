@@ -16,7 +16,7 @@ model = dict(
         dp=0.07,
         init_cfg=dict(
             type='Pretrained',
-            checkpoint='/home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/fastmldnn_iq-ap-channel-deepsig201610A/init/init.pth',
+            checkpoint='./work_dirs/fastmldnn_iq-ap-channel-deepsig201610A/init/init.pth',
             prefix='backbone'
         )
     ),

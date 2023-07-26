@@ -1,5 +1,5 @@
 dataset_type = 'DeepSigDataset'
-data_root = './data/ModulationClassification/DeepSig/201610A'
+data_root = './data/ModulationClassification/DeepSig/RadioML.2016.10A'
 target_name = 'modulation'
 data = dict(
     samples_per_gpu=80,

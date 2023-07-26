@@ -32,7 +32,7 @@ class Flops:
         for dataset_name in self.dataset:
             for method_name in self.dataset[dataset_name]:
                 print(method_name)
-                if method_name == 'MLDNN' or method_name == 'FastMLDNN_V1':
+                if method_name == 'MLDNN' or method_name == 'FastMLDNN_V1' or 'DSCLDNN':
                     input_shape = dict(iqs=(1, 2, 128), aps=(1, 2, 128))
                 else:
                     input_shape = dict(iqs=(2, 128), aps=(2, 128))

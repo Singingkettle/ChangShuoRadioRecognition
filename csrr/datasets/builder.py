@@ -29,7 +29,7 @@ def build(cfg, registry, default_args=None):
             Defaults to None.
 
     Returns:
-        performance: A list of performance handle.
+        performance_info: A list of performance_info handle.
     """
     if isinstance(cfg, list):
         datas = [

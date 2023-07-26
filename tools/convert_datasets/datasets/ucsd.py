@@ -10,5 +10,5 @@ class UCSDRML22(DeepSigBase):
         self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
                         "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
                         "WBFM": "WBFM"}
-        self.name = 'UCSD'
-        self.data_dir = osp.join(self.root_dir, self.name, self.version)
+        self.organization = 'UCSD'
+        self.data_dir = osp.join(self.root_dir, self.organization, self.version)

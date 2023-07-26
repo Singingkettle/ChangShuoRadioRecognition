@@ -15,7 +15,7 @@ from .loading import (LoadAPFromFile, LoadIQFromFile, LoadConstellationFromFile,
                       MLDNNSNRLabel)
 from .train import RebaseModLabelBySNR, SigmoidLossWeight, ASSMaskWeight
 from .transform import (ChannelMode, NormalizeAP, NormalizeIQ,
-                        NormalizeConstellation)
+                        NormalizeConstellation, TRNetProcessIQ)
 
 __all__ = [
     'Compose',
@@ -45,5 +45,6 @@ __all__ = [
     'NormalizeConstellation',
     'RebaseModLabelBySNR',
     'SigmoidLossWeight',
-    'ASSMaskWeight'
+    'ASSMaskWeight',
+    'TRNetProcessIQ'
 ]

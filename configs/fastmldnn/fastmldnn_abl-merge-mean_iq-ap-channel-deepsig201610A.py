@@ -13,6 +13,7 @@ model = dict(
         type='FMLNet',
         input_size=in_size,
         merge='mean',
+        scale=1,
     ),
     classifier_head=dict(
         type='AMCHead',

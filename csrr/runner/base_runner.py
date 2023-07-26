@@ -46,7 +46,7 @@ class BaseRunner(metaclass=ABCMeta):
              Defaults to None. (The default value is just for backward
              compatibility)
         meta (dict | None): A dict records some import information such as
-            environment info and seed, which will be logged in logger hook.
+            environment performance_info and seed, which will be logged in logger hook.
             Defaults to None.
         max_epochs (int, optional): Total training epochs.
         max_iters (int, optional): Total training iterations.
@@ -144,6 +144,7 @@ class BaseRunner(metaclass=ABCMeta):
         self.outputs = None
         self.data_loader = None
         self.data_batch = None
+        self.stop_training = True
 
     @property
     def model_name(self) -> str:
@@ -321,7 +322,7 @@ class BaseRunner(metaclass=ABCMeta):
             getattr(hook, fn_name)(self)
 
     def get_hook_info(self) -> str:
-        # Get hooks info in each stage
+        # Get hooks performance_info in each stage
         stage_hook_map: Dict[str, list] = {stage: [] for stage in Hook.stages}
         for hook in self.hooks:
             try:
@@ -500,6 +501,19 @@ class BaseRunner(metaclass=ABCMeta):
             hook = timer_config
         self.register_hook(hook, priority='LOW')
 
+    def register_early_stopping_hooks(
+            self,
+            early_stopping_config: Union[Dict, Hook, None],
+    ):
+        if early_stopping_config is None:
+            return
+        if isinstance(early_stopping_config, dict):
+            early_stopping_config_ = copy.deepcopy(early_stopping_config)
+            hook = csrr.build_from_cfg(early_stopping_config_, HOOKS)
+        else:
+            hook = early_stopping_config
+        self.register_hook(hook, priority='VERY_HIGH')
+
     def register_custom_hooks(
             self, custom_config: Union[List, Dict, Hook, None]) -> None:
         if custom_config is None:
@@ -514,7 +528,7 @@ class BaseRunner(metaclass=ABCMeta):
             else:
                 self.register_hook(item, priority='NORMAL')
 
-    def register_profiler_hook(
+    def register_profiler_hooks(
             self,
             profiler_config: Union[Dict, Hook, None],
     ) -> None:
@@ -535,6 +549,7 @@ class BaseRunner(metaclass=ABCMeta):
             log_config: Optional[Dict] = None,
             momentum_config: Union[Dict, Hook, None] = None,
             timer_config: Union[Dict, Hook] = dict(type='IterTimerHook'),
+            early_stopping_config: Union[Dict, Hook, None] = None,
             custom_hooks_config: Union[List, Dict, Hook, None] = None) -> None:
         """Register default and custom hooks for training.
 
@@ -567,4 +582,6 @@ class BaseRunner(metaclass=ABCMeta):
         self.register_checkpoint_hook(checkpoint_config)
         self.register_timer_hook(timer_config)
         self.register_logger_hooks(log_config)
+        self.register_early_stopping_hooks(early_stopping_config)
         self.register_custom_hooks(custom_hooks_config)
+

@@ -1,5 +1,6 @@
 import argparse
 import os
+import os.path as osp
 import time
 
 import torch
@@ -19,7 +20,7 @@ def parse_args():
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
-        '--work_dir',
+        '--save_dir',
         help='the directory to format the file containing evaluation figures, results in pickle format, '
              'and format data to upload into test server')
     parser.add_argument('--out', action='store_true', help='output result file in pickle format')
@@ -139,23 +140,23 @@ def main():
 
     rank, _ = get_dist_info()
     # allows not to create
-    mkdir_or_exist(os.path.abspath(args.work_dir))
+    mkdir_or_exist(osp.abspath(args.save_dir))
 
     if rank == 0:
         if args.out:
-            print(f'\nwriting results to {args.work_dir}')
-            IODump(outputs, os.path.join(args.work_dir, 'results.pkl'))
+            print(f'\nwriting results to {args.save_dir}')
+            IODump(outputs, osp.join(args.save_dir, 'results.pkl'))
         if args.format_only:
-            dataset.format_results(args.work_dir, outputs)
+            dataset.format_results(args.save_dir, outputs)
         if args.paper:
-            dataset.paper(args.work_dir, outputs, cfg)
+            dataset.paper(args.save_dir, outputs, cfg)
         if args.eval:
             metric = dataset.evaluate(outputs)
             print(metric)
             metric_dict = dict(config=args.config, metric=metric)
-            if args.work_dir is not None and rank == 0:
+            if args.save_dir is not None and rank == 0:
                 timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-                json_file = os.path.join(args.work_dir, f'eval_{timestamp}.json')
+                json_file = osp.join(args.save_dir, f'eval_{timestamp}.json')
                 IODump(metric_dict, json_file)
 
 

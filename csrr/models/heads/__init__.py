@@ -16,6 +16,7 @@ from .sednn_head import SEDNNHead
 from .shrinkage_head import ShrinkageHead
 from .ss_head import SSHead
 from .ssrcnn_head import SSRCNNHead
+from .vit_head import VitHead
 
 __all__ = [
     'BaseHead',
@@ -37,5 +38,6 @@ __all__ = [
     'ASSHead',
     'SSHead',
     'SSRCNNHead',
-    'EuclideanHead'
+    'EuclideanHead',
+    'VitHead'
 ]

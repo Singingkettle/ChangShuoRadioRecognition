@@ -25,3 +25,4 @@ model = dict(
         ),
     ),
 )
+input_shape = dict(iqs=[1, 2, 128], aps=[1, 2, 128])

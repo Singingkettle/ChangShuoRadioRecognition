@@ -45,7 +45,7 @@ def get_new_fig(fn, fig_size=None):
         fig_size = [9, 9]
     fig = plt.figure(fn, fig_size)
     ax = fig.gca()  # Get Current Axis
-    ax.cla()  # clear existing performance
+    ax.cla()  # clear existing performance_info
     return fig, ax
 
 
@@ -74,7 +74,7 @@ def radar_factory(num_vars, frame='circle'):
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            # rotate performance such that the first axis is at the top
+            # rotate performance_info such that the first axis is at the top
             self.set_theta_zero_location('N')
 
         def fill(self, *args, closed=True, **kwargs):
@@ -82,7 +82,7 @@ def radar_factory(num_vars, frame='circle'):
             return super().fill(closed=closed, *args, **kwargs)
 
         def plot(self, *args, **kwargs):
-            """Override performance so that line is closed by default"""
+            """Override performance_info so that line is closed by default"""
             lines = super().plot(*args, **kwargs)
             for line in lines:
                 self._close_line(line)

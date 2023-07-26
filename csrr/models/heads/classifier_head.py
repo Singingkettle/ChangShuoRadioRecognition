@@ -7,7 +7,8 @@ from ..builder import HEADS, build_loss
 
 @HEADS.register_module()
 class ClassificationHead(BaseHead):
-    def __init__(self, num_classes, in_size=10560, out_size=256, is_shallow=False, loss_cls=None, init_cfg=None):
+    def __init__(self, num_classes, in_size=10560, out_size=256, drop_rate=0.5,
+                 is_shallow=False, loss_cls=None, init_cfg=None):
         super(ClassificationHead, self).__init__(init_cfg)
         if loss_cls is None:
             loss_cls = dict(
@@ -27,7 +28,7 @@ class ClassificationHead(BaseHead):
             self.classifier = nn.Sequential(
                 nn.Linear(self.in_size, self.out_size),
                 nn.ReLU(inplace=True),
-                nn.Dropout(0.5),
+                nn.Dropout(drop_rate),
                 nn.Linear(self.out_size, self.num_classes),
             )
 

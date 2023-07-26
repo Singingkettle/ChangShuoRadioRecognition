@@ -436,7 +436,7 @@ class UniformInit(BaseInit):
 class KaimingInit(BaseInit):
     r"""Initialize module parameters with the values according to the method
     described in `Delving deep into rectifiers: Surpassing human-level.
-    performance on ImageNet classification - He, K. et al. (2015).
+    performance_info on ImageNet classification - He, K. et al. (2015).
     <https://www.cv-foundation.org/openaccess/content_iccv_2015/
     papers/He_Delving_Deep_into_ICCV_2015_paper.pdf>`_
     Args:

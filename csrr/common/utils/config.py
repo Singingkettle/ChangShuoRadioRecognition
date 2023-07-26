@@ -1,6 +1,5 @@
 import ast
 import copy
-import glob
 import json
 import os
 import os.path as osp
@@ -744,23 +743,23 @@ class DictAction(Action):
         setattr(namespace, self.dest, options)
 
 
-def filter_config(cfg, is_regeneration=False, mode='test'):
+def filter_config(info, is_regeneration=False, mode='test'):
     configs = []
     test_configs = []
     no_test_configs = dict()
     train_configs = dict()
-    for dataset in cfg.publish:
-        for method_name in cfg.publish[dataset]:
-            config_name = cfg.publish[dataset][method_name]
-            official_model = osp.join(cfg.work_dir, config_name, f'{method_name}.pth')
-            config_file_path = osp.join(cfg.work_dir, config_name, f'{config_name}.py')
+    for dataset in info['publish']:
+        for method_name in info['publish'][dataset]:
+            config_name = info['publish'][dataset][method_name]
+            official_model = osp.join(info['work_dir'], config_name, f'{method_name}.pth')
+            config_file_path = osp.join(info['work_dir'], config_name, f'{config_name}.py')
             if osp.isfile(config_file_path) or osp.isfile(official_model):
                 if 'feature-based' in config_name:
                     train_configs[config_name] = f'{method_name}.pth'
                 else:
-                    best_epoch = get_the_best_checkpoint(cfg.work_dir, config_name, method_name)
+                    best_epoch = get_the_best_checkpoint(info['work_dir'], config_name, method_name)
                     train_configs[config_name] = best_epoch
-                    if not osp.isfile(osp.join(cfg.work_dir, config_name, 'format/res.pkl')):
+                    if not osp.isfile(osp.join(info['work_dir'], config_name, 'format/res.pkl')):
                         no_test_configs[config_name] = best_epoch
                     else:
                         test_configs.append(config_name)

@@ -1,10 +1,10 @@
 import os.path as osp
 import pickle
-import zlib
 from typing import Dict
 
 import h5py
 import numpy as np
+import zlib
 from mmcv.transforms import to_tensor
 
 from ..builder import PIPELINES
@@ -17,7 +17,7 @@ def normalize_data(x):
 
 class Constellation:
     def __init__(self, filter_size=None, filter_stride=None):
-        # matrix window info
+        # matrix window performance_info
         self.height_range = [-1, 1]
         self.width_range = [-1, 1]
 
@@ -484,7 +484,7 @@ class LoadAPFromIQ:
         if not self.is_squeeze:
             # make the iq as a three-dimensional tensor [1, 2, L]
             ap = np.expand_dims(ap, axis=0)
-            results['inputs']['aps'] = ap
+        results['inputs']['aps'] = ap
         return results
 
     def __repr__(self):

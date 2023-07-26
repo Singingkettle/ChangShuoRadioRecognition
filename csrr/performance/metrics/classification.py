@@ -4,7 +4,11 @@ from typing import Union, Dict, Tuple, Any, List
 
 import numpy as np
 from numpy import ndarray
-from sklearn.manifold import TSNE
+try:
+    # The GPU Version of TSNE, which can run fast
+    from tsnecuda import TSNE
+except:
+    from sklearn.manifold import TSNE
 from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc
 from sklearn.preprocessing import label_binarize
 

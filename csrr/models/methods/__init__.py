@@ -15,6 +15,7 @@ from .dscldnn import DSCLDNN
 from .fast_mldnn import FastMLDNN
 from .googlenet import GoogleNet
 from .hcgdnn import HCGDNN
+from .mcformer import MCformer
 from .mldnn import MLDNN
 from .pointdnn import PointDNN
 from .rescnn import ResCNN
@@ -22,6 +23,7 @@ from .resnet import ResNet
 from .ssnn import SSNNTwoStage, SSNNSingleStage
 from .ssrcnn import SSRCNN
 from .svm import SVM
+from .trn import TRN
 from .vggnet import VGGNet
 
 __all__ = [
@@ -42,6 +44,7 @@ __all__ = [
     'GoogleNet',
     'HCGDNN',
     'MLDNN',
+    'MCformer',
     'PointDNN',
     'ResCNN',
     'ResNet',
@@ -49,5 +52,6 @@ __all__ = [
     'SSNNTwoStage', 'SSNNSingleStage',
     'SSRCNN',
     'SVM',
+    'TRN',
     'VGGNet'
 ]

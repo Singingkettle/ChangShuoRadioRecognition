@@ -37,6 +37,7 @@ def kldiv(pred,
         torch.Tensor: The calculated loss
     """
     # element-wise losses
+    label = label.type_as(pred)
     pred = F.log_softmax(pred, dim=1)
     loss = F.kl_div(pred, label, reduction='none')
 
@@ -98,6 +99,9 @@ class KLDIVLoss(nn.Module):
             torch.Tensor: The calculated loss
         """
         assert reduction_override in (None, 'none', 'mean', 'sum')
+        if cls_score.dim() != label.dim():
+            label = F.one_hot(label, num_classes=cls_score.shape[-1])
+
         reduction = (
             reduction_override if reduction_override else self.reduction)
         loss_cls = self.loss_weight * self.cls_criterion(

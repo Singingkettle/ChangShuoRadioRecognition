@@ -3,13 +3,13 @@
 English | [简体中文](README_zh-CN.md)
 
 CSRR (ChangShuoRadioRecognition) is an open source signal processing toolbox based on PyTorch. The framework of this project is based on
-the [mmdetection](https://github.com/open-mmlab/mmdetection) and [CSRR](https://github.com/open-mmlab/CSRR).
+the [mmdetection](https://github.com/open-mmlab/mmdetection) and [mmcv](https://github.com/open-mmlab/mmcv).
 
 ### Major features
 
 - **Support of multiple frameworks out of box**
 
-  The toolbox directly supports popular and contemporary AMC and SignalSeparation frameworks, *e.g.* CLDNN, TanhNet,
+  The toolbox directly supports popular and contemporary AMC algorithms, *e.g.* CLDNN, TanhNet,
   etc.
 
 ## Changelog
@@ -40,6 +40,8 @@ Supported Automatic Modulation Classification methods:
   Classification**](https://ieeexplore.ieee.org/document/9462447)
 - [x] [HCGDNN](configs/hcgdnn). [**A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9764618)
 - [X] [FMLDNN](configs/fastmldnn). 'New proposed by Shuo Chang'
+- [X] [TRN](configs/trn). [**Signal Modulation Classification Based on the Transformer Network**](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340)
+- [X] [MCformer] (configs/MCformer). [**MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/9685815)
 
 ## Installation
 

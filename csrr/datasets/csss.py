@@ -92,7 +92,7 @@ class BaseCSSS(Dataset, metaclass=ABCMeta):
 
 @DATASETS.register_module()
 class CSSSBCE(BaseCSSS):
-    def __int__(self, file_info, data_root=None, test_mode=False):
+    def __init__(self, file_info, data_root=None, test_mode=False):
         super(CSSSBCE, self).__init__(file_info, data_root, test_mode)
 
         mod_labels = np.zeros((len(self), 5 * 9), dtype=np.float32)

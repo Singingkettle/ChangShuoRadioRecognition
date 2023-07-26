@@ -19,7 +19,7 @@ from ..common import dump, load
 
 
 class COCOeval(_COCOeval):
-    def __int__(self, cocoGt=None, cocoDt=None, iouType='segm'):
+    def __init__(self, cocoGt=None, cocoDt=None, iouType='segm'):
         super().__init__(cocoGt=cocoGt, cocoDt=cocoDt, iouType=iouType)
 
     def summarize(self):

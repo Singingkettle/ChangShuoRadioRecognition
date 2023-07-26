@@ -1,5 +1,6 @@
 from .checkpoint import CheckpointHook
 from .closure import ClosureHook
+from .early_stopping import EarlyStoppingHook
 from .ema import EMAHook
 from .eval_hooks import EvalHook, DistEvalHook
 from .hook import HOOKS, Hook
@@ -16,6 +17,7 @@ from .sync_buffer import SyncBuffersHook
 __all__ = [
     'CheckpointHook',
     'ClosureHook',
+    'EarlyStoppingHook',
     'EMAHook',
     'EvalHook', 'DistEvalHook',
     'HOOKS', 'Hook',

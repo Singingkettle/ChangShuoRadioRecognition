@@ -135,7 +135,7 @@ def digit_version(version_str):
         version_str (str): The version string.
 
     Returns:
-        tuple[int]: The version info in digits (integers).
+        tuple[int]: The version performance_info in digits (integers).
     """
     digit_version = []
     for x in version_str.split('.'):

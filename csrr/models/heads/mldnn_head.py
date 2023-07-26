@@ -66,6 +66,7 @@ class MLDNNHead(BaseHead):
                 losses[f'loss_{key}'] = getattr(self, key).loss(inputs[key], targets['snrs'])['loss_cls']
             else:
                 losses[f'loss_{key}'] = getattr(self, key).loss(inputs[key], targets['modulations'])['loss_cls']
+            assert not torch.isnan(losses[f'loss_{key}']).any(), print(key)
 
         return losses
 

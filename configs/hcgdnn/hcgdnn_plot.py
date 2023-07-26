@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/performance/classification.py',
+    '../_base_/performance_info/classification.py',
 ]
 
 plot = dict(

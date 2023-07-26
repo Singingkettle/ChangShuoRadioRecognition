@@ -2,20 +2,19 @@ import os
 
 from ..builder import PERFORMANCES, build_figure, build_table
 from ..figure_configs import generate_legend_config, generate_scatter_config
-from ..method_info import AMCMethodInfo
 from ..metrics import ClassificationMetricsWithSNRForSingle
 from ...common.fileio import load as IOLoad
 
 
 @PERFORMANCES.register_module()
 class Classification:
-    def __init__(self, save_dir, Figures=None, Tables=None):
+    def __init__(self, save_dir, info, Figures=None, Tables=None):
         self.save_dir = save_dir
-        self.work_dir = AMCMethodInfo.work_dir
-        self.methods = AMCMethodInfo.methods
+        self.work_dir = info['work_dir']
+        self.methods = info['methods']
         self.legend = generate_legend_config(self.methods)
         self.scatter = generate_scatter_config(self.methods)
-        self.publish = AMCMethodInfo.publish
+        self.publish = info['publish']
 
         self.performances = dict()
         for dataset_name in self.publish:

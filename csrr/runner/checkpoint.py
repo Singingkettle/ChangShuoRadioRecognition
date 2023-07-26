@@ -402,7 +402,7 @@ def save_checkpoint(model: torch.nn.Module,
                     file_client_args: Optional[dict] = None) -> None:
     """Save checkpoint to file.
     The checkpoint will have 3 fields: ``meta``, ``state_dict`` and
-    ``optimizer``. By default ``meta`` will contain version and time info.
+    ``optimizer``. By default ``meta`` will contain version and time performance_info.
     Args:
         model (Module): Module whose params are to be saved.
         file_name (str): Checkpoint filename.

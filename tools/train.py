@@ -11,7 +11,7 @@ import torch.distributed as dist
 from csrr import __version__
 from csrr.apis import init_random_seed, set_random_seed, train_method
 from csrr.common import get_root_logger, collect_env
-from csrr.common.utils import DictAction, Config, mkdir_or_exist, redir_and_exist, setup_multi_processes, get_device
+from csrr.common.utils import DictAction, Config, mkdir_or_exist, setup_multi_processes, get_device
 from csrr.datasets import build_dataset
 from csrr.models import build_method
 from csrr.runner import init_dist, get_dist_info
@@ -106,7 +106,6 @@ def main():
     # create work_dir
     mkdir_or_exist(osp.abspath(cfg.work_dir))
 
-
     # dump configs
     cfg.dump(osp.join(cfg.work_dir, osp.basename(args.config)))
     # init the logger before other steps
@@ -115,17 +114,17 @@ def main():
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
     # init the meta dict to record some important information such as
-    # environment info and seed, which will be logged
+    # environment performance_info and seed, which will be logged
     meta = dict()
-    # log env info
+    # log env performance_info
     env_info_dict = collect_env()
     env_info = '\n'.join([(f'{k}: {v}') for k, v in env_info_dict.items()])
     dash_line = '-' * 60 + '\n'
-    logger.info('Environment info:\n' + dash_line + env_info + '\n' +
+    logger.info('Environment performance_info:\n' + dash_line + env_info + '\n' +
                 dash_line)
     meta['env_info'] = env_info
     meta['figure_configs'] = cfg.pretty_text
-    # log some basic info
+    # log some basic performance_info
     logger.info(f'Distributed training: {distributed}')
     logger.info(f'Config:\n{cfg.pretty_text}')
 
@@ -156,7 +155,7 @@ def main():
         datasets.append(build_dataset(val_dataset))
 
     if cfg.checkpoint_config is not None:
-        # format version in checkpoints as meta data
+        # format version in checkpoints as metadata
         cfg.checkpoint_config.meta = dict(csrr_version=__version__)
 
     if hasattr(datasets[0], 'CLASSES'):

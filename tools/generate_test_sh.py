@@ -24,7 +24,7 @@ def main():
 
     test_sh_name = 'test.sh'
 
-    train_configs = filter_config(cfg, is_regeneration=args.is_regeneration, mode='test')
+    train_configs = filter_config(cfg.info, is_regeneration=args.is_regeneration, mode='test')
 
     base_master_port = 29547
     with open(test_sh_name, 'w') as f:

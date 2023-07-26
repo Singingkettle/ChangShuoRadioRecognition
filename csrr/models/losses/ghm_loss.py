@@ -28,7 +28,7 @@ def _expand_onehot_labels(labels, label_weights, label_channels):
 
 # TODO: code refactoring to make it consistent with other losses
 @LOSSES.register_module()
-class GHMC(nn.Module):
+class GHMCLoss(nn.Module):
     """GHM Classification Loss.
     Details of the theorem can be viewed in the paper
     `Gradient Harmonized Single-stage Detector
@@ -41,7 +41,7 @@ class GHMC(nn.Module):
     """
 
     def __init__(self, bins=10, momentum=0, use_sigmoid=True, loss_weight=1.0):
-        super(GHMC, self).__init__()
+        super(GHMCLoss, self).__init__()
         self.bins = bins
         self.momentum = momentum
         edges = torch.arange(bins + 1).float() / bins
@@ -55,7 +55,7 @@ class GHMC(nn.Module):
             raise NotImplementedError
         self.loss_weight = loss_weight
 
-    def forward(self, pred, target, label_weight, *args, **kwargs):
+    def forward(self, pred, target, label_weight=None, **kwargs):
         """Calculate the GHM-C loss.
         Args:
             pred (float tensor of size [batch_num, num_class]):
@@ -68,6 +68,8 @@ class GHMC(nn.Module):
             The gradient harmonized loss.
         """
         # the target should be binary class label
+        if label_weight is None:
+            label_weight = target.new_full(target.shape, 1)
         if pred.dim() != target.dim():
             target, label_weight = _expand_onehot_labels(
                 target, label_weight, pred.size(-1))

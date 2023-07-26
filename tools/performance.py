@@ -1,9 +1,8 @@
 import argparse
 
-import torch
-
-from csrr.common.utils import Config, filter_config
+from csrr.common.utils import Config
 from csrr.performance.builder import build_performance
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -21,8 +20,10 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg.pretty_text)
 
+    cfg.performance['info'] = cfg.info
     performance = build_performance(cfg.performance)
     performance.draw()
+
 
 if __name__ == '__main__':
     main()

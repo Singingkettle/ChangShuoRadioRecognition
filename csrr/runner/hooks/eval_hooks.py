@@ -370,7 +370,7 @@ class EvalHook(Hook):
         runner.log_buffer.ready = True
 
         if self.save_best is not None:
-            # If the performance of model is poor, the `eval_res` may be an
+            # If the performance_info of model is poor, the `eval_res` may be an
             # empty dict and it will raise exception when `self.save_best` is
             # not None. More details at
             # https://github.com/open-mmlab/mmdetection/issues/6265.
@@ -483,7 +483,7 @@ class DistEvalHook(EvalHook):
         """perform evaluation and save ckpt."""
         # Synchronization of BatchNorm's buffer (running_mean
         # and running_var) is not supported in the DDP of pytorch,
-        # which may cause the inconsistent performance of models in
+        # which may cause the inconsistent performance_info of models in
         # different ranks, so we broadcast BatchNorm's buffers
         # of rank 0 to other ranks to avoid this.
         if self.broadcast_bn_buffer:

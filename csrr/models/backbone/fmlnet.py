@@ -9,8 +9,8 @@ from ...runner import Sequential
 @BACKBONES.register_module()
 class FMLNet(BaseBackbone):
 
-    def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None,
-                 is_freeze=False, groups=(2, 16, 4), stride=1, tnn='t', merge='sum', channel_mode=True):
+    def __init__(self, depth=4, input_size=80, hidden_size=256, dp=0.2, init_cfg=None, is_freeze=False,
+                 groups=(2, 16, 4), stride=1, tnn='t', merge='sum', scale=1, channel_mode=True):
         super(FMLNet, self).__init__(init_cfg)
         if channel_mode:
             self.cnn = Sequential(
@@ -52,6 +52,7 @@ class FMLNet(BaseBackbone):
             self.merge = 'last'
 
         self.is_freeze = is_freeze
+        self.scale = scale
 
     def _freeze_layers(self):
         for m in self.modules():
@@ -70,7 +71,7 @@ class FMLNet(BaseBackbone):
         if self.merge == 'sum':
             return torch.sum(fea, dim=1)  # this is best
         elif self.merge == 'mean':
-            return torch.mean(fea, dim=1)
+            return torch.mean(fea, dim=1) * self.scale
         elif self.merge == 'max':  # this is best
             return torch.max(fea, dim=1)[0]
         elif self.merge == 'min':

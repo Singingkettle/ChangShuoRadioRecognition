@@ -3,7 +3,7 @@ from .circle_loss import CircleLoss
 from .contrastive_loss import ContrastiveLoss
 from .cross_entropy_loss import CrossEntropyLoss, cross_entropy
 from .focal_loss import FocalLoss, sigmoid_focal_loss
-from .ghm_loss import GHMC
+from .ghm_loss import GHMCLoss
 from .kldiv_loss import KLDIVLoss, kldiv
 from .mse_loss import MSELoss, mse_loss
 from .nll_loss import NLLLoss, nll
@@ -15,7 +15,7 @@ __all__ = [
     'ContrastiveLoss',
     'CrossEntropyLoss', 'cross_entropy',
     'FocalLoss', 'sigmoid_focal_loss',
-    'GHMC',
+    'GHMCLoss',
     'KLDIVLoss', 'kldiv',
     'MSELoss', 'mse_loss',
     'NLLLoss', 'nll',

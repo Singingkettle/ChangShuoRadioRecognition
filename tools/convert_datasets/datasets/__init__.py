@@ -1,7 +1,11 @@
-from .deepsig import DeepSigBase, DeepSigA, DeepSigB, DeepSigC, DeepSigD
+from .deepsig import DeepSigA, DeepSigB, DeepSigC, DeepSigD
+from .hisar import HisarMod2019
+from .signal_detection import CSRRData
 from .ucsd import UCSDRML22
-from .csrr import CSRRData
+
 __all__ = [
-    'DeepSigBase', 'DeepSigA', 'DeepSigB', 'DeepSigC', 'DeepSigD',
-    'UCSDRML22', 'CSRRData'
+    'DeepSigA', 'DeepSigB', 'DeepSigC', 'DeepSigD',
+    'HisarMod2019',
+    'UCSDRML22',
+    'CSRRData',
 ]

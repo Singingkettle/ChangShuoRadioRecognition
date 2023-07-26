@@ -22,3 +22,6 @@ einops
 lmdb
 mc.py
 pycocotools
+# accelerate the cvs load speed
+pyarrow
+lightgbm

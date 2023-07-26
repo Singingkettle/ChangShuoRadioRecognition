@@ -13,7 +13,7 @@ def digit_version(version_str: str, length: int = 4):
         version_str (str): The version string.
         length (int): The maximum number of version levels. Default: 4.
     Returns:
-        tuple[int]: The version info in digits (integers).
+        tuple[int]: The version performance_info in digits (integers).
     """
     assert 'parrots' not in version_str
     version = parse(version_str)

@@ -2,11 +2,10 @@
 
 ### Requirements
 
-- Ubuntu
-- Python 3.8
-- PyTorch 1.12.1+
-- CUDA 11.6+
-- g++/gcc 5+
+- Ubuntu 22.04 LTS
+- Python 3.10
+- PyTorch 2.0.1
+- CUDA 11.8
 
 ### Install ChangShuoRadioRecognition
 
@@ -15,27 +14,16 @@ a. Upgrade version of g++/gcc to 5+ for building c++ files
 b. Create a conda virtual environment and activate it.
 
 ```shell
-conda create -n ChangShuoRadioRecognition python=3.8 -y
+conda create -n ChangShuoRadioRecognition python=3.10 -y
 conda activate ChangShuoRadioRecognition
 ```
 
-c. Install PyTorch and torchvision following the [official instructions](https://pytorch.org/), e.g.
-
-d. Clone the ChangShuoRadioRecognition repository.
-
+c. Install PyTorch and torchvision.
 ```shell
-git clone https://github.com/ChangShuoRadioRecognition.git
-cd ChangShuoRadioRecognition
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
-e. Install build requirements and then install ChangShuoRadioRecognition.
-
-```shell
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install -v -e .  # or "python setup.py develop"
-```
-
-f. Install mmdet for radio detection and radio recognition.
+d. Install mmdet for radio detection and radio recognition.
 
 ```shell
 pip install -U openmim
@@ -44,15 +32,21 @@ mim install "mmcv>=2.0.0"
 mim install mmdet
 ```
 
+e. Clone the ChangShuoRadioRecognition repository.
 
-g. Install build requirements and then install ChangShuoRadioRecognition.
+```shell
+git clone https://github.com/ChangShuoRadioRecognition.git
+cd ChangShuoRadioRecognition
+```
+
+f. Install build requirements and then install ChangShuoRadioRecognition.
 
 ```shell
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -v -e .  # or "python setup.py develop"
 ```
 
-h. Install "Times New Roman" for matplotlib, following
+g. Install "Times New Roman" for matplotlib, following
 the [link](https://blog.csdn.net/u014712482/article/details/80568540?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.control)
 
 ```shell
@@ -61,4 +55,5 @@ sudo apt-get install ttf-mscorefonts-installer
 rm -rf ~/.cache/matplotlib
 ```
 
-i. Install tsnecuda from source, following the [link](https://github.com/CannyLab/tsne-cuda). 
+h. Install tsnecuda following the [link](https://github.com/CannyLab/tsne-cuda). 
+

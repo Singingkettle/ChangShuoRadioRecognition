@@ -1,5 +1,5 @@
 from .alexnet import AlexNet
-from .cnnnet import CNNNet, ResCNN, DensCNN, DetCNN
+from .cnnnet import CNNNet, DensCNN, DetCNN
 from .cocnet import COCNetTiny
 from .crnet import CRNet
 from .ctnet import CTNet
@@ -9,11 +9,14 @@ from .fsnet import FSNet
 from .googlenet import GoogleNet
 from .hcgnet import (HCGNet, HCGNetCNN, HCGNetGRU1, HCGNetGRU2,
                      HCGNetCG1, HCGNetCG2, HCGNetG1G2)
+from .mcformernet import MCformerNet
 from .mctnet import MCTNet
 from .mlnet import MLNet
+from .rescnnnet import ResCNN, AMRBResCNN
 from .resnet import ResNet
 from .ssnet import SSNet
 from .ssrnet import SSRNet
+from .trnet import TRNet
 from .vggnet import VGGNet
 
 __all__ = [
@@ -35,10 +38,12 @@ __all__ = [
     'HCGNetCG1',
     'HCGNetCG2',
     'HCGNetG1G2',
+    'MCformerNet',
     'MLNet',
     'ResNet',
     'MCTNet',
-    'VGGNet',
     'SSNet',
-    'SSRNet'
+    'SSRNet',
+    'TRNet',
+    'VGGNet',
 ]

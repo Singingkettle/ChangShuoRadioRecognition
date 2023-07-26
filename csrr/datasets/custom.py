@@ -79,7 +79,7 @@ class CustomDataset(Dataset, metaclass=ABCMeta):
             idx (int): Index of data.
 
         Returns:
-            dict: Annotation info of specified idx.
+            dict: Annotation performance_info of specified idx.
         """
 
     def __getitem__(self, idx):

@@ -1,41 +1,26 @@
-import json
+import copy
 import multiprocessing
-import os
 import os.path as osp
 import pickle
 import random
-from concurrent import futures
 
 import h5py
 import numpy as np
-from tools.convert_datasets.common import print_progress, init_annotations, update_annotations, combine_two_annotations, \
-    save_seq_and_constellation_data
 from tqdm import tqdm
 
 from csrr.datasets.pipeline.loading import Constellation
+from .base_dataset import BaseDataset, combine_two_infos
 
 _Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()
 
 
-class DeepSigBase:
+class DeepSigBase(BaseDataset):
     def __init__(self, root_dir, version, data_ratios):
+        super(DeepSigBase, self).__init__('DeepSig', root_dir, version, data_ratios)
 
-        self.name = 'DeepSig'
-        self.root_dir = root_dir
-        self.version = version
-        self.data_dir = osp.join(self.root_dir, self.name, self.version)
-        self.train_num = 0
-        self.val_num = 0
-        self.test_num = 0
-        self.data_ratios = data_ratios
-        self.data_name = ''
-        co = Constellation()
-        self.filters = co.get_filters()
-
-    @property
     def preprocess_original_data(self):
-        print('Start converting data {}-{}'.format(self.name, self.version))
+        print('Start converting data {}-{}'.format(self.organization, self.version))
         raw_data_path = osp.join(self.data_dir, self.data_name)
         data = pickle.load(open(raw_data_path, 'rb'), encoding='bytes')
         rsnrs, rmods = map(lambda j: sorted(list(set(map(lambda x: x[j], data.keys())))), [1, 0])
@@ -44,7 +29,7 @@ class DeepSigBase:
         item_index = 0
 
         modulations = []
-        for mod in rmods:
+        for mod in copy.deepcopy(rmods):
             if hasattr(mod, 'decode'):
                 mod = mod.decode('UTF-8')
             modulations.append(mod)
@@ -53,128 +38,81 @@ class DeepSigBase:
             modulations = [self.mod2mod[mod] for mod in modulations]
 
         snrs = [int(snr) for snr in rsnrs]
-        filter_config = [[0.02, 0.02], [0.05, 0.05]]
 
-        test_annotations = init_annotations(modulations, snrs, filter_config)
-        train_annotations = init_annotations(modulations, snrs, filter_config)
-        validation_annotations = init_annotations(modulations, snrs, filter_config)
+        test_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        train_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        validation_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
 
         random.seed(0)
-
-        mods_snrs = []
-        for mod in rmods:
-            for snr in rsnrs:
-                mods_snrs.append({'mod': mod, 'snr': snr})
-
-        for item in tqdm(mods_snrs):
-            mod = item['mod']
-            snr = item['snr']
-            item_num = data[(mod, snr)].shape[0]
+        for bmodulation, snr in tqdm(data.keys()):
+            sub_data = data[(bmodulation, snr)]
+            item_num = sub_data.shape[0]
             item_indices = [i for i in range(item_num)]
+
             random.shuffle(item_indices)
 
-            if hasattr(mod, 'decode'):
-                mod = mod.decode('UTF-8')
+            if hasattr(bmodulation, 'decode'):
+                modulation = copy.deepcopy(bmodulation.decode('UTF-8'))
+            else:
+                modulation = copy.deepcopy(bmodulation)
 
             if hasattr(self, 'mod2mod'):
-                modulation = self.mod2mod[mod]
+                modulation = self.mod2mod[modulation]
             else:
-                modulation = mod
+                modulation = modulation
 
             train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
             test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
 
             for sub_item_index in item_indices:
-                item = data[(mod, snr)][sub_item_index, :, :]
-                item = item.astype(np.float64)
+                item_data = sub_data[sub_item_index, :, :]
+                item_data = item_data.astype(np.float64)
                 file_name = '{:0>12d}.npy'.format(item_index + sub_item_index)
-
                 if sub_item_index in train_indices:
-                    train_annotations = update_annotations(train_annotations, file_name, snr, modulation)
+                    train_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
                 elif sub_item_index in test_indices:
-                    test_annotations = update_annotations(test_annotations, file_name, snr, modulation)
+                    test_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
                 else:
-                    validation_annotations = update_annotations(validation_annotations, file_name, snr, modulation)
-                real_scale = np.max(
-                    np.abs(item[0, :])) + np.finfo(np.float64).eps
-                imag_scale = np.max(
-                    np.abs(item[1, :])) + np.finfo(np.float64).eps
-                dataset.append({'file_name': file_name, 'data': item,
+                    validation_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                real_scale = np.max(np.abs(item_data[0, :])) + np.finfo(np.float64).eps
+                imag_scale = np.max(np.abs(item_data[1, :])) + np.finfo(np.float64).eps
+                dataset.append({'file_name': file_name, 'data': item_data,
                                 'real_scale': real_scale, 'imag_scale': imag_scale})
             item_index += item_num
 
-        return dataset, train_annotations, validation_annotations, test_annotations
+        train_and_validation_info = combine_two_infos(train_info, validation_info)
 
-    def generate(self):
-        try:
-            dataset, train_annotations, validation_annotations, test_annotations = self.preprocess_original_data
+        infos = dict(train=train_info, validation=validation_info,
+                     test=test_info, train_and_validation=train_and_validation_info)
 
-            train_and_validation_annotations = combine_two_annotations(train_annotations, validation_annotations)
-
-            sequence_data_dir = osp.join(self.data_dir, 'sequence_data')
-            constellation_data_dir = osp.join(
-                self.data_dir, 'constellation_data')
-
-            if not osp.isdir(sequence_data_dir):
-                os.makedirs(sequence_data_dir)
-
-            if not osp.isdir(constellation_data_dir):
-                os.makedirs(constellation_data_dir)
-
-            # Save the item as *.npy file
-            num_items = len(dataset)
-            with futures.ProcessPoolExecutor(max_workers=CPU_COUNT) as executor:
-                fs = [executor.submit(save_seq_and_constellation_data, item, sequence_data_dir, constellation_data_dir)
-                      for item in dataset]
-                for i, f in enumerate(futures.as_completed(fs)):
-                    # Write progress to error so that it can be seen
-                    print_progress(i, num_items, prefix='Convert {}-{}'.format(self.name, self.version), suffix='Done ',
-                                   bar_length=40)
-
-            print('\nSave train, val, test annotation json for the data set {}-{}'.format(self.name, self.version))
-            json.dump(train_annotations,
-                      open(self.data_dir + '/{}.json'.format('train'), 'w'),
-                      indent=4, sort_keys=True)
-            json.dump(validation_annotations,
-                      open(self.data_dir + '/{}.json'.format('validation'), 'w'),
-                      indent=4, sort_keys=True)
-            json.dump(test_annotations,
-                      open(self.data_dir + '/{}.json'.format('test'), 'w'),
-                      indent=4, sort_keys=True)
-            json.dump(train_and_validation_annotations,
-                      open(self.data_dir + '/{}.json'.format('train_and_validation'), 'w'),
-                      indent=4, sort_keys=True)
-        except Exception as e:
-            print('Error Message is: {}'.format(e))
-            raise RuntimeError(
-                'Converting data {}-{} failed'.format(self.name, self.version))
+        return dataset, infos
 
 
 class DeepSigA(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigA, self).__init__(root_dir, version, data_ratios)
         self.data_name = '2016.04C.multisnr.pkl'
-        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
-                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
-                        "WBFM": "WBFM"}
+        self.mod2mod = {'8PSK': '8PSK', 'AM-DSB': 'AM-DSB', 'AM-SSB': 'AM-SSB', 'BPSK': 'BPSK', 'CPFSK': 'CPFSK',
+                        'GFSK': 'GFSK', 'PAM4': '4PAM', 'QAM16': '16QAM', 'QAM64': '64QAM', 'QPSK': 'QPSK',
+                        'WBFM': 'WBFM'}
 
 
 class DeepSigB(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigB, self).__init__(root_dir, version, data_ratios)
         self.data_name = 'RML2016.10a_dict.pkl'
-        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
-                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
-                        "WBFM": "WBFM"}
+        self.mod2mod = {'8PSK': '8PSK', 'AM-DSB': 'AM-DSB', 'AM-SSB': 'AM-SSB', 'BPSK': 'BPSK', 'CPFSK': 'CPFSK',
+                        'GFSK': 'GFSK', 'PAM4': '4PAM', 'QAM16': '16QAM', 'QAM64': '64QAM', 'QPSK': 'QPSK',
+                        'WBFM': 'WBFM'}
 
 
 class DeepSigC(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):
         super(DeepSigC, self).__init__(root_dir, version, data_ratios)
         self.data_name = 'RML2016.10b.dat'
-        self.mod2mod = {"8PSK": '8PSK', "AM-DSB": "AM-DSB", "AM-SSB": "AM-SSB", "BPSK": "BPSK", "CPFSK": "CPFSK",
-                        "GFSK": "GFSK", "PAM4": "4PAM", "QAM16": "16QAM", "QAM64": "64QAM", "QPSK": "QPSK",
-                        "WBFM": "WBFM"}
+        self.mod2mod = {'8PSK': '8PSK', 'AM-DSB': 'AM-DSB', 'AM-SSB': 'AM-SSB', 'BPSK': 'BPSK', 'CPFSK': 'CPFSK',
+                        'GFSK': 'GFSK', 'PAM4': '4PAM', 'QAM16': '16QAM', 'QAM64': '64QAM', 'QPSK': 'QPSK',
+                        'WBFM': 'WBFM'}
 
 
 class DeepSigD(DeepSigBase):
@@ -213,9 +151,8 @@ class DeepSigD(DeepSigBase):
         super(DeepSigD, self).__init__(root_dir, version, data_ratios)
         self.data_name = 'GOLD_XYZ_OSC.0001_1024.hdf5'
 
-    @property
     def preprocess_original_data(self):
-        print('Start converting data {}-{}'.format(self.name, self.version))
+        print(f'Start converting data {self.organization}-{self.version}')
         raw_data_path = osp.join(self.data_dir, self.data_name)
         data = h5py.File(raw_data_path, 'r')
 
@@ -229,7 +166,7 @@ class DeepSigD(DeepSigBase):
         data_map = dict()
         for item_index in tqdm(range(data_mods.shape[0])):
             mod_index = np.argmax(data_mods[item_index, :])
-            key_str = "{}-{}".format(mod_index,
+            key_str = '{}-{}'.format(mod_index,
                                      float(data_snrs[item_index, 0]))
             if key_str not in data_map:
                 data_map[key_str] = []
@@ -239,11 +176,10 @@ class DeepSigD(DeepSigBase):
 
         modulations = [mod for mod in DeepSigD.MODS]
         snrs = [snr for snr in range(-20, 32, 2)]
-        filter_config = [[0.02, 0.02], [0.05, 0.05]]
 
-        test_annotations = init_annotations(modulations, snrs, filter_config)
-        train_annotations = init_annotations(modulations, snrs, filter_config)
-        validation_annotations = init_annotations(modulations, snrs, filter_config)
+        test_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        train_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        validation_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
 
         random.seed(0)
         for tuple_key in data_map.keys():
@@ -254,26 +190,31 @@ class DeepSigD(DeepSigBase):
             train_indices = item_indices[:int(self.data_ratios[0] * item_num)]
             test_indices = item_indices[(int(sum(self.data_ratios[:2]) * item_num)):]
             for item_index in data_map[tuple_key]:
-                item = sequence_data[item_index, :, :]
-                item = item.astype(np.float64)
+                item_data = sequence_data[item_index, :, :]
+                item_data = item_data.astype(np.float64)
 
                 file_name = '{:0>12d}.npy'.format(item_index)
                 mod_index = np.argmax(data_mods[item_index, :])
 
                 if item_index in train_indices:
-                    train_annotations = update_annotations(train_annotations, file_name,
-                                                           int(data_snrs[item_index, 0]), self.MODS[mod_index])
+                    train_info['annotations'].append(
+                        dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
                 elif item_index in test_indices:
-                    test_annotations = update_annotations(test_annotations, file_name,
-                                                          int(data_snrs[item_index, 0]), self.MODS[mod_index])
+                    test_info['annotations'].append(
+                        dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
                 else:
-                    validation_annotations = update_annotations(validation_annotations, file_name,
-                                                                int(data_snrs[item_index, 0]), self.MODS[mod_index])
+                    validation_info['annotations'].append(
+                        dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
 
-                real_scale = np.max(np.abs(item[0, :])) + np.finfo(np.float64).eps
-                imag_scale = np.max(np.abs(item[1, :])) + np.finfo(np.float64).eps
+                real_scale = np.max(np.abs(item_data[0, :])) + np.finfo(np.float64).eps
+                imag_scale = np.max(np.abs(item_data[1, :])) + np.finfo(np.float64).eps
 
-                dataset.append({'file_name': file_name, 'data': item,
+                dataset.append({'file_name': file_name, 'data': item_data,
                                 'real_scale': real_scale, 'imag_scale': imag_scale})
 
-        return dataset, train_annotations, validation_annotations, test_annotations
+        train_and_validation_info = combine_two_infos(train_info, validation_info)
+
+        infos = dict(train=train_info, validation=validation_info,
+                     test=test_info, train_and_validation=train_and_validation_info)
+
+        return dataset, infos

@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/performance/amc.py',
+    '../_base_/performance_info/amc.py',
 ]
 
 performance = dict(

@@ -88,7 +88,7 @@ class GradientCumulativeOptimizerHook(OptimizerHook):
         if self.has_batch_norm(runner.model) and self.cumulative_iters > 1:
             runner.logger.warning(
                 'GradientCumulativeOptimizerHook may slightly decrease '
-                'performance if the model has BatchNorm layers.')
+                'performance_info if the model has BatchNorm layers.')
 
         self.divisible_iters = (
                 runner.max_iters // self.cumulative_iters * self.cumulative_iters)
