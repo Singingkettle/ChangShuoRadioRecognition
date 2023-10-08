@@ -5,15 +5,12 @@ import os
 import os.path as osp
 import pickle
 import sys
-from concurrent import futures
+import zlib
 
 import numpy as np
-import zlib
 from tqdm import tqdm
 
-from csrr.datasets.pipeline.loading import Constellation
 
-_Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()
 
 
@@ -64,7 +61,7 @@ def save_seq_and_constellation_data(item, sequence_data_dir, constellation_data_
     item_data = item['data']
     item_data[0, :] = item_data[0, :] / item['real_scale']
     item_data[1, :] = item_data[1, :] / item['imag_scale']
-    constellations, filters = _Constellation.generate_by_filter(item_data)
+    constellations, filters = Constellation().generate_by_filter(item_data)
 
     for constellation, param in zip(constellations, filters):
         constellation_dir = osp.join(constellation_data_dir,
@@ -91,6 +88,63 @@ def combine_two_infos(annotations1, annotations2):
         combine_annotation[key_name].extend(copy.deepcopy(annotations2[key_name]))
 
     return combine_annotation
+
+
+class Constellation:
+    def __init__(self, filter_size=None, filter_stride=None):
+        # matrix window performance_info
+        self.height_range = [-1, 1]
+        self.width_range = [-1, 1]
+
+        # parameters for converting sequence
+        # data (2, N) to constellation matrix based on conv mode
+        if filter_size is None:
+            self.filter_size = [0.05, 0.02]
+        else:
+            self.filter_size = filter_size
+        if filter_stride is None:
+            self.filter_stride = [0.05, 0.02]
+        else:
+            self.filter_stride = filter_stride
+
+    def get_filters(self):
+        filters = []
+        for filter_size, filter_stride in zip(self.filter_size, self.filter_stride):
+            filters.append([filter_size, filter_stride])
+
+        return filters
+
+    def generate_by_filter(self, data):
+
+        constellations = []
+        filters = []
+        for filter_size, filter_stride in zip(self.filter_size, self.filter_stride):
+            matrix_width = int((self.width_range[1] - self.width_range[0] - filter_size) / filter_stride + 1)
+            matrix_height = int((self.height_range[1] - self.height_range[0] - filter_size) / filter_stride + 1)
+
+            constellation = np.zeros((matrix_height, matrix_width))
+
+            def axis_is(query_axis_x, query_axis_y):
+                axis_x = query_axis_x // filter_stride
+                axis_y = query_axis_y // filter_stride
+                if axis_x * filter_stride + filter_size < query_axis_x:
+                    position = [None, None]
+                elif axis_y * filter_stride + filter_size < query_axis_y:
+                    position = [None, None]
+                else:
+                    position = [int(axis_x), int(axis_y)]
+                return position
+
+            pos_list = map(axis_is, list(data[0, :]), list(data[1, :]))
+            num_point = 0
+            for pos in pos_list:
+                if pos[0] is not None:
+                    constellation[pos[0], pos[1]] += 1
+                    num_point += 1
+            constellations.append(constellation / num_point)
+            filters.append([filter_size, filter_stride])
+
+        return constellations, filters
 
 
 class BaseDataset:

@@ -1,8 +1,5 @@
-from .distributed_sampler import DistributedSampler
-from .group_sampler import GroupSampler, DistributedGroupSampler
+# Copyright (c) OpenMMLab. All rights reserved.
+from .repeat_aug import RepeatAugSampler
+from .sequential import SequentialSampler
 
-__all__ = [
-    'GroupSampler',
-    'DistributedGroupSampler',
-    'DistributedSampler'
-]
+__all__ = ['RepeatAugSampler', 'SequentialSampler']

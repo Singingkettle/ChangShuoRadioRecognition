@@ -8,8 +8,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from csrr.datasets.pipeline.loading import Constellation
-from .base_dataset import BaseDataset, combine_two_infos
+from .base_dataset import BaseDataset, Constellation, combine_two_infos
 
 _Constellation = Constellation()
 CPU_COUNT = multiprocessing.cpu_count()

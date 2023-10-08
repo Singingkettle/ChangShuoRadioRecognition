@@ -1,25 +1,35 @@
-from .center_loss import CenterLoss
-from .circle_loss import CircleLoss
-from .contrastive_loss import ContrastiveLoss
-from .cross_entropy_loss import CrossEntropyLoss, cross_entropy
+# Copyright (c) OpenMMLab. All rights reserved.
+from .asymmetric_loss import AsymmetricLoss, asymmetric_loss
+from .cae_loss import CAELoss
+from .cosine_similarity_loss import CosineSimilarityLoss
+from .cross_correlation_loss import CrossCorrelationLoss
+from .cross_entropy_loss import (CrossEntropyLoss, binary_cross_entropy,
+                                 cross_entropy)
 from .focal_loss import FocalLoss, sigmoid_focal_loss
-from .ghm_loss import GHMCLoss
-from .kldiv_loss import KLDIVLoss, kldiv
-from .mse_loss import MSELoss, mse_loss
-from .nll_loss import NLLLoss, nll
-from .shrinkage_loss import ShrinkageLoss
-from .utils import reduce_loss, weight_reduce_loss, weighted_loss
+from .label_smooth_loss import LabelSmoothLoss
+from .reconstruction_loss import PixelReconstructionLoss
+from .seesaw_loss import SeesawLoss
+from .swav_loss import SwAVLoss
+from .utils import (convert_to_one_hot, reduce_loss, weight_reduce_loss,
+                    weighted_loss)
 
 __all__ = [
-    'CenterLoss',
-    'ContrastiveLoss',
-    'CrossEntropyLoss', 'cross_entropy',
-    'FocalLoss', 'sigmoid_focal_loss',
-    'GHMCLoss',
-    'KLDIVLoss', 'kldiv',
-    'MSELoss', 'mse_loss',
-    'NLLLoss', 'nll',
-    'ShrinkageLoss',
-    'reduce_loss', 'weight_reduce_loss', 'weighted_loss',
-    'CircleLoss'
+    'asymmetric_loss',
+    'AsymmetricLoss',
+    'cross_entropy',
+    'binary_cross_entropy',
+    'CrossEntropyLoss',
+    'reduce_loss',
+    'weight_reduce_loss',
+    'LabelSmoothLoss',
+    'weighted_loss',
+    'FocalLoss',
+    'sigmoid_focal_loss',
+    'convert_to_one_hot',
+    'SeesawLoss',
+    'CAELoss',
+    'CosineSimilarityLoss',
+    'CrossCorrelationLoss',
+    'PixelReconstructionLoss',
+    'SwAVLoss',
 ]

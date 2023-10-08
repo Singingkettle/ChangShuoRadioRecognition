@@ -1,43 +1,65 @@
-from .amc_head import AMCHead
-from .base_head import BaseHead
-from .center_head import CenterHead
-from .classifier_head import ClassificationHead
-from .cosine_head import CosineHead
-from .detector_head import SignalDetectionHead
-from .dscldnn_head import DSCLDNNHead
-from .euclidean_head import EuclideanHead
-from .fast_mldnn_head import FastMLDNNHead
-from .fsdnn_head import FSDNNHead
-from .gb_head import GBBCEHead, GBIndHead, GBDetHead
-from .hcgdnn_head import HCGDNNHead
-from .mldnn_head import MergeAMCHead, MLDNNHead
-from .mm_head import ASDHead, ASSHead
-from .sednn_head import SEDNNHead
-from .shrinkage_head import ShrinkageHead
-from .ss_head import SSHead
-from .ssrcnn_head import SSRCNNHead
-from .vit_head import VitHead
+# Copyright (c) OpenMMLab. All rights reserved.
+from .beitv1_head import BEiTV1Head
+from .beitv2_head import BEiTV2Head
+from .cae_head import CAEHead
+from .cls_head import ClsHead
+from .conformer_head import ConformerHead
+from .contrastive_head import ContrastiveHead
+from .deit_head import DeiTClsHead
+from .efficientformer_head import EfficientFormerClsHead
+from .grounding_head import GroundingHead
+from .itc_head import ITCHead
+from .itm_head import ITMHead
+from .latent_heads import LatentCrossCorrelationHead, LatentPredictHead
+from .levit_head import LeViTClsHead
+from .linear_head import LinearClsHead
+from .mae_head import MAEPretrainHead
+from .margin_head import ArcFaceClsHead
+from .mim_head import MIMHead
+from .mixmim_head import MixMIMPretrainHead
+from .mocov3_head import MoCoV3Head
+from .multi_label_cls_head import MultiLabelClsHead
+from .multi_label_csra_head import CSRAClsHead
+from .multi_label_linear_head import MultiLabelLinearClsHead
+from .multi_task_head import MultiTaskHead
+from .seq_gen_head import SeqGenerationHead
+from .simmim_head import SimMIMHead
+from .stacked_head import StackedLinearClsHead
+from .swav_head import SwAVHead
+from .vig_head import VigClsHead
+from .vision_transformer_head import VisionTransformerClsHead
+from .vqa_head import VQAGenerationHead
 
 __all__ = [
-    'BaseHead',
-    'AMCHead',
-    'CenterHead',
-    'ClassificationHead',
-    'CosineHead',
-    'SignalDetectionHead',
-    'DSCLDNNHead',
-    'FastMLDNNHead',
-    'FSDNNHead',
-    'GBBCEHead', 'GBIndHead', 'GBDetHead',
-    'HCGDNNHead',
-    'MergeAMCHead',
-    'MLDNNHead',
-    'SEDNNHead',
-    'ShrinkageHead',
-    'ASDHead',
-    'ASSHead',
-    'SSHead',
-    'SSRCNNHead',
-    'EuclideanHead',
-    'VitHead'
+    'ClsHead',
+    'LinearClsHead',
+    'StackedLinearClsHead',
+    'MultiLabelClsHead',
+    'MultiLabelLinearClsHead',
+    'VisionTransformerClsHead',
+    'DeiTClsHead',
+    'ConformerHead',
+    'EfficientFormerClsHead',
+    'ArcFaceClsHead',
+    'CSRAClsHead',
+    'MultiTaskHead',
+    'LeViTClsHead',
+    'VigClsHead',
+    'BEiTV1Head',
+    'BEiTV2Head',
+    'CAEHead',
+    'ContrastiveHead',
+    'LatentCrossCorrelationHead',
+    'LatentPredictHead',
+    'MAEPretrainHead',
+    'MixMIMPretrainHead',
+    'SwAVHead',
+    'MoCoV3Head',
+    'MIMHead',
+    'SimMIMHead',
+    'SeqGenerationHead',
+    'VQAGenerationHead',
+    'ITCHead',
+    'ITMHead',
+    'GroundingHead',
 ]

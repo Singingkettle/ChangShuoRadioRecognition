@@ -1,45 +1,50 @@
-dataset_type = 'DeepSigDataset'
-data_root = './data/ModulationClassification/DeepSig/201610A'
-target_name = 'modulation'
-data = dict(
-    samples_per_gpu=128,
-    workers_per_gpu=4,
-    train=dict(
+# dataset settings
+data_root = 'data/ModulationClassification/DeepSig/RadioML.2016.10A'
+dataset_type = 'AMCDataset'
+
+pipeline = [dict(type='Reshape', shapes=dict(iq=[1, 2, 128])), dict(type='PackInputs', input_key='iq')]
+
+train_dataloader = dict(
+    batch_size=400,
+    num_workers=20,
+    dataset=dict(
         type=dataset_type,
-        ann_file='train_and_validation.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='train_and_validation_iq.pkl', to_float32=True),
-            dict(type='LoadSNRs'),
-            dict(type='LoadAnnotations', target_info={target_name: 'int64'}),
-            dict(type='Collect', keys=['inputs', 'targets', 'snrs'])
-        ],
         data_root=data_root,
-    ),
-    val=dict(
-        type=dataset_type,
-        ann_file='test.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['inputs'])
-        ],
-        data_root=data_root,
-        evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
-        ],
-    ),
-    test=dict(
-        type=dataset_type,
-        ann_file='test.json',
-        pipeline=[
-            dict(type='LoadIQFromCache', data_root=data_root, file_name='test_iq.pkl', to_float32=True),
-            dict(type='Collect', keys=['inputs'])
-        ],
-        data_root=data_root,
-        evaluate=[
-            dict(type='EvaluateSingleHeadClassifierWithSNR', target_name=target_name)
-        ],
-        format=[
-            dict(type='FormatSingleHeadClassifierWithSNR', target_name=target_name)
-        ],
-    ),
+        ann_file='mm-train.json',
+        pipeline=pipeline,
+        cache=True,
+        test_mode=False),
+    sampler=dict(type='DefaultSampler', shuffle=True),
 )
+
+val_dataloader = dict(
+    batch_size=400,
+    num_workers=20,
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        ann_file='mm-validation.json',
+        pipeline=pipeline,
+        cache=True,
+        test_mode=True),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+)
+
+val_evaluator = [
+    dict(type='Accuracy', topk=(1,)),
+    dict(type='Loss', task='classification')
+]
+
+test_dataloader = dict(
+    batch_size=400,
+    num_workers=20,
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        ann_file='mm-test.json',
+        pipeline=pipeline,
+        cache=True,
+        test_mode=True),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+)
+test_evaluator = dict(type='Accuracy', topk=(1,))
