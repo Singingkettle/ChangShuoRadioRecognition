@@ -6,11 +6,11 @@ from ..builder import BACKBONES
 
 
 class PET(nn.Module):
-    def __init__(self, *args, **kwargs):
-        super(PET).__init__(*args, **kwargs)
+    def __init__(self, frame_length=128):
+        super(PET, self).__init__()
         self.p1 = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(2, 1),
+            nn.Linear(frame_length*2, 1),
         )
 
     def forward(self, x):
@@ -25,6 +25,8 @@ class PET(nn.Module):
 
         y1 = x11 + x12
         y2 = x21 - x22
+        y1 = torch.unsqueeze(y1, 2)
+        y2 = torch.unsqueeze(y2, 2)
 
         x2 = torch.cat([y1, y2], dim=2)
         x2 = torch.transpose(x2, 1, 2)
@@ -43,11 +45,11 @@ class PETCGDNN(BaseBackbone):
             a feature extractor without the top classifier.
     """
 
-    def __init__(self, num_classes=-1, hidden_size=128, init_cfg=None):
+    def __init__(self, num_classes=-1, frame_length=128, hidden_size=128, init_cfg=None):
         super(PETCGDNN, self).__init__(init_cfg=init_cfg)
         self.num_classes = num_classes
         self.features = nn.Sequential(
-            PET(),
+            PET(frame_length=frame_length),
             nn.Conv2d(1, 75, kernel_size=(2, 8), padding='valid'),
             nn.ReLU(inplace=True),
             nn.Conv2d(75, 25, kernel_size=(1, 5), padding='valid'),
