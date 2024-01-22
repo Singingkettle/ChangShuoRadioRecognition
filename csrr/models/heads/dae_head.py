@@ -54,10 +54,10 @@ class DAEHead(BaseModule):
         """
         return feats[0]
 
-    def forward(self, feats: Tuple[torch.Tensor], return_loss=False) -> Union[torch.Tensor, Tuple[torch.Tensor]]:
+    def forward(self, feats: Tuple[torch.Tensor]) -> Union[torch.Tensor, Tuple[torch.Tensor]]:
         """The forward process."""
         pre_logits = self.pre_logits(feats)
-        if return_loss:
+        if self.training:
             return feats
         else:
             return pre_logits
@@ -79,7 +79,7 @@ class DAEHead(BaseModule):
             dict[str, Tensor]: a dictionary of loss components
         """
         # The part can be traced by torch.fx
-        feats = self(feats, return_loss=True)
+        feats = self(feats)
 
         # The part can not be traced by torch.fx
         losses = self._get_loss(feats[0], feats[1], feats[2], data_samples, **kwargs)

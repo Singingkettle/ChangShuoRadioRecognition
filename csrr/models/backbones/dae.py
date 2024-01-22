@@ -43,4 +43,4 @@ class DAE(BaseBackbone):
             xd = self.time_distributed(f)
             return (xc, x, xd)
         else:
-            return (xc)
+            return (xc,)
