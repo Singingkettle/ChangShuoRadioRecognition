@@ -4,16 +4,16 @@ dataset_type = 'AMCDataset'
 
 pipeline = [
     dict(
+        type='IQToAP',
+    ),
+    dict(
         type='Reshape',
         shapes=dict(ap=[1, 2, 128])
     ),
     dict(
-        type='SelfNormalize',
-        norms=dict(ap=dict(ord=2, axis=(0, 2), keepdims=True))
-    ),
-    dict(
         type='PackInputs',
-        input_key='ap')
+        input_key='ap'
+    )
 ]
 
 train_dataloader = dict(
@@ -22,10 +22,9 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='mm-train.json',
+        ann_file='train.json',
         pipeline=pipeline,
         cache=True,
-        input_data=['ap'],
         test_mode=False),
     sampler=dict(type='DefaultSampler', shuffle=True),
 )
@@ -36,10 +35,9 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='mm-validation.json',
+        ann_file='validation.json',
         pipeline=pipeline,
         cache=True,
-        input_data=['ap'],
         test_mode=True),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
@@ -55,10 +53,9 @@ test_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='mm-test.json',
+        ann_file='test.json',
         pipeline=pipeline,
         cache=True,
-        input_data=['ap'],
         test_mode=True),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )

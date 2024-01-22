@@ -19,8 +19,8 @@ class BaseBackbone(BaseModule, metaclass=ABCMeta):
         """Forward computation.
 
         Args:
-            x (tensor | tuple[tensor]): x could be a Torch.tensor or a tuple of
-                Torch.tensor, containing input data for forward computation.
+            x (tensor | dict[tensor]): x could be a Torch.Tensor or a tuple of
+                Torch. Tensor, containing input data for forward computation.
         """
         pass
 

@@ -25,7 +25,7 @@ performance = dict(
                             'MLDNN_V5', 'MLDNN_V6', 'MLDNN_V7', 'MLDNN_V8', 'MLDNN_V9'
                         ],
                         iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                            'MLDNN', 'DSCLDNN', 'rescnn', 'CLDNN', 'CNN4', 'DensCNN',
                         ],
                         co=[
                             'MLDNN', 'AlexNet', 'GoogleNet', 'ResNet', 'VGGNet', 'SVM-FB', 'DecisionTree-FB',
@@ -35,7 +35,7 @@ performance = dict(
                 deepsig201801A=[
                     dict(
                         iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                            'MLDNN', 'DSCLDNN', 'rescnn', 'CLDNN', 'CNN4', 'DensCNN',
                         ],
                     )
                 ]
@@ -47,7 +47,7 @@ performance = dict(
                 deepsig201610A=[
                     dict(
                         iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                            'MLDNN', 'DSCLDNN', 'rescnn', 'CLDNN', 'CNN4', 'DensCNN',
                         ],
                         co=[
                             'MLDNN', 'AlexNet', 'GoogleNet', 'ResNet', 'VGGNet', 'SVM-FB', 'DecisionTree-FB',
@@ -57,7 +57,7 @@ performance = dict(
                 deepsig201801A=[
                     dict(
                         iq_ap=[
-                            'MLDNN', 'DSCLDNN', 'ResCNN', 'CLDNN', 'CNN4', 'DensCNN',
+                            'MLDNN', 'DSCLDNN', 'rescnn', 'CLDNN', 'CNN4', 'DensCNN',
                         ],
                     )
                 ]

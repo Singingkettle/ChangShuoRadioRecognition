@@ -15,7 +15,7 @@ info = dict(
         # 'CNN3_ap': 8,
         'CNN4': 9,
         'DensCNN': 10,
-        'ResCNN': 11,
+        'rescnn': 11,
 
         # 'CGDNN2': 12,
         # 'CGDNN2_ap': 13,
@@ -135,7 +135,7 @@ info = dict(
             # MLDNN_V3='mldnn_abl-mtlh_iq-ap-deepsig201610A',
             # MLDNN_V4='mldnn_abl-bigru-mtlh_iq-ap-deepsig201610A',
             # MLDNN_V5='mldnn_abl-bigru-safn-mtlh_iq-ap-deepsig201610A',
-            # MLDNN_V6='mldnn_abl-gru-safn-gradient-truncation-mtlh_iq-ap-deepsig201610A',
+            # MLDNN_V6='mldnn_abl-gru2-safn-gradient-truncation-mtlh_iq-ap-deepsig201610A',
             # MLDNN_V7='mldnn_abl-bigru-attention-gradient-truncation-mtlh_iq-ap-deepsig201610A',
             # MLDNN_V8='mldnn_abl-bigru-last-gradient-truncation-mtlh_iq-ap-deepsig201610A',
             # MLDNN_V9='mldnn_abl-bigru-add-gradient-truncation-mtlh_iq-ap-deepsig201610A',
@@ -200,7 +200,7 @@ info = dict(
         #     CNN3_ap='cnn3_ap-deepsig201801A',
         #     CNN4='cnn4_iq-deepsig201801A',
         #     DensCNN='denscnn_iq-deepsig201801A',
-        #     ResCNN='rescnn_iq-deepsig201801A',
+        #     rescnn='rescnn_iq-deepsig201801A',
         #
         #     CGDNN2='cgdnn2_iq-deepsig201801A',
         #     CGDNN2_ap='cgdnn2_ap-deepsig201801A',

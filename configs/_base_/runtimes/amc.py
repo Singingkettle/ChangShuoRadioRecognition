@@ -14,7 +14,7 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook'),
 )
 
-custom_hooks = [dict(type='EarlyStoppingHook', monitor='loss/classification', min_delta=0, patience=100, rule='less')]
+custom_hooks = [dict(type='EarlyStoppingHook', monitor='loss/classification', min_delta=0, patience=50, rule='less')]
 
 env_cfg = dict(
     # disable cudnn benchmark

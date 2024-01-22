@@ -2,7 +2,7 @@ import copy
 
 import numpy as np
 
-with open('../fastmldnn_abl-merge-mean_iq-ap-channel-deepsig201610A.py', 'r') as f:
+with open('fastmldnn_abl-merge-mean_iq-ap-channel-deepsig201610A.py', 'r') as f:
     contents = f.read()
 
 gpu_index = 0

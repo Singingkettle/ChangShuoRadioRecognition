@@ -1,15 +1,10 @@
-import multiprocessing
 import os.path as osp
 import random
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
-from .base_dataset import BaseDataset, Constellation, combine_two_infos
-
-_Constellation = Constellation()
-CPU_COUNT = multiprocessing.cpu_count()
+from .base_dataset import BaseDataset, combine_two_infos
 
 
 class HisarMod2019(BaseDataset):
@@ -63,9 +58,9 @@ class HisarMod2019(BaseDataset):
         modulations = list(self.MODS.values())
         snrs = np.sort(np.unique(train_snr[:])).tolist()
 
-        test_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        train_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        validation_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        test_info = self._generate_new_info(modulations, snrs)
+        train_info = self._generate_new_info(modulations, snrs)
+        validation_info = self._generate_new_info(modulations, snrs)
 
         random.seed(0)
 
@@ -78,37 +73,34 @@ class HisarMod2019(BaseDataset):
                 item_indices = ((train_label == mod) & (train_snr == snr)).nonzero()[0].tolist()
                 random.shuffle(item_indices)
                 train_indices = [dict(data='train', index=index) for index in
-                              item_indices[:int(0.8 * len(item_indices))]]
+                                 item_indices[:int(0.8 * len(item_indices))]]
                 validation_indices = [dict(data='validation', index=index) for index in
-                                   item_indices[int(0.8 * len(item_indices)):]]
+                                      item_indices[int(0.8 * len(item_indices)):]]
                 indices.extend(train_indices)
                 indices.extend(validation_indices)
 
         dataset = []
-        for item_index, item in enumerate(tqdm(indices)):
+        for item_index, item in enumerate(indices):
             file_name = '{:0>12d}.npy'.format(item_index)
 
             if item['data'] == 'test':
                 snr = int(test_snr[item['index']])
                 item_data = test_data[item['index'], :]
                 modulation = self.MODS[test_label[item['index']]]
-                test_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                test_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
             elif item['data'] == 'train':
                 snr = int(train_snr[item['index']])
                 item_data = train_data[item['index'], :]
                 modulation = self.MODS[train_label[item['index']]]
-                train_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                train_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
             else:
                 snr = int(train_snr[item['index']])
                 item_data = train_data[item['index'], :]
                 modulation = self.MODS[train_label[item['index']]]
-                validation_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                validation_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
             item_data = np.char.replace(item_data.astype(str), 'i', 'j').astype(np.complex128)
             item_data = np.vstack([np.real(item_data), np.imag(item_data)])
-            real_scale = np.max(np.abs(item_data[0, :])) + np.finfo(np.float64).eps
-            imag_scale = np.max(np.abs(item_data[1, :])) + np.finfo(np.float64).eps
-            dataset.append({'file_name': file_name, 'data': item_data,
-                            'real_scale': real_scale, 'imag_scale': imag_scale})
+            dataset.append(dict(file_name=file_name, data=item_data))
 
         train_and_validation_info = combine_two_infos(train_info, validation_info)
 

@@ -219,32 +219,22 @@ class PackMultiTaskInputs(BaseTransform):
 class Transpose(BaseTransform):
     """Transpose numpy array.
 
-    **Required Keys:**
-
-    - ``*keys``
-
-    **Modified Keys:**
-
-    - ``*keys``
-
     Args:
-        keys (List[str]): The fields to convert to tensor.
-        order (List[int]): The output dimensions order.
+        orders (Dict[str, List[int]]): The output dimensions order.
     """
 
-    def __init__(self, keys, order):
-        self.keys = keys
-        self.order = order
+    def __init__(self, orders):
+        self.orders = orders
 
     def transform(self, results):
         """Method to transpose array."""
-        for key in self.keys:
-            results[key] = results[key].transpose(self.order)
+        for key in self.orders:
+            results[key] = results[key].transpose(self.orders[key])
         return results
 
     def __repr__(self):
         return self.__class__.__name__ + \
-            f'(keys={self.keys}, order={self.order})'
+            f'(orders={self.orders})'
 
 
 @TRANSFORMS.register_module()

@@ -43,7 +43,7 @@ f. Install build requirements and then install ChangShuoRadioRecognition.
 
 ```shell
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install -v -e .  # or "python setup.py develop"
+mim install -e .  # or "python setup.py develop"
 ```
 
 g. Install "Times New Roman" for matplotlib, following

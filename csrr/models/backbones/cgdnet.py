@@ -26,13 +26,15 @@ class CGDNet(BaseBackbone):
     """`CGDNet <https://ieeexplore.ieee.org/abstract/document/9349627>`_ backbone
     The input for CNN1 is a 2*L frame
     Args:
+        frame_length (int): the frame length equal to number of sample points
         num_classes (int): number of classes for classification.
             The default value is -1, which uses the backbone as
             a feature extractor without the top classifier.
     """
 
-    def __init__(self, num_classes=-1, init_cfg=None):
+    def __init__(self, frame_length=128, num_classes=-1, init_cfg=None):
         super(CGDNet, self).__init__(init_cfg=init_cfg)
+        self.frame_length = frame_length
         self.num_classes = num_classes
         self.cnn1 = nn.Sequential(
             nn.Conv2d(1, 50, kernel_size=(1, 6)),
@@ -55,7 +57,7 @@ class CGDNet(BaseBackbone):
             nn.MaxPool2d(kernel_size=(2, 2), stride=1),
             GaussianDropout(0.2),
         )
-        self.gru = nn.GRU(input_size=472, hidden_size=50, batch_first=True)
+        self.gru = nn.GRU(input_size=(self.frame_length*2-5*4)*2, hidden_size=50, batch_first=True)
         self.dp = GaussianDropout(0.2)
 
         if self.num_classes > 0:
@@ -72,7 +74,7 @@ class CGDNet(BaseBackbone):
         x2 = self.cnn2(x1)
         x3 = self.cnn3(x2)
         x4 = torch.cat([x1, x3], dim=3)
-        x4 = x4.view(-1, 50, 472)
+        x4 = x4.view(-1, 50, (self.frame_length*2-5*4)*2)
         _, x5 = self.gru(x4)
         x5 = torch.squeeze(x5)
         x5 = self.dp(x5)

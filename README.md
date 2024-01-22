@@ -20,28 +20,28 @@ v1.0.1 was released in 5/9/2020.
 ## Benchmark and model zoo
 
 Supported Automatic Modulation Classification methods:
-
-- [x] [AlexNet](configs/alexnet). [**Provided as Baseline in MLDNN with some modifications for the constellation image (1\*112\*112)**](https://en.wikipedia.org/wiki/AlexNet)
+- [x] [CGDNet](configs/cgdnet). [**CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition**](https://ieeexplore.ieee.org/abstract/document/9349627)
+- [x] [CLDNNW](configs/cldnnw). [**Deep architectures for modulation recognition**](https://ieeexplore.ieee.org/abstract/document/7920754)
+- [x] [CLDNNL](configs/cldnnl). [**Deep Neural Network Architectures for Modulation Classification**](https://ieeexplore.ieee.org/document/8335483)
 - [x] [CNN1DPF](configs/cnn1dpf). [**Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks**](https://lirias.kuleuven.be/retrieve/546033)
 - [x] [CNN2](configs/cnn2). [**Convolutional Radio Modulation Recognition Networks**](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
-- [x] [CNN3](configs/cnn3). "Provided as Baseline"
-- [x] [CNN4](configs/cnn4). "Provided as Baseline"
-- [x] [DS-CLDNN](configs/dscldnn). ["Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure"](https://ieeexplore.ieee.org/document/9220797)
-- [x] [DensCNN](configs/denscnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [ResCNN](configs/rescnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [CLDNN](configs/cldnn). ["Deep Neural Network Architectures for Modulation Classification"](https://ieeexplore.ieee.org/document/8335483)
-- [x] [GoogleNet](configs/googlenet). "Provided as Baseline in MLDNN"
-- [x] [ResNet](configs/resnet). "Provided as Baseline in MLDNN"
-- [x] [VGGnet](configs/vggnet). "Provided as Baseline in MLDNN"
-- [x] [CLDNN2](configs/cldnn2). "Provided as Baseline in MLDNN"
-- [x] [CGDNN2](configs/cgdnn2). "Provided as Baseline in MLDNN"
-- [x] [DecisionTree](configs/decisiontree). "Provided as Baseline in MLDNN"
-- [x] [SVM](configs/svm). "Provided as Baseline in MLDNN"
-- [x] [MLDNN](configs/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9462447)
+- [x] [CNN4](configs/cnn4). [**Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels**](https://ieeexplore.ieee.org/abstract/document/9128408)
+- [x] [DAE](configs/dae). [**Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder**](https://ieeexplore.ieee.org/abstract/document/9487492)
+- [x] [DensCNN](configs/denscnn). [**Deep Neural Network Architectures for Modulation Classification**](https://ieeexplore.ieee.org/document/8335483)
+- [x] [DSCLDNN](configs/dscldnn). [**Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure**](https://ieeexplore.ieee.org/document/9220797)
+- [x] [FastMLDNN](configs/fastmldnn). [**A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/10239249)
+- [x] [GRU2](configs/gru2). [**Automatic modulation classification using recurrent neural networks**](https://ieeexplore.ieee.org/abstract/document/8322633)
 - [x] [HCGDNN](configs/hcgdnn). [**A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9764618)
-- [X] [FMLDNN](configs/fastmldnn). [**A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/10239249)
-- [X] [TRN](configs/trn). [**Signal Modulation Classification Based on the Transformer Network**](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340)
-- [X] [MCformer](configs/MCformer). [**MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/9685815)
+- [x] [LSTM2](configs/lstm2). [**Deep Learning Models for Wireless Signal Classification With Distributed Low-Cost Spectrum Sensors**](https://ieeexplore.ieee.org/abstract/document/8357902)
+- [x] [IC-AMCNet](configs/icamcnet). [**CNN-Based Automatic Modulation Classification for Beyond 5G Communications**](https://ieeexplore.ieee.org/abstract/document/8977561)
+- [x] [MCformer](configs/MCformer). [**MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/9685815)
+- [x] [MCLDNN](configs/mcldnn). [**A Spatiotemporal Multi-Channel Learning Framework for Automatic Modulation Recognition**](https://ieeexplore.ieee.org/abstract/document/9106397)
+- [x] [MCNET](configs/mcnet). [**MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/8963964)
+- [x] [MLDNN](configs/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9462447)
+- [x] [FMLDNN](configs/fastmldnn). [**A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/10239249)
+- [x] [PET-CGDNN](configs/petcgdnn). [**An Efficient Deep Learning Model for Automatic Modulation Recognition Based on Parameter Estimation and Transformation**](https://ieeexplore.ieee.org/abstract/document/9507514)
+- [x] [TRN](configs/trn). [**Signal Modulation Classification Based on the Transformer Network**](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340)
+
 
 ## Installation
 

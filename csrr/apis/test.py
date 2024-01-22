@@ -11,7 +11,6 @@ import torch.nn as nn
 
 from ..common.fileio import dump, load
 from ..common.utils import ProgressBar
-from ..runner import get_dist_info
 
 
 def apply_dropout(m):

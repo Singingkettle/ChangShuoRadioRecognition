@@ -1,27 +1,38 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from .alexnet import AlexNet
 from .beit import BEiTViT
+from .cgdnet import CGDNet
+from .cldnn import CLDNNL, CLDNNW
 from .cnn1dpf import CNN1DPF
 from .cnn2 import CNN2
-from .cgdnet import CGDNet
-from .cnnnet import CNNNet, DensCNN, DetCNN
+from .cnn4 import CNN4
+from .cnnnet import CNNNet, DetCNN
 from .conformer import Conformer
 from .convmixer import ConvMixer
 from .convnext import ConvNeXt
 from .cspnet import CSPDarkNet, CSPNet, CSPResNet, CSPResNeXt
+from .dae import DAE
 from .davit import DaViT
 from .deit import DistilledVisionTransformer
 from .deit3 import DeiT3
+from .denscnn import DensCNN
 from .densenet import DenseNet
+from .dscldnn import DSCLDNN
 from .edgenext import EdgeNeXt
 from .efficientformer import EfficientFormer
 from .efficientnet import EfficientNet
 from .efficientnet_v2 import EfficientNetV2
+from .gru2 import GRU2
 from .hornet import HorNet
 from .hrnet import HRNet
+from .icamcnet import ICAMCNet
 from .inception_v3 import InceptionV3
 from .lenet import LeNet5
 from .levit import LeViT
+from .lstm2 import LSTM2
+from .mcformer import MCformer
+from .mcldnn import MCLDNN
+from .mcnet import MCNet
 from .mixmim import MixMIMTransformer
 from .mlp_mixer import MlpMixer
 from .mobilenet_v2 import MobileNetV2
@@ -29,11 +40,13 @@ from .mobilenet_v3 import MobileNetV3
 from .mobileone import MobileOne
 from .mobilevit import MobileViT
 from .mvit import MViT
+from .petcgdnn import PETCGDNN
 from .poolformer import PoolFormer
 from .regnet import RegNet
 from .replknet import RepLKNet
 from .repmlp import RepMLPNet
 from .repvgg import RepVGG
+from .rescnn import ResCNN
 from .res2net import Res2Net
 from .resnest import ResNeSt
 from .resnet import ResNet, ResNetV1c, ResNetV1d
@@ -63,9 +76,21 @@ from .xcit import XCiT
 __all__ = [
     'LeNet5',
     'AlexNet',
+     'CLDNNL', 'CLDNNW',
     'CNN1DPF',
     'CNN2',
+    'CNN4',
     'CGDNet',
+    'DensCNN',
+    'DSCLDNN',
+    'MCLDNN',
+    'MCformer',
+    'MCNet',
+    'ICAMCNet',
+    'ResCNN',
+    'GRU2',
+    'DAE',
+    'PETCGDNN',
     'VGG',
     'RegNet',
     'ResNet',
@@ -127,4 +152,5 @@ __all__ = [
     'XCiT',
     'ViTSAM',
     'ViTEVA02',
+    'LSTM2'
 ]

@@ -5,6 +5,7 @@ from .cae_head import CAEHead
 from .cls_head import ClsHead
 from .conformer_head import ConformerHead
 from .contrastive_head import ContrastiveHead
+from .dae_head import DAEHead
 from .deit_head import DeiTClsHead
 from .efficientformer_head import EfficientFormerClsHead
 from .grounding_head import GroundingHead

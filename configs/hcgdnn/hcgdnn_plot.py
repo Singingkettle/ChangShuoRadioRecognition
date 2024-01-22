@@ -159,7 +159,7 @@ plot = dict(
                 ),
                 dict(
                     config='rescnn_deepsig_iq_201610A',
-                    name='ResCNN',
+                    name='rescnn',
                 ),
                 dict(
                     config='cldnn_deepsig_iq_201610A',

@@ -21,10 +21,8 @@ class AMCDataset(BaseClassificationDataset):
                  test_mode: bool = False,
                  lazy_init: bool = False,
                  max_refetch: int = 1000,
-                 input_data: List[str] = ['iq'],
                  cache: bool = False) -> None:
 
-        self.input_data = input_data
         self.cache = cache
 
         super().__init__(ann_file, metainfo, data_root, filter_cfg, indices, serialize_data, pipeline,
@@ -52,15 +50,12 @@ class AMCDataset(BaseClassificationDataset):
         for raw_data_info in raw_data_list:
             gt_label = np.array(self.CLASSES.index(raw_data_info['modulation']), dtype=np.int64)
             data_info = dict(gt_label=gt_label)
-            for data_key in self.input_data:
-                data_path = os.path.join(self.data_root, self.metainfo['data_prefix'][data_key],
-                                         raw_data_info['file_name'])
-                if self.cache:
-                    x = np.load(data_path)
-                    x = x.astype(np.float32)
-                    data_info[data_key] = x
-                else:
-                    data_info[f'{data_key}_path'] = data_path
+            data_path = os.path.join(self.data_root, 'iq', raw_data_info['file_name'])
+            if self.cache:
+                x = np.load(data_path)
+                data_info['iq'] = x.astype(np.float32)
+            else:
+                data_info['iq_path'] = data_path
             data_list.append(data_info)
 
         return data_list

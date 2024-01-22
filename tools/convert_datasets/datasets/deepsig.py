@@ -1,5 +1,4 @@
 import copy
-import multiprocessing
 import os.path as osp
 import pickle
 import random
@@ -8,10 +7,7 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
-from .base_dataset import BaseDataset, Constellation, combine_two_infos
-
-_Constellation = Constellation()
-CPU_COUNT = multiprocessing.cpu_count()
+from .base_dataset import BaseDataset, combine_two_infos
 
 
 class DeepSigBase(BaseDataset):
@@ -38,22 +34,22 @@ class DeepSigBase(BaseDataset):
 
         snrs = [int(snr) for snr in rsnrs]
 
-        test_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        train_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        validation_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        test_info = self._generate_new_info(modulations, snrs)
+        train_info = self._generate_new_info(modulations, snrs)
+        validation_info = self._generate_new_info(modulations, snrs)
 
         random.seed(0)
-        for bmodulation, snr in tqdm(data.keys()):
-            sub_data = data[(bmodulation, snr)]
+        for modulation, snr in data.keys():
+            sub_data = data[(modulation, snr)]
             item_num = sub_data.shape[0]
             item_indices = [i for i in range(item_num)]
 
             random.shuffle(item_indices)
 
-            if hasattr(bmodulation, 'decode'):
-                modulation = copy.deepcopy(bmodulation.decode('UTF-8'))
+            if hasattr(modulation, 'decode'):
+                modulation = copy.deepcopy(modulation.decode('UTF-8'))
             else:
-                modulation = copy.deepcopy(bmodulation)
+                modulation = copy.deepcopy(modulation)
 
             if hasattr(self, 'mod2mod'):
                 modulation = self.mod2mod[modulation]
@@ -68,15 +64,12 @@ class DeepSigBase(BaseDataset):
                 item_data = item_data.astype(np.float64)
                 file_name = '{:0>12d}.npy'.format(item_index + sub_item_index)
                 if sub_item_index in train_indices:
-                    train_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                    train_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
                 elif sub_item_index in test_indices:
-                    test_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                    test_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
                 else:
-                    validation_info['annotations'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
-                real_scale = np.max(np.abs(item_data[0, :])) + np.finfo(np.float64).eps
-                imag_scale = np.max(np.abs(item_data[1, :])) + np.finfo(np.float64).eps
-                dataset.append({'file_name': file_name, 'data': item_data,
-                                'real_scale': real_scale, 'imag_scale': imag_scale})
+                    validation_info['data_list'].append(dict(file_name=file_name, snr=snr, modulation=modulation))
+                dataset.append(dict(file_name=file_name, data=item_data))
             item_index += item_num
 
         train_and_validation_info = combine_two_infos(train_info, validation_info)
@@ -176,9 +169,9 @@ class DeepSigD(DeepSigBase):
         modulations = [mod for mod in DeepSigD.MODS]
         snrs = [snr for snr in range(-20, 32, 2)]
 
-        test_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        train_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
-        validation_info = dict(filter_config=self.filter_config, modulations=modulations, snrs=snrs, annotations=[])
+        test_info = self._generate_new_info(modulations, snrs)
+        train_info = self._generate_new_info(modulations, snrs)
+        validation_info = self._generate_new_info(modulations, snrs)
 
         random.seed(0)
         for tuple_key in data_map.keys():
@@ -196,20 +189,16 @@ class DeepSigD(DeepSigBase):
                 mod_index = np.argmax(data_mods[item_index, :])
 
                 if item_index in train_indices:
-                    train_info['annotations'].append(
+                    train_info['data_list'].append(
                         dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
                 elif item_index in test_indices:
-                    test_info['annotations'].append(
+                    test_info['data_list'].append(
                         dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
                 else:
-                    validation_info['annotations'].append(
+                    validation_info['data_list'].append(
                         dict(file_name=file_name, snr=int(data_snrs[item_index, 0]), modulation=self.MODS[mod_index]))
 
-                real_scale = np.max(np.abs(item_data[0, :])) + np.finfo(np.float64).eps
-                imag_scale = np.max(np.abs(item_data[1, :])) + np.finfo(np.float64).eps
-
-                dataset.append({'file_name': file_name, 'data': item_data,
-                                'real_scale': real_scale, 'imag_scale': imag_scale})
+                dataset.append(dict(file_name=file_name, data=item_data))
 
         train_and_validation_info = combine_two_infos(train_info, validation_info)
 

@@ -55,8 +55,7 @@ class SignalClassifier(BaseClassifier):
         data_preprocessor = data_preprocessor or {}
 
         if isinstance(data_preprocessor, dict):
-            data_preprocessor.setdefault('type', 'ClsDataPreprocessor')
-            data_preprocessor.setdefault('batch_augments', train_cfg)
+            data_preprocessor.setdefault('type', 'SignalDataPreprocessor')
             data_preprocessor = MODELS.build(data_preprocessor)
         elif not isinstance(data_preprocessor, nn.Module):
             raise TypeError('data_preprocessor should be a `dict` or '
@@ -195,10 +194,7 @@ class SignalClassifier(BaseClassifier):
         assert stage in ['backbone', 'neck', 'pre_logits'], \
             (f'Invalid output stage "{stage}", please choose from "backbone", '
              '"neck" and "pre_logits"')
-        if isinstance(inputs, dict):
-            x = self.backbone(**inputs)
-        else:
-            x = self.backbone(inputs)
+        x = self.backbone(inputs)
 
         if stage == 'backbone':
             return x

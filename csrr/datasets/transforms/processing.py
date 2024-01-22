@@ -1,5 +1,6 @@
 from typing import Union
 
+import numpy as np
 import numpy.linalg as LA
 
 from csrr.registry import TRANSFORMS
@@ -58,3 +59,52 @@ class SelfNormalize(BaseTransform):
         repr_str = self.__class__.__name__
         repr_str += f'(norms={self.norms})'
         return repr_str
+
+
+@TRANSFORMS.register_module()
+class IQToAP(BaseTransform):
+    """Convert IQ frame to AP frame.
+
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Function to convert iq frame to ap frame.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: results, key 'ap' is added in to result dict.
+        """
+
+        iq = results['iq'][0, :] + 1j * results['iq'][1, :]
+        amp = np.abs(iq)
+        ang = np.angle(iq) / np.pi
+        results['ap'] = np.vstack((amp, ang))
+
+        return results
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        return repr_str
+
+
+@TRANSFORMS.register_module()
+class DAENormalize(BaseTransform):
+    """Normalize the ap frame
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Function to normalize ap frame.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: results, key 'ap' is added in to result dict.
+        """
+        ap = results['ap']
+        ap[0, :] = ap[0, :] / np.linalg.norm(ap[0, :])
+        ap[1, :] = -1 + 2 / (ap[1, :].max() - ap[1, :].min()) * (ap[1, :] - ap[1, :].min())
+        results['ap'] = ap
+        return results

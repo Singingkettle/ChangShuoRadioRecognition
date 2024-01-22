@@ -1,7 +1,6 @@
 # schedule settings
 optim_wrapper = dict(
-    type='AmpOptimWrapper',
-    optimizer=dict(type='Adam', lr=0.001)
+    optimizer=dict(type='Adam', lr=0.0001)
 )
 
 param_scheduler = dict(
@@ -9,7 +8,7 @@ param_scheduler = dict(
     param_name='lr',
     monitor='loss/classification',
     factor=0.5,
-    patience=40,
+    patience=5,
     verbose=True,
     min_value=0.0000001,
 )

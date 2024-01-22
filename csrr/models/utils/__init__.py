@@ -8,7 +8,8 @@ from .batch_augments import CutMix, Mixup, RandomBatchAugment, ResizeMix
 from .batch_shuffle import batch_shuffle_ddp, batch_unshuffle_ddp
 from .channel_shuffle import channel_shuffle
 from .clip_generator_helper import QuickGELU, build_clip_model
-from .data_preprocessor import (ClsDataPreprocessor,
+from .data_preprocessor import (SignalDataPreprocessor,
+                                ClsDataPreprocessor,
                                 MultiModalDataPreprocessor,
                                 SelfSupDataPreprocessor,
                                 TwoNormDataPreprocessor, VideoDataPreprocessor)
@@ -48,6 +49,7 @@ __all__ = [
     'ConditionalPositionEncoding',
     'resize_pos_embed',
     'resize_relative_position_bias_table',
+    'SignalDataPreprocessor',
     'ClsDataPreprocessor',
     'Mixup',
     'CutMix',
