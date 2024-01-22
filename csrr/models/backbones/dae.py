@@ -18,7 +18,8 @@ class DAE(BaseBackbone):
         super(DAE, self).__init__(init_cfg=init_cfg)
         self.num_classes = num_classes
         self.lstm = nn.LSTM(input_size=2, hidden_size=hidden_size, num_layers=depth, batch_first=True)
-        self.time_distributed = nn.Linear(hidden_size, 2)
+        if self.training:
+            self.time_distributed = nn.Linear(hidden_size, 2)
 
         if self.num_classes > 0:
             self.classifier = nn.Sequential(
@@ -33,9 +34,13 @@ class DAE(BaseBackbone):
 
     def forward(self, x):
 
-        xc, _ = self.lstm(x)
-        xd = self.time_distributed(xc)
-        if self.num_classes > 0:
-            xc = self.classifier(xc[:, -1, :])
+        x, _ = self.lstm(x)
 
-        return (xc, x, xd)
+        if self.num_classes > 0:
+            xc = self.classifier(x[:, -1, :])
+
+        if self.training:
+            xd = self.time_distributed(x)
+            return (xc, x, xd)
+        else:
+            return (xc)
