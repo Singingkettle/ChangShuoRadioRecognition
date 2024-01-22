@@ -34,13 +34,13 @@ class DAE(BaseBackbone):
 
     def forward(self, x):
 
-        x, _ = self.lstm(x)
+        f, _ = self.lstm(x)
 
         if self.num_classes > 0:
-            xc = self.classifier(x[:, -1, :])
+            xc = self.classifier(f[:, -1, :])
 
         if self.training:
-            xd = self.time_distributed(x)
+            xd = self.time_distributed(f)
             return (xc, x, xd)
         else:
             return (xc)
