@@ -21,9 +21,11 @@ class AMCDataset(BaseClassificationDataset):
                  test_mode: bool = False,
                  lazy_init: bool = False,
                  max_refetch: int = 1000,
+                 use_snr: Optional[dict] = None,
                  cache: bool = False) -> None:
 
         self.cache = cache
+        self.use_snr = use_snr
 
         super().__init__(ann_file, metainfo, data_root, filter_cfg, indices, serialize_data, pipeline,
                          test_mode, lazy_init, max_refetch)
@@ -49,7 +51,8 @@ class AMCDataset(BaseClassificationDataset):
         data_list = []
         for raw_data_info in raw_data_list:
             gt_label = np.array(self.CLASSES.index(raw_data_info['modulation']), dtype=np.int64)
-            data_info = dict(gt_label=gt_label)
+            snr = raw_data_info['snr']
+            data_info = dict(gt_label=gt_label, snr=snr)
             data_path = os.path.join(self.data_root, 'iq', raw_data_info['file_name'])
             if self.cache:
                 x = np.load(data_path)
