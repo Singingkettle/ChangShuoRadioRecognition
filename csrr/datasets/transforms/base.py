@@ -28,3 +28,7 @@ class BaseTransform(metaclass=ABCMeta):
         Returns:
             dict: The result dict.
         """
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        return repr_str
