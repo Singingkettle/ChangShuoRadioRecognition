@@ -85,7 +85,7 @@ class MultiTaskHead(BaseModule):
         Args:
             feats (tuple[Tensor]): The features extracted from the backbone.
             data_samples (List[MultiTaskDataSample]): The annotation data of
-                every samples.
+                every sample.
             **kwargs: Other keyword arguments to forward the loss module.
 
         Returns:
@@ -109,7 +109,7 @@ class MultiTaskHead(BaseModule):
         Args:
             feats (tuple[Tensor]): The features extracted from the backbone.
             data_samples (List[MultiTaskDataSample], optional): The annotation
-                data of every samples. If not None, set ``pred_label`` of
+                data of every sample. If not None, set ``pred_label`` of
                 the input data samples. Defaults to None.
 
         Returns:
