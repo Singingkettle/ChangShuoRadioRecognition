@@ -34,6 +34,7 @@ from .mcformer import MCformer
 from .mcldnn import MCLDNN
 from .mcnet import MCNet
 from .mixmim import MixMIMTransformer
+from .mldnn import MLDNNSingleBranch, MLDNN
 from .mlp_mixer import MlpMixer
 from .mobilenet_v2 import MobileNetV2
 from .mobilenet_v3 import MobileNetV3
@@ -91,6 +92,8 @@ __all__ = [
     'GRU2',
     'DAE',
     'PETCGDNN',
+    'MLDNNSingleBranch',
+    'MLDNN',
     'VGG',
     'RegNet',
     'ResNet',

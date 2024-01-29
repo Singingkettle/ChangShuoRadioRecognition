@@ -82,7 +82,7 @@ class PackInputs(BaseTransform):
     DEFAULT_META_KEYS = ('sample_idx',)
 
     def __init__(self,
-                 input_key: Union[str, List[str]],
+                 input_key: Union[str, List[str]] = 'noinput',
                  algorithm_keys: List[str] = (),
                  meta_keys=DEFAULT_META_KEYS) -> None:
         if isinstance(input_key, Sequence):
@@ -183,7 +183,7 @@ class PackMultiTaskInputs(BaseTransform):
         if isinstance(self.input_key, Sequence):
             packed_results['inputs'] = dict()
             for input_key in self.input_key:
-                input_ = results[self.input_key]
+                input_ = results[input_key]
                 packed_results['inputs'][input_key] = PackInputs.format_input(input_)
         else:
             packed_results['inputs'] = PackInputs.format_input([])

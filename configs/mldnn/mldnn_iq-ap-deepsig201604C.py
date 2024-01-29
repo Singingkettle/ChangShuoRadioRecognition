@@ -1,5 +1,5 @@
 _base_ = [
-    './iq-ap-deepsig201801A.py',
+    './iq-ap-deepsig201604C.py',
     './schedules.py',
     '../_base_/runtimes/amc.py'
 ]
@@ -13,8 +13,7 @@ model = dict(
         is_BIGRU=True,
         fusion_method='safn',
         gradient_truncation=True,
-        num_classes=24,
-        avg_pool=(1, 8),
+        num_classes=11,
     ),
     head=dict(
         type='MLDNNHead',

@@ -1,66 +1,37 @@
 _base_ = [
-    '../_base_/default_runtime.py',
-    './schedule.py',
-    './data_iq-ap-deepsig201610A.py'
+    './iq-ap-deepsig201610A.py',
+    './schedules.py',
+    '../_base_/runtimes/amc.py'
 ]
 
 model = dict(
-    type='MLDNN',
+    type='SignalClassifier',
     backbone=dict(
-        type='MLNet',
+        type='MLDNN',
         dropout_rate=0.5,
         use_GRU=True,
         is_BIGRU=True,
         fusion_method='safn',
         gradient_truncation=True,
+        num_classes=11,
     ),
-    classifier_head=dict(
+    head=dict(
         type='MLDNNHead',
-        heads=dict(
-            # Snr Head
-            snr=dict(
-                type='ClassificationHead',
-                num_classes=2,
-                in_size=100,
-                out_size=256,
-                loss_cls=dict(
-                    type='CrossEntropyLoss',
-                    loss_weight=1,
-                ),
-            ),
-            # Low Head
-            low=dict(
-                type='ClassificationHead',
-                num_classes=11,
-                in_size=100,
-                out_size=256,
-                loss_cls=dict(
-                    type='CrossEntropyLoss',
-                    loss_weight=1,
-                ),
-            ),
-            # High Head
-            high=dict(
-                type='ClassificationHead',
-                num_classes=11,
-                in_size=100,
-                out_size=256,
-                loss_cls=dict(
-                    type='CrossEntropyLoss',
-                    loss_weight=1,
-                ),
-            ),
-            # Merge Head
-            merge=dict(
-                type='MergeAMCHead',
-                loss_cls=dict(
-                    type='NLLLoss',
-                    loss_weight=1,
-                ),
-            ),
-        )
+        loss_amc_merge=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        ),
+        loss_amc_ap=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        ),
+        loss_amc_iq=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        ),
+        loss_snr=dict(
+            type='CrossEntropyLoss',
+            loss_weight=1
+        ),
     ),
 )
-
-# for flops calculation
-input_shape = dict(iqs=(1, 2, 128), aps=(1, 2, 128))
