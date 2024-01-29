@@ -28,7 +28,6 @@ d. Install mmdet for radio detection and radio recognition.
 ```shell
 pip install -U openmim
 mim install mmengine
-mim install "mmcv>=2.0.0"
 mim install mmdet
 ```
 
@@ -42,8 +41,7 @@ cd ChangShuoRadioRecognition
 f. Install build requirements and then install ChangShuoRadioRecognition.
 
 ```shell
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-mim install -e .  # or "python setup.py develop"
+mim install -e .  # or "python setup_backup.py develop"
 ```
 
 g. Install "Times New Roman" for matplotlib, following

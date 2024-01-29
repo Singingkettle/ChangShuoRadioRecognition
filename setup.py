@@ -1,22 +1,9 @@
-import glob
 import os
-import platform
-import re
-
-from pkg_resources import DistributionNotFound, get_distribution
+import os.path as osp
+import shutil
+import sys
+import warnings
 from setuptools import find_packages, setup
-
-EXT_TYPE = ''
-try:
-    import torch
-
-    from torch.utils.cpp_extension import BuildExtension
-
-    EXT_TYPE = 'pytorch'
-    cmd_class = {'build_ext': BuildExtension}
-except ModuleNotFoundError:
-    cmd_class = {}
-    print('Skip building ext ops due to the absence of torch.')
 
 
 def readme():
@@ -25,25 +12,11 @@ def readme():
     return content
 
 
-version_file = 'csrr/version.py'
-
-
 def get_version():
-    with open(version_file, 'r') as f:
+    version_file = 'csrr/version.py'
+    with open(version_file, 'r', encoding='utf-8') as f:
         exec(compile(f.read(), version_file, 'exec'))
     return locals()['__version__']
-
-
-def choose_requirement(primary, secondary):
-    """If some version of primary requirement installed, return primary, else
-    return secondary."""
-    try:
-        name = re.split(r'[!<>=]', primary)[0]
-        get_distribution(name)
-    except DistributionNotFound:
-        return secondary
-
-    return str(primary)
 
 
 def parse_requirements(fname='requirements.txt', with_version=True):
@@ -58,11 +31,11 @@ def parse_requirements(fname='requirements.txt', with_version=True):
         List[str]: list of requirements items
 
     CommandLine:
-        python -c 'import setup; print(setup.parse_requirements())'
+        python -c "import setup; print(setup.parse_requirements())"
     """
+    import re
     import sys
     from os.path import exists
-    import re
     require_fpath = fname
 
     def parse_line(line):
@@ -76,8 +49,6 @@ def parse_requirements(fname='requirements.txt', with_version=True):
             info = {'line': line}
             if line.startswith('-e '):
                 info['package'] = line.split('#egg=')[1]
-            elif '@git+' in line:
-                info['package'] = line
             else:
                 # Remove versioning from the package
                 pat = '(' + '|'.join(['>=', '==', '>']) + ')'
@@ -89,13 +60,15 @@ def parse_requirements(fname='requirements.txt', with_version=True):
                     op, rest = parts[1:]
                     if ';' in rest:
                         # Handle platform specific dependencies
-                        # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific
-                        # -dependencies
+                        # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
                         version, platform_deps = map(str.strip,
                                                      rest.split(';'))
                         info['platform_deps'] = platform_deps
                     else:
                         version = rest  # NOQA
+                    if '--' in version:
+                        # the `extras_require` doesn't accept options.
+                        version = version.split('--')[0].strip()
                     info['version'] = (op, version)
             yield info
 
@@ -125,109 +98,98 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     return packages
 
 
-install_requires = parse_requirements()
+def add_mim_extension():
+    """Add extra files that are required to support MIM into the package.
+
+    These files will be added by creating a symlink to the originals if the
+    package is installed in `editable` mode (e.g. pip install -e .), or by
+    copying from the originals otherwise.
+    """
+
+    # parse installment mode
+    if 'develop' in sys.argv:
+        # installed by `pip install -e .`
+        mode = 'symlink'
+    elif 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
+        # installed by `pip install .`
+        # or create source distribution by `python setup_backup.py sdist`
+        mode = 'copy'
+    else:
+        return
+
+    filenames = ['tools', 'configs', 'model-index.yml']
+    repo_path = osp.dirname(__file__)
+    mim_path = osp.join(repo_path, 'csrr', '.mim')
+    os.makedirs(mim_path, exist_ok=True)
+
+    for filename in filenames:
+        if osp.exists(filename):
+            src_path = osp.join(repo_path, filename)
+            tar_path = osp.join(mim_path, filename)
+
+            if osp.isfile(tar_path) or osp.islink(tar_path):
+                os.remove(tar_path)
+            elif osp.isdir(tar_path):
+                shutil.rmtree(tar_path)
+
+            if mode == 'symlink':
+                src_relpath = osp.relpath(src_path, osp.dirname(tar_path))
+                try:
+                    os.symlink(src_relpath, tar_path)
+                except OSError:
+                    # Creating a symbolic link on windows may raise an
+                    # `OSError: [WinError 1314]` due to privilege. If
+                    # the error happens, the src file will be copied
+                    mode = 'copy'
+                    warnings.warn(
+                        f'Failed to create a symbolic link for {src_relpath}, '
+                        f'and it will be copied to {tar_path}')
+                else:
+                    continue
+
+            if mode == 'copy':
+                if osp.isfile(src_path):
+                    shutil.copyfile(src_path, tar_path)
+                elif osp.isdir(src_path):
+                    shutil.copytree(src_path, tar_path)
+                else:
+                    warnings.warn(f'Cannot copy file {src_path}.')
+            else:
+                raise ValueError(f'Invalid mode {mode}')
 
 
-def get_extensions():
-    extensions = []
-
-    if EXT_TYPE == 'pytorch':
-        ext_name = 'csrr._ext'
-        from torch.utils.cpp_extension import CppExtension, CUDAExtension
-
-        # prevent ninja from using too many resources
-        try:
-            import psutil
-            num_cpu = len(psutil.Process().cpu_affinity())
-            cpu_use = max(4, num_cpu - 1)
-        except (ModuleNotFoundError, AttributeError):
-            cpu_use = 4
-
-        os.environ.setdefault('MAX_JOBS', str(cpu_use))
-        define_macros = []
-
-        # Before PyTorch1.8.0, when compiling CUDA code, `cxx` is a
-        # required key passed to PyTorch. Even if there is no flag passed
-        # to cxx, users also need to pass an empty list to PyTorch.
-        # Since PyTorch1.8.0, it has a default value so users do not need
-        # to pass an empty list anymore.
-        # More details at https://github.com/pytorch/pytorch/pull/45956
-        extra_compile_args = {'cxx': []}
-
-        # Since the PR (https://github.com/open-mmlab/CSRR/pull/1463) uses
-        # c++14 features, the argument ['std=c++14'] must be added here.
-        # However, in the windows environment, some standard libraries
-        # will depend on c++17 or higher. In fact, for the windows
-        # environment, the compiler will choose the appropriate compiler
-        # to compile those cpp files, so there is no need to add the
-        # argument
-        if platform.system() != 'Windows':
-            extra_compile_args['cxx'] = ['-std=c++14']
-
-        include_dirs = []
-        if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
-            define_macros += [('CSRR_WITH_CUDA', None)]
-            cuda_args = os.getenv('CSRR_CUDA_ARGS')
-            extra_compile_args['nvcc'] = [cuda_args] if cuda_args else []
-            op_files = glob.glob('./csrr/ops/csrc/pytorch/*.cpp') + \
-                       glob.glob('./csrr/ops/csrc/pytorch/cpu/*.cpp') + \
-                       glob.glob('./csrr/ops/csrc/pytorch/cuda/*.cu') + \
-                       glob.glob('./csrr/ops/csrc/pytorch/cuda/*.cpp')
-            extension = CUDAExtension
-            include_dirs.append(os.path.abspath('./csrr/ops/csrc/pytorch'))
-            include_dirs.append(os.path.abspath('./csrr/ops/csrc/common'))
-            include_dirs.append(os.path.abspath('./csrr/ops/csrc/common/cuda'))
-        else:
-            print(f'Compiling {ext_name} only with CPU')
-            op_files = glob.glob('csrr/ops/csrc/pytorch/*.cpp') + \
-                       glob.glob('csrr/ops/csrc/pytorch/cpu/*.cpp')
-            extension = CppExtension
-            include_dirs.append(os.path.abspath('csrr/ops/csrc/common'))
-
-        if 'nvcc' in extra_compile_args and platform.system() != 'Windows':
-            extra_compile_args['nvcc'] += ['-std=c++14']
-
-        ext_ops = extension(
-            name=ext_name,
-            sources=op_files,
-            include_dirs=include_dirs,
-            define_macros=define_macros,
-            extra_compile_args=extra_compile_args)
-        extensions.append(ext_ops)
-
-    return extensions
-
-
-setup(
-    name='csrr',
-    version=get_version(),
-    description='ChangShuoRadioRecognition Toolbox',
-    long_description=readme(),
-    long_description_content_type='text/markdown',
-    author='ShuoChang',
-    author_email='changshuo@bupt.edu.cn',
-    keywords='signal separation, deep learning, machine learning',
-    url='https://github.com/Singingkettle/ChangShuoRadioRecognition.git',
-    packages=find_packages(exclude=('configs', 'tools', 'demo')),
-    include_package_data=True,
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-    ],
-    license='Apache License 2.0',
-    setup_requires=parse_requirements('requirements/build.txt'),
-    tests_require=parse_requirements('requirements/tests.txt'),
-    install_requires=parse_requirements('requirements/runtime.txt'),
-    extras_require={
-        'all': parse_requirements('requirements.txt'),
-        'tests': parse_requirements('requirements/tests.txt'),
-        'build': parse_requirements('requirements/build.txt'),
-    },
-    ext_modules=get_extensions(),
-    cmdclass=cmd_class,
-    zip_safe=False)
+if __name__ == '__main__':
+    add_mim_extension()
+    setup(
+        name='csrr',
+        version=get_version(),
+        description='ChangShuoRadioRecognition Toolbox',
+        long_description=readme(),
+        long_description_content_type='text/markdown',
+        packages=find_packages(exclude=('configs', 'tools', 'demo', 'tests')),
+        include_package_data=True,
+        python_requires='>=3.7',
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'License :: OSI Approved :: Apache Software License',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+            'Topic :: Scientific/Engineering :: Artificial Intelligence For Wireless Signal',
+        ],
+        license='Apache License 2.0',
+        url='https://github.com/Singingkettle/ChangShuoRadioRecognition.git',
+        author='ShuoChang',
+        author_email='changshuo@bupt.edu.cn',
+        keywords='signal recognition, deep learning, machine learning',
+        install_requires=parse_requirements('requirements/runtime.txt'),
+        extras_require={
+            'all': parse_requirements('requirements.txt'),
+            'tests': parse_requirements('requirements/tests.txt'),
+            'mim': parse_requirements('requirements/mminstall.txt'),
+        },
+        zip_safe=False)

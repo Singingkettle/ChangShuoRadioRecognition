@@ -79,14 +79,10 @@ class IQToAP(BaseTransform):
 
         iq = results['iq'][0, :] + 1j * results['iq'][1, :]
         amp = np.abs(iq)
-        ang = np.angle(iq) / np.pi
+        ang = np.angle(iq)
         results['ap'] = np.vstack((amp, ang))
 
         return results
-
-    def __repr__(self) -> str:
-        repr_str = self.__class__.__name__
-        return repr_str
 
 
 @TRANSFORMS.register_module()
@@ -108,3 +104,54 @@ class DAENormalize(BaseTransform):
         ap[1, :] = -1 + 2 / (ap[1, :].max() - ap[1, :].min()) * (ap[1, :] - ap[1, :].min())
         results['ap'] = ap
         return results
+
+
+@TRANSFORMS.register_module()
+class MLDNNIQToAP(BaseTransform):
+    """Convert IQ frame to AP frame.
+
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Function to convert iq frame to ap frame.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: results, key 'ap' is added in to result dict.
+        """
+
+        iq = results['iq'][0, :] + 1j * results['iq'][1, :]
+        amp = np.abs(iq)
+        ang = np.arctan(results['iq'][0, :] / (results['iq'][1, :] + np.finfo(np.float64).eps))
+        results['ap'] = np.vstack((amp, ang))
+
+        return results
+
+
+@TRANSFORMS.register_module()
+class MLDNNSNRLabel(BaseTransform):
+    """Generate SNR label for MLDNN.
+
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Function to generate SNR label for MLDNN.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: results, key 'gt_label' is replaced with a dict for amc task and snr classification task.
+        """
+
+        if results['snr'] >= 0:
+            snr_label = np.array(0, np.int64)
+        else:
+            snr_label = np.array(1, np.int64)
+        results['gt_label'] = dict(amc=results['gt_label'], snr=snr_label)
+
+        return results
+
+

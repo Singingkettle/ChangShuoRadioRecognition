@@ -18,6 +18,7 @@ from .mae_head import MAEPretrainHead
 from .margin_head import ArcFaceClsHead
 from .mim_head import MIMHead
 from .mixmim_head import MixMIMPretrainHead
+from .mldnn_head import MLDNNHead
 from .mocov3_head import MoCoV3Head
 from .multi_label_cls_head import MultiLabelClsHead
 from .multi_label_csra_head import CSRAClsHead
@@ -32,6 +33,8 @@ from .vision_transformer_head import VisionTransformerClsHead
 from .vqa_head import VQAGenerationHead
 
 __all__ = [
+    'DAEHead',
+    'MLDNNHead',
     'ClsHead',
     'LinearClsHead',
     'StackedLinearClsHead',
