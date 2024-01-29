@@ -99,12 +99,12 @@ class DAEHead(BaseModule):
 
         # compute loss
         losses = dict()
-        cls_loss = self.loss_cls(
+        loss_cls = self.loss_cls(
             cls_score, target, avg_factor=cls_score.size(0), **kwargs)
-        mse_loss = self.loss_mse(x, xd)
+        loss_mse = self.loss_mse(x, xd)
 
-        losses['loss_cls'] = cls_loss
-        losses['loss_mse'] = mse_loss
+        losses['loss_cls'] = loss_cls
+        losses['loss_mse'] = loss_mse
 
         # compute accuracy
         if self.cal_acc:
