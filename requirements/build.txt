@@ -1,3 +1,0 @@
-numpy
-setuptools==58.2.0
-ninja
