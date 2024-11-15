@@ -4,7 +4,7 @@ from typing import Callable, List, Optional, Sequence, Union
 import numpy as np
 from mmengine.fileio import load
 
-from csrr.registry import DATASETS
+from csrr.registry import DATASETS, DATA_FILTERS
 from .base_dataset import BaseClassificationDataset
 
 
@@ -41,6 +41,7 @@ class AMCDataset(BaseClassificationDataset):
         metainfo = annotations['metainfo']
         metainfo['classes'] = metainfo['modulations']
         raw_data_list = annotations['data_list']
+        SNRs = metainfo['snrs']
 
         # Meta information load from annotation file will not influence the
         # existed meta information load from `BaseDataset.METAINFO` and
@@ -52,7 +53,8 @@ class AMCDataset(BaseClassificationDataset):
         for raw_data_info in raw_data_list:
             gt_label = np.array(self.CLASSES.index(raw_data_info['modulation']), dtype=np.int64)
             snr = raw_data_info['snr']
-            data_info = dict(gt_label=gt_label, snr=snr)
+            snr_label = np.array(SNRs.index(snr), dtype=np.int64)
+            data_info = dict(gt_label=gt_label, snr_label=snr_label, snr=snr, modulation=raw_data_info['modulation'])
             data_path = os.path.join(self.data_root, 'iq', raw_data_info['file_name'])
             if self.cache:
                 x = np.load(data_path)
@@ -62,3 +64,15 @@ class AMCDataset(BaseClassificationDataset):
             data_list.append(data_info)
 
         return data_list
+
+    def filter_data(self) -> List[dict]:
+        if self.filter_cfg is not None:
+            if isinstance(self.filter_cfg, list):
+                for cfg in self.filter_cfg:
+                    f = DATA_FILTERS.build(cfg)
+                    self.data_list, self._metainfo = f(self.data_list, self._metainfo)
+            else:
+                f = DATA_FILTERS.build(self.filter_cfg)
+                self.data_list, self._metainfo = f(self.data_list, self._metainfo)
+        return self.data_list
+

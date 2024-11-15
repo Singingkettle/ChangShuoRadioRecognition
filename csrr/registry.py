@@ -184,6 +184,16 @@ VISBACKENDS = Registry(
     locations=['csrr.visualization'],
 )
 
+#######################################################################
+#                      csrr.analysis                       #
+#######################################################################
+
+# Analysis tools (Plot and Table) to analyze the performance results
+ANALYSIS = Registry(
+    'analysis',
+    locations=['csrr.analysis'],
+)
+
 __all__ = [
     'RUNNERS', 'RUNNER_CONSTRUCTORS', 'LOOPS', 'HOOKS', 'LOG_PROCESSORS',
     'OPTIMIZERS', 'OPTIM_WRAPPERS', 'OPTIM_WRAPPER_CONSTRUCTORS',

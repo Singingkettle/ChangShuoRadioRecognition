@@ -9,12 +9,43 @@ from tqdm import tqdm
 
 from .base_dataset import BaseDataset, combine_two_infos
 
-
 class DeepSigBase(BaseDataset):
+    """
+    This is the base class for the DeepSig dataset. It inherits from the BaseDataset class.
+
+    Attributes:
+        root_dir (str): The root directory where the dataset is stored.
+        version (str): The version of the dataset.
+        data_ratios (list): The ratios for splitting the dataset into training, validation, and testing sets.
+
+    Methods:
+        preprocess_original_data(): This method is responsible for preprocessing the original data. It loads the data,
+                                    decodes the modulation types, splits the data into training, validation, and testing sets,
+                                    and finally returns the preprocessed dataset and information about each split.
+    """
+
     def __init__(self, root_dir, version, data_ratios):
+        """
+        The constructor for the DeepSigBase class.
+
+        Parameters:
+            root_dir (str): The root directory where the dataset is stored.
+            version (str): The version of the dataset.
+            data_ratios (list): The ratios for splitting the dataset into training, validation, and testing sets.
+        """
         super(DeepSigBase, self).__init__('DeepSig', root_dir, version, data_ratios)
 
     def preprocess_original_data(self):
+        """
+        This method is responsible for preprocessing the original data. It loads the data, decodes the modulation types,
+        splits the data into training, validation, and testing sets, and finally returns the preprocessed dataset and
+        information about each split.
+
+        Returns:
+            dataset (list): The preprocessed dataset.
+            infos (dict): Information about each split of the dataset.
+        """
+        # Implementation of the method...
         print('Start converting data {}-{}'.format(self.organization, self.version))
         raw_data_path = osp.join(self.data_dir, self.data_name)
         data = pickle.load(open(raw_data_path, 'rb'), encoding='bytes')
@@ -79,6 +110,12 @@ class DeepSigBase(BaseDataset):
 
         return dataset, infos
 
+
+# Additional classes (DeepSigA, DeepSigB, DeepSigC, DeepSigD) inherit from DeepSigBase and override the __init__ method
+# and potentially the preprocess_original_data method. Each class represents a different version of the DeepSig dataset.
+# They each have a unique data_name and potentially a unique mod2mod dictionary.
+# The mod2mod dictionary is used to map the modulation types in the original dataset to the modulation types used in this project.
+# The preprocess_original_data method in these classes may be different from the one in the base class to accommodate the unique characteristics of each version of the dataset.
 
 class DeepSigA(DeepSigBase):
     def __init__(self, root_dir, version, data_ratios):

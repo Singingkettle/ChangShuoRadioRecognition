@@ -8,7 +8,9 @@ from .contrastive_head import ContrastiveHead
 from .dae_head import DAEHead
 from .deit_head import DeiTClsHead
 from .efficientformer_head import EfficientFormerClsHead
+from .fast_mldnn_head import FastMLDNNHead
 from .grounding_head import GroundingHead
+from .hcgdnn_head import HCGDNNHead
 from .itc_head import ITCHead
 from .itm_head import ITMHead
 from .latent_heads import LatentCrossCorrelationHead, LatentPredictHead
@@ -26,6 +28,7 @@ from .multi_label_linear_head import MultiLabelLinearClsHead
 from .multi_task_head import MultiTaskHead
 from .seq_gen_head import SeqGenerationHead
 from .simmim_head import SimMIMHead
+from .snr_auxiliary_head import SNRAuxiliaryHead
 from .stacked_head import StackedLinearClsHead
 from .swav_head import SwAVHead
 from .vig_head import VigClsHead

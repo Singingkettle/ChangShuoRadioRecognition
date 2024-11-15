@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/deepsig/ap-deepsig201610A.py',
+    '../_base_/datasets/deepsig/ap-shape-L-F-deepsig201610A.py',
     '../_base_/schedules/amc.py',
     '../_base_/runtimes/amc.py'
 ]

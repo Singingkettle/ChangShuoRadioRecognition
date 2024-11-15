@@ -29,9 +29,11 @@ class SNRAuxiliaryHead(BaseModule):
                  num_classes: int,
                  num_snr: int,
                  input_size: int,
-                 output_size: int,
-                 snr_output_size: int,
+                 snr_output_size: int = 256,
+                 output_size: int = 256,
+                 is_shallow: bool = False,
                  is_share: bool = False,
+                 loss_fcls=None,
                  loss_cls=None,
                  loss_snr=None,
                  topk: Union[int, Tuple[int]] = (1,),
@@ -39,10 +41,15 @@ class SNRAuxiliaryHead(BaseModule):
                  init_cfg: Optional[dict] = None):
         super(SNRAuxiliaryHead, self).__init__(init_cfg=init_cfg)
 
+        if loss_fcls is None:
+            loss_fcls = dict(type='CrossEntropyLoss', loss_weight=1.0)
         if loss_cls is None:
             loss_cls = dict(type='CrossEntropyLoss', loss_weight=1.0)
         if loss_snr is None:
             loss_snr = dict(type='CrossEntropyLoss', loss_weight=1.0)
+
+        if not isinstance(loss_fcls, nn.Module):
+            loss_fcls = MODELS.build(loss_fcls)
 
         if not isinstance(loss_cls, nn.Module):
             loss_cls = MODELS.build(loss_cls)
@@ -52,34 +59,43 @@ class SNRAuxiliaryHead(BaseModule):
 
         self.num_classes = num_classes
         self.num_snr = num_snr
+        self.loss_fcls = loss_fcls
         self.loss_cls = loss_cls
         self.loss_snr = loss_snr
 
         self.topk = topk
         self.cal_acc = cal_acc
 
-        if is_share:
+        if is_shallow:
             self.classifier = nn.Sequential(
-                nn.Conv1d(input_size, output_size, kernel_size=1, bias=False),
-                nn.ReLU(inplace=True),
-                nn.Dropout(0.5),
-                nn.Conv1d(output_size, self.num_classes * self.num_snr, kernel_size=1, bias=False),
+                nn.Conv1d(input_size, self.num_classes * self.num_snr, kernel_size=1, bias=False),
+            )
+            self.snr_classifier = nn.Sequential(
+                nn.Conv1d(input_size, self.num_snr, kernel_size=1, bias=False),
             )
         else:
-            self.classifier = nn.Sequential(
-                nn.Conv1d(input_size, output_size * self.num_snr, kernel_size=1, bias=False),
+            if is_share:
+                self.classifier = nn.Sequential(
+                    nn.Conv1d(input_size, output_size, kernel_size=1, bias=False),
+                    nn.ReLU(inplace=True),
+                    nn.Dropout(0.5),
+                    nn.Conv1d(output_size, self.num_classes * self.num_snr, kernel_size=1, bias=False),
+                )
+            else:
+                self.classifier = nn.Sequential(
+                    nn.Conv1d(input_size, output_size * self.num_snr, kernel_size=1, bias=False),
+                    nn.ReLU(inplace=True),
+                    nn.Dropout(0.5),
+                    nn.Conv1d(output_size * self.num_snr, self.num_classes * self.num_snr,
+                              kernel_size=1, bias=False, groups=self.num_snr),
+                )
+
+            self.snr_classifier = nn.Sequential(
+                nn.Conv1d(input_size, snr_output_size, kernel_size=1, bias=False),
                 nn.ReLU(inplace=True),
                 nn.Dropout(0.5),
-                nn.Conv1d(output_size * self.num_snr, self.num_classes * self.num_snr,
-                          kernel_size=1, bias=False, groups=self.num_snr),
+                nn.Conv1d(snr_output_size, self.num_snr, kernel_size=1, bias=False),
             )
-
-        self.snr_classifier = nn.Sequential(
-            nn.Conv1d(input_size, snr_output_size, kernel_size=1, bias=False),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-            nn.Conv1d(snr_output_size, self.num_snr, kernel_size=1, bias=False),
-        )
 
     def pre_logits(self, feats: Tuple[torch.Tensor]) -> torch.Tensor:
         """The process before the final classification head.
@@ -91,6 +107,16 @@ class SNRAuxiliaryHead(BaseModule):
         # The ClsHead doesn't have other module, just return after unpacking.
         return feats[-1]
 
+    def _fusion(self, pres, snr_pres):
+        # calculate fusion results based bayesian rule
+        fpres = torch.reshape(pres, (-1, self.num_snr, self.num_classes))
+        fpres = F.softmax(fpres, dim=2)
+        fsnr_pres = F.softmax(snr_pres, dim=1)
+        fpres = fpres * fsnr_pres
+        fpres = torch.sum(fpres, dim=1)
+
+        return fpres
+
     def forward(self, feats: Dict[str, torch.Tensor]) -> Union[
         torch.Tensor, Dict[str, torch.Tensor]]:
         """The forward process."""
@@ -100,19 +126,13 @@ class SNRAuxiliaryHead(BaseModule):
         pres = self.classifier(x)
         snr_pres = self.snr_classifier(x)
         pres = torch.squeeze(pres)
-
+        fpres = self._fusion(pres, snr_pres)
         if self.training:
             pres = torch.squeeze(pres)
             snr_pres = torch.squeeze(snr_pres)
-            return dict(pres=pres, snr_pres=snr_pres)
+            return dict(pres=pres, snr_pres=snr_pres, fpres=fpres)
         else:
-            pres = torch.reshape(pres, (-1, self.num_snr, self.num_classes))
-            pres = F.softmax(pres, dim=2)
-            snr_pres = F.softmax(snr_pres, dim=1)
-            pres = pres * snr_pres
-            pres = torch.sum(pres, dim=1)
-            return pres
-
+            return fpres
 
     def loss(self, feats: Dict[str, torch.Tensor], data_samples: List[MultiTaskDataSample],
              **kwargs) -> dict:
@@ -153,6 +173,7 @@ class SNRAuxiliaryHead(BaseModule):
         else:
             snr_target = torch.cat([i.get('snr').gt_label for i in data_samples])
 
+        fpres = cls_scores['fpres']
         pres = torch.reshape(cls_scores['pres'], (-1, self.num_classes))
         snr_pres = cls_scores['snr_pres']
 
@@ -160,13 +181,13 @@ class SNRAuxiliaryHead(BaseModule):
         mask = target.new_zeros(snr_pres.size(0), self.num_snr)
         target_[torch.arange(snr_pres.size(0)), snr_target[:]] = target
         mask[torch.arange(snr_pres.size(0)), snr_target[:]] = 1
-        target = torch.reshape(target_, (snr_pres.size(0) * self.num_snr,))
+        target_ = torch.reshape(target_, (snr_pres.size(0) * self.num_snr,))
         mask = torch.reshape(mask, (snr_pres.size(0) * self.num_snr,))
 
         # compute loss
         losses = dict()
-
-        losses['loss_amc'] = self.loss_cls(pres, target, avg_factor=snr_pres.size(0), weight=mask, **kwargs)
+        losses['loss_famc'] = self.loss_fcls(fpres, target, avg_factor=snr_pres.size(0), **kwargs)
+        losses['loss_amc'] = self.loss_cls(pres, target_, avg_factor=snr_pres.size(0), weight=mask, **kwargs)
         losses['loss_snr'] = self.loss_snr(snr_pres, snr_target, avg_factor=snr_pres.size(0), **kwargs)
 
         return losses

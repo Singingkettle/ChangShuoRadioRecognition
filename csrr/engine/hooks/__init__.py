@@ -2,6 +2,7 @@
 from .class_num_check_hook import ClassNumCheckHook
 from .densecl_hook import DenseCLHook
 from .ema_hook import EMAHook
+from .hcgdnn_hook import HCGDNNHook
 from .margin_head_hooks import SetAdaptiveMarginsHook
 from .precise_bn_hook import PreciseBNHook
 from .retriever_hooks import PrepareProtoBeforeValLoopHook
@@ -15,5 +16,6 @@ __all__ = [
     'ClassNumCheckHook', 'PreciseBNHook', 'VisualizationHook',
     'SwitchRecipeHook', 'PrepareProtoBeforeValLoopHook',
     'SetAdaptiveMarginsHook', 'EMAHook', 'SimSiamHook', 'DenseCLHook',
-    'SwAVHook', 'WarmupParamHook'
+    'SwAVHook', 'WarmupParamHook',
+    'HCGDNNHook'
 ]

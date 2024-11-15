@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 from .base_backbone import BaseBackbone
@@ -23,9 +22,9 @@ class LSTM2(BaseBackbone):
             self.classifier = nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
-
         x, _ = self.features(x)
+        x = x[:, -1, :]
         if self.num_classes > 0:
-            x = self.classifier(x[:, -1, :])
+            x = self.classifier(x)
 
         return (x,)

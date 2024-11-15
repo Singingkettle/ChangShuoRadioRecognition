@@ -1,6 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from itertools import combinations
 from itertools import product
 from typing import List, Optional, Sequence, Union
+
+from sklearn.metrics import silhouette_score, silhouette_samples, roc_curve, auc
+
+try:
+    from tsnecuda import TSNE
+except:
+    from tsne_torch import TorchTSNE as TSNE
 
 import mmengine
 import numpy as np
@@ -20,6 +28,127 @@ def to_tensor(value):
     elif not isinstance(value, torch.Tensor):
         raise TypeError(f'{type(value)} is not an available argument.')
     return value
+
+
+def to_numpy(value):
+    """Convert value to np.ndarray."""
+    if isinstance(value, torch.Tensor):
+        value = value.detach().cpu().numpy()
+    elif isinstance(value, Sequence) and not mmengine.is_str(value):
+        value = np.asarray(value)
+    elif not isinstance(value, np.ndarray):
+        raise TypeError(f'{type(value)} is not an available argument.')
+    return value
+
+
+def _feature_distribution(feature, target, num_classes, vis_dim=2):
+    feature = to_numpy(feature)
+    silhouette_avg = silhouette_score(feature, target)
+    sample_silhouette_values = silhouette_samples(feature, target)
+    if vis_dim > 3:
+        vis_dim = 3
+    if feature.shape[1] > vis_dim:
+        feature = TSNE(n_components=vis_dim, perplexity=15, learning_rate=10, verbose=1, n_jobs=12).fit_transform(
+            feature)
+
+    center = np.zeros((num_classes, feature.shape[1]), dtype=np.float32)
+    for class_index in range(num_classes):
+        center[class_index, :] = np.mean(feature[target == class_index, :], axis=0)
+
+    return feature, center, silhouette_avg, sample_silhouette_values
+
+
+def _roc_ovr_ovo(pred_positive, gt_positive, gt_label, num_classes):
+    """This metric is based on https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+    """
+    pred_positive = to_numpy(pred_positive)
+    gt_positive = to_numpy(gt_positive)
+    gt_label = to_numpy(gt_label)
+
+    def _roc_ovr(_pred_positive, _gt_positive, _num_classes):
+        # In the first step, we calculate One-vs-Rest multiclass ROC in micro and macro
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(_num_classes):
+            fpr[i], tpr[i], _ = roc_curve(_pred_positive[:, i], _gt_positive[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+
+        # ROC curve using micro-averaged OvR
+        fpr['micro'], tpr['micro'], _ = roc_curve(_pred_positive.ravel(), _gt_positive.ravel())
+        roc_auc['micro'] = auc(fpr['micro'], tpr['micro'])
+
+        # ROC curve using the OvR macro-average
+        fpr_grid = np.linspace(0.0, 1.0, 1000)
+
+        # Interpolate all ROC curves at these points
+        mean_tpr = np.zeros_like(fpr_grid)
+
+        for i in range(_num_classes):
+            mean_tpr += np.interp(fpr_grid, fpr[i], tpr[i])  # linear interpolation
+
+        # Average it and compute AUC
+        mean_tpr /= _num_classes
+
+        fpr['macro'] = fpr_grid
+        tpr['macro'] = mean_tpr
+        roc_auc['macro'] = auc(fpr['macro'], tpr['macro'])
+
+        _roc = dict(fpr=fpr, tpr=tpr, auc=roc_auc)
+
+        return _roc
+
+    def _roc_ovo(_pred_positive, _gt_label, _num_classes):
+        # In the second step, we calculate One-vs-One multiclass ROC in macro
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        fpr_grid = np.linspace(0.0, 1.0, 1000)
+        pair_list = list(combinations([i for i in range(_num_classes)], 2))
+        for ix, (label_a, label_b) in enumerate(pair_list):
+            fpr[(label_a, label_b)] = dict()
+            tpr[(label_a, label_b)] = dict()
+            roc_auc[(label_a, label_b)] = dict()
+
+            a_mask = _gt_label == label_a
+            b_mask = _gt_label == label_b
+            ab_mask = np.logical_or(a_mask, b_mask)
+
+            a_true = a_mask[ab_mask]
+            b_true = b_mask[ab_mask]
+
+            fpr_a, tpr_a, _ = roc_curve(a_true, _pred_positive[ab_mask, label_a])
+            fpr_b, tpr_b, _ = roc_curve(b_true, _pred_positive[ab_mask, label_b])
+
+            auc_a = auc(fpr_a, tpr_a)
+            auc_b = auc(fpr_b, tpr_b)
+
+            fpr[(label_a, label_b)][label_a] = fpr_a
+            fpr[(label_a, label_b)][label_b] = fpr_b
+            tpr[(label_a, label_b)][label_a] = tpr_a
+            tpr[(label_a, label_b)][label_b] = tpr_b
+            roc_auc[(label_a, label_b)][label_a] = auc_a
+            roc_auc[(label_a, label_b)][label_b] = auc_b
+
+            mean_tpr = (np.interp(fpr_grid, fpr_a, tpr_a) + np.interp(fpr_grid, fpr_b, tpr_b)) / 2
+            mean_auc = auc(fpr_grid, mean_tpr)
+
+            fpr[(label_a, label_b)]['macro'] = fpr_grid
+            tpr[(label_a, label_b)]['macro'] = mean_tpr
+            roc_auc[(label_a, label_b)]['macro'] = mean_auc
+
+        roc_auc['macro'] = sum([roc_auc[pair]['macro'] for pair in roc_auc.keys()]) / (1.0 * len(pair_list))
+
+        _roc = dict(fpr=fpr, tpr=tpr, auc=roc_auc)
+
+        return _roc
+
+    # Save the result
+    roc = dict()
+    roc['ovr'] = _roc_ovr(pred_positive, gt_positive, num_classes)
+    roc['ovo'] = _roc_ovo(pred_positive, gt_label, num_classes)
+
+    return roc
 
 
 def _precision_recall_f1_support(pred_positive, gt_positive, average):
@@ -105,7 +234,7 @@ class Loss(BaseMetric):
         for data_sample in data_samples:
             result = dict()
             if f'{self.task}_loss' in data_sample:
-                result[self.task] = data_sample[self.task+'_loss'].cpu()
+                result[self.task] = data_sample[self.task + '_loss'].cpu()
             # Save the result to `self.results`.
             self.results.append(result)
 
@@ -148,6 +277,146 @@ class Loss(BaseMetric):
         loss = loss.sum()
         loss = loss.mul_(1. / num)
         return loss
+
+
+@METRICS.register_module()
+class FeaturesDistribution(BaseMetric):
+    default_prefix: Optional[str] = 'feature'
+
+    def __init__(self,
+                 classes: Sequence[str],
+                 vis_dim: int = 2,
+                 collect_device: str = 'cpu',
+                 prefix: Optional[str] = None) -> None:
+        super().__init__(collect_device=collect_device, prefix=prefix)
+        self.classes = classes
+        self.num_classes = len(classes)
+        if vis_dim > 3:
+            raise Warning(
+                'Currently, only support visualization of features with dimension <=3. So if vis_dim is >3, it'
+                'will be truncated as 3.')
+            vis_dim = 3
+
+        self.vis_dim = vis_dim
+
+    def process(self, data_batch, data_samples: Sequence[dict]):
+        for data_sample in data_samples:
+            result = dict()
+            result['feature'] = data_sample['feature'].cpu()
+            result['gt_label'] = data_sample['gt_label'].cpu()
+            num_classes = self.num_classes or data_sample.get('num_classes')
+            result['num_classes'] = num_classes
+            result['vid_dim'] = self.vis_dim
+            self.results.append(result)
+
+    def compute_metrics(self, results: list):
+        metrics = {}
+        target = torch.cat([res['gt_label']] for res in results)
+        feature = torch.cat([res['feature']] for res in results)
+        feature, center, silhouette_avg, sample_silhouette_values = self.calculate(feature, target,
+                                                                                   results[0]['num_classes'],
+                                                                                   results[0]['vis_dim'])
+        metrics['silhouette'] = silhouette_avg
+        return metrics
+
+    @staticmethod
+    def calculate(
+            feature: Union[torch.Tensor, np.ndarray, Sequence],
+            target: Union[torch.Tensor, np.ndarray, Sequence],
+            num_classes: int,
+            vis_dim: int = 2,
+    ):
+
+        feature, center, silhouette_avg, sample_silhouette_values = _feature_distribution(feature, target, num_classes,
+                                                                                          vis_dim)
+        return feature, center, silhouette_avg, sample_silhouette_values
+
+
+@METRICS.register_module()
+class ROC(BaseMetric):
+    default_prefix: Optional[str] = 'ROC'
+
+    def __init__(self,
+                 classes: Sequence[str],
+                 mode: Optional[str] = 'ovr',
+                 average: Optional[str] = 'macro',
+                 collect_device: str = 'cpu',
+                 prefix: Optional[str] = None) -> None:
+        super().__init__(collect_device=collect_device, prefix=prefix)
+        self.classes = classes
+        self.num_classes = len(classes)
+        self.mode = mode
+        self.average = average
+        if self.mode == 'ovo':
+            self.average = 'macro'
+
+    def process(self, data_batch, data_samples: Sequence[dict]):
+        """Process one batch of data samples.
+
+        The processed results should be stored in ``self.results``, which will
+        be used to compute the metrics when all batches have been processed.
+
+        Args:
+            data_batch: A batch of data from the dataloader.
+            data_samples (Sequence[dict]): A batch of outputs from the model.
+        """
+        for data_sample in data_samples:
+            result = dict()
+            if 'pred_score' in data_sample:
+                result['pred_score'] = data_sample['pred_score'].cpu()
+            else:
+                num_classes = self.num_classes or data_sample.get(
+                    'num_classes')
+                assert num_classes is not None, \
+                    'The `num_classes` must be specified if no `pred_score`.'
+                result['pred_label'] = data_sample['pred_label'].cpu()
+                result['num_classes'] = num_classes
+            result['gt_label'] = data_sample['gt_label'].cpu()
+            # Save the result to `self.results`.
+            self.results.append(result)
+
+    def compute_metrics(self, results: List):
+        """Compute the metrics from processed results.
+
+        Args:
+            results (dict): The processed results of each batch.
+
+        Returns:
+            Dict: The computed metrics. The keys are the names of the metrics,
+            and the values are corresponding results.
+        """
+        # NOTICE: don't access `self.results` from the method.
+        metrics = {}
+
+        # concat
+        target = torch.cat([res['gt_label'] for res in results])
+        if 'pred_score' in results[0]:
+            pred = torch.stack([res['pred_score'] for res in results])
+        else:
+            pred = torch.cat([res['pred_label'] for res in results])
+        roc = self.calculate(pred, target, results[0]['num_classes'])
+
+        metrics['auc'] = roc[self.mode]['auc'][self.average]
+
+    @staticmethod
+    def calculate(
+            pred: Union[torch.Tensor, np.ndarray, Sequence],
+            target: Union[torch.Tensor, np.ndarray, Sequence],
+            num_classes: Optional[int] = None,
+    ):
+
+        gt_positive = F.one_hot(target.flatten(), num_classes)
+        if pred.ndim == 1:
+            assert num_classes is not None, \
+                'Please specify the `num_classes` if the `pred` is labels ' \
+                'intead of scores.'
+            pred_positive = F.one_hot(pred.to(torch.int64), num_classes)
+        else:
+            pred_positive = pred
+
+        roc = _roc_ovr_ovo(pred_positive, gt_positive, target, num_classes)
+
+        return roc
 
 
 @METRICS.register_module()

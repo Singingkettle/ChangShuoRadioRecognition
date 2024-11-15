@@ -79,7 +79,9 @@ class IQToAP(BaseTransform):
 
         iq = results['iq'][0, :] + 1j * results['iq'][1, :]
         amp = np.abs(iq)
-        ang = np.angle(iq)
+        amp = amp / LA.norm(amp, 2)
+        ang = np.arctan2(results['iq'][1, :], results['iq'][0, :]) / np.pi
+
         results['ap'] = np.vstack((amp, ang))
 
         return results
@@ -154,4 +156,24 @@ class MLDNNSNRLabel(BaseTransform):
 
         return results
 
+
+@TRANSFORMS.register_module()
+class SNRLabel(BaseTransform):
+    """Generate SNR label.
+
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Function to generate SNR label.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: results, key 'gt_label' is replaced with a dict for amc task and snr classification task.
+        """
+
+        results['gt_label'] = dict(amc=results['gt_label'], snr=results['snr_label'])
+
+        return results
 

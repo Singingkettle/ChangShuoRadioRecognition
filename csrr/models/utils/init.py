@@ -1,45 +1,42 @@
 from typing import List, Union
-
+import numpy as np
 import torch
 import torch.nn as nn
 from mmengine.model.weight_init import BaseInit, _get_bases_name, update_init_info
-from mmengine.registry import WEIGHT_INITIALIZERS
+from csrr.registry import WEIGHT_INITIALIZERS
 
 
-def _svd(w, gain=1):
+def _svd(w, gain=1.0):
     rows = w.size(0)
     cols = w.numel() // rows
-    flattened = w.new(rows, cols).normal_(0, 1)
-    if rows > cols:
-        flattened.t_()
-        u, _, v = torch.linalg.svd(flattened, full_matrices=False)
-        u.t_()
-        v.t_()
-    else:
-        u, _, v = torch.linalg.svd(flattened, full_matrices=False)
+    a = np.random.normal(0, 1, (cols, rows))
+    u, _, v = np.linalg.svd(a, full_matrices=False)
+    # Pick the one with the correct shape.
     q = u if u.shape == w.shape else v
-    q = q.reshape(w.shape)
 
+    q = np.transpose(q)
     with torch.no_grad():
-        w.view_as(q).copy_(q)
+        w.copy_(torch.from_numpy(q).float())
         w.mul_(gain)
     return w
 
 
-def rnn_init(module: nn.Module, gain: float = 10.0) -> None:
+def rnn_init(module: nn.Module, gain: float = 1.0) -> None:
     for name, param in module.named_parameters():
         if 'weight_ih' in name:
-            nn.init.xavier_uniform_(param, gain=gain)
+            nn.init.xavier_uniform_(param)
         elif 'weight_hh' in name:
-            _svd(param, gain=gain)
+            nn.init.orthogonal_(param.data, gain=gain)
         elif 'bias_ih' in name:
             nn.init.zeros_(param)
+            n = param.size(0)
+            param.data[(n // 4):(n // 2)].fill_(1)
         elif 'bias_hh' in name:
             nn.init.zeros_(param)
 
 
-@WEIGHT_INITIALIZERS.register_module(name='RNN')
-class RNNInit(BaseInit):
+@WEIGHT_INITIALIZERS.register_module(name='LSTM')
+class LSTMInit(BaseInit):
     def __init__(self, gain: float, layer: Union[str, List, None] = None):
         super().__init__(layer=layer)
         self.gain = gain

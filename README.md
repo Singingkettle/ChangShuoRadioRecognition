@@ -38,7 +38,6 @@ Supported Automatic Modulation Classification methods:
 - [x] [MCLDNN](configs/mcldnn). [**A Spatiotemporal Multi-Channel Learning Framework for Automatic Modulation Recognition**](https://ieeexplore.ieee.org/abstract/document/9106397)
 - [x] [MCNET](configs/mcnet). [**MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/8963964)
 - [x] [MLDNN](configs/mldnn). [**Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/document/9462447)
-- [x] [FMLDNN](configs/fastmldnn). [**A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification**](https://ieeexplore.ieee.org/abstract/document/10239249)
 - [x] [PET-CGDNN](configs/petcgdnn). [**An Efficient Deep Learning Model for Automatic Modulation Recognition Based on Parameter Estimation and Transformation**](https://ieeexplore.ieee.org/abstract/document/9507514)
 - [x] [TRN](configs/trn). [**Signal Modulation Classification Based on the Transformer Network**](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340)
 

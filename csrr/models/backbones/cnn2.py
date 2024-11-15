@@ -30,7 +30,7 @@ class CNN2(BaseBackbone):
         )
         if self.num_classes > 0:
             self.classifier = nn.Sequential(
-                nn.Linear(self.frame_length-7, 256),
+                nn.Linear((self.frame_length-7)*50, 256),
                 nn.ReLU(inplace=True),
                 nn.Dropout(0.5),
                 nn.Linear(256, self.num_classes),

@@ -14,6 +14,7 @@ model = dict(
         fusion_method='safn',
         gradient_truncation=True,
         num_classes=11,
+        init_cfg=dict(type='Xavier', layer='Conv2d')
     ),
     head=dict(
         type='MLDNNHead',

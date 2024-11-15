@@ -20,7 +20,7 @@ conda activate ChangShuoRadioRecognition
 
 c. Install PyTorch and torchvision.
 ```shell
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 ```
 
 d. Install mmdet for radio detection and radio recognition.

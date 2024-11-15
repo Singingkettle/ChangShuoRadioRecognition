@@ -17,7 +17,7 @@ from .ema import CosineEMA
 from .embed import (HybridEmbed, PatchEmbed, PatchMerging, resize_pos_embed,
                     resize_relative_position_bias_table)
 from .helpers import is_tracing, to_2tuple, to_3tuple, to_4tuple, to_ntuple
-from .init import RNNInit
+from .init import LSTMInit
 from .inverted_residual import InvertedResidual
 from .layer_scale import LayerScale
 from .make_divisible import make_divisible
@@ -81,7 +81,7 @@ __all__ = [
     'SwiGLUFFN',
     'SwiGLUFFNFused',
     'RotaryEmbeddingFast',
-    'RNNInit'
+    'LSTMInit',
 ]
 
 if WITH_MULTIMODAL:

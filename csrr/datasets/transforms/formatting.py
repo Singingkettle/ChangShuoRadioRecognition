@@ -163,7 +163,7 @@ class PackMultiTaskInputs(BaseTransform):
                  input_key: Union[str, List[str]],
                  task_handlers: Dict = dict()):
         self.multi_task_fields = multi_task_fields
-        if isinstance(input_key, Sequence):
+        if isinstance(input_key, list):
             if len(input_key) == 1:
                 input_key = input_key[0]
         self.input_key = input_key
@@ -180,13 +180,14 @@ class PackMultiTaskInputs(BaseTransform):
         packed_results = dict()
         results = results.copy()
 
-        if isinstance(self.input_key, Sequence):
+        if isinstance(self.input_key, list):
             packed_results['inputs'] = dict()
             for input_key in self.input_key:
                 input_ = results[input_key]
                 packed_results['inputs'][input_key] = PackInputs.format_input(input_)
         else:
-            packed_results['inputs'] = PackInputs.format_input([])
+            input_ = results[self.input_key]
+            packed_results['inputs'] = PackInputs.format_input(input_)
 
         task_results = defaultdict(dict)
         for field in self.multi_task_fields:
