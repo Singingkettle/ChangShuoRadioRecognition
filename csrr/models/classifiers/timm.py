@@ -15,7 +15,7 @@ from .base import BaseClassifier
 
 @MODELS.register_module()
 class TimmClassifier(BaseClassifier):
-    """Image classifiers for pytorch-image-models (timm) model.
+    """Image tasks for pytorch-image-models (timm) model.
 
     This class accepts all positional and keyword arguments of the function
     `timm.models.create_model <https://timm.fast.ai/create_model>`_ and use

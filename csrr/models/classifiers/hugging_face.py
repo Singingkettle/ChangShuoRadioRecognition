@@ -15,7 +15,7 @@ from .base import BaseClassifier
 
 @MODELS.register_module()
 class HuggingFaceClassifier(BaseClassifier):
-    """Image classifiers for HuggingFace model.
+    """Image tasks for HuggingFace model.
 
     This class accepts all positional and keyword arguments of the API
     ``from_pretrained`` (when ``pretrained=True``) and ``from_config`` (when

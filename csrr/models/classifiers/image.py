@@ -11,7 +11,7 @@ from .base import BaseClassifier
 
 @MODELS.register_module()
 class ImageClassifier(BaseClassifier):
-    """Image classifiers for supervised classification task.
+    """Image tasks for supervised classification task.
 
     Args:
         backbone (dict): The backbone module. See

@@ -10,7 +10,7 @@ from .base import BaseClassifier
 
 @MODELS.register_module()
 class SignalClassifier(BaseClassifier):
-    """Signal classifiers for supervised classification task.
+    """Signal tasks for supervised classification task.
 
     Args:
         backbone (dict): The backbone module. See

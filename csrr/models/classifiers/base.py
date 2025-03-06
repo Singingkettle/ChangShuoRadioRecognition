@@ -8,7 +8,7 @@ from mmengine.structures import BaseDataElement
 
 
 class BaseClassifier(BaseModel, metaclass=ABCMeta):
-    """Base class for classifiers.
+    """Base class for tasks.
 
     Args:
         init_cfg (dict, optional): Initialization config dict.
