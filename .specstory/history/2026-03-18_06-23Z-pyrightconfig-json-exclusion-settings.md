@@ -3910,6 +3910,49 @@ _**Agent (model claude-4.6-opus-high-thinking, mode Agent)**_
 
 ---
 
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "paper",
+  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore",
+  "caseInsensitive": false
+}
+```
+Additional data:
+
+```json
+{
+  "isPruned": true,
+  "pattern": "paper",
+  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore",
+  "outputMode": "content",
+  "totalFiles": 0,
+  "totalMatches": 0,
+  "topFiles": []
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore</summary>
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && git status configs/fastmldnn/paper/ 2>/dev/null; git check-ignore -v configs/fastmldnn/paper/ 2>/dev/null; ls -la configs/fastmldnn/paper/ 2>/dev/null</summary>
 
@@ -3967,49 +4010,6 @@ drwxrwxr-x 3 citybuster citybuster 4096  3月 18 14:29 ..
 
 ---
 
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
-
-
-Parameters:
-
-```json
-{
-  "pattern": "paper",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore",
-  "caseInsensitive": false
-}
-```
-Additional data:
-
-```json
-{
-  "isPruned": true,
-  "pattern": "paper",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore",
-  "outputMode": "content",
-  "totalFiles": 0,
-  "totalMatches": 0,
-  "topFiles": []
-}
-```
-Status: **completed**
-
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/.gitignore</summary>
-
-</details>
-</tool-use>
-
----
-
 <think><details><summary>Thought Process</summary>
 **Checking git status**
 
@@ -4020,41 +4020,6 @@ I'm verifying if the paper folder and its files are tracked by Git, checking for
 
 
 
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && git ls-files configs/fastmldnn/paper/ | head -20</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && git ls-files configs/fastmldnn/paper/ | head -20
-```
-
-```
-configs/fastmldnn/paper/data_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/data_iq-ap-deepsig201610A.py
-configs/fastmldnn/paper/default_runtime.py
-configs/fastmldnn/paper/extract_acc_all_mean_scales.py
-configs/fastmldnn/paper/fastmldnn_abl-balance-0.1_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-balance-0.3_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-balance-0.7_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-balance-0.9_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-cross-entropy-center-loss_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-focal-loss_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-ghmc-loss_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-kl-divergence_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-last_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-logsumexp_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-max_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-mean_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-median_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-min_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-quantile_iq-ap-channel-deepsig201610A.py
-configs/fastmldnn/paper/fastmldnn_abl-merge-std_iq-ap-channel-deepsig201610A.py
-
-```
-</details>
-</tool-use>
 
 ---
 
@@ -4096,6 +4061,41 @@ Status: **completed**
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
 <details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/pyrightconfig.json</summary>
 
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && git ls-files configs/fastmldnn/paper/ | head -20</summary>
+
+```bash
+cd /home/citybuster/Projects/ChangShuoRadioRecognition && git ls-files configs/fastmldnn/paper/ | head -20
+```
+
+```
+configs/fastmldnn/paper/data_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/data_iq-ap-deepsig201610A.py
+configs/fastmldnn/paper/default_runtime.py
+configs/fastmldnn/paper/extract_acc_all_mean_scales.py
+configs/fastmldnn/paper/fastmldnn_abl-balance-0.1_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-balance-0.3_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-balance-0.7_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-balance-0.9_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-cross-entropy-center-loss_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-focal-loss_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-ghmc-loss_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-kl-divergence_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-last_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-logsumexp_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-max_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-mean_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-median_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-min_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-quantile_iq-ap-channel-deepsig201610A.py
+configs/fastmldnn/paper/fastmldnn_abl-merge-std_iq-ap-channel-deepsig201610A.py
+
+```
 </details>
 </tool-use>
 
@@ -4285,6 +4285,14 @@ I'm stashing uncommitted changes to pyrightconfig.json before syncing with origi
 
 ---
 
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/pyrightconfig.json</summary>
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && git diff origin/main --stat 2>/dev/null | tail -20</summary>
 
@@ -4315,14 +4323,6 @@ cd /home/citybuster/Projects/ChangShuoRadioRecognition && git diff origin/main -
  636 files changed, 61137 insertions(+), 56935 deletions(-)
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/pyrightconfig.json</summary>
-
 </details>
 </tool-use>
 
@@ -4583,6 +4583,41 @@ nothing to commit, working tree clean
 
 ---
 
+<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
+<details>
+<summary>Tool use: **ripgrep_raw_search**</summary>
+
+
+Parameters:
+
+```json
+{
+  "pattern": "fastmldnn_vis_abl-no-class-distance-expansion",
+  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper",
+  "caseInsensitive": false
+}
+```
+Additional data:
+
+```json
+{
+  "isPruned": true,
+  "pattern": "fastmldnn_vis_abl-no-class-distance-expansion",
+  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper",
+  "outputMode": "content",
+  "totalFiles": 0,
+  "totalMatches": 0,
+  "topFiles": []
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && git show origin/main:configs/fastmldnn/paper/fastmldnn_vis_abl-no-class-distance-expansion_-iq-ap-channel-deepsig201610A.py 2>/dev/null || echo "File not in remote"</summary>
 
@@ -4640,48 +4675,21 @@ lr_config = dict(
 
 ---
 
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
 
 
-Parameters:
+---
 
-```json
-{
-  "pattern": "fastmldnn_vis_abl-no-class-distance-expansion",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper",
-  "caseInsensitive": false
-}
-```
-Additional data:
 
-```json
-{
-  "isPruned": true,
-  "pattern": "fastmldnn_vis_abl-no-class-distance-expansion",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper",
-  "outputMode": "content",
-  "totalFiles": 0,
-  "totalMatches": 0,
-  "topFiles": []
-}
-```
-Status: **completed**
 
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper/fastmldnn_vis_iq-ap-channel-deepsig201610A.py</summary>
 
 </details>
 </tool-use>
-
----
-
-
-
----
-
-
-
-
 
 ---
 
@@ -4718,14 +4726,6 @@ fastmldnn_vis_abl-no-class-distance-expansion_-iq-ap-channel-deepsig201610A.py
 fastmldnn_vis_iq-ap-channel-deepsig201610A.py
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/fastmldnn/paper/fastmldnn_vis_iq-ap-channel-deepsig201610A.py</summary>
-
 </details>
 </tool-use>
 
@@ -5240,6 +5240,22 @@ Directory: **/home/citybuster/Projects/ChangShuoRadioRecognition/configs** (309 
 
 ---
 
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/_base_/datasets/doctorhe/co-doctorhe-case1-cd.py</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/docs/dataset/deepsig.md</summary>
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: ls -la /home/citybuster/Projects/ChangShuoRadioRecognition/data 2>/dev/null || echo "data dir not found"; ls -la /home/citybuster/Data/WirelessRadio/data 2>/dev/null || echo "WirelessRadio data not found"; find /home/citybuster -maxdepth 4 -type d -name "ModulationClassification" 2>/dev/null | head -5</summary>
 
@@ -5264,29 +5280,21 @@ drwxrwxr-x   6 citybuster citybuster  4096  2月 26  2024 ModulationClassificati
 
 ---
 
+
+
+---
+
+
+
+
+
+---
+
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/_base_/datasets/doctorhe/co-doctorhe-case1-cd.py</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/_base_/datasets/deepsig/iq-deepsig201610A.py</summary>
 
 </details>
 </tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/docs/dataset/deepsig.md</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
 
 ---
 
@@ -5307,14 +5315,6 @@ drwxrwxr-x 3 citybuster citybuster 4096  7月  2  2023 Hisar
 drwxrwxr-x 3 citybuster citybuster 4096  7月  2  2023 UCSD
 
 ```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/configs/_base_/datasets/deepsig/iq-deepsig201610A.py</summary>
-
 </details>
 </tool-use>
 
@@ -5802,45 +5802,6 @@ Directory: **/home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/bac
 
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
-import mmdet
-import os
-# Find resnet in mmdet
-for root, dirs, files in os.walk(os.path.dirname(mmdet.__file__)):
-    for f in files:
-        if 'resnet' in f.lower():
-            print(os.path.join(root, f))
-" 2>/dev/null | head -10</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
-import mmdet
-import os
-# Find resnet in mmdet
-for root, dirs, files in os.walk(os.path.dirname(mmdet.__file__)):
-    for f in files:
-        if 'resnet' in f.lower():
-            print(os.path.join(root, f))
-" 2>/dev/null | head -10
-```
-
-```
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/trident_resnet.py
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/resnet.py
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/detectors_resnet.py
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/trident_resnet.cpython-310.pyc
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/resnet.cpython-310.pyc
-/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/detectors_resnet.cpython-310.pyc
-/home/citybuster/Downloads/mmdetection/mmdet/models/necks/ct_resnet_neck.py
-/home/citybuster/Downloads/mmdetection/mmdet/models/necks/__pycache__/ct_resnet_neck.cpython-310.pyc
-
-```
-</details>
-</tool-use>
-
----
-
 <tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
 <details>
 <summary>Tool use: **ripgrep_raw_search**</summary>
@@ -5880,6 +5841,45 @@ Additional data:
 Status: **completed**
 
 
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
+import mmdet
+import os
+# Find resnet in mmdet
+for root, dirs, files in os.walk(os.path.dirname(mmdet.__file__)):
+    for f in files:
+        if 'resnet' in f.lower():
+            print(os.path.join(root, f))
+" 2>/dev/null | head -10</summary>
+
+```bash
+cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
+import mmdet
+import os
+# Find resnet in mmdet
+for root, dirs, files in os.walk(os.path.dirname(mmdet.__file__)):
+    for f in files:
+        if 'resnet' in f.lower():
+            print(os.path.join(root, f))
+" 2>/dev/null | head -10
+```
+
+```
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/trident_resnet.py
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/resnet.py
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/detectors_resnet.py
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/trident_resnet.cpython-310.pyc
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/resnet.cpython-310.pyc
+/home/citybuster/Downloads/mmdetection/mmdet/models/backbones/__pycache__/detectors_resnet.cpython-310.pyc
+/home/citybuster/Downloads/mmdetection/mmdet/models/necks/ct_resnet_neck.py
+/home/citybuster/Downloads/mmdetection/mmdet/models/necks/__pycache__/ct_resnet_neck.cpython-310.pyc
+
+```
 </details>
 </tool-use>
 
@@ -6283,6 +6283,14 @@ ModuleNotFoundError: No module named 'csrr.models.backbones.vision_transformer'
 
 ---
 
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/mae_neck.py</summary>
+
+</details>
+</tool-use>
+
+---
+
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
 <details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
 import pkgutil
@@ -6318,21 +6326,21 @@ for pkg in [mmdet, mmcls]:
 
 ---
 
+
+
+---
+
+
+
+
+
+---
+
 <tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/mae_neck.py</summary>
+<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/__init__.py</summary>
 
 </details>
 </tool-use>
-
----
-
-
-
----
-
-
-
-
 
 ---
 
@@ -6366,14 +6374,6 @@ pip list 2>/dev/null | grep -i mmselfsup; find /home/citybuster/Applications/con
 
 ---
 
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
 
 
 ---
@@ -6381,17 +6381,6 @@ pip list 2>/dev/null | grep -i mmselfsup; find /home/citybuster/Applications/con
 
 
 
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: find /home/citybuster/Downloads/mmdetection /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition -path "*backbones*" -name "*.py" 2>/dev/null | xargs grep -l "TransformerEncoderLayer" 2>/dev/null | head -5</summary>
-
-```bash
-find /home/citybuster/Downloads/mmdetection /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition -path "*backbones*" -name "*.py" 2>/dev/null | xargs grep -l "TransformerEncoderLayer" 2>/dev/null | head -5
-```
-</details>
-</tool-use>
 
 ---
 
@@ -6467,6 +6456,17 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: find /home/citybuster/Downloads/mmdetection /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition -path "*backbones*" -name "*.py" 2>/dev/null | xargs grep -l "TransformerEncoderLayer" 2>/dev/null | head -5</summary>
+
+```bash
+find /home/citybuster/Downloads/mmdetection /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition -path "*backbones*" -name "*.py" 2>/dev/null | xargs grep -l "TransformerEncoderLayer" 2>/dev/null | head -5
+```
+</details>
+</tool-use>
+
+---
+
 
 
 ---
@@ -6533,1618 +6533,23 @@ Error fetching URL, status code: 404
 
 ---
 
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && pip list | grep -i mm</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && pip list | grep -i mm
-```
-
-```
-mmcv                         2.2.0       /home/citybuster/Downloads/mmcv
-mmdet                        3.3.0       /home/citybuster/Downloads/mmdetection
-mmengine                     0.10.4
-mmengine-lite                0.10.4      /home/citybuster/Downloads/mmengine
-smmap                        5.0.1
-
-```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
-
-
-Parameters:
-
-```json
-{
-  "pattern": "vision_transformer|TransformerEncoderLayer",
-  "path": "/home/citybuster/Downloads/mmdetection",
-  "caseInsensitive": false
-}
-```
-Additional data:
-
-```json
-{
-  "isPruned": true,
-  "pattern": "vision_transformer|TransformerEncoderLayer",
-  "path": "/home/citybuster/Downloads/mmdetection",
-  "outputMode": "content",
-  "totalFiles": 19,
-  "totalMatches": 36,
-  "topFiles": [
-    {
-      "uri": "../../Downloads/mmdetection/tests/test_models/test_layers/test_plugins.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "../../Downloads/mmdetection/tests/test_models/test_layers/test_transformer.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/projects/example_largemodel/fsdp_utils.py",
-      "matchCount": 3
-    },
-    {
-      "uri": "../../Downloads/mmdetection/projects/XDecoder/xdecoder/pixel_decoder.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "../../Downloads/mmdetection/projects/XDecoder/xdecoder/transformer_blocks.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/__init__.py",
-      "matchCount": 4
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/transformer/dab_detr_layers.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/transformer/detr_layers.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/transformer/__init__.py",
-      "matchCount": 4
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/transformer/deformable_detr_layers.py",
-      "matchCount": 3
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/models/layers/transformer/grounding_dino_layers.py",
-      "matchCount": 4
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/configs/detr/detr_r50_8xb2_150e_coco.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/configs/maskformer/maskformer_r50_ms_16xb1_75e_coco.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/mmdet/configs/deformable_detr/deformable_detr_r50_16xb2_50e_coco.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/configs/maskformer/maskformer_r50_ms-16xb1-75e_coco.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/configs/mask2former_vis/mask2former_r50_8xb2-8e_youtubevis2019.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/configs/mask2former/mask2former_r50_8xb2-lsj-50e_coco-panoptic.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/configs/detr/detr_r50_8xb2-150e_coco.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "../../Downloads/mmdetection/configs/deformable_detr/deformable-detr_r50_16xb2-50e_coco.py",
-      "matchCount": 1
-    }
-  ]
-}
-```
-Status: **completed**
-
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-改为延迟导入有依赖的 necks，使 CNN2 能在无 mmselfsup 时运行：
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && mim install mmselfsup 2>&1 | tail -20</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && mim install mmselfsup 2>&1 | tail -20
-```
-
-```
-Requirement already satisfied: model-index in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from modelindex-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (0.1.11)
-Requirement already satisfied: markdown-it-py&gt;=2.2.0 in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from rich-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (3.0.0)
-Requirement already satisfied: pygments&lt;3.0.0,&gt;=2.13.0 in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from rich-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (2.18.0)
-Requirement already satisfied: mdurl~=0.1 in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from markdown-it-py&gt;=2.2.0-&gt;rich-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (0.1.2)
-Requirement already satisfied: pyyaml in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from model-index-&gt;modelindex-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (6.0.1)
-Requirement already satisfied: ordered-set in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from model-index-&gt;modelindex-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (4.1.0)
-Requirement already satisfied: click in /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages (from model-index-&gt;modelindex-&gt;mmcls&lt;1.1.0,&gt;=1.0.0rc6-&gt;mmselfsup) (8.1.7)
-Downloading mmselfsup-1.0.0-py3-none-any.whl (422 kB)
-Downloading mmcls-1.0.0rc6-py2.py3-none-any.whl (906 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 906.1/906.1 kB 10.9 MB/s eta 0:00:00
-
-Using cached future-1.0.0-py3-none-any.whl (491 kB)
-Installing collected packages: future, mmcls, mmselfsup
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-mmcls 1.0.0rc6 requires mmcv&lt;=2.1.0,&gt;=2.0.0rc4; extra == "mim", but you have mmcv 2.2.0 which is incompatible.
-mmselfsup 1.0.0 requires mmcv&lt;2.1.0,&gt;=2.0.0rc4; extra == "mim", but you have mmcv 2.2.0 which is incompatible.
-Successfully installed future-1.0.0 mmcls-1.0.0rc6 mmselfsup-1.0.0
-
-[notice] A new release of pip is available: 24.3.1 -&gt; 26.0.1
-[notice] To update, run: pip install --upgrade pip
-
-```
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
-from mmselfsup.models.backbones import vision_transformer
-print(dir(vision_transformer))
-print(hasattr(vision_transformer, 'TransformerEncoderLayer'))
-" 2>&1</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python -c "
-from mmselfsup.models.backbones import vision_transformer
-print(dir(vision_transformer))
-print(hasattr(vision_transformer, 'TransformerEncoderLayer'))
-" 2>&1
-```
-
-```
-Traceback (most recent call last):
-  File "&lt;string&gt;", line 2, in &lt;module&gt;
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmselfsup/__init__.py", line 2, in &lt;module&gt;
-    import mmcls
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmcls/__init__.py", line 18, in &lt;module&gt;
-    and mmcv_version &lt; digit_version(mmcv_maximum_version)), \
-AssertionError: MMCV==2.2.0 is used but incompatible. Please install mmcv&gt;=2.0.0rc4, &lt;2.1.0.
-
-```
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && pip uninstall mmselfsup mmcls -y 2>&1</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && pip uninstall mmselfsup mmcls -y 2>&1
-```
-
-```
-Found existing installation: mmselfsup 1.0.0
-Uninstalling mmselfsup-1.0.0:
-  Successfully uninstalled mmselfsup-1.0.0
-Found existing installation: mmcls 1.0.0rc6
-Uninstalling mmcls-1.0.0rc6:
-  Successfully uninstalled mmcls-1.0.0rc6
-
-```
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="web_fetch">
-<details>
-<summary>Tool use: **web_fetch**</summary>
-
-
-Parameters:
-
-```json
-{
-  "url": "https://raw.githubusercontent.com/open-mmlab/mmselfsup/main/mmselfsup/models/utils/transformer_blocks.py"
-}
-```
-Result:
-
-```json
-{
-  "url": "https://raw.githubusercontent.com/open-mmlab/mmselfsup/main/mmselfsup/models/utils/transformer_blocks.py",
-  "markdown": "# Copyright (c) OpenMMLab. All rights reserved.\nfrom typing import List, Optional, Sequence, Union\n\nimport torch\nimport torch.nn as nn\nfrom mmcls.models.backbones.vision_transformer import \\\n TransformerEncoderLayer as _TransformerEncoderLayer\nfrom mmcls.models.utils import MultiheadAttention as _MultiheadAttention\nfrom mmcv.cnn import build_norm_layer\nfrom mmcv.cnn.bricks.drop import build_dropout\nfrom mmcv.cnn.bricks.transformer import FFN\nfrom mmengine.model import BaseModule\nfrom torch.nn import functional as F\n\n\nclass PromptMultiheadAttention(_MultiheadAttention):\n \"\"\"Prompt Multihead Attention for MILAN.\n\n This module is specific for the prompt encoder in MILAN. It will not update\n the visible tokens from the encoder.\n\n Args:\n embed_dims (int): The embedding dimension.\n num_heads (int): Parallel attention heads.\n input_dims (int, optional): The input dimension, and if None,\n use &#96;&#96;embed_dims&#96;&#96;. Defaults to None.\n attn_drop (float): Dropout rate of the dropout layer after the\n attention calculation of query and key. Defaults to 0.\n proj_drop (float): Dropout rate of the dropout layer after the\n output projection. Defaults to 0.\n dropout_layer (dict): The dropout config before adding the shortcut.\n Defaults to &#96;&#96;dict(type='Dropout', drop_prob=0.)&#96;&#96;.\n qkv_bias (bool): If True, add a learnable bias to q, k, v.\n Defaults to True.\n qk_scale (float, optional): Override default qk scale of\n &#96;&#96;head_dim ** -0.5&#96;&#96; if set. Defaults to None.\n proj_bias (bool) If True, add a learnable bias to output projection.\n Defaults to True.\n v_shortcut (bool): Add a shortcut from value to output. It's usually\n used if &#96;&#96;input_dims&#96;&#96; is different from &#96;&#96;embed_dims&#96;&#96;.\n Defaults to False.\n return_attention (bool): If True, return the attention map, computed by\n the cross attention between the class token and all other tokens.\n Defaults to False.\n init_cfg (Union[List[dict], dict], optional): The Config for\n initialization. Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int,\n input_dims: Optional[int] = None,\n attn_drop: float = 0,\n proj_drop: float = 0,\n dropout_layer: dict = dict(type='Dropout', drop_prob=0.),\n qkv_bias: bool = True,\n qk_scale: Optional[float] = None,\n proj_bias: bool = True,\n v_shortcut: bool = False,\n use_layer_scale: bool = False,\n init_cfg: Optional[Union[List[dict], dict]] = None) -&gt; None:\n super().__init__(embed_dims, num_heads, input_dims, attn_drop,\n proj_drop, dropout_layer, qkv_bias, qk_scale,\n proj_bias, v_shortcut, use_layer_scale, init_cfg)\n # no longer need qkv\n del self.qkv\n\n # to project the mask tokens\n self.q = nn.Linear(embed_dims, embed_dims, bias=qkv_bias)\n # to project al the tokens\n self.kv = nn.Linear(embed_dims, embed_dims * 2, bias=qkv_bias)\n\n def forward(self, x: torch.Tensor, visible_tokens: torch.Tensor,\n ids_restore: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function for &#96;PromptMultiheadAttention&#96;.\n\n Args:\n x (torch.Tensor): Mask token features with shape N x L_m x C.\n visible_tokens (torch.Tensor): The visible tokens features from\n encoder with shape N x L_v x C.\n ids_restore (torch.Tensor): The ids of all tokens in the original\n image with shape N x L.\n\n Returns:\n torch Tensor: Output features with shape N x L x C.\n \"\"\"\n x_ = torch.cat([visible_tokens[:, 1:, :], x], dim=1)\n assert x_.shape[1] == ids_restore.shape[1]\n x_ = torch.gather(\n x_,\n dim=1,\n index=ids_restore.unsqueeze(-1).repeat(1, 1, x.shape[-1]))\n x_ = torch.cat([visible_tokens[:, :1, :], x_], dim=1)\n\n # full sequence shape\n B, _, _ = x_.shape\n q = self.q(x).reshape(B, x.shape[1], self.num_heads,\n self.head_dims).permute(0, 2, 1, 3)\n kv = self.kv(x_).reshape(B, x_.shape[1], 2, self.num_heads,\n self.head_dims).permute(2, 0, 3, 1, 4)\n k, v = kv[0], kv[1]\n\n attn = (q @ k.transpose(-2, -1)) * self.scale\n attn = attn.softmax(dim=-1)\n attn = self.attn_drop(attn)\n\n x = (attn @ v).transpose(1, 2).reshape(B, x.shape[1], self.embed_dims)\n x = self.proj(x)\n x = self.out_drop(self.gamma1(self.proj_drop(x)))\n return x\n\n\nclass PromptTransformerEncoderLayer(_TransformerEncoderLayer):\n \"\"\"Prompt Transformer Encoder Layer for MILAN.\n\n This module is specific for the prompt encoder in MILAN. It will not update\n the visible tokens from the encoder.\n\n Args:\n embed_dims (int): The feature dimension.\n num_heads (int): Parallel attention heads.\n feedforward_channels (int): The hidden dimension for FFNs.\n drop_rate (float): Probability of an element to be zeroed\n after the feed forward layer. Defaults to 0.0.\n attn_drop_rate (float): The drop out rate for attention layer.\n Defaults to 0.0.\n drop_path_rate (float): Stochastic depth rate. Defaults to 0.0.\n num_fcs (int): The number of fully-connected layers for FFNs.\n Defaults to 2.\n qkv_bias (bool): Enable bias for qkv if True. Defaults to True.\n act_cfg (dict): The activation config for FFNs.\n Defaluts to &#96;&#96;dict(type='GELU')&#96;&#96;.\n norm_cfg (dict): Config dict for normalization layer.\n Defaults to &#96;&#96;dict(type='LN')&#96;&#96;.\n batch_first (bool): Key, Query and Value are shape of\n (batch, n, embed_dim)\n or (n, batch, embed_dim). Defaults to False.\n init_cfg (dict, optional): The Config for initialization.\n Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int,\n feedforward_channels=int,\n drop_rate: float = 0.,\n attn_drop_rate: float = 0.,\n drop_path_rate: float = 0.,\n num_fcs: int = 2,\n qkv_bias: bool = True,\n act_cfg: dict = dict(type='GELU'),\n norm_cfg: dict = dict(type='LN'),\n init_cfg: Optional[Union[List[dict], dict]] = None) -&gt; None:\n super().__init__(\n embed_dims=embed_dims,\n num_heads=num_heads,\n feedforward_channels=feedforward_channels,\n drop_rate=drop_rate,\n attn_drop_rate=attn_drop_rate,\n drop_path_rate=drop_path_rate,\n num_fcs=num_fcs,\n qkv_bias=qkv_bias,\n act_cfg=act_cfg,\n norm_cfg=norm_cfg,\n init_cfg=init_cfg)\n self.attn = PromptMultiheadAttention(\n embed_dims=embed_dims,\n num_heads=num_heads,\n attn_drop=attn_drop_rate,\n proj_drop=drop_rate,\n dropout_layer=dict(type='DropPath', drop_prob=drop_path_rate),\n qkv_bias=qkv_bias)\n\n def forward(self, x: torch.Tensor, visible_tokens: torch.Tensor,\n ids_restore: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function for &#96;PromptMultiheadAttention&#96;.\n\n Args:\n x (torch.Tensor): Mask token features with shape N x L_m x C.\n visible_tokens (torch.Tensor): The visible tokens features from\n encoder with shape N x L_v x C.\n ids_restore (torch.Tensor): The ids of all tokens in the original\n image with shape N x L.\n\n Returns:\n torch Tensor: Output features with shape N x L x C.\n \"\"\"\n x = x + self.attn(self.norm1(x), visible_tokens, ids_restore)\n x = self.ffn(self.norm2(x), identity=x)\n return x\n\n\nclass MultiheadAttention(_MultiheadAttention):\n \"\"\"Multi-head Attention Module.\n\n This module rewrite the MultiheadAttention by replacing qkv bias with\n customized qkv bias, in addition to removing the drop path layer.\n\n Args:\n embed_dims (int): The embedding dimension.\n num_heads (int): Parallel attention heads.\n input_dims (int, optional): The input dimension, and if None,\n use &#96;&#96;embed_dims&#96;&#96;. Defaults to None.\n attn_drop (float): Dropout rate of the dropout layer after the\n attention calculation of query and key. Defaults to 0.\n proj_drop (float): Dropout rate of the dropout layer after the\n output projection. Defaults to 0.\n dropout_layer (dict): The dropout config before adding the shortcut.\n Defaults to &#96;&#96;dict(type='Dropout', drop_prob=0.)&#96;&#96;.\n qkv_bias (bool): If True, add a learnable bias to q, k, v.\n Defaults to True.\n qk_scale (float, optional): Override default qk scale of\n &#96;&#96;head_dim ** -0.5&#96;&#96; if set. Defaults to None.\n proj_bias (bool) If True, add a learnable bias to output projection.\n Defaults to True.\n init_cfg (dict, optional): The Config for initialization.\n Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int,\n input_dims: int = None,\n attn_drop: float = 0.,\n proj_drop: float = 0.,\n qkv_bias: bool = True,\n qk_scale: float = None,\n proj_bias: bool = True,\n init_cfg: dict = None) -&gt; None:\n super(MultiheadAttention, self).__init__(\n embed_dims,\n num_heads=num_heads,\n input_dims=input_dims,\n attn_drop=attn_drop,\n proj_drop=proj_drop,\n qkv_bias=qkv_bias,\n qk_scale=qk_scale,\n proj_bias=proj_bias,\n init_cfg=init_cfg)\n\n self.qkv_bias = qkv_bias\n\n if not self.qkv_bias:\n self._init_qv_bias()\n\n self.qkv = nn.Linear(\n self.input_dims, embed_dims * 3, bias=self.qkv_bias)\n\n def _init_qv_bias(self):\n self.q_bias = nn.Parameter(torch.zeros(self.embed_dims))\n self.v_bias = nn.Parameter(torch.zeros(self.embed_dims))\n\n def forward(self, x: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function.\"\"\"\n # qkv bias is different from that in mmcls\n B, N, _ = x.shape\n\n if not self.qkv_bias:\n k_bias = torch.zeros_like(self.v_bias, requires_grad=False)\n qkv_bias = torch.cat((self.q_bias, k_bias, self.v_bias))\n qkv = F.linear(x, weight=self.qkv.weight, bias=qkv_bias)\n else:\n qkv = self.qkv(x)\n\n qkv = qkv.reshape(B, N, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)\n q, k, v = qkv[0], qkv[1], qkv[2]\n\n attn = (q @ k.transpose(-2, -1)) * self.scale\n attn = attn.softmax(dim=-1)\n attn = self.attn_drop(attn)\n\n x = (attn @ v).transpose(1, 2).reshape(B, N, self.embed_dims)\n x = self.proj(x)\n x = self.proj_drop(x)\n\n return x\n\n\nclass MultiheadAttentionWithRPE(MultiheadAttention):\n \"\"\"Multi-head Attention Module.\n\n This module rewrite the MultiheadAttention in MMSelfSup by adding the\n relative position bias.\n\n Args:\n embed_dims (int): The embedding dimension.\n num_heads (int): Parallel attention heads.\n window_size (int): The window size of the relative position bias.\n input_dims (int, optional): The input dimension, and if None,\n use &#96;&#96;embed_dims&#96;&#96;. Defaults to None.\n attn_drop (float): Dropout rate of the dropout layer after the\n attention calculation of query and key. Defaults to 0.\n proj_drop (float): Dropout rate of the dropout layer after the\n output projection. Defaults to 0.\n dropout_layer (dict): The dropout config before adding the shortcut.\n Defaults to &#96;&#96;dict(type='Dropout', drop_prob=0.)&#96;&#96;.\n qkv_bias (bool): If True, add a learnable bias to q, k, v.\n Defaults to True.\n qk_scale (float, optional): Override default qk scale of\n &#96;&#96;head_dim ** -0.5&#96;&#96; if set. Defaults to None.\n proj_bias (bool) If True, add a learnable bias to output projection.\n Defaults to True.\n init_cfg (dict, optional): The Config for initialization.\n Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int,\n window_size: int,\n input_dims: int = None,\n attn_drop: float = 0,\n proj_drop: float = 0,\n qkv_bias: bool = True,\n qk_scale: float = None,\n proj_bias: bool = True,\n init_cfg: dict = None) -&gt; None:\n super().__init__(\n embed_dims=embed_dims,\n num_heads=num_heads,\n input_dims=input_dims,\n attn_drop=attn_drop,\n proj_drop=proj_drop,\n qkv_bias=qkv_bias,\n qk_scale=qk_scale,\n proj_bias=proj_bias,\n init_cfg=init_cfg)\n\n self.qkv = nn.Linear(self.input_dims, embed_dims * 3, bias=False)\n if qkv_bias:\n self.q_bias = nn.Parameter(torch.zeros(embed_dims))\n self.v_bias = nn.Parameter(torch.zeros(embed_dims))\n else:\n self.q_bias = None\n self.k_bias = None\n self.v_bias = None\n\n assert isinstance(window_size, Sequence)\n self.window_size = window_size\n self.num_relative_distance = (2 * window_size[0] -\n 1) * (2 * window_size[1] - 1) + 3\n # relative_position_bias_table shape is (2*Wh-1 * 2*Ww-1 + 3, nH)\n self.relative_position_bias_table = nn.Parameter(\n torch.zeros(self.num_relative_distance, num_heads))\n\n # get pair-wise relative position index for\n # each token inside the window\n coords_h = torch.arange(window_size[0])\n coords_w = torch.arange(window_size[1])\n # coords shape is (2, Wh, Ww)\n coords = torch.stack(torch.meshgrid([coords_h, coords_w]))\n # coords_flatten shape is (2, Wh*Ww)\n coords_flatten = torch.flatten(coords, 1)\n relative_coords = (\n coords_flatten[:, :, None] - coords_flatten[:, None, :])\n # relative_coords shape is (Wh*Ww, Wh*Ww, 2)\n relative_coords = relative_coords.permute(1, 2, 0).contiguous()\n # shift to start from 0\n relative_coords[:, :, 0] += window_size[0] - 1\n relative_coords[:, :, 1] += window_size[1] - 1\n relative_coords[:, :, 0] *= 2 * window_size[1] - 1\n relative_position_index = torch.zeros(\n size=(window_size[0] * window_size[1] + 1, ) * 2,\n dtype=relative_coords.dtype)\n\n # relative_position_index shape is (Wh*Ww, Wh*Ww)\n relative_position_index[1:, 1:] = relative_coords.sum(-1)\n relative_position_index[0, 0:] = self.num_relative_distance - 3\n relative_position_index[0:, 0] = self.num_relative_distance - 2\n relative_position_index[0, 0] = self.num_relative_distance - 1\n\n self.register_buffer('relative_position_index',\n relative_position_index)\n\n def forward(self, x: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function.\"\"\"\n qkv_bias = None\n if self.q_bias is not None:\n qkv_bias = torch.cat(\n (self.q_bias,\n torch.zeros_like(self.v_bias,\n requires_grad=False), self.v_bias))\n B, N, _ = x.shape\n qkv = F.linear(\n x, weight=self.qkv.weight,\n bias=qkv_bias).reshape(B, N, 3, self.num_heads,\n self.head_dims).permute(2, 0, 3, 1, 4)\n q, k, v = qkv[0], qkv[1], qkv[2]\n\n q = q * self.scale\n attn = (q @ k.transpose(-2, -1))\n\n if self.relative_position_bias_table is not None:\n relative_position_bias = \\\n self.relative_position_bias_table[\n self.relative_position_index.view(-1)].view(\n self.window_size[0] * self.window_size[1] + 1,\n self.window_size[0] * self.window_size[1] + 1, -1)\n relative_position_bias = relative_position_bias.permute(\n 2, 0, 1).contiguous() # nH, Wh*Ww, Wh*Ww\n attn = attn + relative_position_bias.unsqueeze(0)\n\n attn = attn.softmax(dim=-1)\n attn = self.attn_drop(attn)\n\n x = (attn @ v).transpose(1, 2).reshape(B, N, self.embed_dims)\n x = self.proj(x)\n x = self.proj_drop(x)\n return x\n\n\nclass TransformerEncoderLayer(_TransformerEncoderLayer):\n \"\"\"Implements one encoder layer in Vision Transformer.\n\n This module is the rewritten version of the TransformerEncoderLayer in\n MMClassification by adding the gamma and relative position bias in\n Attention module.\n\n Args:\n embed_dims (int): The feature dimension.\n num_heads (int): Parallel attention heads\n feedforward_channels (int): The hidden dimension for FFNs\n drop_rate (float): Probability of an element to be zeroed\n after the feed forward layer. Defaults to 0.\n attn_drop_rate (float): The drop out rate for attention output weights.\n Defaults to 0.\n drop_path_rate (float): Stochastic depth rate. Defaults to 0.\n num_fcs (int): The number of fully-connected layers for FFNs.\n Defaults to 2.\n qkv_bias (bool): enable bias for qkv if True. Defaults to True.\n act_cfg (dict): The activation config for FFNs.\n Defaluts to &#96;&#96;dict(type='GELU')&#96;&#96;.\n norm_cfg (dict): Config dict for normalization layer.\n Defaults to &#96;&#96;dict(type='LN')&#96;&#96;.\n init_values (float): The init values of gamma. Defaults to 0.0.\n init_cfg (dict, optional): Initialization config dict.\n Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int,\n feedforward_channels: int,\n window_size: int = None,\n drop_rate: float = 0.,\n attn_drop_rate: float = 0.,\n drop_path_rate: float = 0.,\n num_fcs: int = 2,\n qkv_bias: bool = True,\n act_cfg: dict = dict(type='GELU'),\n norm_cfg: dict = dict(type='LN'),\n init_values: float = 0.0,\n init_cfg: dict = None) -&gt; None:\n super(TransformerEncoderLayer, self).__init__(\n embed_dims=embed_dims,\n num_heads=num_heads,\n feedforward_channels=feedforward_channels,\n drop_rate=drop_rate,\n attn_drop_rate=attn_drop_rate,\n drop_path_rate=drop_path_rate,\n num_fcs=num_fcs,\n qkv_bias=qkv_bias,\n act_cfg=act_cfg,\n norm_cfg=norm_cfg,\n init_cfg=init_cfg)\n self.embed_dims = embed_dims\n\n self.norm1_name, norm1 = build_norm_layer(\n norm_cfg, self.embed_dims, postfix=1)\n self.add_module(self.norm1_name, norm1)\n if window_size is None:\n # attention without relative position bias\n self.attn = MultiheadAttention(\n embed_dims=embed_dims,\n num_heads=num_heads,\n attn_drop=attn_drop_rate,\n proj_drop=drop_rate,\n qkv_bias=qkv_bias)\n else:\n # attention with relative position bias\n self.attn = MultiheadAttentionWithRPE(\n embed_dims=embed_dims,\n num_heads=num_heads,\n window_size=window_size,\n attn_drop=attn_drop_rate,\n proj_drop=drop_rate,\n qkv_bias=qkv_bias)\n\n self.norm2_name, norm2 = build_norm_layer(\n norm_cfg, self.embed_dims, postfix=2)\n self.add_module(self.norm2_name, norm2)\n\n self.ffn = FFN(\n embed_dims=embed_dims,\n feedforward_channels=feedforward_channels,\n num_fcs=num_fcs,\n ffn_drop=drop_rate,\n dropout_layer=None,\n act_cfg=act_cfg,\n add_identity=False)\n\n self.drop_path = build_dropout(\n dict(type='DropPath', drop_prob=drop_path_rate))\n\n if init_values &gt; 0:\n self.gamma_1 = nn.Parameter(\n init_values * torch.ones((embed_dims)), requires_grad=True)\n self.gamma_2 = nn.Parameter(\n init_values * torch.ones((embed_dims)), requires_grad=True)\n else:\n self.gamma_1, self.gamma_2 = None, None\n\n def forward(self, x: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function.\"\"\"\n if self.gamma_1 is not None:\n x = x + self.drop_path(self.gamma_1 * self.attn(self.norm1(x)))\n x = x + self.drop_path(self.gamma_2 * self.ffn(self.norm2(x)))\n else:\n x = x + self.drop_path(self.attn(self.norm1(x)))\n x = x + self.drop_path(self.ffn(self.norm2(x)))\n return x\n\n\nclass CAETransformerRegressorLayer(BaseModule):\n \"\"\"Transformer layer for the regressor of CAE.\n\n This module is different from conventional transformer encoder layer, for\n its queries are the masked tokens, but its keys and values are the\n concatenation of the masked and unmasked tokens.\n\n Args:\n embed_dims (int): The feature dimension.\n num_heads (int): The number of heads in multi-head attention.\n feedforward_channels (int): The hidden dimension of FFNs.\n Defaults: 1024.\n num_fcs (int, optional): The number of fully-connected layers in\n FFNs. Default: 2.\n qkv_bias (bool): If True, add a learnable bias to q, k, v.\n Defaults to True.\n qk_scale (float, optional): Override default qk scale of\n &#96;&#96;head_dim ** -0.5&#96;&#96; if set. Defaults to None.\n drop_rate (float): The dropout rate. Defaults to 0.0.\n attn_drop_rate (float): The drop out rate for attention output weights.\n Defaults to 0.\n drop_path_rate (float): Stochastic depth rate. Defaults to 0.\n init_values (float): The init values of gamma. Defaults to 0.0.\n act_cfg (dict): The activation config for FFNs.\n Defaluts to &#96;&#96;dict(type='GELU')&#96;&#96;.\n norm_cfg (dict): Config dict for normalization layer.\n Defaults to &#96;&#96;dict(type='LN')&#96;&#96;.\n \"\"\"\n\n def __init__(\n self,\n embed_dims: int,\n num_heads: int,\n feedforward_channels: int,\n num_fcs: int = 2,\n qkv_bias: bool = False,\n qk_scale: float = None,\n drop_rate: float = 0.,\n attn_drop_rate: float = 0.,\n drop_path_rate: float = 0.,\n init_values: float = 0.0,\n act_cfg: dict = dict(type='GELU'),\n norm_cfg: dict = dict(type='LN', eps=1e-6)\n ) -&gt; None:\n super().__init__()\n\n # NOTE: cross attention\n _, self.norm1_q_cross = build_norm_layer(\n norm_cfg, embed_dims, postfix=2)\n _, self.norm1_k_cross = build_norm_layer(\n norm_cfg, embed_dims, postfix=2)\n _, self.norm1_v_cross = build_norm_layer(\n norm_cfg, embed_dims, postfix=2)\n _, self.norm2_cross = build_norm_layer(norm_cfg, embed_dims, postfix=2)\n self.cross_attn = CrossMultiheadAttention(\n embed_dims,\n num_heads=num_heads,\n qkv_bias=qkv_bias,\n qk_scale=qk_scale,\n attn_drop=attn_drop_rate,\n proj_drop=drop_rate)\n\n self.ffn = FFN(\n embed_dims=embed_dims,\n feedforward_channels=feedforward_channels,\n num_fcs=num_fcs,\n ffn_drop=drop_rate,\n dropout_layer=None,\n act_cfg=act_cfg,\n add_identity=False)\n\n self.drop_path = build_dropout(\n dict(type='DropPath', drop_prob=drop_path_rate))\n\n if init_values &gt; 0:\n self.gamma_1_cross = nn.Parameter(\n init_values * torch.ones((embed_dims)), requires_grad=True)\n self.gamma_2_cross = nn.Parameter(\n init_values * torch.ones((embed_dims)), requires_grad=True)\n else:\n self.gamma_1_cross = nn.Parameter(\n torch.ones((embed_dims)), requires_grad=False)\n self.gamma_2_cross = nn.Parameter(\n torch.ones((embed_dims)), requires_grad=False)\n\n def forward(self, x_q: torch.Tensor, x_kv: torch.Tensor,\n pos_q: torch.Tensor, pos_k: torch.Tensor) -&gt; torch.Tensor:\n \"\"\"Forward function.\"\"\"\n x = x_q + self.drop_path(self.gamma_1_cross * self.cross_attn(\n self.norm1_q_cross(x_q + pos_q),\n k=self.norm1_k_cross(x_kv + pos_k),\n v=self.norm1_v_cross(x_kv)))\n x = self.norm2_cross(x)\n x = x + self.drop_path(self.gamma_2_cross * self.ffn(x))\n\n return x\n\n\nclass CrossMultiheadAttention(BaseModule):\n \"\"\"Cross attention between queries and the union of keys and values.\n\n This module is different from &#96;&#96;MultiheadAttention&#96;&#96;, for the attention\n is computed between queries and the union of keys and values.\n\n Args:\n embed_dims (int): The embedding dimension.\n num_heads (int): Parallel attention heads.\n qkv_bias (bool): If True, add a learnable bias to q, k, v.\n Defaults to True.\n qk_scale (float, optional): Override default qk scale of\n &#96;&#96;head_dim ** -0.5&#96;&#96; if set. Defaults to None.\n attn_drop (float): Dropout rate of the dropout layer after the\n attention calculation of query and key. Defaults to 0.\n proj_drop (float): Dropout rate of the dropout layer after the\n output projection. Defaults to 0.\n \"\"\"\n\n def __init__(self,\n embed_dims: int,\n num_heads: int = 8,\n qkv_bias: bool = False,\n qk_scale: float = None,\n attn_drop: float = 0.,\n proj_drop: float = 0.) -&gt; None:\n super().__init__()\n self.num_heads = num_heads\n head_dim = embed_dims // num_heads\n self.scale = qk_scale or head_dim**-0.5\n\n self.q = nn.Linear(embed_dims, embed_dims, bias=False)\n self.k = nn.Linear(embed_dims, embed_dims, bias=False)\n self.v = nn.Linear(embed_dims, embed_dims, bias=False)\n\n if qkv_bias:\n self.q_bias = nn.Parameter(torch.zeros(embed_dims))\n self.v_bias = nn.Parameter(torch.zeros(embed_dims))\n else:\n self.q_bias = None\n self.k_bias = None\n self.v_bias = None\n\n self.attn_drop = nn.Dropout(attn_drop)\n self.proj = nn.Linear(embed_dims, embed_dims)\n self.proj_drop = nn.Dropout(proj_drop)\n\n def forward(self,\n x: torch.Tensor,\n k: torch.Tensor = None,\n v: torch.Tensor = None) -&gt; None:\n \"\"\"Forward function.\"\"\"\n B, N, _ = x.shape\n\n N_k = k.shape[1]\n N_v = v.shape[1]\n\n q_bias, k_bias, v_bias = None, None, None\n if self.q_bias is not None:\n q_bias = self.q_bias\n k_bias = torch.zeros_like(self.v_bias, requires_grad=False)\n v_bias = self.v_bias\n\n q = F.linear(\n input=x, weight=self.q.weight, bias=q_bias) # (B, N_q, dim)\n k = F.linear(\n input=k, weight=self.k.weight, bias=k_bias) # (B, N_k, dim)\n v = F.linear(input=v, weight=self.v.weight, bias=v_bias)\n\n q = q.reshape(B, N, 1, self.num_heads,\n -1).permute(2, 0, 3, 1,\n 4).squeeze(0) # (B, num_heads, N_q, dim)\n k = k.reshape(B, N_k, 1, self.num_heads,\n -1).permute(2, 0, 3, 1,\n 4).squeeze(0) # (B, num_heads, N_k, dim)\n v = v.reshape(B, N_v, 1, self.num_heads,\n -1).permute(2, 0, 3, 1,\n 4).squeeze(0) # (B, num_heads, N_v, dim)\n\n q = q * self.scale\n attn = (q @ k.transpose(-2, -1)) # (B, N_head, N_q, N_k)\n\n attn = attn.softmax(dim=-1)\n attn = self.attn_drop(attn)\n\n x = (attn @ v).transpose(1, 2).reshape(B, N, -1)\n x = self.proj(x)\n x = self.proj_drop(x)\n\n return x\n"
-}
-```
-User decision: **accepted**
-
-Status: **completed**
-
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/.cursor/projects/home-citybuster-Projects-ChangShuoRadioRecognition/agent-tools/2c5ab65b-73fc-4409-a06c-720a49cf66a1.txt</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="web_fetch">
-<details>
-<summary>Tool use: **web_fetch**</summary>
-
-
-Parameters:
-
-```json
-{
-  "url": "https://raw.githubusercontent.com/open-mmlab/mmpretrain/main/mmpretrain/models/backbones/vision_transformer.py"
-}
-```
-Result:
-
-```json
-{
-  "url": "https://raw.githubusercontent.com/open-mmlab/mmpretrain/main/mmpretrain/models/backbones/vision_transformer.py",
-  "markdown": "# Copyright (c) OpenMMLab. All rights reserved.\nfrom typing import Sequence\n\nimport numpy as np\nimport torch\nimport torch.nn as nn\nfrom mmcv.cnn.bricks.transformer import FFN, PatchEmbed\nfrom mmengine.model import BaseModule, ModuleList\nfrom mmengine.model.weight_init import trunc_normal_\n\nfrom mmpretrain.registry import MODELS\nfrom ..utils import (MultiheadAttention, SwiGLUFFNFused, build_norm_layer,\n resize_pos_embed, to_2tuple)\nfrom .base_backbone import BaseBackbone\n\n\nclass TransformerEncoderLayer(BaseModule):\n \"\"\"Implements one encoder layer in Vision Transformer.\n\n Args:\n embed_dims (int): The feature dimension\n num_heads (int): Parallel attention heads\n feedforward_channels (int): The hidden dimension for FFNs\n layer_scale_init_value (float or torch.Tensor): Init value of layer\n scale. Defaults to 0.\n drop_rate (float): Probability of an element to be zeroed\n after the feed forward layer. Defaults to 0.\n attn_drop_rate (float): The drop out rate for attention output weights.\n Defaults to 0.\n drop_path_rate (float): Stochastic depth rate. Defaults to 0.\n num_fcs (int): The number of fully-connected layers for FFNs.\n Defaults to 2.\n qkv_bias (bool): enable bias for qkv if True. Defaults to True.\n ffn_type (str): Select the type of ffn layers. Defaults to 'origin'.\n act_cfg (dict): The activation config for FFNs.\n Defaults to &#96;&#96;dict(type='GELU')&#96;&#96;.\n norm_cfg (dict): Config dict for normalization layer.\n Defaults to &#96;&#96;dict(type='LN')&#96;&#96;.\n init_cfg (dict, optional): Initialization config dict.\n Defaults to None.\n \"\"\"\n\n def __init__(self,\n embed_dims,\n num_heads,\n feedforward_channels,\n layer_scale_init_value=0.,\n drop_rate=0.,\n attn_drop_rate=0.,\n drop_path_rate=0.,\n num_fcs=2,\n qkv_bias=True,\n ffn_type='origin',\n act_cfg=dict(type='GELU'),\n norm_cfg=dict(type='LN'),\n init_cfg=None):\n super(TransformerEncoderLayer, self).__init__(init_cfg=init_cfg)\n\n self.embed_dims = embed_dims\n\n self.ln1 = build_norm_layer(norm_cfg, self.embed_dims)\n\n self.attn = MultiheadAttention(\n embed_dims=embed_dims,\n num_heads=num_heads,\n attn_drop=attn_drop_rate,\n proj_drop=drop_rate,\n dropout_layer=dict(type='DropPath', drop_prob=drop_path_rate),\n qkv_bias=qkv_bias,\n layer_scale_init_value=layer_scale_init_value)\n\n self.ln2 = build_norm_layer(norm_cfg, self.embed_dims)\n\n if ffn_type == 'origin':\n self.ffn = FFN(\n embed_dims=embed_dims,\n feedforward_channels=feedforward_channels,\n num_fcs=num_fcs,\n ffn_drop=drop_rate,\n dropout_layer=dict(type='DropPath', drop_prob=drop_path_rate),\n act_cfg=act_cfg,\n layer_scale_init_value=layer_scale_init_value)\n elif ffn_type == 'swiglu_fused':\n self.ffn = SwiGLUFFNFused(\n embed_dims=embed_dims,\n feedforward_channels=feedforward_channels,\n layer_scale_init_value=layer_scale_init_value)\n else:\n raise NotImplementedError\n\n @property\n def norm1(self):\n return self.ln1\n\n @property\n def norm2(self):\n return self.ln2\n\n def init_weights(self):\n super(TransformerEncoderLayer, self).init_weights()\n for m in self.ffn.modules():\n if isinstance(m, nn.Linear):\n nn.init.xavier_uniform_(m.weight)\n nn.init.normal_(m.bias, std=1e-6)\n\n def forward(self, x):\n x = x + self.attn(self.ln1(x))\n x = self.ffn(self.ln2(x), identity=x)\n return x\n\n\n@MODELS.register_module()\nclass VisionTransformer(BaseBackbone):\n \"\"\"Vision Transformer.\n\n A PyTorch implement of : &#96;An Image is Worth 16x16 Words: Transformers\n for Image Recognition at Scale &#96;_\n\n Args:\n arch (str | dict): Vision Transformer architecture. If use string,\n choose from 'small', 'base', 'large', 'deit-tiny', 'deit-small'\n and 'deit-base'. If use dict, it should have below keys:\n\n - **embed_dims** (int): The dimensions of embedding.\n - **num_layers** (int): The number of transformer encoder layers.\n - **num_heads** (int): The number of heads in attention modules.\n - **feedforward_channels** (int): The hidden dimensions in\n feedforward modules.\n\n Defaults to 'base'.\n img_size (int | tuple): The expected input image shape. Because we\n support dynamic input shape, just set the argument to the most\n common input image shape. Defaults to 224.\n patch_size (int | tuple): The patch size in patch embedding.\n Defaults to 16.\n in_channels (int): The num of input channels. Defaults to 3.\n out_indices (Sequence | int): Output from which stages.\n Defaults to -1, means the last stage.\n drop_rate (float): Probability of an element to be zeroed.\n Defaults to 0.\n drop_path_rate (float): stochastic depth rate. Defaults to 0.\n qkv_bias (bool): Whether to add bias for qkv in attention modules.\n Defaults to True.\n norm_cfg (dict): Config dict for normalization layer.\n Defaults to &#96;&#96;dict(type='LN')&#96;&#96;.\n final_norm (bool): Whether to add a additional layer to normalize\n final feature map. Defaults to True.\n out_type (str): The type of output features. Please choose from\n\n - &#96;&#96;\"cls_token\"&#96;&#96;: The class token tensor with shape (B, C).\n - &#96;&#96;\"featmap\"&#96;&#96;: The feature map tensor from the patch tokens\n with shape (B, C, H, W).\n - &#96;&#96;\"avg_featmap\"&#96;&#96;: The global averaged feature map tensor\n with shape (B, C).\n - &#96;&#96;\"raw\"&#96;&#96;: The raw feature tensor includes patch tokens and\n class tokens with shape (B, L, C).\n\n Defaults to &#96;&#96;\"cls_token\"&#96;&#96;.\n with_cls_token (bool): Whether concatenating class token into image\n tokens as transformer input. Defaults to True.\n frozen_stages (int): Stages to be frozen (stop grad and set eval mode).\n -1 means not freezing any parameters. Defaults to -1.\n interpolate_mode (str): Select the interpolate mode for position\n embeding vector resize. Defaults to \"bicubic\".\n layer_scale_init_value (float or torch.Tensor): Init value of layer\n scale. Defaults to 0.\n patch_cfg (dict): Configs of patch embeding. Defaults to an empty dict.\n layer_cfgs (Sequence | dict): Configs of each transformer layer in\n encoder. Defaults to an empty dict.\n init_cfg (dict, optional): Initialization config dict.\n Defaults to None.\n \"\"\"\n arch_zoo = {\n **dict.fromkeys(\n ['s', 'small'], {\n 'embed_dims': 768,\n 'num_layers': 8,\n 'num_heads': 8,\n 'feedforward_channels': 768 * 3,\n }),\n **dict.fromkeys(\n ['b', 'base'], {\n 'embed_dims': 768,\n 'num_layers': 12,\n 'num_heads': 12,\n 'feedforward_channels': 3072\n }),\n **dict.fromkeys(\n ['l', 'large'], {\n 'embed_dims': 1024,\n 'num_layers': 24,\n 'num_heads': 16,\n 'feedforward_channels': 4096\n }),\n **dict.fromkeys(\n ['h', 'huge'],\n {\n # The same as the implementation in MAE\n # \n 'embed_dims': 1280,\n 'num_layers': 32,\n 'num_heads': 16,\n 'feedforward_channels': 5120\n }),\n **dict.fromkeys(\n ['eva-g', 'eva-giant'],\n {\n # The implementation in EVA\n # \n 'embed_dims': 1408,\n 'num_layers': 40,\n 'num_heads': 16,\n 'feedforward_channels': 6144\n }),\n **dict.fromkeys(\n ['deit-t', 'deit-tiny'], {\n 'embed_dims': 192,\n 'num_layers': 12,\n 'num_heads': 3,\n 'feedforward_channels': 192 * 4\n }),\n **dict.fromkeys(\n ['deit-s', 'deit-small', 'dinov2-s', 'dinov2-small'], {\n 'embed_dims': 384,\n 'num_layers': 12,\n 'num_heads': 6,\n 'feedforward_channels': 384 * 4\n }),\n **dict.fromkeys(\n ['deit-b', 'deit-base'], {\n 'embed_dims': 768,\n 'num_layers': 12,\n 'num_heads': 12,\n 'feedforward_channels': 768 * 4\n }),\n **dict.fromkeys(\n ['dinov2-g', 'dinov2-giant'], {\n 'embed_dims': 1536,\n 'num_layers': 40,\n 'num_heads': 24,\n 'feedforward_channels': 6144\n }),\n }\n num_extra_tokens = 1 # class token\n OUT_TYPES = {'raw', 'cls_token', 'featmap', 'avg_featmap'}\n\n def __init__(self,\n arch='base',\n img_size=224,\n patch_size=16,\n in_channels=3,\n out_indices=-1,\n drop_rate=0.,\n drop_path_rate=0.,\n qkv_bias=True,\n norm_cfg=dict(type='LN', eps=1e-6),\n final_norm=True,\n out_type='cls_token',\n with_cls_token=True,\n frozen_stages=-1,\n interpolate_mode='bicubic',\n layer_scale_init_value=0.,\n patch_cfg=dict(),\n layer_cfgs=dict(),\n pre_norm=False,\n init_cfg=None):\n super(VisionTransformer, self).__init__(init_cfg)\n\n if isinstance(arch, str):\n arch = arch.lower()\n assert arch in set(self.arch_zoo), \\\n f'Arch {arch} is not in default archs {set(self.arch_zoo)}'\n self.arch_settings = self.arch_zoo[arch]\n else:\n essential_keys = {\n 'embed_dims', 'num_layers', 'num_heads', 'feedforward_channels'\n }\n assert isinstance(arch, dict) and essential_keys &lt;= set(arch), \\\n f'Custom arch needs a dict with keys {essential_keys}'\n self.arch_settings = arch\n\n self.embed_dims = self.arch_settings['embed_dims']\n self.num_layers = self.arch_settings['num_layers']\n self.img_size = to_2tuple(img_size)\n\n # Set patch embedding\n _patch_cfg = dict(\n in_channels=in_channels,\n input_size=img_size,\n embed_dims=self.embed_dims,\n conv_type='Conv2d',\n kernel_size=patch_size,\n stride=patch_size,\n bias=not pre_norm, # disable bias if pre_norm is used(e.g., CLIP)\n )\n _patch_cfg.update(patch_cfg)\n self.patch_embed = PatchEmbed(**_patch_cfg)\n self.patch_resolution = self.patch_embed.init_out_size\n num_patches = self.patch_resolution[0] * self.patch_resolution[1]\n\n # Set out type\n if out_type not in self.OUT_TYPES:\n raise ValueError(f'Unsupported &#96;out_type&#96; {out_type}, please '\n f'choose from {self.OUT_TYPES}')\n self.out_type = out_type\n\n # Set cls token\n self.with_cls_token = with_cls_token\n if with_cls_token:\n self.cls_token = nn.Parameter(torch.zeros(1, 1, self.embed_dims))\n elif out_type != 'cls_token':\n self.cls_token = None\n self.num_extra_tokens = 0\n else:\n raise ValueError(\n 'with_cls_token must be True when &#96;out_type=\"cls_token\"&#96;.')\n\n # Set position embedding\n self.interpolate_mode = interpolate_mode\n self.pos_embed = nn.Parameter(\n torch.zeros(1, num_patches + self.num_extra_tokens,\n self.embed_dims))\n self._register_load_state_dict_pre_hook(self._prepare_pos_embed)\n\n self.drop_after_pos = nn.Dropout(p=drop_rate)\n\n if isinstance(out_indices, int):\n out_indices = [out_indices]\n assert isinstance(out_indices, Sequence), \\\n f'\"out_indices\" must by a sequence or int, ' \\\n f'get {type(out_indices)} instead.'\n for i, index in enumerate(out_indices):\n if index &lt; 0:\n out_indices[i] = self.num_layers + index\n assert 0 &lt;= out_indices[i] &lt;= self.num_layers, \\\n f'Invalid out_indices {index}'\n self.out_indices = out_indices\n\n # stochastic depth decay rule\n dpr = np.linspace(0, drop_path_rate, self.num_layers)\n\n self.layers = ModuleList()\n if isinstance(layer_cfgs, dict):\n layer_cfgs = [layer_cfgs] * self.num_layers\n for i in range(self.num_layers):\n _layer_cfg = dict(\n embed_dims=self.embed_dims,\n num_heads=self.arch_settings['num_heads'],\n feedforward_channels=self.\n arch_settings['feedforward_channels'],\n layer_scale_init_value=layer_scale_init_value,\n drop_rate=drop_rate,\n drop_path_rate=dpr[i],\n qkv_bias=qkv_bias,\n norm_cfg=norm_cfg)\n _layer_cfg.update(layer_cfgs[i])\n self.layers.append(TransformerEncoderLayer(**_layer_cfg))\n\n self.frozen_stages = frozen_stages\n if pre_norm:\n self.pre_norm = build_norm_layer(norm_cfg, self.embed_dims)\n else:\n self.pre_norm = nn.Identity()\n\n self.final_norm = final_norm\n if final_norm:\n self.ln1 = build_norm_layer(norm_cfg, self.embed_dims)\n if self.out_type == 'avg_featmap':\n self.ln2 = build_norm_layer(norm_cfg, self.embed_dims)\n\n # freeze stages only when self.frozen_stages &gt; 0\n if self.frozen_stages &gt; 0:\n self._freeze_stages()\n\n @property\n def norm1(self):\n return self.ln1\n\n @property\n def norm2(self):\n return self.ln2\n\n def init_weights(self):\n super(VisionTransformer, self).init_weights()\n\n if not (isinstance(self.init_cfg, dict)\n and self.init_cfg['type'] == 'Pretrained'):\n if self.pos_embed is not None:\n trunc_normal_(self.pos_embed, std=0.02)\n\n def _prepare_pos_embed(self, state_dict, prefix, *args, **kwargs):\n name = prefix + 'pos_embed'\n if name not in state_dict.keys():\n return\n\n ckpt_pos_embed_shape = state_dict[name].shape\n if (not self.with_cls_token\n and ckpt_pos_embed_shape[1] == self.pos_embed.shape[1] + 1):\n # Remove cls token from state dict if it's not used.\n state_dict[name] = state_dict[name][:, 1:]\n ckpt_pos_embed_shape = state_dict[name].shape\n\n if self.pos_embed.shape != ckpt_pos_embed_shape:\n from mmengine.logging import MMLogger\n logger = MMLogger.get_current_instance()\n logger.info(\n f'Resize the pos_embed shape from {ckpt_pos_embed_shape} '\n f'to {self.pos_embed.shape}.')\n\n ckpt_pos_embed_shape = to_2tuple(\n int(np.sqrt(ckpt_pos_embed_shape[1] - self.num_extra_tokens)))\n pos_embed_shape = self.patch_embed.init_out_size\n\n state_dict[name] = resize_pos_embed(state_dict[name],\n ckpt_pos_embed_shape,\n pos_embed_shape,\n self.interpolate_mode,\n self.num_extra_tokens)\n\n @staticmethod\n def resize_pos_embed(*args, **kwargs):\n \"\"\"Interface for backward-compatibility.\"\"\"\n return resize_pos_embed(*args, **kwargs)\n\n def _freeze_stages(self):\n # freeze position embedding\n if self.pos_embed is not None:\n self.pos_embed.requires_grad = False\n # set dropout to eval model\n self.drop_after_pos.eval()\n # freeze patch embedding\n self.patch_embed.eval()\n for param in self.patch_embed.parameters():\n param.requires_grad = False\n # freeze pre-norm\n for param in self.pre_norm.parameters():\n param.requires_grad = False\n # freeze cls_token\n if self.cls_token is not None:\n self.cls_token.requires_grad = False\n # freeze layers\n for i in range(1, self.frozen_stages + 1):\n m = self.layers[i - 1]\n m.eval()\n for param in m.parameters():\n param.requires_grad = False\n # freeze the last layer norm\n if self.frozen_stages == len(self.layers):\n if self.final_norm:\n self.ln1.eval()\n for param in self.ln1.parameters():\n param.requires_grad = False\n\n if self.out_type == 'avg_featmap':\n self.ln2.eval()\n for param in self.ln2.parameters():\n param.requires_grad = False\n\n def forward(self, x):\n B = x.shape[0]\n x, patch_resolution = self.patch_embed(x)\n\n if self.cls_token is not None:\n # stole cls_tokens impl from Phil Wang, thanks\n cls_token = self.cls_token.expand(B, -1, -1)\n x = torch.cat((cls_token, x), dim=1)\n\n x = x + resize_pos_embed(\n self.pos_embed,\n self.patch_resolution,\n patch_resolution,\n mode=self.interpolate_mode,\n num_extra_tokens=self.num_extra_tokens)\n x = self.drop_after_pos(x)\n\n x = self.pre_norm(x)\n\n outs = []\n for i, layer in enumerate(self.layers):\n x = layer(x)\n\n if i == len(self.layers) - 1 and self.final_norm:\n x = self.ln1(x)\n\n if i in self.out_indices:\n outs.append(self._format_output(x, patch_resolution))\n\n return tuple(outs)\n\n def _format_output(self, x, hw):\n if self.out_type == 'raw':\n return x\n if self.out_type == 'cls_token':\n return x[:, 0]\n\n patch_token = x[:, self.num_extra_tokens:]\n if self.out_type == 'featmap':\n B = x.size(0)\n # (B, N, C) -&gt; (B, H, W, C) -&gt; (B, C, H, W)\n return patch_token.reshape(B, *hw, -1).permute(0, 3, 1, 2)\n if self.out_type == 'avg_featmap':\n return self.ln2(patch_token.mean(dim=1))\n\n def get_layer_depth(self, param_name: str, prefix: str = ''):\n \"\"\"Get the layer-wise depth of a parameter.\n\n Args:\n param_name (str): The name of the parameter.\n prefix (str): The prefix for the parameter.\n Defaults to an empty string.\n\n Returns:\n Tuple[int, int]: The layer-wise depth and the num of layers.\n\n Note:\n The first depth is the stem module (&#96;&#96;layer_depth=0&#96;&#96;), and the\n last depth is the subsequent module (&#96;&#96;layer_depth=num_layers-1&#96;&#96;)\n \"\"\"\n num_layers = self.num_layers + 2\n\n if not param_name.startswith(prefix):\n # For subsequent module like head\n return num_layers - 1, num_layers\n\n param_name = param_name[len(prefix):]\n\n if param_name in ('cls_token', 'pos_embed'):\n layer_depth = 0\n elif param_name.startswith('patch_embed'):\n layer_depth = 0\n elif param_name.startswith('layers'):\n layer_id = int(param_name.split('.')[1])\n layer_depth = layer_id + 1\n else:\n layer_depth = num_layers - 1\n\n return layer_depth, num_layers\n"
-}
-```
-User decision: **accepted**
-
-Status: **completed**
-
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="ripgrep_raw_search">
-<details>
-<summary>Tool use: **ripgrep_raw_search**</summary>
-
-
-Parameters:
-
-```json
-{
-  "pattern": "MultiheadAttention|FFN|build_norm_layer",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/csrr",
-  "outputMode": "content",
-  "contextAfter": 0,
-  "caseInsensitive": false
-}
-```
-Additional data:
-
-```json
-{
-  "isPruned": true,
-  "pattern": "MultiheadAttention|FFN|build_norm_layer",
-  "path": "/home/citybuster/Projects/ChangShuoRadioRecognition/csrr",
-  "outputMode": "content",
-  "totalFiles": 19,
-  "totalMatches": 81,
-  "topFiles": [
-    {
-      "uri": "csrr/models/multimodal/ofa/ofa_modules.py",
-      "matchCount": 7
-    },
-    {
-      "uri": "csrr/models/utils/swiglu_ffn.py",
-      "matchCount": 6
-    },
-    {
-      "uri": "csrr/models/utils/res_layer_extra_norm.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/utils/embed.py",
-      "matchCount": 4
-    },
-    {
-      "uri": "csrr/models/utils/norm.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "csrr/models/utils/attention.py",
-      "matchCount": 8
-    },
-    {
-      "uri": "csrr/models/utils/clip_generator_helper.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/utils/__init__.py",
-      "matchCount": 12
-    },
-    {
-      "uri": "csrr/models/selfsup/mixmim.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "csrr/models/selfsup/beit.py",
-      "matchCount": 1
-    },
-    {
-      "uri": "csrr/models/necks/mae_neck.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/necks/swav_neck.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/necks/milan_neck.py",
-      "matchCount": 6
-    },
-    {
-      "uri": "csrr/models/necks/linear_neck.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/necks/nonlinear_neck.py",
-      "matchCount": 4
-    },
-    {
-      "uri": "csrr/models/necks/beitv2_neck.py",
-      "matchCount": 3
-    },
-    {
-      "uri": "csrr/models/necks/cae_neck.py",
-      "matchCount": 14
-    },
-    {
-      "uri": "csrr/models/heads/stacked_head.py",
-      "matchCount": 2
-    },
-    {
-      "uri": "csrr/models/heads/levit_head.py",
-      "matchCount": 2
-    }
-  ]
-}
-```
-Status: **completed**
-
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/utils/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/utils/attention.py</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/necks/cae_neck.py</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/backbones/vision_transformer.py</summary>
-
-</details>
-
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/utils/norm.py</summary>
-
-</details>
-</tool-use>
-
----
-
-Path does not exist: /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmcv/cnn/bricks/transformer
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/utils/norm.py</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: python3 -c "
-from mmcv.cnn.bricks.transformer import FFN
-import inspect
-print(inspect.signature(FFN.__init__))
-# check forward
-sig = inspect.signature(FFN.forward)
-print('FFN.forward', sig)
-" 2>/dev/null || true</summary>
-
-```bash
-python3 -c "
-from mmcv.cnn.bricks.transformer import FFN
-import inspect
-print(inspect.signature(FFN.__init__))
-# check forward
-sig = inspect.signature(FFN.forward)
-print('FFN.forward', sig)
-" 2>/dev/null || true
-```
-
-```
-(self, embed_dims=256, feedforward_channels=1024, num_fcs=2, act_cfg={'type': 'ReLU', 'inplace': True}, ffn_drop=0.0, dropout_layer=None, add_identity=True, init_cfg=None, layer_scale_init_value=0.0)
-FFN.forward (self, x, identity=None)
-
-```
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/backbones/vision_transformer.py</summary>
-
-</details>
-
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/backbones/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python tools/train.py configs/cnn2/cnn2_iq-deepsig-201610A.py --cfg-options runner.max_epochs=2 train_dataloader.batch_size=64 val_dataloader.batch_size=64 train_dataloader.num_workers=2 val_dataloader.num_workers=2 --work-dir work_dirs/test_env 2>&1</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python tools/train.py configs/cnn2/cnn2_iq-deepsig-201610A.py --cfg-options runner.max_epochs=2 train_dataloader.batch_size=64 val_dataloader.batch_size=64 train_dataloader.num_workers=2 val_dataloader.num_workers=2 --work-dir work_dirs/test_env 2>&1
-```
-
-```
-03/18 14:37:25 - mmengine - INFO - 
-------------------------------------------------------------
-System environment:
-    sys.platform: linux
-    Python: 3.10.14 (main, May  6 2024, 19:42:50) [GCC 11.2.0]
-    CUDA available: True
-    MUSA available: False
-    numpy_random_seed: 0
-    GPU 0,1: NVIDIA GeForce RTX 3090
-    CUDA_HOME: /usr/local/cuda
-    NVCC: Cuda compilation tools, release 12.4, V12.4.99
-    GCC: gcc (Ubuntu 12.3.0-1ubuntu1~22.04.3) 12.3.0
-    PyTorch: 2.3.1
-    PyTorch compiling details: PyTorch built with:
-  - GCC 9.3
-  - C++ Version: 201703
-  - Intel(R) oneAPI Math Kernel Library Version 2023.1-Product Build 20230303 for Intel(R) 64 architecture applications
-  - Intel(R) MKL-DNN v3.3.6 (Git Hash 86e6af5974177e513fd3fee58425e1063e7f1361)
-  - OpenMP 201511 (a.k.a. OpenMP 4.5)
-  - LAPACK is enabled (usually provided by MKL)
-  - NNPACK is enabled
-  - CPU capability usage: AVX512
-  - CUDA Runtime 12.1
-  - NVCC architecture flags: -gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_90,code=sm_90
-  - CuDNN 8.9.2
-  - Magma 2.6.1
-  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=12.1, CUDNN_VERSION=8.9.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=pedantic -Wno-error=old-style-cast -Wno-missing-braces -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=2.3.1, USE_CUDA=ON, USE_CUDNN=ON, USE_CUSPARSELT=1, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, 
-
-    TorchVision: 0.18.1
-    OpenCV: 4.10.0
-    MMEngine: 0.10.4
-
-Runtime environment:
-    cudnn_benchmark: False
-    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
-    dist_cfg: {'backend': 'nccl'}
-    seed: 0
-    deterministic: False
-    Distributed launcher: none
-    Distributed training: False
-    GPU number: 1
-------------------------------------------------------------
-
-03/18 14:37:25 - mmengine - INFO - Config:
-custom_hooks = [
-    dict(
-        min_delta=0,
-        monitor='accuracy/top1',
-        patience=50,
-        rule='greater',
-        type='EarlyStoppingHook'),
-]
-data_root = 'data/ModulationClassification/DeepSig/RadioML.2016.10A'
-dataset_type = 'AMCDataset'
-default_hooks = dict(
-    checkpoint=dict(
-        interval=1,
-        max_keep_ckpts=1,
-        rule='greater',
-        save_best='accuracy/top1',
-        type='CheckpointHook'),
-    logger=dict(interval=50, type='LoggerHook'),
-    param_scheduler=dict(type='ParamSchedulerHook'),
-    sampler_seed=dict(type='DistSamplerSeedHook'),
-    timer=dict(type='IterTimerHook'))
-default_scope = 'csrr'
-env_cfg = dict(
-    cudnn_benchmark=False,
-    dist_cfg=dict(backend='nccl'),
-    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
-launcher = 'none'
-load_from = None
-log_level = 'INFO'
-model = dict(
-    backbone=dict(
-        init_cfg=dict(layer='Conv2d', type='Xavier'),
-        num_classes=11,
-        type='CNN2'),
-    head=dict(
-        loss=dict(loss_weight=1.0, type='CrossEntropyLoss'), type='ClsHead'),
-    type='SignalClassifier')
-optim_wrapper = dict(optimizer=dict(lr=0.001, type='Adam'))
-param_scheduler = dict(
-    factor=0.5,
-    min_value=1e-06,
-    monitor='loss/classification',
-    param_name='lr',
-    patience=5,
-    type='ReduceOnPlateauParamScheduler',
-    verbose=True)
-pipeline = [
-    dict(shapes=dict(iq=[
-        1,
-        2,
-        128,
-    ]), type='Reshape'),
-    dict(input_key='iq', type='PackInputs'),
-]
-randomness = dict(deterministic=False, seed=0)
-resume_from = None
-runner = dict(max_epochs=2)
-test_cfg = dict()
-test_dataloader = dict(
-    batch_size=400,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='test.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=True,
-        type='AMCDataset'),
-    num_workers=20,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=False, type='DefaultSampler'))
-test_evaluator = dict(topk=(1, ), type='Accuracy')
-train_cfg = dict(by_epoch=True, max_epochs=10000, val_interval=1)
-train_dataloader = dict(
-    batch_size=64,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='train.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=False,
-        type='AMCDataset'),
-    num_workers=2,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=True, type='DefaultSampler'))
-val_cfg = dict()
-val_dataloader = dict(
-    batch_size=64,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='validation.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=True,
-        type='AMCDataset'),
-    num_workers=2,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=False, type='DefaultSampler'))
-val_evaluator = [
-    dict(topk=(1, ), type='Accuracy'),
-    dict(task='classification', type='Loss'),
-]
-visualizer = dict(
-    type='Visualizer', vis_backends=[
-        dict(type='TensorboardVisBackend'),
-    ])
-work_dir = 'work_dirs/test_env'
-
-2026-03-18 14:37:26.112294: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable &#96;TF_ENABLE_ONEDNN_OPTS=0&#96;.
-2026-03-18 14:37:26.155882: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Traceback (most recent call last):
-  File "/home/citybuster/Projects/ChangShuoRadioRecognition/tools/train.py", line 159, in &lt;module&gt;
-    main()
-  File "/home/citybuster/Projects/ChangShuoRadioRecognition/tools/train.py", line 152, in main
-    runner = Runner.from_cfg(cfg)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/runner/runner.py", line 462, in from_cfg
-    runner = cls(
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/runner/runner.py", line 429, in __init__
-    self.model = self.build_model(model)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/runner/runner.py", line 836, in build_model
-    model = MODELS.build(model)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/registry/registry.py", line 570, in build
-    return self.build_func(cfg, *args, **kwargs, registry=self)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/registry/build_functions.py", line 232, in build_model_from_cfg
-    return build_from_cfg(cfg, registry, default_args)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/registry/build_functions.py", line 98, in build_from_cfg
-    obj_cls = registry.get(obj_type)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/registry/registry.py", line 451, in get
-    self.import_from_location()
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/mmengine/registry/registry.py", line 376, in import_from_location
-    import_module(loc)
-  File "/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-  File "&lt;frozen importlib._bootstrap&gt;", line 1050, in _gcd_import
-  File "&lt;frozen importlib._bootstrap&gt;", line 1027, in _find_and_load
-  File "&lt;frozen importlib._bootstrap&gt;", line 1006, in _find_and_load_unlocked
-  File "&lt;frozen importlib._bootstrap&gt;", line 688, in _load_unlocked
-  File "&lt;frozen importlib._bootstrap_external&gt;", line 883, in exec_module
-  File "&lt;frozen importlib._bootstrap&gt;", line 241, in _call_with_frames_removed
-  File "/home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/__init__.py", line 12, in &lt;module&gt;
-    from .selfsup import *  # noqa: F401,F403
-  File "/home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/selfsup/__init__.py", line 4, in &lt;module&gt;
-    from .beit import VQKD, BEiT, BEiTPretrainViT
-  File "/home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/selfsup/beit.py", line 11, in &lt;module&gt;
-    from csrr.models.backbones import BEiTViT
-ImportError: cannot import name 'BEiTViT' from 'csrr.models.backbones' (/home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/backbones/__init__.py)
-
-```
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-<tool-use data-tool-type="read" data-tool-name="read_file_v2">
-<details><summary>Tool use: **read_file_v2** • Read file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/selfsup/__init__.py</summary>
-
-</details>
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="write" data-tool-name="edit_file_v2">
-
-<details><summary>Tool use: **edit_file_v2** • Edit file: /home/citybuster/Projects/ChangShuoRadioRecognition/csrr/models/__init__.py</summary>
-
-</details>
-
-</tool-use>
-
----
-
-
-
----
-
-
-
-
-
----
-
-<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
-<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python tools/train.py configs/cnn2/cnn2_iq-deepsig-201610A.py --cfg-options runner.max_epochs=2 train_dataloader.batch_size=64 val_dataloader.batch_size=64 train_dataloader.num_workers=2 val_dataloader.num_workers=2 --work-dir work_dirs/test_env 2>&1</summary>
-
-```bash
-cd /home/citybuster/Projects/ChangShuoRadioRecognition && source /home/citybuster/Applications/conda/etc/profile.d/conda.sh && conda activate ChangShuoRadioRecognition && python tools/train.py configs/cnn2/cnn2_iq-deepsig-201610A.py --cfg-options runner.max_epochs=2 train_dataloader.batch_size=64 val_dataloader.batch_size=64 train_dataloader.num_workers=2 val_dataloader.num_workers=2 --work-dir work_dirs/test_env 2>&1
-```
-
-```
-03/18 14:37:42 - mmengine - INFO - 
-------------------------------------------------------------
-System environment:
-    sys.platform: linux
-    Python: 3.10.14 (main, May  6 2024, 19:42:50) [GCC 11.2.0]
-    CUDA available: True
-    MUSA available: False
-    numpy_random_seed: 0
-    GPU 0,1: NVIDIA GeForce RTX 3090
-    CUDA_HOME: /usr/local/cuda
-    NVCC: Cuda compilation tools, release 12.4, V12.4.99
-    GCC: gcc (Ubuntu 12.3.0-1ubuntu1~22.04.3) 12.3.0
-    PyTorch: 2.3.1
-    PyTorch compiling details: PyTorch built with:
-  - GCC 9.3
-  - C++ Version: 201703
-  - Intel(R) oneAPI Math Kernel Library Version 2023.1-Product Build 20230303 for Intel(R) 64 architecture applications
-  - Intel(R) MKL-DNN v3.3.6 (Git Hash 86e6af5974177e513fd3fee58425e1063e7f1361)
-  - OpenMP 201511 (a.k.a. OpenMP 4.5)
-  - LAPACK is enabled (usually provided by MKL)
-  - NNPACK is enabled
-  - CPU capability usage: AVX512
-  - CUDA Runtime 12.1
-  - NVCC architecture flags: -gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_90,code=sm_90
-  - CuDNN 8.9.2
-  - Magma 2.6.1
-  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=12.1, CUDNN_VERSION=8.9.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=pedantic -Wno-error=old-style-cast -Wno-missing-braces -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=2.3.1, USE_CUDA=ON, USE_CUDNN=ON, USE_CUSPARSELT=1, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, 
-
-    TorchVision: 0.18.1
-    OpenCV: 4.10.0
-    MMEngine: 0.10.4
-
-Runtime environment:
-    cudnn_benchmark: False
-    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
-    dist_cfg: {'backend': 'nccl'}
-    seed: 0
-    deterministic: False
-    Distributed launcher: none
-    Distributed training: False
-    GPU number: 1
-------------------------------------------------------------
-
-03/18 14:37:42 - mmengine - INFO - Config:
-custom_hooks = [
-    dict(
-        min_delta=0,
-        monitor='accuracy/top1',
-        patience=50,
-        rule='greater',
-        type='EarlyStoppingHook'),
-]
-data_root = 'data/ModulationClassification/DeepSig/RadioML.2016.10A'
-dataset_type = 'AMCDataset'
-default_hooks = dict(
-    checkpoint=dict(
-        interval=1,
-        max_keep_ckpts=1,
-        rule='greater',
-        save_best='accuracy/top1',
-        type='CheckpointHook'),
-    logger=dict(interval=50, type='LoggerHook'),
-    param_scheduler=dict(type='ParamSchedulerHook'),
-    sampler_seed=dict(type='DistSamplerSeedHook'),
-    timer=dict(type='IterTimerHook'))
-default_scope = 'csrr'
-env_cfg = dict(
-    cudnn_benchmark=False,
-    dist_cfg=dict(backend='nccl'),
-    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
-launcher = 'none'
-load_from = None
-log_level = 'INFO'
-model = dict(
-    backbone=dict(
-        init_cfg=dict(layer='Conv2d', type='Xavier'),
-        num_classes=11,
-        type='CNN2'),
-    head=dict(
-        loss=dict(loss_weight=1.0, type='CrossEntropyLoss'), type='ClsHead'),
-    type='SignalClassifier')
-optim_wrapper = dict(optimizer=dict(lr=0.001, type='Adam'))
-param_scheduler = dict(
-    factor=0.5,
-    min_value=1e-06,
-    monitor='loss/classification',
-    param_name='lr',
-    patience=5,
-    type='ReduceOnPlateauParamScheduler',
-    verbose=True)
-pipeline = [
-    dict(shapes=dict(iq=[
-        1,
-        2,
-        128,
-    ]), type='Reshape'),
-    dict(input_key='iq', type='PackInputs'),
-]
-randomness = dict(deterministic=False, seed=0)
-resume_from = None
-runner = dict(max_epochs=2)
-test_cfg = dict()
-test_dataloader = dict(
-    batch_size=400,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='test.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=True,
-        type='AMCDataset'),
-    num_workers=20,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=False, type='DefaultSampler'))
-test_evaluator = dict(topk=(1, ), type='Accuracy')
-train_cfg = dict(by_epoch=True, max_epochs=10000, val_interval=1)
-train_dataloader = dict(
-    batch_size=64,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='train.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=False,
-        type='AMCDataset'),
-    num_workers=2,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=True, type='DefaultSampler'))
-val_cfg = dict()
-val_dataloader = dict(
-    batch_size=64,
-    collate_fn=dict(type='default_collate'),
-    dataset=dict(
-        ann_file='validation.json',
-        cache=True,
-        data_root='data/ModulationClassification/DeepSig/RadioML.2016.10A',
-        filter_cfg=dict(save_range=[
-            -14,
-            18,
-        ], type='FilterBySNR'),
-        pipeline=[
-            dict(shapes=dict(iq=[
-                1,
-                2,
-                128,
-            ]), type='Reshape'),
-            dict(input_key='iq', type='PackInputs'),
-        ],
-        test_mode=True,
-        type='AMCDataset'),
-    num_workers=2,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(shuffle=False, type='DefaultSampler'))
-val_evaluator = [
-    dict(topk=(1, ), type='Accuracy'),
-    dict(task='classification', type='Loss'),
-]
-visualizer = dict(
-    type='Visualizer', vis_backends=[
-        dict(type='TensorboardVisBackend'),
-    ])
-work_dir = 'work_dirs/test_env'
-
-2026-03-18 14:37:43.544291: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable &#96;TF_ENABLE_ONEDNN_OPTS=0&#96;.
-2026-03-18 14:37:43.586699: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-03/18 14:37:46 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
-03/18 14:37:46 - mmengine - INFO - Hooks will be executed in the following order:
-before_run:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(BELOW_NORMAL) LoggerHook                         
-(LOWEST      ) EarlyStoppingHook                  
- -------------------- 
-before_train:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
-(VERY_LOW    ) CheckpointHook                     
- -------------------- 
-before_train_epoch:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
-(NORMAL      ) DistSamplerSeedHook                
- -------------------- 
-before_train_iter:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
- -------------------- 
-after_train_iter:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
-(BELOW_NORMAL) LoggerHook                         
-(LOW         ) ParamSchedulerHook                 
-(VERY_LOW    ) CheckpointHook                     
- -------------------- 
-after_train_epoch:
-(NORMAL      ) IterTimerHook                      
-(LOW         ) ParamSchedulerHook                 
-(VERY_LOW    ) CheckpointHook                     
- -------------------- 
-before_val:
-(VERY_HIGH   ) RuntimeInfoHook                    
- -------------------- 
-before_val_epoch:
-(NORMAL      ) IterTimerHook                      
- -------------------- 
-before_val_iter:
-(NORMAL      ) IterTimerHook                      
- -------------------- 
-after_val_iter:
-(NORMAL      ) IterTimerHook                      
-(BELOW_NORMAL) LoggerHook                         
- -------------------- 
-after_val_epoch:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
-(BELOW_NORMAL) LoggerHook                         
-(LOW         ) ParamSchedulerHook                 
-(VERY_LOW    ) CheckpointHook                     
-(LOWEST      ) EarlyStoppingHook                  
- -------------------- 
-after_val:
-(VERY_HIGH   ) RuntimeInfoHook                    
- -------------------- 
-after_train:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(VERY_LOW    ) CheckpointHook                     
- -------------------- 
-before_test:
-(VERY_HIGH   ) RuntimeInfoHook                    
- -------------------- 
-before_test_epoch:
-(NORMAL      ) IterTimerHook                      
- -------------------- 
-before_test_iter:
-(NORMAL      ) IterTimerHook                      
- -------------------- 
-after_test_iter:
-(NORMAL      ) IterTimerHook                      
-(BELOW_NORMAL) LoggerHook                         
- -------------------- 
-after_test_epoch:
-(VERY_HIGH   ) RuntimeInfoHook                    
-(NORMAL      ) IterTimerHook                      
-(BELOW_NORMAL) LoggerHook                         
- -------------------- 
-after_test:
-(VERY_HIGH   ) RuntimeInfoHook                    
- -------------------- 
-after_run:
-(BELOW_NORMAL) LoggerHook                         
- -------------------- 
-03/18 14:38:19 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
-03/18 14:38:19 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
-03/18 14:38:19 - mmengine - INFO - Checkpoints will be saved to /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env.
-/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/lib/python3.10/site-packages/torch/nn/modules/conv.py:456: UserWarning: Using padding='same' with even kernel lengths and odd dilation may require a zero-padded copy of the input be created (Triggered internally at /opt/conda/conda-bld/pytorch_1716905979055/work/aten/src/ATen/native/Convolution.cpp:1031.)
-  return F.conv2d(input, weight, bias, self.stride,
-03/18 14:38:24 - mmengine - INFO - Epoch(train)     [1][  50/1461]  lr: 1.0000e-03  eta: 15 days, 13:22:41  time: 0.0090  data_time: 0.0005  memory: 866  loss: 2.3840
-03/18 14:38:24 - mmengine - INFO - Epoch(train)     [1][ 100/1461]  lr: 1.0000e-03  eta: 8 days, 13:16:37  time: 0.0091  data_time: 0.0006  memory: 866  loss: 2.2705
-03/18 14:38:25 - mmengine - INFO - Epoch(train)     [1][ 150/1461]  lr: 1.0000e-03  eta: 6 days, 5:16:18  time: 0.0097  data_time: 0.0006  memory: 866  loss: 2.2386
-03/18 14:38:25 - mmengine - INFO - Epoch(train)     [1][ 200/1461]  lr: 1.0000e-03  eta: 5 days, 1:00:59  time: 0.0092  data_time: 0.0008  memory: 866  loss: 2.1006
-03/18 14:38:26 - mmengine - INFO - Epoch(train)     [1][ 250/1461]  lr: 1.0000e-03  eta: 4 days, 8:26:36  time: 0.0102  data_time: 0.0012  memory: 866  loss: 2.1141
-03/18 14:38:26 - mmengine - INFO - Epoch(train)     [1][ 300/1461]  lr: 1.0000e-03  eta: 3 days, 21:08:47  time: 0.0093  data_time: 0.0004  memory: 866  loss: 2.0315
-03/18 14:38:26 - mmengine - INFO - Epoch(train)     [1][ 350/1461]  lr: 1.0000e-03  eta: 3 days, 13:17:07  time: 0.0096  data_time: 0.0005  memory: 866  loss: 2.0154
-03/18 14:38:27 - mmengine - INFO - Epoch(train)     [1][ 400/1461]  lr: 1.0000e-03  eta: 3 days, 7:17:38  time: 0.0090  data_time: 0.0005  memory: 866  loss: 2.0175
-03/18 14:38:27 - mmengine - INFO - Epoch(train)     [1][ 450/1461]  lr: 1.0000e-03  eta: 3 days, 2:25:39  time: 0.0088  data_time: 0.0003  memory: 866  loss: 1.9603
-03/18 14:38:28 - mmengine - INFO - Epoch(train)     [1][ 500/1461]  lr: 1.0000e-03  eta: 2 days, 22:30:29  time: 0.0087  data_time: 0.0006  memory: 866  loss: 1.9124
-03/18 14:38:28 - mmengine - INFO - Epoch(train)     [1][ 550/1461]  lr: 1.0000e-03  eta: 2 days, 19:20:43  time: 0.0089  data_time: 0.0006  memory: 866  loss: 1.8775
-03/18 14:38:29 - mmengine - INFO - Epoch(train)     [1][ 600/1461]  lr: 1.0000e-03  eta: 2 days, 16:50:45  time: 0.0090  data_time: 0.0004  memory: 866  loss: 1.8091
-03/18 14:38:29 - mmengine - INFO - Epoch(train)     [1][ 650/1461]  lr: 1.0000e-03  eta: 2 days, 14:31:06  time: 0.0083  data_time: 0.0003  memory: 866  loss: 1.8980
-03/18 14:38:30 - mmengine - INFO - Epoch(train)     [1][ 700/1461]  lr: 1.0000e-03  eta: 2 days, 12:28:14  time: 0.0084  data_time: 0.0005  memory: 866  loss: 1.8859
-03/18 14:38:30 - mmengine - INFO - Epoch(train)     [1][ 750/1461]  lr: 1.0000e-03  eta: 2 days, 10:51:51  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.8713
-03/18 14:38:30 - mmengine - INFO - Epoch(train)     [1][ 800/1461]  lr: 1.0000e-03  eta: 2 days, 9:18:48  time: 0.0083  data_time: 0.0003  memory: 866  loss: 1.7885
-03/18 14:38:31 - mmengine - INFO - Epoch(train)     [1][ 850/1461]  lr: 1.0000e-03  eta: 2 days, 7:56:47  time: 0.0083  data_time: 0.0003  memory: 866  loss: 1.8208
-03/18 14:38:31 - mmengine - INFO - Epoch(train)     [1][ 900/1461]  lr: 1.0000e-03  eta: 2 days, 6:43:39  time: 0.0085  data_time: 0.0005  memory: 866  loss: 1.8063
-03/18 14:38:32 - mmengine - INFO - Epoch(train)     [1][ 950/1461]  lr: 1.0000e-03  eta: 2 days, 5:38:09  time: 0.0084  data_time: 0.0004  memory: 866  loss: 1.8772
-03/18 14:38:32 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:38:32 - mmengine - INFO - Epoch(train)     [1][1000/1461]  lr: 1.0000e-03  eta: 2 days, 4:46:34  time: 0.0092  data_time: 0.0009  memory: 866  loss: 1.8392
-03/18 14:38:33 - mmengine - INFO - Epoch(train)     [1][1050/1461]  lr: 1.0000e-03  eta: 2 days, 4:03:40  time: 0.0092  data_time: 0.0007  memory: 866  loss: 1.8010
-03/18 14:38:33 - mmengine - INFO - Epoch(train)     [1][1100/1461]  lr: 1.0000e-03  eta: 2 days, 3:26:40  time: 0.0095  data_time: 0.0005  memory: 866  loss: 1.8179
-03/18 14:38:33 - mmengine - INFO - Epoch(train)     [1][1150/1461]  lr: 1.0000e-03  eta: 2 days, 2:49:52  time: 0.0090  data_time: 0.0004  memory: 866  loss: 1.7621
-03/18 14:38:34 - mmengine - INFO - Epoch(train)     [1][1200/1461]  lr: 1.0000e-03  eta: 2 days, 2:20:44  time: 0.0098  data_time: 0.0005  memory: 866  loss: 1.7721
-03/18 14:38:34 - mmengine - INFO - Epoch(train)     [1][1250/1461]  lr: 1.0000e-03  eta: 2 days, 1:50:37  time: 0.0094  data_time: 0.0006  memory: 866  loss: 1.7386
-03/18 14:38:35 - mmengine - INFO - Epoch(train)     [1][1300/1461]  lr: 1.0000e-03  eta: 2 days, 1:19:54  time: 0.0083  data_time: 0.0004  memory: 866  loss: 1.7151
-03/18 14:38:35 - mmengine - INFO - Epoch(train)     [1][1350/1461]  lr: 1.0000e-03  eta: 2 days, 0:52:39  time: 0.0095  data_time: 0.0005  memory: 866  loss: 1.6657
-03/18 14:38:36 - mmengine - INFO - Epoch(train)     [1][1400/1461]  lr: 1.0000e-03  eta: 2 days, 0:28:04  time: 0.0094  data_time: 0.0005  memory: 866  loss: 1.6282
-03/18 14:38:36 - mmengine - INFO - Epoch(train)     [1][1450/1461]  lr: 1.0000e-03  eta: 2 days, 0:06:06  time: 0.0095  data_time: 0.0007  memory: 866  loss: 1.6829
-03/18 14:38:36 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:38:36 - mmengine - INFO - Saving checkpoint at 1 epochs
-03/18 14:38:37 - mmengine - INFO - Epoch(val)     [1][ 50/293]    eta: 0:00:02  time: 0.0073  data_time: 0.0007  memory: 866  
-03/18 14:38:37 - mmengine - INFO - Epoch(val)     [1][100/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0006  memory: 46  
-03/18 14:38:38 - mmengine - INFO - Epoch(val)     [1][150/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0004  memory: 46  
-03/18 14:38:38 - mmengine - INFO - Epoch(val)     [1][200/293]    eta: 0:00:00  time: 0.0060  data_time: 0.0003  memory: 46  
-03/18 14:38:39 - mmengine - INFO - Epoch(val)     [1][250/293]    eta: 0:00:00  time: 0.0074  data_time: 0.0006  memory: 46  
-03/18 14:38:39 - mmengine - INFO - Epoch(val) [1][293/293]    accuracy/top1: 38.9358  loss/classification: 1.5468  data_time: 0.0010  time: 0.0083
-03/18 14:38:40 - mmengine - INFO - The best checkpoint with 38.9358 accuracy/top1 at 1 epoch is saved to best_accuracy_top1_epoch_1.pth.
-03/18 14:38:40 - mmengine - INFO - Epoch(train)     [2][  50/1461]  lr: 1.0000e-03  eta: 1 day, 23:48:16  time: 0.0091  data_time: 0.0006  memory: 866  loss: 1.7029
-03/18 14:38:41 - mmengine - INFO - Epoch(train)     [2][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 23:26:59  time: 0.0091  data_time: 0.0002  memory: 866  loss: 1.6103
-03/18 14:38:41 - mmengine - INFO - Epoch(train)     [2][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 23:08:23  time: 0.0098  data_time: 0.0007  memory: 866  loss: 1.6744
-03/18 14:38:42 - mmengine - INFO - Epoch(train)     [2][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 22:42:19  time: 0.0081  data_time: 0.0005  memory: 866  loss: 1.5813
-03/18 14:38:42 - mmengine - INFO - Epoch(train)     [2][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 22:18:05  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.6067
-03/18 14:38:42 - mmengine - INFO - Epoch(train)     [2][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 21:55:10  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.5742
-03/18 14:38:43 - mmengine - INFO - Epoch(train)     [2][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 21:33:40  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.6113
-03/18 14:38:43 - mmengine - INFO - Epoch(train)     [2][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 21:13:05  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.5332
-03/18 14:38:44 - mmengine - INFO - Epoch(train)     [2][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 20:53:51  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.5100
-03/18 14:38:44 - mmengine - INFO - Epoch(train)     [2][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 20:35:26  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.5378
-03/18 14:38:44 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:38:44 - mmengine - INFO - Epoch(train)     [2][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 20:19:43  time: 0.0095  data_time: 0.0007  memory: 866  loss: 1.5531
-03/18 14:38:45 - mmengine - INFO - Epoch(train)     [2][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 20:08:19  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.4616
-03/18 14:38:45 - mmengine - INFO - Epoch(train)     [2][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 19:58:41  time: 0.0089  data_time: 0.0008  memory: 866  loss: 1.4839
-03/18 14:38:46 - mmengine - INFO - Epoch(train)     [2][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 19:47:26  time: 0.0088  data_time: 0.0006  memory: 866  loss: 1.4700
-03/18 14:38:46 - mmengine - INFO - Epoch(train)     [2][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 19:36:49  time: 0.0088  data_time: 0.0008  memory: 866  loss: 1.5252
-03/18 14:38:47 - mmengine - INFO - Epoch(train)     [2][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 19:27:23  time: 0.0088  data_time: 0.0006  memory: 866  loss: 1.4361
-03/18 14:38:47 - mmengine - INFO - Epoch(train)     [2][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 19:17:36  time: 0.0086  data_time: 0.0005  memory: 866  loss: 1.5426
-03/18 14:38:48 - mmengine - INFO - Epoch(train)     [2][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 19:08:07  time: 0.0088  data_time: 0.0007  memory: 866  loss: 1.4756
-03/18 14:38:48 - mmengine - INFO - Epoch(train)     [2][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 19:07:14  time: 0.0091  data_time: 0.0006  memory: 866  loss: 1.4676
-03/18 14:38:49 - mmengine - INFO - Epoch(train)     [2][1000/1461]  lr: 1.0000e-03  eta: 1 day, 18:58:22  time: 0.0088  data_time: 0.0006  memory: 866  loss: 1.3746
-03/18 14:38:49 - mmengine - INFO - Epoch(train)     [2][1050/1461]  lr: 1.0000e-03  eta: 1 day, 18:51:07  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.4693
-03/18 14:38:50 - mmengine - INFO - Epoch(train)     [2][1100/1461]  lr: 1.0000e-03  eta: 1 day, 18:44:52  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.4786
-03/18 14:38:50 - mmengine - INFO - Epoch(train)     [2][1150/1461]  lr: 1.0000e-03  eta: 1 day, 18:38:53  time: 0.0089  data_time: 0.0004  memory: 866  loss: 1.4526
-03/18 14:38:50 - mmengine - INFO - Epoch(train)     [2][1200/1461]  lr: 1.0000e-03  eta: 1 day, 18:32:47  time: 0.0089  data_time: 0.0005  memory: 866  loss: 1.5161
-03/18 14:38:51 - mmengine - INFO - Epoch(train)     [2][1250/1461]  lr: 1.0000e-03  eta: 1 day, 18:27:21  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.4515
-03/18 14:38:51 - mmengine - INFO - Epoch(train)     [2][1300/1461]  lr: 1.0000e-03  eta: 1 day, 18:14:45  time: 0.0075  data_time: 0.0003  memory: 866  loss: 1.4168
-03/18 14:38:52 - mmengine - INFO - Epoch(train)     [2][1350/1461]  lr: 1.0000e-03  eta: 1 day, 18:03:52  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.4003
-03/18 14:38:52 - mmengine - INFO - Epoch(train)     [2][1400/1461]  lr: 1.0000e-03  eta: 1 day, 17:53:17  time: 0.0078  data_time: 0.0003  memory: 866  loss: 1.4113
-03/18 14:38:52 - mmengine - INFO - Epoch(train)     [2][1450/1461]  lr: 1.0000e-03  eta: 1 day, 17:43:11  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.4284
-03/18 14:38:53 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:38:53 - mmengine - INFO - Saving checkpoint at 2 epochs
-03/18 14:38:53 - mmengine - INFO - Epoch(val)     [2][ 50/293]    eta: 0:00:01  time: 0.0070  data_time: 0.0007  memory: 866  
-03/18 14:38:53 - mmengine - INFO - Epoch(val)     [2][100/293]    eta: 0:00:01  time: 0.0070  data_time: 0.0006  memory: 46  
-03/18 14:38:54 - mmengine - INFO - Epoch(val)     [2][150/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0003  memory: 46  
-03/18 14:38:54 - mmengine - INFO - Epoch(val)     [2][200/293]    eta: 0:00:00  time: 0.0079  data_time: 0.0005  memory: 46  
-03/18 14:38:55 - mmengine - INFO - Epoch(val)     [2][250/293]    eta: 0:00:00  time: 0.0072  data_time: 0.0004  memory: 46  
-03/18 14:38:55 - mmengine - INFO - Epoch(val) [2][293/293]    accuracy/top1: 50.7701  loss/classification: 1.4119  data_time: 0.0006  time: 0.0078
-03/18 14:38:55 - mmengine - INFO - The previous best checkpoint /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env/best_accuracy_top1_epoch_1.pth is removed
-03/18 14:38:55 - mmengine - INFO - The best checkpoint with 50.7701 accuracy/top1 at 2 epoch is saved to best_accuracy_top1_epoch_2.pth.
-03/18 14:38:56 - mmengine - INFO - Epoch(train)     [3][  50/1461]  lr: 1.0000e-03  eta: 1 day, 17:39:00  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.4726
-03/18 14:38:56 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:38:57 - mmengine - INFO - Epoch(train)     [3][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 17:35:46  time: 0.0099  data_time: 0.0003  memory: 866  loss: 1.4249
-03/18 14:38:57 - mmengine - INFO - Epoch(train)     [3][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 17:32:55  time: 0.0098  data_time: 0.0012  memory: 866  loss: 1.3989
-03/18 14:38:57 - mmengine - INFO - Epoch(train)     [3][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 17:23:47  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.3737
-03/18 14:38:58 - mmengine - INFO - Epoch(train)     [3][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 17:14:57  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.4054
-03/18 14:38:58 - mmengine - INFO - Epoch(train)     [3][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 17:06:22  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.3780
-03/18 14:38:59 - mmengine - INFO - Epoch(train)     [3][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 16:58:02  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.4238
-03/18 14:38:59 - mmengine - INFO - Epoch(train)     [3][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 16:50:01  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.3376
-03/18 14:38:59 - mmengine - INFO - Epoch(train)     [3][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 16:42:13  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.3551
-03/18 14:39:00 - mmengine - INFO - Epoch(train)     [3][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 16:34:55  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.3070
-03/18 14:39:00 - mmengine - INFO - Epoch(train)     [3][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 16:29:29  time: 0.0086  data_time: 0.0004  memory: 866  loss: 1.4231
-03/18 14:39:01 - mmengine - INFO - Epoch(train)     [3][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 16:27:14  time: 0.0093  data_time: 0.0005  memory: 866  loss: 1.2997
-03/18 14:39:01 - mmengine - INFO - Epoch(train)     [3][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 16:25:03  time: 0.0095  data_time: 0.0006  memory: 866  loss: 1.3711
-03/18 14:39:02 - mmengine - INFO - Epoch(train)     [3][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 16:22:10  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.4074
-03/18 14:39:02 - mmengine - INFO - Epoch(train)     [3][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 16:19:58  time: 0.0095  data_time: 0.0005  memory: 866  loss: 1.3568
-03/18 14:39:03 - mmengine - INFO - Epoch(train)     [3][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 16:18:14  time: 0.0095  data_time: 0.0004  memory: 866  loss: 1.3916
-03/18 14:39:03 - mmengine - INFO - Epoch(train)     [3][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 16:16:53  time: 0.0100  data_time: 0.0006  memory: 866  loss: 1.3470
-03/18 14:39:04 - mmengine - INFO - Epoch(train)     [3][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 16:15:19  time: 0.0088  data_time: 0.0005  memory: 866  loss: 1.3056
-03/18 14:39:04 - mmengine - INFO - Epoch(train)     [3][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 16:09:13  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.3085
-03/18 14:39:04 - mmengine - INFO - Epoch(train)     [3][1000/1461]  lr: 1.0000e-03  eta: 1 day, 16:03:37  time: 0.0080  data_time: 0.0004  memory: 866  loss: 1.3493
-03/18 14:39:05 - mmengine - INFO - Epoch(train)     [3][1050/1461]  lr: 1.0000e-03  eta: 1 day, 15:58:06  time: 0.0080  data_time: 0.0004  memory: 866  loss: 1.2926
-03/18 14:39:05 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:05 - mmengine - INFO - Epoch(train)     [3][1100/1461]  lr: 1.0000e-03  eta: 1 day, 15:52:37  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.2504
-03/18 14:39:06 - mmengine - INFO - Epoch(train)     [3][1150/1461]  lr: 1.0000e-03  eta: 1 day, 15:47:49  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.3270
-03/18 14:39:06 - mmengine - INFO - Epoch(train)     [3][1200/1461]  lr: 1.0000e-03  eta: 1 day, 15:43:06  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.2802
-03/18 14:39:06 - mmengine - INFO - Epoch(train)     [3][1250/1461]  lr: 1.0000e-03  eta: 1 day, 15:38:34  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.3291
-03/18 14:39:07 - mmengine - INFO - Epoch(train)     [3][1300/1461]  lr: 1.0000e-03  eta: 1 day, 15:34:52  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.3566
-03/18 14:39:07 - mmengine - INFO - Epoch(train)     [3][1350/1461]  lr: 1.0000e-03  eta: 1 day, 15:29:40  time: 0.0084  data_time: 0.0003  memory: 866  loss: 1.2965
-03/18 14:39:08 - mmengine - INFO - Epoch(train)     [3][1400/1461]  lr: 1.0000e-03  eta: 1 day, 15:24:25  time: 0.0078  data_time: 0.0003  memory: 866  loss: 1.3540
-03/18 14:39:08 - mmengine - INFO - Epoch(train)     [3][1450/1461]  lr: 1.0000e-03  eta: 1 day, 15:19:20  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.3010
-03/18 14:39:08 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:08 - mmengine - INFO - Saving checkpoint at 3 epochs
-03/18 14:39:09 - mmengine - INFO - Epoch(val)     [3][ 50/293]    eta: 0:00:01  time: 0.0072  data_time: 0.0005  memory: 866  
-03/18 14:39:09 - mmengine - INFO - Epoch(val)     [3][100/293]    eta: 0:00:01  time: 0.0070  data_time: 0.0004  memory: 46  
-03/18 14:39:09 - mmengine - INFO - Epoch(val)     [3][150/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0009  memory: 46  
-03/18 14:39:10 - mmengine - INFO - Epoch(val)     [3][200/293]    eta: 0:00:00  time: 0.0070  data_time: 0.0007  memory: 46  
-03/18 14:39:10 - mmengine - INFO - Epoch(val)     [3][250/293]    eta: 0:00:00  time: 0.0069  data_time: 0.0005  memory: 46  
-03/18 14:39:11 - mmengine - INFO - Epoch(val) [3][293/293]    accuracy/top1: 52.9572  loss/classification: 1.3370  data_time: 0.0007  time: 0.0075
-03/18 14:39:11 - mmengine - INFO - The previous best checkpoint /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env/best_accuracy_top1_epoch_2.pth is removed
-03/18 14:39:11 - mmengine - INFO - The best checkpoint with 52.9572 accuracy/top1 at 3 epoch is saved to best_accuracy_top1_epoch_3.pth.
-03/18 14:39:12 - mmengine - INFO - Epoch(train)     [4][  50/1461]  lr: 1.0000e-03  eta: 1 day, 15:19:39  time: 0.0095  data_time: 0.0007  memory: 866  loss: 1.2853
-03/18 14:39:12 - mmengine - INFO - Epoch(train)     [4][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 15:18:55  time: 0.0092  data_time: 0.0006  memory: 866  loss: 1.2751
-03/18 14:39:13 - mmengine - INFO - Epoch(train)     [4][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 15:19:13  time: 0.0100  data_time: 0.0004  memory: 866  loss: 1.2804
-03/18 14:39:13 - mmengine - INFO - Epoch(train)     [4][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 15:18:06  time: 0.0091  data_time: 0.0006  memory: 866  loss: 1.2793
-03/18 14:39:14 - mmengine - INFO - Epoch(train)     [4][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 15:15:50  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.2869
-03/18 14:39:14 - mmengine - INFO - Epoch(train)     [4][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 15:11:52  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.3450
-03/18 14:39:14 - mmengine - INFO - Epoch(train)     [4][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 15:08:05  time: 0.0081  data_time: 0.0005  memory: 866  loss: 1.2713
-03/18 14:39:15 - mmengine - INFO - Epoch(train)     [4][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 15:04:23  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.2128
-03/18 14:39:15 - mmengine - INFO - Epoch(train)     [4][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 15:00:34  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.2758
-03/18 14:39:16 - mmengine - INFO - Epoch(train)     [4][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 14:57:03  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.2717
-03/18 14:39:16 - mmengine - INFO - Epoch(train)     [4][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 14:54:14  time: 0.0087  data_time: 0.0005  memory: 866  loss: 1.2831
-03/18 14:39:16 - mmengine - INFO - Epoch(train)     [4][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 14:52:08  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.2616
-03/18 14:39:17 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:17 - mmengine - INFO - Epoch(train)     [4][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 14:49:44  time: 0.0085  data_time: 0.0005  memory: 866  loss: 1.3410
-03/18 14:39:17 - mmengine - INFO - Epoch(train)     [4][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 14:48:16  time: 0.0092  data_time: 0.0004  memory: 866  loss: 1.2301
-03/18 14:39:18 - mmengine - INFO - Epoch(train)     [4][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 14:47:41  time: 0.0090  data_time: 0.0004  memory: 866  loss: 1.3427
-03/18 14:39:18 - mmengine - INFO - Epoch(train)     [4][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 14:47:09  time: 0.0088  data_time: 0.0005  memory: 866  loss: 1.1786
-03/18 14:39:19 - mmengine - INFO - Epoch(train)     [4][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 14:46:51  time: 0.0094  data_time: 0.0006  memory: 866  loss: 1.2465
-03/18 14:39:19 - mmengine - INFO - Epoch(train)     [4][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 14:46:51  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.2444
-03/18 14:39:20 - mmengine - INFO - Epoch(train)     [4][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 14:47:14  time: 0.0097  data_time: 0.0006  memory: 866  loss: 1.2847
-03/18 14:39:20 - mmengine - INFO - Epoch(train)     [4][1000/1461]  lr: 1.0000e-03  eta: 1 day, 14:43:58  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1813
-03/18 14:39:21 - mmengine - INFO - Epoch(train)     [4][1050/1461]  lr: 1.0000e-03  eta: 1 day, 14:40:47  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.2828
-03/18 14:39:21 - mmengine - INFO - Epoch(train)     [4][1100/1461]  lr: 1.0000e-03  eta: 1 day, 14:37:39  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.2597
-03/18 14:39:21 - mmengine - INFO - Epoch(train)     [4][1150/1461]  lr: 1.0000e-03  eta: 1 day, 14:37:08  time: 0.0096  data_time: 0.0006  memory: 866  loss: 1.2302
-03/18 14:39:22 - mmengine - INFO - Epoch(train)     [4][1200/1461]  lr: 1.0000e-03  eta: 1 day, 14:36:52  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.2060
-03/18 14:39:22 - mmengine - INFO - Epoch(train)     [4][1250/1461]  lr: 1.0000e-03  eta: 1 day, 14:34:31  time: 0.0084  data_time: 0.0003  memory: 866  loss: 1.2352
-03/18 14:39:23 - mmengine - INFO - Epoch(train)     [4][1300/1461]  lr: 1.0000e-03  eta: 1 day, 14:32:10  time: 0.0081  data_time: 0.0003  memory: 866  loss: 1.1846
-03/18 14:39:23 - mmengine - INFO - Epoch(train)     [4][1350/1461]  lr: 1.0000e-03  eta: 1 day, 14:30:34  time: 0.0083  data_time: 0.0005  memory: 866  loss: 1.1743
-03/18 14:39:24 - mmengine - INFO - Epoch(train)     [4][1400/1461]  lr: 1.0000e-03  eta: 1 day, 14:29:34  time: 0.0091  data_time: 0.0004  memory: 866  loss: 1.2426
-03/18 14:39:24 - mmengine - INFO - Epoch(train)     [4][1450/1461]  lr: 1.0000e-03  eta: 1 day, 14:28:49  time: 0.0091  data_time: 0.0006  memory: 866  loss: 1.1865
-03/18 14:39:24 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:24 - mmengine - INFO - Saving checkpoint at 4 epochs
-03/18 14:39:25 - mmengine - INFO - Epoch(val)     [4][ 50/293]    eta: 0:00:02  time: 0.0087  data_time: 0.0004  memory: 866  
-03/18 14:39:25 - mmengine - INFO - Epoch(val)     [4][100/293]    eta: 0:00:01  time: 0.0074  data_time: 0.0004  memory: 46  
-03/18 14:39:26 - mmengine - INFO - Epoch(val)     [4][150/293]    eta: 0:00:01  time: 0.0083  data_time: 0.0004  memory: 46  
-03/18 14:39:26 - mmengine - INFO - Epoch(val)     [4][200/293]    eta: 0:00:00  time: 0.0068  data_time: 0.0004  memory: 46  
-03/18 14:39:26 - mmengine - INFO - Epoch(val)     [4][250/293]    eta: 0:00:00  time: 0.0088  data_time: 0.0007  memory: 46  
-03/18 14:39:27 - mmengine - INFO - Epoch(val) [4][293/293]    accuracy/top1: 55.0107  loss/classification: 1.2761  data_time: 0.0006  time: 0.0078
-03/18 14:39:27 - mmengine - INFO - The previous best checkpoint /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env/best_accuracy_top1_epoch_3.pth is removed
-03/18 14:39:27 - mmengine - INFO - The best checkpoint with 55.0107 accuracy/top1 at 4 epoch is saved to best_accuracy_top1_epoch_4.pth.
-03/18 14:39:28 - mmengine - INFO - Epoch(train)     [5][  50/1461]  lr: 1.0000e-03  eta: 1 day, 14:30:31  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.1902
-03/18 14:39:28 - mmengine - INFO - Epoch(train)     [5][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 14:28:36  time: 0.0086  data_time: 0.0004  memory: 866  loss: 1.2835
-03/18 14:39:29 - mmengine - INFO - Epoch(train)     [5][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 14:28:23  time: 0.0101  data_time: 0.0005  memory: 866  loss: 1.2190
-03/18 14:39:29 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:29 - mmengine - INFO - Epoch(train)     [5][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 14:29:12  time: 0.0098  data_time: 0.0010  memory: 866  loss: 1.2508
-03/18 14:39:30 - mmengine - INFO - Epoch(train)     [5][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 14:30:03  time: 0.0098  data_time: 0.0008  memory: 866  loss: 1.1823
-03/18 14:39:30 - mmengine - INFO - Epoch(train)     [5][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 14:31:03  time: 0.0099  data_time: 0.0006  memory: 866  loss: 1.2326
-03/18 14:39:31 - mmengine - INFO - Epoch(train)     [5][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 14:32:01  time: 0.0097  data_time: 0.0007  memory: 866  loss: 1.2379
-03/18 14:39:31 - mmengine - INFO - Epoch(train)     [5][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 14:32:52  time: 0.0098  data_time: 0.0006  memory: 866  loss: 1.2241
-03/18 14:39:32 - mmengine - INFO - Epoch(train)     [5][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 14:34:10  time: 0.0103  data_time: 0.0007  memory: 866  loss: 1.1850
-03/18 14:39:32 - mmengine - INFO - Epoch(train)     [5][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 14:34:57  time: 0.0098  data_time: 0.0007  memory: 866  loss: 1.2394
-03/18 14:39:33 - mmengine - INFO - Epoch(train)     [5][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 14:35:16  time: 0.0103  data_time: 0.0015  memory: 866  loss: 1.2528
-03/18 14:39:33 - mmengine - INFO - Epoch(train)     [5][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 14:34:11  time: 0.0091  data_time: 0.0004  memory: 866  loss: 1.2638
-03/18 14:39:34 - mmengine - INFO - Epoch(train)     [5][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 14:33:38  time: 0.0090  data_time: 0.0007  memory: 866  loss: 1.2103
-03/18 14:39:34 - mmengine - INFO - Epoch(train)     [5][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 14:32:33  time: 0.0093  data_time: 0.0006  memory: 866  loss: 1.2139
-03/18 14:39:35 - mmengine - INFO - Epoch(train)     [5][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 14:32:28  time: 0.0098  data_time: 0.0005  memory: 866  loss: 1.2324
-03/18 14:39:35 - mmengine - INFO - Epoch(train)     [5][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 14:31:53  time: 0.0088  data_time: 0.0006  memory: 866  loss: 1.2551
-03/18 14:39:36 - mmengine - INFO - Epoch(train)     [5][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 14:31:44  time: 0.0094  data_time: 0.0009  memory: 866  loss: 1.2177
-03/18 14:39:36 - mmengine - INFO - Epoch(train)     [5][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 14:29:57  time: 0.0078  data_time: 0.0003  memory: 866  loss: 1.2240
-03/18 14:39:36 - mmengine - INFO - Epoch(train)     [5][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 14:28:30  time: 0.0094  data_time: 0.0006  memory: 866  loss: 1.1999
-03/18 14:39:37 - mmengine - INFO - Epoch(train)     [5][1000/1461]  lr: 1.0000e-03  eta: 1 day, 14:28:08  time: 0.0094  data_time: 0.0005  memory: 866  loss: 1.2716
-03/18 14:39:37 - mmengine - INFO - Epoch(train)     [5][1050/1461]  lr: 1.0000e-03  eta: 1 day, 14:27:39  time: 0.0090  data_time: 0.0008  memory: 866  loss: 1.1936
-03/18 14:39:38 - mmengine - INFO - Epoch(train)     [5][1100/1461]  lr: 1.0000e-03  eta: 1 day, 14:27:17  time: 0.0093  data_time: 0.0007  memory: 866  loss: 1.1661
-03/18 14:39:38 - mmengine - INFO - Epoch(train)     [5][1150/1461]  lr: 1.0000e-03  eta: 1 day, 14:27:20  time: 0.0094  data_time: 0.0009  memory: 866  loss: 1.1888
-03/18 14:39:38 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:39 - mmengine - INFO - Epoch(train)     [5][1200/1461]  lr: 1.0000e-03  eta: 1 day, 14:26:50  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.2061
-03/18 14:39:39 - mmengine - INFO - Epoch(train)     [5][1250/1461]  lr: 1.0000e-03  eta: 1 day, 14:26:27  time: 0.0092  data_time: 0.0006  memory: 866  loss: 1.1487
-03/18 14:39:40 - mmengine - INFO - Epoch(train)     [5][1300/1461]  lr: 1.0000e-03  eta: 1 day, 14:26:43  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.3128
-03/18 14:39:40 - mmengine - INFO - Epoch(train)     [5][1350/1461]  lr: 1.0000e-03  eta: 1 day, 14:26:56  time: 0.0100  data_time: 0.0008  memory: 866  loss: 1.2507
-03/18 14:39:41 - mmengine - INFO - Epoch(train)     [5][1400/1461]  lr: 1.0000e-03  eta: 1 day, 14:27:08  time: 0.0098  data_time: 0.0006  memory: 866  loss: 1.1902
-03/18 14:39:41 - mmengine - INFO - Epoch(train)     [5][1450/1461]  lr: 1.0000e-03  eta: 1 day, 14:26:45  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.2793
-03/18 14:39:41 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:41 - mmengine - INFO - Saving checkpoint at 5 epochs
-03/18 14:39:42 - mmengine - INFO - Epoch(val)     [5][ 50/293]    eta: 0:00:01  time: 0.0072  data_time: 0.0004  memory: 866  
-03/18 14:39:42 - mmengine - INFO - Epoch(val)     [5][100/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0004  memory: 46  
-03/18 14:39:42 - mmengine - INFO - Epoch(val)     [5][150/293]    eta: 0:00:01  time: 0.0069  data_time: 0.0004  memory: 46  
-03/18 14:39:43 - mmengine - INFO - Epoch(val)     [5][200/293]    eta: 0:00:00  time: 0.0072  data_time: 0.0006  memory: 46  
-03/18 14:39:43 - mmengine - INFO - Epoch(val)     [5][250/293]    eta: 0:00:00  time: 0.0074  data_time: 0.0004  memory: 46  
-03/18 14:39:44 - mmengine - INFO - Epoch(val) [5][293/293]    accuracy/top1: 55.0481  loss/classification: 1.2386  data_time: 0.0006  time: 0.0073
-03/18 14:39:44 - mmengine - INFO - The previous best checkpoint /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env/best_accuracy_top1_epoch_4.pth is removed
-03/18 14:39:44 - mmengine - INFO - The best checkpoint with 55.0481 accuracy/top1 at 5 epoch is saved to best_accuracy_top1_epoch_5.pth.
-03/18 14:39:45 - mmengine - INFO - Epoch(train)     [6][  50/1461]  lr: 1.0000e-03  eta: 1 day, 14:27:05  time: 0.0089  data_time: 0.0006  memory: 866  loss: 1.1694
-03/18 14:39:45 - mmengine - INFO - Epoch(train)     [6][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 14:25:09  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.1488
-03/18 14:39:46 - mmengine - INFO - Epoch(train)     [6][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 14:23:33  time: 0.0085  data_time: 0.0004  memory: 866  loss: 1.1976
-03/18 14:39:46 - mmengine - INFO - Epoch(train)     [6][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 14:21:28  time: 0.0083  data_time: 0.0005  memory: 866  loss: 1.1442
-03/18 14:39:46 - mmengine - INFO - Epoch(train)     [6][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 14:19:20  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.1750
-03/18 14:39:47 - mmengine - INFO - Epoch(train)     [6][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 14:18:20  time: 0.0090  data_time: 0.0005  memory: 866  loss: 1.1749
-03/18 14:39:47 - mmengine - INFO - Epoch(train)     [6][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 14:17:46  time: 0.0092  data_time: 0.0008  memory: 866  loss: 1.1603
-03/18 14:39:48 - mmengine - INFO - Epoch(train)     [6][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 14:17:01  time: 0.0090  data_time: 0.0005  memory: 866  loss: 1.1502
-03/18 14:39:48 - mmengine - INFO - Epoch(train)     [6][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 14:16:08  time: 0.0084  data_time: 0.0005  memory: 866  loss: 1.2259
-03/18 14:39:49 - mmengine - INFO - Epoch(train)     [6][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 14:14:01  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1760
-03/18 14:39:49 - mmengine - INFO - Epoch(train)     [6][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 14:11:52  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1907
-03/18 14:39:49 - mmengine - INFO - Epoch(train)     [6][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 14:09:47  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.1453
-03/18 14:39:50 - mmengine - INFO - Epoch(train)     [6][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 14:07:35  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1286
-03/18 14:39:50 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:50 - mmengine - INFO - Epoch(train)     [6][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 14:05:37  time: 0.0083  data_time: 0.0005  memory: 866  loss: 1.1878
-03/18 14:39:51 - mmengine - INFO - Epoch(train)     [6][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 14:03:55  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.2530
-03/18 14:39:51 - mmengine - INFO - Epoch(train)     [6][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 14:02:14  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.1846
-03/18 14:39:51 - mmengine - INFO - Epoch(train)     [6][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 14:00:34  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1521
-03/18 14:39:52 - mmengine - INFO - Epoch(train)     [6][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 13:57:41  time: 0.0071  data_time: 0.0003  memory: 866  loss: 1.1412
-03/18 14:39:52 - mmengine - INFO - Epoch(train)     [6][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 13:54:23  time: 0.0071  data_time: 0.0003  memory: 866  loss: 1.1182
-03/18 14:39:53 - mmengine - INFO - Epoch(train)     [6][1000/1461]  lr: 1.0000e-03  eta: 1 day, 13:51:08  time: 0.0071  data_time: 0.0003  memory: 866  loss: 1.1535
-03/18 14:39:53 - mmengine - INFO - Epoch(train)     [6][1050/1461]  lr: 1.0000e-03  eta: 1 day, 13:47:56  time: 0.0071  data_time: 0.0003  memory: 866  loss: 1.2634
-03/18 14:39:53 - mmengine - INFO - Epoch(train)     [6][1100/1461]  lr: 1.0000e-03  eta: 1 day, 13:44:43  time: 0.0071  data_time: 0.0003  memory: 866  loss: 1.2375
-03/18 14:39:54 - mmengine - INFO - Epoch(train)     [6][1150/1461]  lr: 1.0000e-03  eta: 1 day, 13:42:06  time: 0.0090  data_time: 0.0005  memory: 866  loss: 1.1811
-03/18 14:39:54 - mmengine - INFO - Epoch(train)     [6][1200/1461]  lr: 1.0000e-03  eta: 1 day, 13:40:25  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1157
-03/18 14:39:54 - mmengine - INFO - Epoch(train)     [6][1250/1461]  lr: 1.0000e-03  eta: 1 day, 13:38:44  time: 0.0083  data_time: 0.0004  memory: 866  loss: 1.1367
-03/18 14:39:55 - mmengine - INFO - Epoch(train)     [6][1300/1461]  lr: 1.0000e-03  eta: 1 day, 13:38:32  time: 0.0094  data_time: 0.0005  memory: 866  loss: 1.1315
-03/18 14:39:55 - mmengine - INFO - Epoch(train)     [6][1350/1461]  lr: 1.0000e-03  eta: 1 day, 13:38:31  time: 0.0092  data_time: 0.0004  memory: 866  loss: 1.1110
-03/18 14:39:56 - mmengine - INFO - Epoch(train)     [6][1400/1461]  lr: 1.0000e-03  eta: 1 day, 13:38:33  time: 0.0096  data_time: 0.0005  memory: 866  loss: 1.1177
-03/18 14:39:56 - mmengine - INFO - Epoch(train)     [6][1450/1461]  lr: 1.0000e-03  eta: 1 day, 13:38:29  time: 0.0091  data_time: 0.0004  memory: 866  loss: 1.1644
-03/18 14:39:56 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:39:56 - mmengine - INFO - Saving checkpoint at 6 epochs
-03/18 14:39:57 - mmengine - INFO - Epoch(val)     [6][ 50/293]    eta: 0:00:02  time: 0.0079  data_time: 0.0004  memory: 866  
-03/18 14:39:57 - mmengine - INFO - Epoch(val)     [6][100/293]    eta: 0:00:01  time: 0.0077  data_time: 0.0004  memory: 46  
-03/18 14:39:58 - mmengine - INFO - Epoch(val)     [6][150/293]    eta: 0:00:01  time: 0.0075  data_time: 0.0004  memory: 46  
-03/18 14:39:58 - mmengine - INFO - Epoch(val)     [6][200/293]    eta: 0:00:00  time: 0.0077  data_time: 0.0006  memory: 46  
-03/18 14:39:59 - mmengine - INFO - Epoch(val)     [6][250/293]    eta: 0:00:00  time: 0.0076  data_time: 0.0007  memory: 46  
-03/18 14:39:59 - mmengine - INFO - Epoch(val) [6][293/293]    accuracy/top1: 56.3102  loss/classification: 1.2084  data_time: 0.0006  time: 0.0078
-03/18 14:39:59 - mmengine - INFO - The previous best checkpoint /home/citybuster/Projects/ChangShuoRadioRecognition/work_dirs/test_env/best_accuracy_top1_epoch_5.pth is removed
-03/18 14:39:59 - mmengine - INFO - The best checkpoint with 56.3102 accuracy/top1 at 6 epoch is saved to best_accuracy_top1_epoch_6.pth.
-03/18 14:40:00 - mmengine - INFO - Epoch(train)     [7][  50/1461]  lr: 1.0000e-03  eta: 1 day, 13:39:22  time: 0.0090  data_time: 0.0006  memory: 866  loss: 1.2224
-03/18 14:40:01 - mmengine - INFO - Epoch(train)     [7][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 13:39:18  time: 0.0091  data_time: 0.0007  memory: 866  loss: 1.1822
-03/18 14:40:01 - mmengine - INFO - Epoch(train)     [7][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 13:37:50  time: 0.0081  data_time: 0.0004  memory: 866  loss: 1.1666
-03/18 14:40:01 - mmengine - INFO - Epoch(train)     [7][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 13:36:31  time: 0.0082  data_time: 0.0005  memory: 866  loss: 1.1636
-03/18 14:40:02 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:02 - mmengine - INFO - Epoch(train)     [7][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 13:35:14  time: 0.0080  data_time: 0.0004  memory: 866  loss: 1.1679
-03/18 14:40:02 - mmengine - INFO - Epoch(train)     [7][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 13:33:32  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1806
-03/18 14:40:03 - mmengine - INFO - Epoch(train)     [7][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 13:31:49  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1088
-03/18 14:40:03 - mmengine - INFO - Epoch(train)     [7][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:08  time: 0.0079  data_time: 0.0003  memory: 866  loss: 1.0914
-03/18 14:40:03 - mmengine - INFO - Epoch(train)     [7][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 13:28:29  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.2237
-03/18 14:40:04 - mmengine - INFO - Epoch(train)     [7][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:54  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1499
-03/18 14:40:04 - mmengine - INFO - Epoch(train)     [7][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:19  time: 0.0087  data_time: 0.0007  memory: 866  loss: 1.1502
-03/18 14:40:05 - mmengine - INFO - Epoch(train)     [7][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:06  time: 0.0093  data_time: 0.0007  memory: 866  loss: 1.1470
-03/18 14:40:05 - mmengine - INFO - Epoch(train)     [7][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:21  time: 0.0095  data_time: 0.0006  memory: 866  loss: 1.1602
-03/18 14:40:06 - mmengine - INFO - Epoch(train)     [7][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:01  time: 0.0096  data_time: 0.0007  memory: 866  loss: 1.1549
-03/18 14:40:06 - mmengine - INFO - Epoch(train)     [7][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:08  time: 0.0092  data_time: 0.0006  memory: 866  loss: 1.2145
-03/18 14:40:07 - mmengine - INFO - Epoch(train)     [7][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:27  time: 0.0093  data_time: 0.0007  memory: 866  loss: 1.1409
-03/18 14:40:07 - mmengine - INFO - Epoch(train)     [7][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:19  time: 0.0086  data_time: 0.0005  memory: 866  loss: 1.1981
-03/18 14:40:08 - mmengine - INFO - Epoch(train)     [7][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:59  time: 0.0096  data_time: 0.0007  memory: 866  loss: 1.2435
-03/18 14:40:08 - mmengine - INFO - Epoch(train)     [7][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 13:28:05  time: 0.0089  data_time: 0.0004  memory: 866  loss: 1.1312
-03/18 14:40:09 - mmengine - INFO - Epoch(train)     [7][1000/1461]  lr: 1.0000e-03  eta: 1 day, 13:28:51  time: 0.0102  data_time: 0.0007  memory: 866  loss: 1.1651
-03/18 14:40:09 - mmengine - INFO - Epoch(train)     [7][1050/1461]  lr: 1.0000e-03  eta: 1 day, 13:28:57  time: 0.0093  data_time: 0.0006  memory: 866  loss: 1.1692
-03/18 14:40:10 - mmengine - INFO - Epoch(train)     [7][1100/1461]  lr: 1.0000e-03  eta: 1 day, 13:29:22  time: 0.0095  data_time: 0.0009  memory: 866  loss: 1.2296
-03/18 14:40:10 - mmengine - INFO - Epoch(train)     [7][1150/1461]  lr: 1.0000e-03  eta: 1 day, 13:29:59  time: 0.0104  data_time: 0.0013  memory: 866  loss: 1.1104
-03/18 14:40:11 - mmengine - INFO - Epoch(train)     [7][1200/1461]  lr: 1.0000e-03  eta: 1 day, 13:29:54  time: 0.0100  data_time: 0.0008  memory: 866  loss: 1.2188
-03/18 14:40:11 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:11 - mmengine - INFO - Epoch(train)     [7][1250/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:15  time: 0.0095  data_time: 0.0005  memory: 866  loss: 1.1576
-03/18 14:40:11 - mmengine - INFO - Epoch(train)     [7][1300/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:36  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.1481
-03/18 14:40:12 - mmengine - INFO - Epoch(train)     [7][1350/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:46  time: 0.0094  data_time: 0.0006  memory: 866  loss: 1.1407
-03/18 14:40:12 - mmengine - INFO - Epoch(train)     [7][1400/1461]  lr: 1.0000e-03  eta: 1 day, 13:31:00  time: 0.0094  data_time: 0.0007  memory: 866  loss: 1.1325
-03/18 14:40:13 - mmengine - INFO - Epoch(train)     [7][1450/1461]  lr: 1.0000e-03  eta: 1 day, 13:31:23  time: 0.0092  data_time: 0.0004  memory: 866  loss: 1.1391
-03/18 14:40:13 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:13 - mmengine - INFO - Saving checkpoint at 7 epochs
-03/18 14:40:14 - mmengine - INFO - Epoch(val)     [7][ 50/293]    eta: 0:00:01  time: 0.0072  data_time: 0.0004  memory: 866  
-03/18 14:40:14 - mmengine - INFO - Epoch(val)     [7][100/293]    eta: 0:00:01  time: 0.0071  data_time: 0.0006  memory: 46  
-03/18 14:40:14 - mmengine - INFO - Epoch(val)     [7][150/293]    eta: 0:00:01  time: 0.0070  data_time: 0.0004  memory: 46  
-03/18 14:40:15 - mmengine - INFO - Epoch(val)     [7][200/293]    eta: 0:00:00  time: 0.0071  data_time: 0.0006  memory: 46  
-03/18 14:40:15 - mmengine - INFO - Epoch(val)     [7][250/293]    eta: 0:00:00  time: 0.0071  data_time: 0.0006  memory: 46  
-03/18 14:40:15 - mmengine - INFO - Epoch(val) [7][293/293]    accuracy/top1: 54.7273  loss/classification: 1.1949  data_time: 0.0006  time: 0.0071
-03/18 14:40:16 - mmengine - INFO - Epoch(train)     [8][  50/1461]  lr: 1.0000e-03  eta: 1 day, 13:32:26  time: 0.0096  data_time: 0.0006  memory: 866  loss: 1.1660
-03/18 14:40:16 - mmengine - INFO - Epoch(train)     [8][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 13:32:36  time: 0.0090  data_time: 0.0006  memory: 866  loss: 1.1798
-03/18 14:40:17 - mmengine - INFO - Epoch(train)     [8][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 13:32:47  time: 0.0092  data_time: 0.0004  memory: 866  loss: 1.2137
-03/18 14:40:17 - mmengine - INFO - Epoch(train)     [8][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 13:32:09  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.1485
-03/18 14:40:18 - mmengine - INFO - Epoch(train)     [8][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:29  time: 0.0086  data_time: 0.0006  memory: 866  loss: 1.0692
-03/18 14:40:18 - mmengine - INFO - Epoch(train)     [8][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 13:30:05  time: 0.0088  data_time: 0.0006  memory: 866  loss: 1.1842
-03/18 14:40:19 - mmengine - INFO - Epoch(train)     [8][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 13:29:39  time: 0.0082  data_time: 0.0003  memory: 866  loss: 1.1294
-03/18 14:40:19 - mmengine - INFO - Epoch(train)     [8][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 13:28:29  time: 0.0082  data_time: 0.0003  memory: 866  loss: 1.1061
-03/18 14:40:19 - mmengine - INFO - Epoch(train)     [8][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 13:27:21  time: 0.0085  data_time: 0.0004  memory: 866  loss: 1.1850
-03/18 14:40:20 - mmengine - INFO - Epoch(train)     [8][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:49  time: 0.0087  data_time: 0.0004  memory: 866  loss: 1.1256
-03/18 14:40:20 - mmengine - INFO - Epoch(train)     [8][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 13:26:11  time: 0.0087  data_time: 0.0003  memory: 866  loss: 1.1556
-03/18 14:40:21 - mmengine - INFO - Epoch(train)     [8][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 13:25:35  time: 0.0086  data_time: 0.0003  memory: 866  loss: 1.1512
-03/18 14:40:21 - mmengine - INFO - Epoch(train)     [8][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 13:25:00  time: 0.0087  data_time: 0.0003  memory: 866  loss: 1.0742
-03/18 14:40:22 - mmengine - INFO - Epoch(train)     [8][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 13:24:32  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.0915
-03/18 14:40:22 - mmengine - INFO - Epoch(train)     [8][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 13:24:03  time: 0.0088  data_time: 0.0004  memory: 866  loss: 1.0721
-03/18 14:40:22 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:23 - mmengine - INFO - Epoch(train)     [8][ 800/1461]  lr: 1.0000e-03  eta: 1 day, 13:23:20  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1780
-03/18 14:40:23 - mmengine - INFO - Epoch(train)     [8][ 850/1461]  lr: 1.0000e-03  eta: 1 day, 13:22:36  time: 0.0084  data_time: 0.0005  memory: 866  loss: 1.1420
-03/18 14:40:23 - mmengine - INFO - Epoch(train)     [8][ 900/1461]  lr: 1.0000e-03  eta: 1 day, 13:22:03  time: 0.0087  data_time: 0.0004  memory: 866  loss: 1.0938
-03/18 14:40:24 - mmengine - INFO - Epoch(train)     [8][ 950/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:39  time: 0.0089  data_time: 0.0005  memory: 866  loss: 1.1659
-03/18 14:40:24 - mmengine - INFO - Epoch(train)     [8][1000/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:29  time: 0.0091  data_time: 0.0005  memory: 866  loss: 1.1313
-03/18 14:40:25 - mmengine - INFO - Epoch(train)     [8][1050/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:16  time: 0.0090  data_time: 0.0007  memory: 866  loss: 1.1368
-03/18 14:40:25 - mmengine - INFO - Epoch(train)     [8][1100/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:23  time: 0.0097  data_time: 0.0005  memory: 866  loss: 1.1466
-03/18 14:40:26 - mmengine - INFO - Epoch(train)     [8][1150/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:29  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.1564
-03/18 14:40:26 - mmengine - INFO - Epoch(train)     [8][1200/1461]  lr: 1.0000e-03  eta: 1 day, 13:21:35  time: 0.0085  data_time: 0.0004  memory: 866  loss: 1.0798
-03/18 14:40:27 - mmengine - INFO - Epoch(train)     [8][1250/1461]  lr: 1.0000e-03  eta: 1 day, 13:20:36  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.1585
-03/18 14:40:27 - mmengine - INFO - Epoch(train)     [8][1300/1461]  lr: 1.0000e-03  eta: 1 day, 13:19:32  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.2401
-03/18 14:40:27 - mmengine - INFO - Epoch(train)     [8][1350/1461]  lr: 1.0000e-03  eta: 1 day, 13:18:29  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.1345
-03/18 14:40:28 - mmengine - INFO - Epoch(train)     [8][1400/1461]  lr: 1.0000e-03  eta: 1 day, 13:17:38  time: 0.0089  data_time: 0.0005  memory: 866  loss: 1.2173
-03/18 14:40:28 - mmengine - INFO - Epoch(train)     [8][1450/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:42  time: 0.0083  data_time: 0.0004  memory: 866  loss: 1.1518
-03/18 14:40:28 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:28 - mmengine - INFO - Saving checkpoint at 8 epochs
-03/18 14:40:29 - mmengine - INFO - Epoch(val)     [8][ 50/293]    eta: 0:00:03  time: 0.0071  data_time: 0.0003  memory: 866  
-03/18 14:40:30 - mmengine - INFO - Epoch(val)     [8][100/293]    eta: 0:00:02  time: 0.0070  data_time: 0.0007  memory: 46  
-03/18 14:40:30 - mmengine - INFO - Epoch(val)     [8][150/293]    eta: 0:00:01  time: 0.0072  data_time: 0.0007  memory: 46  
-03/18 14:40:30 - mmengine - INFO - Epoch(val)     [8][200/293]    eta: 0:00:00  time: 0.0070  data_time: 0.0004  memory: 46  
-03/18 14:40:31 - mmengine - INFO - Epoch(val)     [8][250/293]    eta: 0:00:00  time: 0.0070  data_time: 0.0008  memory: 46  
-03/18 14:40:31 - mmengine - INFO - Epoch(val) [8][293/293]    accuracy/top1: 55.2727  loss/classification: 1.1808  data_time: 0.0007  time: 0.0083
-03/18 14:40:32 - mmengine - INFO - Epoch(train)     [9][  50/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:35  time: 0.0083  data_time: 0.0003  memory: 866  loss: 1.0645
-03/18 14:40:32 - mmengine - INFO - Epoch(train)     [9][ 100/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:43  time: 0.0083  data_time: 0.0003  memory: 866  loss: 1.1028
-03/18 14:40:32 - mmengine - INFO - Epoch(train)     [9][ 150/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:03  time: 0.0080  data_time: 0.0003  memory: 866  loss: 1.1122
-03/18 14:40:33 - mmengine - INFO - Epoch(train)     [9][ 200/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:29  time: 0.0099  data_time: 0.0009  memory: 866  loss: 1.1570
-03/18 14:40:33 - mmengine - INFO - Epoch(train)     [9][ 250/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:47  time: 0.0096  data_time: 0.0010  memory: 866  loss: 1.1111
-03/18 14:40:34 - mmengine - INFO - Epoch(train)     [9][ 300/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:55  time: 0.0092  data_time: 0.0006  memory: 866  loss: 1.0563
-03/18 14:40:34 - mmengine - INFO - Exp name: cnn2_iq-deepsig-201610A_20260318_143741
-03/18 14:40:34 - mmengine - INFO - Epoch(train)     [9][ 350/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:13  time: 0.0098  data_time: 0.0008  memory: 866  loss: 1.1585
-03/18 14:40:35 - mmengine - INFO - Epoch(train)     [9][ 400/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:18  time: 0.0091  data_time: 0.0005  memory: 866  loss: 1.1635
-03/18 14:40:35 - mmengine - INFO - Epoch(train)     [9][ 450/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:58  time: 0.0097  data_time: 0.0016  memory: 866  loss: 1.1224
-03/18 14:40:36 - mmengine - INFO - Epoch(train)     [9][ 500/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:59  time: 0.0082  data_time: 0.0004  memory: 866  loss: 1.2028
-03/18 14:40:36 - mmengine - INFO - Epoch(train)     [9][ 550/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:10  time: 0.0086  data_time: 0.0004  memory: 866  loss: 1.1662
-03/18 14:40:37 - mmengine - INFO - Epoch(train)     [9][ 600/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:26  time: 0.0093  data_time: 0.0006  memory: 866  loss: 1.1383
-03/18 14:40:37 - mmengine - INFO - Epoch(train)     [9][ 650/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:30  time: 0.0092  data_time: 0.0005  memory: 866  loss: 1.2060
-03/18 14:40:38 - mmengine - INFO - Epoch(train)     [9][ 700/1461]  lr: 1.0000e-03  eta: 1 day, 13:15:44  time: 0.0093  data_time: 0.0005  memory: 866  loss: 1.1588
-03/18 14:40:38 - mmengine - INFO - Epoch(train)     [9][ 750/1461]  lr: 1.0000e-03  eta: 1 day, 13:16:01  time: 0.0094  data_time: 0.0009  memory: 866  loss: 1.0385
-
-```
-</details>
-</tool-use>
-
----
-
-<think><details><summary>Thought Process</summary>
-**Checking training config**
-
-The runner.max_epochs=2 override isn't taking effect; training continues past epoch 2 to epoch 9, suggesting conflicting logic in param_scheduler or train_cfg. </details></think>
-
----
-
-
-训练已成功启动，环境配置正常。
-
-**本次修改：**
-
-1. **`hr_fuse.py`**：将 `ResNet` 相关导入改为使用 `mmdet` 的实现  
-2. **`ofa_modules.py`**：同上，改为从 `mmdet` 导入  
-3. **新增 `vision_transformer.py`**：实现 `TransformerEncoderLayer`，供 MAE 等 necks 使用  
-4. **`models/__init__.py`**：对 necks、multimodal、retrievers、selfsup、tta 使用可选导入，避免缺少依赖时影响基础模型训练  
-
-**训练验证：**
-
-- 使用 CNN2 在 DeepSig RadioML.2016.10A 上训练  
-- 训练与验证流程正常，loss 下降，accuracy 约 54–55%  
-
-**说明：** 当前 `selfsup`、`multimodal` 等模块因缺少 `BEiTViT` 等依赖会导入失败，但已通过 try/except 处理，不影响 CNN2、FastMLDNN 等基础模型的训练。
-
----
-
 _**User**_
 
 这个代码目前支持的模型和reademe里面一致：
 @README.md (22-43) 
 其它的模型都是不支持的，因为我们这个框架直接用了是在别的框架基础上修改的，因此遗留了一些其它框架的代码请你帮我清理掉比如config配置以及csrr里面的核心代码，我们希望这个框架尽量只依赖mmengine对于其它mm家族的框架依赖尽量最低。我希望你能站在专家的角度好好帮我梳理整个项目的所有代码，帮我做好代码的清理工作
+
+---
+
+训练验证是不是也验证通过了
+
+---
+
+请你仔细帮我梳理整个代码，我这个代码开发了很长时间。整个项目是基于mmengine进行开发的，用于维护一个用于频谱信号识别的任务框架。目前模型的训练以及测试这些功能都没有问题。但是目前关于绘制模型的曲线模块没有完整的重构合并进来，原来其实我们基于类似训练模型的配置风格，搞了一个绘制曲线的功能，这个你可以查阅好比这个代码：https://github.com/Singingkettle/ChangShuoRadioRecognition/blob/211b49f6c53028ae926560222427b44156574be4/configs/mldnn/mldnn_plot.py 。这个逻辑整体上是这样的，就是比如我新搞了一个算法，然后我需要编写论文，试验部分的一些图和表，我希望绘制，那么这个绘制其实就是你想绘制那些曲线，这些曲线你和那些算法做对比。然后每个算法我们会给一个大写字母类似的简写名称，同时在：https://github.com/Singingkettle/ChangShuoRadioRecognition/blob/211b49f6c53028ae926560222427b44156574be4/configs/_base_/performance_info/amc.py 给一张对照表，就是你这个算法到底使用那个训练好的模型。我希望你能联网仔细梳理一下：https://github.com/Singingkettle/ChangShuoRadioRecognition/blob/211b49f6c53028ae926560222427b44156574be4 这个节点时候我们的曲线生成逻辑。然后基于我现在代码的进行合理的重构把曲线绘制功能添加进来。我这个功能原来很强大，就是每个算法名称绘制曲线的时候他不管绘制啥曲线它的线性以及颜色都是固定的，保持了一致性。此外一些曲线对比，可以方便的修改plot配置文件，你可以方便的对比已有训练好的算法，避免每次重复训练其它的模型，而且比如说我们绘制同一类型的曲线，一组像和ABC做对比一组想和BCD方法对比，都是可以的。只要写配置文件。我们的逻辑引擎会给予你想出的实验结果图或者表，按照配置去抓取对应的模型在测试集上的表现结果。当然我说的不全面你好好检查我们原来那个节点是如何实现的，然后我希望你再考虑易用性的角度上把这个功能在当前这个项目代码进行实现，实现完请你训练3个不同的算法模型来测试这个绘制功能
+
+---
+
+你的绘图的核心代码放在那里了 csrr下面有 paper 以及 performance文件夹，其实paper是我们以前自己准备手动重构的，你可以删除无用，深度清理一次代码文件以及文件夹，同时更新  @README.md  @README_zh-CN.md  说明我们项目的代码使用方式
 
 ---
 
