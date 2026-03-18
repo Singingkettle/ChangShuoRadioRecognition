@@ -6,7 +6,6 @@ NECKS = MODELS
 HEADS = MODELS
 LOSSES = MODELS
 CLASSIFIERS = MODELS
-RETRIEVER = MODELS
 
 
 def build_backbone(cfg):
@@ -32,8 +31,3 @@ def build_loss(cfg):
 def build_classifier(cfg):
     """Build classifier."""
     return CLASSIFIERS.build(cfg)
-
-
-def build_retriever(cfg):
-    """Build retriever."""
-    return RETRIEVER.build(cfg)

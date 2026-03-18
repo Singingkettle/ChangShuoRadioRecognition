@@ -18,7 +18,7 @@ class DAEHead(BaseModule):
         loss_cls (dict): Config of classification loss. Defaults to
             ``dict(type='CrossEntropyLoss', loss_weight=0.1)``.
         loss_mse (dict): Config of mse loss. Defaults to
-            ``dict(type='MSELoss', loss_weight=0.9, reduction='mean', _scope_='mmdet')
+            ``dict(type='MSELoss', loss_weight=0.9, reduction='mean')
         topk (int | Tuple[int]): Top-k accuracy. Defaults to ``(1, )``.
         cal_acc (bool): Whether to calculate accuracy during training.
             If you use batch augmentations like Mixup and CutMix during
@@ -30,7 +30,7 @@ class DAEHead(BaseModule):
 
     def __init__(self,
                  loss_cls: dict = dict(type='CrossEntropyLoss', loss_weight=0.1),
-                 loss_mse: dict = dict(type='MSELoss', loss_weight=0.9, reduction='mean', _scope_='mmdet'),
+                 loss_mse: dict = dict(type='MSELoss', loss_weight=0.9, reduction='mean'),
                  topk: Union[int, Tuple[int]] = (1,),
                  cal_acc: bool = False,
                  init_cfg: Optional[dict] = None):

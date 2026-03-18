@@ -63,20 +63,3 @@ def require(dep, install=None):
         return ask_install
 
     return wrapper
-
-
-WITH_MULTIMODAL = all(
-    satisfy_requirement(item)
-    for item in ['pycocotools', 'transformers>=4.28.0'])
-
-
-def register_multimodal_placeholder(names, registry):
-    for name in names:
-
-        def ask_install(*args, **kwargs):
-            raise ImportError(
-                f'{name} requires extra multi-modal dependencies, please '
-                'install it by `pip install "csrr[multimodal]"` '
-                'or `pip install -e ".[multimodal]"`.')
-
-        registry.register_module(name=name, module=ask_install)
