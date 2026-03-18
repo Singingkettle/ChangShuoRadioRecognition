@@ -1,0 +1,17 @@
+einops
+importlib-metadata
+mat4py
+matplotlib
+modelindex
+numpy
+rich
+h5py
+pyzmq
+cvxopt
+tensorboard
+tensorboardX
+seaborn
+tsne-torch
+# accelerate the cvs load speed
+pyarrow
+lightgbm
