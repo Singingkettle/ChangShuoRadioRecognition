@@ -11,6 +11,7 @@ model = dict(
         type='DensCNN',
         frame_length=1024,
         num_classes=24,
+        init_cfg=dict(type='Xavier', layer='Conv2d')
     ),
     head=dict(
         type='ClsHead',

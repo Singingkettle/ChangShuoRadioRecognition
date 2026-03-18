@@ -10,6 +10,7 @@ model = dict(
     backbone=dict(
         type='CNN4',
         num_classes=10,
+        init_cfg=dict(type='Xavier', layer='Conv2d')
     ),
     head=dict(
         type='ClsHead',

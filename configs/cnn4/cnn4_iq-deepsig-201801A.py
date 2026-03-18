@@ -11,6 +11,7 @@ model = dict(
         type='CNN4',
         frame_length=1024,
         num_classes=24,
+        init_cfg=dict(type='Xavier', layer='Conv2d')
     ),
     head=dict(
         type='ClsHead',

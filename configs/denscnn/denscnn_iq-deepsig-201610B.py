@@ -10,6 +10,7 @@ model = dict(
     backbone=dict(
         type='DensCNN',
         num_classes=10,
+        init_cfg=dict(type='Xavier', layer='Conv2d')
     ),
     head=dict(
         type='ClsHead',
