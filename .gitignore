@@ -125,4 +125,4 @@ work_dirs/
 *.pth
 *.py~
 *.sh~
-。
+.specstory/
