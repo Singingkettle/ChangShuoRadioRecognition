@@ -1,43 +1,17 @@
-from csrr.common.utils import Registry, build_from_cfg
+from mmengine.registry import Registry
 
 FIGURES = Registry('figure')
 TABLES = Registry('table')
-PERFORMANCES = Registry('performance_info')
-
-
-def build(cfg, registry, default_args=None):
-    """Build a performance_info.
-
-    Args:
-        cfg (dict, list[dict]): The figure_configs of modules, is is either a dict
-            or a list of figure_configs.
-        registry (:obj:`Registry`): A registry the module belongs to.
-        default_args (dict, optional): Default arguments to build the module.
-            Defaults to None.
-
-    Returns:
-        performance_info: A list of performance_info handle.
-    """
-    if isinstance(cfg, list):
-        performances = [
-            build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
-        ]
-        return performances
-    else:
-        return build_from_cfg(cfg, registry, default_args)
-
-
-def build_table(cfg, **kwargs):
-    """Build confusion map."""
-    return build(cfg, TABLES, kwargs)
+PERFORMANCES = Registry('performance')
 
 
 def build_figure(cfg, **kwargs):
-    """Build figure."""
+    return FIGURES.build(cfg, default_args=kwargs)
 
-    return build(cfg, FIGURES, kwargs)
+
+def build_table(cfg, **kwargs):
+    return TABLES.build(cfg, default_args=kwargs)
 
 
 def build_performance(cfg, **kwargs):
-    """Build performance"""
-    return build(cfg, PERFORMANCES, kwargs)
+    return PERFORMANCES.build(cfg, default_args=kwargs)

@@ -12,7 +12,7 @@ except:
 from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc
 from sklearn.preprocessing import label_binarize
 
-from csrr.common.utils import Config
+from mmengine.config import Config
 
 
 class ClassificationMetricsForSingle:

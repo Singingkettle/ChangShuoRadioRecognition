@@ -1,12 +1,13 @@
 import argparse
 
 from mmengine.config import Config
-from mmengine.runner import Runner
+
+from csrr.performance.builder import build_performance
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='ChangShuoRadioRecognition Performance Results')
+        description='ChangShuoRadioRecognition Performance Analysis')
     parser.add_argument('config', help='performance config file path')
     args = parser.parse_args()
     return args
@@ -14,18 +15,12 @@ def parse_args():
 
 def main():
     args = parse_args()
-
-    # load config
     cfg = Config.fromfile(args.config)
+    print(cfg.pretty_text)
 
-    # merge cli arguments to config
-    cfg = merge_args(cfg, args)
-
-    # build the runner from config
-    runner = Runner.from_cfg(cfg)
-
-    # start training
-    runner.train()
+    cfg.performance['info'] = cfg.info
+    performance = build_performance(cfg.performance)
+    performance.draw()
 
 
 if __name__ == '__main__':

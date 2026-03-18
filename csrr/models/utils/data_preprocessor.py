@@ -16,6 +16,8 @@ class SignalDataPreprocessor(BaseDataPreprocessor):
 
     def forward(self, data: dict, training: bool = False) -> dict:
         inputs = self.cast_data(data['inputs'])
+        if isinstance(inputs, (list, tuple)):
+            inputs = torch.stack(inputs)
         data_samples = data.get('data_samples', None)
         sample_item = data_samples[0] if data_samples is not None else None
 
