@@ -2,6 +2,7 @@
   "exclude": [
     "data",
     "csrr.egg-info",
-    "work_dirs"
+    "work_dirs",
+    "configs/fastmldnn/paper"
   ]
 }
