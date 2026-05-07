@@ -78,3 +78,13 @@
   - `tools/rcps/monitor_experiments.py` writes one factual snapshot to JSONL and Markdown logs under `/home/citybuster/Data/RCPS/work_dirs/logs`.
   - `tools/rcps/monitor_loop.sh` runs the snapshotter repeatedly, defaulting to one snapshot every 600 seconds.
 - Snapshot status at policy adoption: first-stage calibration still running, 7 validation CSVs observed, error scan clean, no conclusions drawn yet.
+
+## Iteration 7: Night Monitoring Handoff
+
+- Handoff time: 2026-05-07 23:40 CST.
+- Active monitor: `tools/rcps/monitor_loop.sh`, appending status snapshots every 600 seconds.
+- Active watchdog: `/home/citybuster/Data/RCPS/work_dirs/logs/rcps_calibration_watchdog.sh`, waiting for the first-stage calibration grid to reach 68 validation CSVs before launching the confusion grid.
+- Current first-stage status: 10/68 validation CSVs; confusion stage 0/48.
+- Current running candidates: `CGDNet` and `MCLDNN` have entered the `RCPS-Uniform` grid after completing hard-label and static label-smoothing candidates.
+- Error scan at handoff: clean for tracebacks, conda errors, and CUDA OOM.
+- Night policy: do not change epochs, grids, datasets, or model set overnight; only record progress and let watchdog advance the predefined queue.
