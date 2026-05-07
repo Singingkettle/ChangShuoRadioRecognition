@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--dataset', default='deepsig201610A')
     parser.add_argument('--work-root', default='/home/citybuster/Data/RCPS/work_dirs')
     parser.add_argument('--max-epochs', type=int, default=None)
+    parser.add_argument('--num-workers', type=int, default=None)
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--test', action='store_true')
     args = parser.parse_args()
@@ -48,6 +49,12 @@ def main():
                 cfg_options = [f'randomness.seed={seed}', f'work_dir={work_dir.as_posix()}']
                 if args.max_epochs is not None:
                     cfg_options.append(f'train_cfg.max_epochs={args.max_epochs}')
+                if args.num_workers is not None:
+                    cfg_options.extend([
+                        f'train_dataloader.num_workers={args.num_workers}',
+                        f'val_dataloader.num_workers={args.num_workers}',
+                        f'test_dataloader.num_workers={args.num_workers}',
+                    ])
                 run(['python', 'tools/train.py', config, '--cfg-options', *cfg_options], args.execute)
                 if args.test:
                     matches = sorted(work_dir.glob('best_accuracy_top1_epoch_*.pth'))
