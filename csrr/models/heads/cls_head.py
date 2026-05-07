@@ -92,8 +92,10 @@ class ClsHead(BaseModule):
 
         # compute loss
         losses = dict()
-        loss = self.loss_module(
-            cls_score, target, avg_factor=cls_score.size(0), **kwargs)
+        loss_kwargs = dict(avg_factor=cls_score.size(0), **kwargs)
+        if getattr(self.loss_module, 'requires_data_samples', False):
+            loss_kwargs['data_samples'] = data_samples
+        loss = self.loss_module(cls_score, target, **loss_kwargs)
         losses['loss'] = loss
 
         # compute accuracy

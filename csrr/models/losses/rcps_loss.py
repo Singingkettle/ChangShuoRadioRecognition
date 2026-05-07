@@ -1,0 +1,334 @@
+# Copyright (c) ShuoChang. All rights reserved.
+import math
+import pickle
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Union
+
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from csrr.registry import MODELS
+from csrr.structures import DataSample
+from .cross_entropy_loss import soft_cross_entropy
+from .utils import weight_reduce_loss
+
+
+def _as_tensor_1d(values, device, dtype=torch.float32):
+    tensor = torch.as_tensor(values, device=device, dtype=dtype)
+    return tensor.flatten()
+
+
+def _load_array(source: Union[str, Path]):
+    source = Path(source)
+    suffix = source.suffix.lower()
+    if suffix == '.npy':
+        return np.load(source)
+    if suffix in {'.pkl', '.pickle'}:
+        with source.open('rb') as f:
+            return pickle.load(f)
+    if suffix in {'.pt', '.pth'}:
+        return torch.load(source, map_location='cpu')
+    raise ValueError(f'Unsupported RCPS source file: {source}')
+
+
+def _get_sample_value(sample: DataSample, key: str):
+    value = sample.get(key, None)
+    if value is None and hasattr(sample, key):
+        value = getattr(sample, key)
+    if value is None:
+        raise KeyError(
+            f'RCPS requires reliability key "{key}" in data_samples. '
+            'Add it through PackInputs(meta_keys=(..., "snr")).')
+    if isinstance(value, torch.Tensor):
+        value = value.detach().flatten()[0]
+    return value
+
+
+def collect_reliability(data_samples: List[DataSample], key: str,
+                        device: torch.device) -> torch.Tensor:
+    """Collect reliability metadata from a batch of DataSample objects."""
+    values = [_get_sample_value(sample, key) for sample in data_samples]
+    return _as_tensor_1d(values, device=device)
+
+
+def map_reliability(raw_reliability: torch.Tensor,
+                    cfg: Optional[Dict] = None) -> torch.Tensor:
+    """Map a raw reliability coordinate such as SNR to [0, 1]."""
+    cfg = cfg or dict(type='identity')
+    map_type = cfg.get('type', 'identity')
+
+    if map_type == 'identity':
+        reliability = raw_reliability.float()
+    elif map_type == 'linear':
+        min_value = float(cfg['min'])
+        max_value = float(cfg['max'])
+        if math.isclose(max_value, min_value):
+            raise ValueError('linear reliability_map requires max != min.')
+        reliability = (raw_reliability.float() - min_value) / (max_value - min_value)
+    else:
+        raise ValueError(f'Unsupported reliability map type: {map_type}')
+
+    return reliability.clamp_(0.0, 1.0)
+
+
+def build_epsilon(reliability: torch.Tensor,
+                  cfg: Optional[Dict] = None) -> torch.Tensor:
+    """Build the RCPS interpolation strength epsilon(r)."""
+    cfg = cfg or dict(type='power', max=1.0, gamma=1.0)
+    eps_type = cfg.get('type', 'power')
+
+    if eps_type == 'power':
+        eps_max = float(cfg.get('max', 1.0))
+        gamma = float(cfg.get('gamma', 1.0))
+        epsilon = eps_max * torch.pow(1.0 - reliability, gamma)
+    elif eps_type == 'constant':
+        epsilon = torch.full_like(reliability, float(cfg.get('value', 0.0)))
+    else:
+        raise ValueError(f'Unsupported epsilon type: {eps_type}')
+
+    return epsilon.clamp_(0.0, 1.0)
+
+
+def _normalize_distribution(dist: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
+    dist = dist.clamp_min(eps)
+    return dist / dist.sum(dim=-1, keepdim=True).clamp_min(eps)
+
+
+def _build_uniform_base(label: torch.Tensor, num_classes: int) -> torch.Tensor:
+    return label.new_full((label.size(0), num_classes), 1.0 / num_classes, dtype=torch.float32)
+
+
+def _build_prior_base(label: torch.Tensor, num_classes: int, cfg: Dict) -> torch.Tensor:
+    device = label.device
+    if 'prior' in cfg:
+        prior = torch.as_tensor(cfg['prior'], dtype=torch.float32, device=device)
+    elif 'source' in cfg:
+        prior = torch.as_tensor(_load_array(cfg['source']), dtype=torch.float32, device=device)
+    else:
+        prior = torch.ones(num_classes, dtype=torch.float32, device=device)
+    if prior.numel() != num_classes:
+        raise ValueError(f'Prior has {prior.numel()} entries, expected {num_classes}.')
+    prior = _normalize_distribution(prior.reshape(1, -1))
+    return prior.expand(label.size(0), -1)
+
+
+def _build_confusion_base(label: torch.Tensor, num_classes: int, cfg: Dict,
+                          reliability: Optional[torch.Tensor] = None) -> torch.Tensor:
+    device = label.device
+    if 'matrix' in cfg:
+        matrix = torch.as_tensor(cfg['matrix'], dtype=torch.float32, device=device)
+    elif 'source' in cfg:
+        matrix = torch.as_tensor(_load_array(cfg['source']), dtype=torch.float32, device=device)
+    else:
+        raise ValueError('Confusion-aware RCPS base requires "matrix" or "source".')
+
+    if matrix.shape != (num_classes, num_classes):
+        raise ValueError(f'Confusion matrix shape {tuple(matrix.shape)} does not match ({num_classes}, {num_classes}).')
+
+    laplace = float(cfg.get('laplace', 1e-4))
+    temperature = float(cfg.get('temperature', 1.0))
+    base = matrix[label.long()].float().clamp_min(0.0) + laplace
+    if not math.isclose(temperature, 1.0):
+        base = torch.pow(base, 1.0 / temperature)
+    base = _normalize_distribution(base)
+
+    prior_blend = float(cfg.get('prior_blend', 0.0))
+    if prior_blend > 0.0 and reliability is not None:
+        prior_cfg = cfg.get('prior', dict(type='uniform'))
+        if isinstance(prior_cfg, (list, tuple)):
+            prior_cfg = dict(type='prior', prior=prior_cfg)
+        if prior_cfg.get('type', 'uniform') == 'uniform':
+            prior = _build_uniform_base(label, num_classes)
+        else:
+            prior = _build_prior_base(label, num_classes, prior_cfg)
+        alpha = (prior_blend * (1.0 - reliability)).clamp(0.0, 1.0).reshape(-1, 1)
+        base = (1.0 - alpha) * base + alpha * prior
+        base = _normalize_distribution(base)
+    return base
+
+
+def build_base_distribution(label: torch.Tensor,
+                            num_classes: int,
+                            cfg: Optional[Dict] = None,
+                            reliability: Optional[torch.Tensor] = None) -> torch.Tensor:
+    cfg = cfg or dict(type='uniform')
+    base_type = cfg.get('type', 'uniform')
+    if base_type == 'uniform':
+        return _build_uniform_base(label, num_classes)
+    if base_type == 'prior':
+        return _build_prior_base(label, num_classes, cfg)
+    if base_type == 'confusion':
+        return _build_confusion_base(label, num_classes, cfg, reliability)
+    raise ValueError(f'Unsupported RCPS base type: {base_type}')
+
+
+def build_sample_weight(reliability: torch.Tensor,
+                        cfg: Optional[Dict] = None) -> Optional[torch.Tensor]:
+    cfg = cfg or dict(type='none')
+    weight_type = cfg.get('type', 'none')
+    if weight_type == 'none':
+        return None
+    if weight_type == 'reliability_power':
+        gamma = float(cfg.get('gamma', 1.0))
+        min_weight = float(cfg.get('min', 0.0))
+        return (min_weight + (1.0 - min_weight) * torch.pow(reliability, gamma)).clamp_min(0.0)
+    raise ValueError(f'Unsupported sample weight type: {weight_type}')
+
+
+def build_rcps_targets(label: torch.Tensor,
+                       raw_reliability: torch.Tensor,
+                       num_classes: int,
+                       reliability_map: Optional[Dict] = None,
+                       epsilon: Optional[Dict] = None,
+                       base: Optional[Dict] = None) -> torch.Tensor:
+    """Build reliability-conditioned posterior supervision targets."""
+    if label.ndim != 1:
+        label = label.flatten()
+    if label.numel() != raw_reliability.numel():
+        raise ValueError('label and raw_reliability must have the same batch size.')
+
+    reliability = map_reliability(raw_reliability, reliability_map)
+    eps = build_epsilon(reliability, epsilon).reshape(-1, 1)
+    one_hot = F.one_hot(label.long(), num_classes=num_classes).float()
+    base_dist = build_base_distribution(label, num_classes, base, reliability)
+    target = (1.0 - eps) * one_hot + eps * base_dist
+    return _normalize_distribution(target)
+
+
+@MODELS.register_module()
+class RCPSCrossEntropyLoss(nn.Module):
+    """Reliability-Conditioned Posterior Supervision loss."""
+
+    requires_data_samples = True
+
+    def __init__(self,
+                 reliability_key: str = 'snr',
+                 reliability_map: Optional[Dict] = None,
+                 epsilon: Optional[Dict] = None,
+                 base: Optional[Dict] = None,
+                 sample_weight: Optional[Dict] = None,
+                 reduction: str = 'mean',
+                 loss_weight: float = 1.0,
+                 class_weight: Optional[Sequence[float]] = None):
+        super().__init__()
+        self.reliability_key = reliability_key
+        self.reliability_map = reliability_map or dict(type='identity')
+        self.epsilon = epsilon or dict(type='power', max=1.0, gamma=1.0)
+        self.base = base or dict(type='uniform')
+        self.sample_weight = sample_weight or dict(type='none')
+        self.reduction = reduction
+        self.loss_weight = loss_weight
+        self.class_weight = class_weight
+
+    def forward(self,
+                cls_score: torch.Tensor,
+                label: torch.Tensor,
+                weight: Optional[torch.Tensor] = None,
+                avg_factor: Optional[int] = None,
+                reduction_override: Optional[str] = None,
+                data_samples: Optional[List[DataSample]] = None,
+                **kwargs) -> torch.Tensor:
+        if data_samples is None:
+            raise ValueError('RCPSCrossEntropyLoss requires data_samples.')
+        if label.ndim != 1:
+            raise ValueError('RCPSCrossEntropyLoss expects hard class labels, not gt_score.')
+
+        raw_reliability = collect_reliability(data_samples, self.reliability_key, cls_score.device)
+        targets = build_rcps_targets(
+            label=label,
+            raw_reliability=raw_reliability,
+            num_classes=cls_score.size(1),
+            reliability_map=self.reliability_map,
+            epsilon=self.epsilon,
+            base=self.base)
+
+        reliability = map_reliability(raw_reliability, self.reliability_map)
+        rcps_weight = build_sample_weight(reliability, self.sample_weight)
+        if weight is not None and rcps_weight is not None:
+            weight = weight.to(cls_score.device).float() * rcps_weight
+        elif rcps_weight is not None:
+            weight = rcps_weight
+
+        class_weight = None
+        if self.class_weight is not None:
+            class_weight = cls_score.new_tensor(self.class_weight)
+
+        reduction = reduction_override if reduction_override else self.reduction
+        return self.loss_weight * soft_cross_entropy(
+            cls_score,
+            targets,
+            weight=weight,
+            reduction=reduction,
+            class_weight=class_weight,
+            avg_factor=avg_factor)
+
+
+@MODELS.register_module()
+class LabelSmoothingCrossEntropyLoss(nn.Module):
+    """Static label smoothing baseline implemented as soft cross entropy."""
+
+    def __init__(self,
+                 smoothing: float = 0.1,
+                 reduction: str = 'mean',
+                 loss_weight: float = 1.0,
+                 class_weight: Optional[Sequence[float]] = None):
+        super().__init__()
+        self.smoothing = float(smoothing)
+        self.reduction = reduction
+        self.loss_weight = loss_weight
+        self.class_weight = class_weight
+
+    def forward(self,
+                cls_score: torch.Tensor,
+                label: torch.Tensor,
+                weight: Optional[torch.Tensor] = None,
+                avg_factor: Optional[int] = None,
+                reduction_override: Optional[str] = None,
+                **kwargs) -> torch.Tensor:
+        num_classes = cls_score.size(1)
+        one_hot = F.one_hot(label.long().flatten(), num_classes=num_classes).float()
+        uniform = one_hot.new_full(one_hot.shape, 1.0 / num_classes)
+        targets = (1.0 - self.smoothing) * one_hot + self.smoothing * uniform
+        class_weight = None
+        if self.class_weight is not None:
+            class_weight = cls_score.new_tensor(self.class_weight)
+        reduction = reduction_override if reduction_override else self.reduction
+        return self.loss_weight * soft_cross_entropy(
+            cls_score,
+            targets,
+            weight=weight,
+            reduction=reduction,
+            class_weight=class_weight,
+            avg_factor=avg_factor)
+
+
+@MODELS.register_module()
+class ConfidencePenaltyLoss(nn.Module):
+    """Cross entropy with a confidence penalty on low-entropy predictions."""
+
+    def __init__(self,
+                 beta: float = 0.1,
+                 reduction: str = 'mean',
+                 loss_weight: float = 1.0):
+        super().__init__()
+        self.beta = float(beta)
+        self.reduction = reduction
+        self.loss_weight = loss_weight
+
+    def forward(self,
+                cls_score: torch.Tensor,
+                label: torch.Tensor,
+                weight: Optional[torch.Tensor] = None,
+                avg_factor: Optional[int] = None,
+                reduction_override: Optional[str] = None,
+                **kwargs) -> torch.Tensor:
+        ce = F.cross_entropy(cls_score, label.long().flatten(), reduction='none')
+        log_prob = F.log_softmax(cls_score, dim=-1)
+        prob = log_prob.exp()
+        penalty = (prob * log_prob).sum(dim=-1)
+        loss = ce + self.beta * penalty
+        reduction = reduction_override if reduction_override else self.reduction
+        loss = weight_reduce_loss(loss, weight=weight, reduction=reduction, avg_factor=avg_factor)
+        return self.loss_weight * loss

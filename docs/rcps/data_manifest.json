@@ -1,0 +1,232 @@
+{
+  "DeepSig/RadioML.2016.04C": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/DeepSig/RadioML.2016.04C",
+    "num_classes": 11,
+    "classes": [
+      "8PSK",
+      "AM-DSB",
+      "AM-SSB",
+      "BPSK",
+      "CPFSK",
+      "GFSK",
+      "4PAM",
+      "16QAM",
+      "64QAM",
+      "QPSK",
+      "WBFM"
+    ],
+    "splits": {
+      "train": {
+        "samples": 80960,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 16220,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 64880,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      }
+    }
+  },
+  "DeepSig/RadioML.2016.10A": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/DeepSig/RadioML.2016.10A",
+    "num_classes": 11,
+    "classes": [
+      "8PSK",
+      "AM-DSB",
+      "AM-SSB",
+      "BPSK",
+      "CPFSK",
+      "GFSK",
+      "4PAM",
+      "16QAM",
+      "64QAM",
+      "QPSK",
+      "WBFM"
+    ],
+    "splits": {
+      "train": {
+        "samples": 110000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 22000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 88000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      }
+    }
+  },
+  "DeepSig/RadioML.2016.10B": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/DeepSig/RadioML.2016.10B",
+    "num_classes": 10,
+    "classes": [
+      "8PSK",
+      "AM-DSB",
+      "BPSK",
+      "CPFSK",
+      "GFSK",
+      "4PAM",
+      "16QAM",
+      "64QAM",
+      "QPSK",
+      "WBFM"
+    ],
+    "splits": {
+      "train": {
+        "samples": 600000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 120000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 480000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      }
+    }
+  },
+  "DeepSig/RadioML.2018.01A": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/DeepSig/RadioML.2018.01A",
+    "num_classes": 24,
+    "classes": [
+      "OOK",
+      "4ASK",
+      "8ASK",
+      "BPSK",
+      "QPSK",
+      "8PSK",
+      "16PSK",
+      "32PSK",
+      "16APSK",
+      "32APSK",
+      "64APSK",
+      "128APSK",
+      "16QAM",
+      "32QAM",
+      "64QAM",
+      "128QAM",
+      "256QAM",
+      "AM-SSB-WC",
+      "AM-SSB-SC",
+      "AM-DSB-WC",
+      "AM-DSB-SC",
+      "FM",
+      "GMSK",
+      "OQPSK"
+    ],
+    "splits": {
+      "train": {
+        "samples": 1277952,
+        "reliability": "-20..30 (26 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 255216,
+        "reliability": "-20..30 (26 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 1022736,
+        "reliability": "-20..30 (26 bins)",
+        "status": "ok"
+      }
+    }
+  },
+  "Hisar/HisarMod2019.1": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/Hisar/HisarMod2019.1",
+    "num_classes": 26,
+    "classes": [
+      "BPSK",
+      "QPSK",
+      "8PSK",
+      "16PSK",
+      "32PSK",
+      "64PSK",
+      "4QAM",
+      "8QAM",
+      "16QAM",
+      "32QAM",
+      "64QAM",
+      "128QAM",
+      "256QAM",
+      "2FSK",
+      "4FSK",
+      "8FSK",
+      "16FSK",
+      "4PAM",
+      "8PAM",
+      "16PAM",
+      "AM-DSB",
+      "AM-DSB-SC",
+      "AM-USB",
+      "AM-LSB",
+      "FM",
+      "PM"
+    ],
+    "splits": {
+      "train": {
+        "samples": 416000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 104000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 260000,
+        "reliability": "-20..18 (20 bins)",
+        "status": "ok"
+      }
+    }
+  },
+  "UCSD/RML22": {
+    "path": "/home/citybuster/Data/WirelessRadio/data/ModulationClassification/UCSD/RML22",
+    "num_classes": 10,
+    "classes": [
+      "8PSK",
+      "AM-DSB",
+      "BPSK",
+      "CPFSK",
+      "GFSK",
+      "4PAM",
+      "16QAM",
+      "64QAM",
+      "QPSK",
+      "WBFM"
+    ],
+    "splits": {
+      "train": {
+        "samples": 210000,
+        "reliability": "-20..20 (21 bins)",
+        "status": "ok"
+      },
+      "validation": {
+        "samples": 42000,
+        "reliability": "-20..20 (21 bins)",
+        "status": "ok"
+      },
+      "test": {
+        "samples": 168000,
+        "reliability": "-20..20 (21 bins)",
+        "status": "ok"
+      }
+    }
+  }
+}
