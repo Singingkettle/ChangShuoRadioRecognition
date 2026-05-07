@@ -14,6 +14,10 @@ Generate the commands for the TPAMI main table:
 python tools/rcps/run_amc_matrix.py
 ```
 
+The default matrix now uses the stronger maintained baselines
+`MCLDNN`, `CGDNet`, `PETCGDNN`, and `MCformer`. `CNN2` is kept as a
+smoke-test and ablation model only.
+
 Execute the same matrix:
 
 ```bash
@@ -29,6 +33,32 @@ python tools/rcps/run_amc_matrix.py \
   --seeds 2026 \
   --max-epochs 1 \
   --execute --test
+```
+
+## Calibration Grid
+
+Run a one-seed calibration pilot on the stronger AMC models:
+
+```bash
+python tools/rcps/run_calibration_grid.py \
+  --models mcldnn cgdnet petcgdnn mcformer \
+  --methods hard-ce rcps-uniform \
+  --seeds 2026 \
+  --max-epochs 1 \
+  --epsilon-max 0.3 0.5 0.7 1.0 \
+  --epsilon-gamma 0.5 1.0 2.0 \
+  --collect-splits validation \
+  --analyze \
+  --execute
+```
+
+For a smaller pilot, pass one candidate such as `--epsilon-max 0.5
+--epsilon-gamma 2.0`. Select candidates with:
+
+```bash
+python tools/rcps/select_calibration.py \
+  --metrics /home/citybuster/Data/RCPS/work_dirs/metrics/calibration/*.csv \
+  --out-csv /home/citybuster/Data/RCPS/work_dirs/metrics/calibration/selected.csv
 ```
 
 ## Prior and Confusion Bases

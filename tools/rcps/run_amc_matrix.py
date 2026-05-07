@@ -14,6 +14,14 @@ CONFIGS = {
     ('mcldnn', 'static-ls'): 'configs/rcps/mcldnn/mcldnn_static-ls_iq-snr-deepsig-201610A.py',
     ('mcldnn', 'rcps-uniform'): 'configs/rcps/mcldnn/mcldnn_rcps-uniform_iq-snr-deepsig-201610A.py',
     ('mcldnn', 'rcps-confusion'): 'configs/rcps/mcldnn/mcldnn_rcps-confusion_iq-snr-deepsig-201610A.py',
+    ('cgdnet', 'hard-ce'): 'configs/rcps/cgdnet/cgdnet_hard-ce_iq-snr-deepsig-201610A.py',
+    ('cgdnet', 'static-ls'): 'configs/rcps/cgdnet/cgdnet_static-ls_iq-snr-deepsig-201610A.py',
+    ('cgdnet', 'rcps-uniform'): 'configs/rcps/cgdnet/cgdnet_rcps-uniform_iq-snr-deepsig-201610A.py',
+    ('cgdnet', 'rcps-confusion'): 'configs/rcps/cgdnet/cgdnet_rcps-confusion_iq-snr-deepsig-201610A.py',
+    ('petcgdnn', 'hard-ce'): 'configs/rcps/petcgdnn/petcgdnn_hard-ce_iq-snr-deepsig-201610A.py',
+    ('petcgdnn', 'static-ls'): 'configs/rcps/petcgdnn/petcgdnn_static-ls_iq-snr-deepsig-201610A.py',
+    ('petcgdnn', 'rcps-uniform'): 'configs/rcps/petcgdnn/petcgdnn_rcps-uniform_iq-snr-deepsig-201610A.py',
+    ('petcgdnn', 'rcps-confusion'): 'configs/rcps/petcgdnn/petcgdnn_rcps-confusion_iq-snr-deepsig-201610A.py',
     ('mcformer', 'hard-ce'): 'configs/rcps/mcformer/mcformer_hard-ce_iq-snr-deepsig-201610A.py',
     ('mcformer', 'static-ls'): 'configs/rcps/mcformer/mcformer_static-ls_iq-snr-deepsig-201610A.py',
     ('mcformer', 'rcps-uniform'): 'configs/rcps/mcformer/mcformer_rcps-uniform_iq-snr-deepsig-201610A.py',
@@ -30,7 +38,7 @@ def run(cmd, execute):
 def main():
     parser = argparse.ArgumentParser(
         description='Generate or execute the RCPS AMC experiment matrix.')
-    parser.add_argument('--models', nargs='+', default=['cnn2', 'mcldnn', 'mcformer'])
+    parser.add_argument('--models', nargs='+', default=['mcldnn', 'cgdnet', 'petcgdnn', 'mcformer'])
     parser.add_argument('--methods', nargs='+', default=['hard-ce', 'static-ls', 'rcps-uniform', 'rcps-confusion'])
     parser.add_argument('--seeds', nargs='+', type=int, default=[2026, 2027, 2028])
     parser.add_argument('--dataset', default='deepsig201610A')
@@ -75,8 +83,16 @@ def main():
                 if args.test:
                     matches = sorted(work_dir.glob('best_accuracy_top1_epoch_*.pth'))
                     checkpoint = matches[-1] if matches else work_dir / 'best_accuracy_top1_epoch_*.pth'
-                    run(['python', 'tools/test.py', config, checkpoint.as_posix(), '--work-dir', work_dir.as_posix()],
-                        args.execute)
+                    test_cmd = ['python', 'tools/test.py', config, checkpoint.as_posix(), '--work-dir',
+                                work_dir.as_posix()]
+                    if args.num_workers is not None:
+                        test_cmd.extend([
+                            '--cfg-options',
+                            f'test_dataloader.num_workers={args.num_workers}',
+                        ])
+                        if args.num_workers == 0:
+                            test_cmd.append('test_dataloader.persistent_workers=False')
+                    run(test_cmd, args.execute)
 
 
 if __name__ == '__main__':
