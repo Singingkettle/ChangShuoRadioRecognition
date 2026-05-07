@@ -1,0 +1,4 @@
+iteration,dataset,model,method,seed,commit,epochs,work_dir,metrics,status,notes
+1,RadioML.2016.10A,CNN2,hard-ce,2026,2eb6c29,1,/home/citybuster/Data/RCPS/work_dirs/amc/deepsig201610A/cnn2_hard-ce/seed_2026,/home/citybuster/Data/RCPS/work_dirs/metrics/pilot_deepsig201610A_cnn2_seed2026.csv,completed,"1-epoch smoke; train/test/analyze succeeded"
+1,RadioML.2016.10A,CNN2,static-ls,2026,2eb6c29,1,/home/citybuster/Data/RCPS/work_dirs/amc/deepsig201610A/cnn2_static-ls/seed_2026,/home/citybuster/Data/RCPS/work_dirs/metrics/pilot_deepsig201610A_cnn2_seed2026.csv,completed,"1-epoch smoke; train/test/analyze succeeded"
+1,RadioML.2016.10A,CNN2,rcps-uniform,2026,2eb6c29,1,/home/citybuster/Data/RCPS/work_dirs/amc/deepsig201610A/cnn2_rcps-uniform/seed_2026,/home/citybuster/Data/RCPS/work_dirs/metrics/pilot_deepsig201610A_cnn2_seed2026.csv,completed,"1-epoch smoke; low-SNR calibration improved, high-SNR ECE needs calibration"
