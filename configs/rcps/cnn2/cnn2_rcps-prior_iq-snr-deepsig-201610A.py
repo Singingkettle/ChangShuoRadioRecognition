@@ -2,4 +2,21 @@ _base_ = [
     '../_base_/models/cnn2_iq-snr-deepsig-201610A.py',
 ]
 
-work_dir = 'work_dirs/rcps/amc/deepsig201610A/cnn2_rcps-prior'
+work_dir = '/home/citybuster/Data/RCPS/work_dirs/amc/deepsig201610A/cnn2_rcps-prior'
+
+method_name = 'rcps_prior_power'
+
+model = dict(
+    head=dict(
+        loss=dict(
+            type='RCPSCrossEntropyLoss',
+            reliability_key='snr',
+            reliability_map=dict(type='linear', min=-20, max=18),
+            epsilon=dict(type='power', max=1.0, gamma=1.0),
+            base=dict(
+                type='prior',
+                source='/home/citybuster/Data/RCPS/work_dirs/priors/deepsig201610A.npy'),
+            sample_weight=dict(type='none'),
+            loss_weight=1.0),
+    ),
+)

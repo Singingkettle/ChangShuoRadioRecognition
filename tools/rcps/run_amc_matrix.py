@@ -55,6 +55,12 @@ def main():
                         f'val_dataloader.num_workers={args.num_workers}',
                         f'test_dataloader.num_workers={args.num_workers}',
                     ])
+                    if args.num_workers == 0:
+                        cfg_options.extend([
+                            'train_dataloader.persistent_workers=False',
+                            'val_dataloader.persistent_workers=False',
+                            'test_dataloader.persistent_workers=False',
+                        ])
                 run(['python', 'tools/train.py', config, '--cfg-options', *cfg_options], args.execute)
                 if args.test:
                     matches = sorted(work_dir.glob('best_accuracy_top1_epoch_*.pth'))
