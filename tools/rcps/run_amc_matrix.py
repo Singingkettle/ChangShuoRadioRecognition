@@ -37,6 +37,9 @@ def main():
     parser.add_argument('--work-root', default='/home/citybuster/Data/RCPS/work_dirs')
     parser.add_argument('--max-epochs', type=int, default=None)
     parser.add_argument('--num-workers', type=int, default=None)
+    parser.add_argument('--epsilon-max', type=float, default=None)
+    parser.add_argument('--epsilon-gamma', type=float, default=None)
+    parser.add_argument('--label-smoothing', type=float, default=None)
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--test', action='store_true')
     args = parser.parse_args()
@@ -49,6 +52,13 @@ def main():
                 cfg_options = [f'randomness.seed={seed}', f'work_dir={work_dir.as_posix()}']
                 if args.max_epochs is not None:
                     cfg_options.append(f'train_cfg.max_epochs={args.max_epochs}')
+                if method.startswith('rcps-'):
+                    if args.epsilon_max is not None:
+                        cfg_options.append(f'model.head.loss.epsilon.max={args.epsilon_max}')
+                    if args.epsilon_gamma is not None:
+                        cfg_options.append(f'model.head.loss.epsilon.gamma={args.epsilon_gamma}')
+                if method == 'static-ls' and args.label_smoothing is not None:
+                    cfg_options.append(f'model.head.loss.smoothing={args.label_smoothing}')
                 if args.num_workers is not None:
                     cfg_options.extend([
                         f'train_dataloader.num_workers={args.num_workers}',
