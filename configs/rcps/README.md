@@ -61,6 +61,26 @@ python tools/rcps/select_calibration.py \
   --out-csv /home/citybuster/Data/RCPS/work_dirs/metrics/calibration/selected.csv
 ```
 
+## Monitoring
+
+Write one status snapshot:
+
+```bash
+python tools/rcps/monitor_experiments.py
+```
+
+Run repeated snapshots every ten minutes:
+
+```bash
+nohup bash tools/rcps/monitor_loop.sh \
+  > /home/citybuster/Data/RCPS/work_dirs/logs/rcps_monitor_loop.nohup.log 2>&1 &
+```
+
+Snapshots are appended to
+`/home/citybuster/Data/RCPS/work_dirs/logs/rcps_monitor_snapshots.jsonl`
+and
+`/home/citybuster/Data/RCPS/work_dirs/logs/rcps_monitor_snapshots.md`.
+
 ## Prior and Confusion Bases
 
 Build the prior base from the training annotation:

@@ -68,3 +68,13 @@
 - Watchdog: `/home/citybuster/Data/RCPS/work_dirs/logs/rcps_calibration_watchdog.sh`.
 - Watchdog behavior: wait for 68 validation CSVs, run calibration selection, build prior/confusion bases, then launch the `RCPS-Confusion` 10-epoch grid under `/home/citybuster/Data/RCPS/work_dirs/calibration_10ep_confusion`.
 - Status at launch verification: both GPUs training, first hard-label validation CSVs created, no conclusions drawn yet.
+
+## Iteration 6: Conservative Monitoring Policy
+
+- Monitoring policy: conservative automatic adjustment.
+- Automatic actions allowed: record status snapshots, restart only clearly interrupted identical runs, and stop/report queues if logs contain hard failures such as tracebacks, conda errors, or CUDA OOM.
+- Actions requiring confirmation: changing epochs, grid ranges, model set, dataset set, selection rule, or paper claims.
+- Added monitor entry points:
+  - `tools/rcps/monitor_experiments.py` writes one factual snapshot to JSONL and Markdown logs under `/home/citybuster/Data/RCPS/work_dirs/logs`.
+  - `tools/rcps/monitor_loop.sh` runs the snapshotter repeatedly, defaulting to one snapshot every 600 seconds.
+- Snapshot status at policy adoption: first-stage calibration still running, 7 validation CSVs observed, error scan clean, no conclusions drawn yet.
