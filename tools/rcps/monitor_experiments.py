@@ -65,6 +65,7 @@ def collect_snapshot(args):
     calibration_metrics = Path(args.work_root) / 'calibration_10ep' / 'metrics' / 'calibration'
     confusion_metrics = Path(args.work_root) / 'calibration_10ep_confusion' / 'metrics' / 'calibration'
     main_metrics = Path(args.work_root) / 'main_10ep_3seed' / 'metrics' / 'main'
+    baseline_metrics = Path(args.work_root) / 'baseline_gate' / 'metrics' / 'baseline_gate'
     log_dir = Path(args.work_root) / 'logs'
 
     snapshot = {
@@ -95,6 +96,11 @@ def collect_snapshot(args):
                 'expected': args.expected_main,
                 'latest': latest_csv(main_metrics, args.latest),
             },
+            'baseline_gate': {
+                'count': count_csv(baseline_metrics),
+                'expected': args.expected_baseline,
+                'latest': latest_csv(baseline_metrics, args.latest),
+            },
         },
         'artifacts': {
             'selected_static_uniform': str(
@@ -120,6 +126,7 @@ def collect_snapshot(args):
                 'main_10ep_3seed_gpu*.log',
                 'rcps_calibration_watchdog.log',
                 'rcps_main_10ep_watchdog.log',
+                'baseline_gate_mldnn_seed2028*.log',
             ]),
     }
 
@@ -149,12 +156,14 @@ def append_markdown(path, snapshot):
     cal = snapshot['metrics']['calibration_10ep']
     conf = snapshot['metrics']['calibration_10ep_confusion']
     main = snapshot['metrics']['main_10ep_3seed']
+    baseline = snapshot['metrics'].get('baseline_gate', {'count': 0, 'expected': 0, 'latest': []})
     with path.open('a', encoding='utf-8') as f:
         f.write(f'\n## {snapshot["timestamp"]} - {snapshot["status"]}\n\n')
         f.write(f'- Commit: `{snapshot["repo"]["commit"]}` on `{snapshot["repo"]["branch"]}`\n')
         f.write(f'- Calibration CSV: {cal["count"]}/{cal["expected"]}\n')
         f.write(f'- Confusion CSV: {conf["count"]}/{conf["expected"]}\n')
         f.write(f'- Main CSV: {main["count"]}/{main["expected"]}\n')
+        f.write(f'- Baseline gate CSV: {baseline["count"]}/{baseline["expected"]}\n')
         f.write(f'- Active processes: {len(snapshot["processes"])}\n')
         f.write(f'- GPUs: {"; ".join(snapshot["gpus"])}\n')
         if cal['latest']:
@@ -163,6 +172,8 @@ def append_markdown(path, snapshot):
             f.write(f'- Latest confusion CSV: `{conf["latest"][-1]}`\n')
         if main['latest']:
             f.write(f'- Latest main CSV: `{main["latest"][-1]}`\n')
+        if baseline['latest']:
+            f.write(f'- Latest baseline CSV: `{baseline["latest"][-1]}`\n')
         if snapshot['errors']:
             f.write('- Error hits:\n')
             for hit in snapshot['errors'][-5:]:
@@ -180,6 +191,7 @@ def main():
     parser.add_argument('--expected-calibration', type=int, default=68)
     parser.add_argument('--expected-confusion', type=int, default=48)
     parser.add_argument('--expected-main', type=int, default=96)
+    parser.add_argument('--expected-baseline', type=int, default=3)
     parser.add_argument('--latest', type=int, default=10)
     args = parser.parse_args()
 
