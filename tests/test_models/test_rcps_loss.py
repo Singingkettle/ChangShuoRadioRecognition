@@ -29,6 +29,24 @@ def test_rcps_targets_endpoint_behavior():
     assert torch.allclose(targets.sum(dim=1), torch.ones(2))
 
 
+def test_rcps_retention_power_preserves_high_reliability_targets():
+    labels = torch.tensor([0, 1, 2])
+    snrs = torch.tensor([-20.0, 10.4, 18.0])
+    targets = build_rcps_targets(
+        labels,
+        snrs,
+        num_classes=3,
+        reliability_map=dict(type='linear', min=-20, max=18),
+        epsilon=dict(
+            type='retention_power', max=1.0, gamma=1.0, retain_min=0.8),
+        base=dict(type='uniform'))
+
+    assert not torch.allclose(targets[0], F.one_hot(labels[0], 3).float())
+    assert torch.allclose(targets[1], F.one_hot(labels[1], 3).float())
+    assert torch.allclose(targets[2], F.one_hot(labels[2], 3).float())
+    assert torch.allclose(targets.sum(dim=1), torch.ones(3))
+
+
 def test_rcps_epsilon_zero_matches_hard_ce():
     logits = torch.tensor([[2.0, 0.0, -1.0], [0.0, 1.5, -0.5]])
     labels = torch.tensor([0, 1])

@@ -28,15 +28,24 @@ def read_selected(path, models, families):
     return selected
 
 
+def loss_option_prefixes(model):
+    if model == 'mldnn':
+        return ['model.head.loss_amc_merge', 'model.head.loss_amc_ap', 'model.head.loss_amc_iq']
+    return ['model.head.loss']
+
+
 def method_options(row):
     opts = []
+    prefixes = loss_option_prefixes(row['model'])
     if row['config_method'] == 'static-ls' and row.get('smoothing'):
-        opts.append(f'model.head.loss.smoothing={float(row["smoothing"])}')
+        for prefix in prefixes:
+            opts.append(f'{prefix}.smoothing={float(row["smoothing"])}')
     if row['config_method'].startswith('rcps-'):
-        if row.get('epsilon_max'):
-            opts.append(f'model.head.loss.epsilon.max={float(row["epsilon_max"])}')
-        if row.get('epsilon_gamma'):
-            opts.append(f'model.head.loss.epsilon.gamma={float(row["epsilon_gamma"])}')
+        for prefix in prefixes:
+            if row.get('epsilon_max'):
+                opts.append(f'{prefix}.epsilon.max={float(row["epsilon_max"])}')
+            if row.get('epsilon_gamma'):
+                opts.append(f'{prefix}.epsilon.gamma={float(row["epsilon_gamma"])}')
     return opts
 
 

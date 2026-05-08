@@ -1,0 +1,11 @@
+scenario,dataset,model,reference,threshold_accuracy,observed_accuracy,margin,gate_status,metric_path,notes
+AMC,RadioML2016.10A,MLDNN,CSRR historical run; FastMLDNN paper family,0.61,,,missing_metric,,Existing checkpoint best accuracy around 62.97; this is the first baseline gate.
+AMC,RadioML2016.10A,MCLDNN,AMR-Benchmark / original MCLDNN,,,,reference_only,,The stopped 10-epoch run is invalid diagnostic evidence only.
+AMC,RadioML2016.10A,CGDNet,AMR-Benchmark,,,,reference_only,,
+AMC,RadioML2016.10A,PETCGDNN,AMR-Benchmark,,,,reference_only,,
+AMC,RadioML2016.10A,FastMLDNN,CSRR paper configs,,,,reference_only,,
+AMC,RadioML2016.10A,MCformer,CSRR maintained config,,,,reference_only,,
+Vision,CIFAR-10-C,ResNet18,TorchVision references,,,,reference_only,,
+Vision,CIFAR-10-C,WideResNet,RobustBench,,,,reference_only,,
+Audio,Speech Commands v0.02,DS-CNN,TensorFlow Speech Commands,,,,reference_only,,
+Audio,Speech Commands v0.02,log-mel ResNet,torchaudio examples,,,,reference_only,,

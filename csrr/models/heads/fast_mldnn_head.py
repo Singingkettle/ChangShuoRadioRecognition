@@ -95,7 +95,10 @@ class FastMLDNNHead(BaseModule):
 
         # compute loss
         losses = dict()
-        loss_cls = self.loss_cls(cls_score, target, avg_factor=cls_score.size(0), **kwargs)
+        loss_kwargs = dict(avg_factor=cls_score.size(0), **kwargs)
+        if getattr(self.loss_cls, 'requires_data_samples', False):
+            loss_kwargs['data_samples'] = data_samples
+        loss_cls = self.loss_cls(cls_score, target, **loss_kwargs)
         loss_center = self.loss_center(p, target.new_tensor(np.arange(cls_score.shape[1])))
 
         losses['loss_cls'] = loss_cls

@@ -80,21 +80,28 @@ def analyze_cmd(dataset, model, method, pred_path, out_csv):
     ]
 
 
-def candidate_specs(method, epsilon_max, epsilon_gamma, smoothing):
+def loss_option_prefixes(model):
+    if model == 'mldnn':
+        return ['model.head.loss_amc_merge', 'model.head.loss_amc_ap', 'model.head.loss_amc_iq']
+    return ['model.head.loss']
+
+
+def candidate_specs(model, method, epsilon_max, epsilon_gamma, smoothing):
+    prefixes = loss_option_prefixes(model)
     if method == 'hard-ce':
         yield method, 'hard', []
     elif method == 'static-ls':
         for value in smoothing:
             suffix = f'ls{fmt_float(value)}'
-            yield method, suffix, [f'model.head.loss.smoothing={value}']
+            yield method, suffix, [f'{prefix}.smoothing={value}' for prefix in prefixes]
     elif method.startswith('rcps-'):
         for eps in epsilon_max:
             for gamma in epsilon_gamma:
                 suffix = f'eps{fmt_float(eps)}_g{fmt_float(gamma)}'
-                yield method, suffix, [
-                    f'model.head.loss.epsilon.max={eps}',
-                    f'model.head.loss.epsilon.gamma={gamma}',
-                ]
+                opts = []
+                for prefix in prefixes:
+                    opts.extend([f'{prefix}.epsilon.max={eps}', f'{prefix}.epsilon.gamma={gamma}'])
+                yield method, suffix, opts
     else:
         raise KeyError(f'Unsupported calibration method: {method}')
 
@@ -122,7 +129,7 @@ def main():
             config = CONFIGS[(model, method)]
             for seed in args.seeds:
                 for base_method, suffix, method_options in candidate_specs(
-                        method, args.epsilon_max, args.epsilon_gamma, args.smoothing):
+                        model, method, args.epsilon_max, args.epsilon_gamma, args.smoothing):
                     run_name = f'{model}_{base_method}_{suffix}'
                     work_dir = Path(args.work_root) / 'amc' / args.dataset / run_name / f'seed_{seed}'
                     cfg_options = [*method_options, *train_worker_opts]

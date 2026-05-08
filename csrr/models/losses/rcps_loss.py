@@ -85,6 +85,20 @@ def build_epsilon(reliability: torch.Tensor,
         epsilon = eps_max * torch.pow(1.0 - reliability, gamma)
     elif eps_type == 'constant':
         epsilon = torch.full_like(reliability, float(cfg.get('value', 0.0)))
+    elif eps_type in {'retention_power', 'power_retention'}:
+        eps_max = float(cfg.get('max', 1.0))
+        gamma = float(cfg.get('gamma', 1.0))
+        retain_min = float(cfg.get('retain_min', 0.8))
+        transition = float(cfg.get('transition', 0.0))
+        epsilon = eps_max * torch.pow(1.0 - reliability, gamma)
+        if transition <= 0.0:
+            epsilon = torch.where(
+                reliability >= retain_min,
+                torch.zeros_like(epsilon),
+                epsilon)
+        else:
+            gate = ((retain_min - reliability) / transition).clamp(0.0, 1.0)
+            epsilon = epsilon * gate
     else:
         raise ValueError(f'Unsupported epsilon type: {eps_type}')
 

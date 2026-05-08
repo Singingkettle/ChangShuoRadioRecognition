@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 
-FAMILIES = ['hard-ce', 'static-ls', 'rcps-uniform', 'rcps-confusion']
+FAMILIES = ['hard-ce', 'static-ls', 'rcps-uniform', 'rcps-retention', 'rcps-confusion']
 FLOAT_TOKEN = re.compile(r'(?P<kind>eps|g|ls)(?P<value>[0-9]+p[0-9]+|[0-9]+)')
 
 
@@ -46,6 +46,9 @@ def parse_method(method):
     elif method.startswith('rcps-uniform_'):
         config_method = 'rcps-uniform'
         family = 'rcps-uniform'
+    elif method.startswith('rcps-retention_'):
+        config_method = 'rcps-retention'
+        family = 'rcps-retention'
     elif method.startswith('rcps-confusion_'):
         config_method = 'rcps-confusion'
         family = 'rcps-confusion'

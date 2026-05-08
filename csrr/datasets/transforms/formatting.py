@@ -161,12 +161,14 @@ class PackMultiTaskInputs(BaseTransform):
     def __init__(self,
                  multi_task_fields: List[str],
                  input_key: Union[str, List[str]],
-                 task_handlers: Dict = dict()):
+                 task_handlers: Dict = dict(),
+                 meta_keys=PackInputs.DEFAULT_META_KEYS):
         self.multi_task_fields = multi_task_fields
         if isinstance(input_key, list):
             if len(input_key) == 1:
                 input_key = input_key[0]
         self.input_key = input_key
+        self.meta_keys = meta_keys
         self.task_handlers = defaultdict(PackInputs)
         for task_name, task_handler in task_handlers.items():
             self.task_handlers[task_name] = TRANSFORMS.build(task_handler)
@@ -202,6 +204,15 @@ class PackMultiTaskInputs(BaseTransform):
             task_pack_result = task_handler({**results, **task_result})
             data_sample.set_field(task_pack_result['data_samples'], task_name)
 
+        for key in self.meta_keys:
+            if isinstance(key, (tuple, list)):
+                source_key, target_key = key
+            else:
+                source_key = target_key = key
+            if source_key in results:
+                data_sample.set_field(
+                    results[source_key], target_key, field_type='metainfo')
+
         packed_results['data_samples'] = data_sample
         return packed_results
 
@@ -212,7 +223,8 @@ class PackMultiTaskInputs(BaseTransform):
             for name, handler in self.task_handlers.items())
         repr += f'(multi_task_fields={self.multi_task_fields}, '
         repr += f"input_key='{self.input_key}', "
-        repr += f'task_handlers={{{task_handlers}}})'
+        repr += f'task_handlers={{{task_handlers}}}, '
+        repr += f'meta_keys={self.meta_keys})'
         return repr
 
 

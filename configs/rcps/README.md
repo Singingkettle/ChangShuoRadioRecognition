@@ -3,6 +3,25 @@
 This folder contains the AMC implementation for Reliability-Conditioned
 Posterior Supervision (RCPS).
 
+
+## Baseline-First Gate
+
+Current TPAMI experiments must start from hard-label baseline parity. The
+previous 10-epoch `main_10ep_3seed` run is diagnostic-invalid and must not be
+used as paper evidence. Use the reference registry before launching RCPS runs:
+
+```bash
+python tools/rcps/audit_framework_parity.py \
+  configs/mldnn/mldnn_iq-ap-deepsig201610A.py \
+  configs/rcps/mldnn/mldnn_hard-ce_iq-ap-snr-deepsig-201610A.py
+
+python tools/rcps/check_baseline_gate.py
+```
+
+The first hard gate is `MLDNN + RadioML2016.10A`: reproduce about 0.63 overall
+accuracy under the original 400-epoch schedule before comparing RCPS variants.
+`RCPS-Retention` is available for high-reliability preservation experiments.
+
 ## Main AMC Matrix
 
 The RCPS configs use the server data root directly:
@@ -15,8 +34,7 @@ python tools/rcps/run_amc_matrix.py
 ```
 
 The default matrix now uses the stronger maintained baselines
-`MCLDNN`, `CGDNet`, `PETCGDNN`, and `MCformer`. `CNN2` is kept as a
-smoke-test and ablation model only.
+`MLDNN`, `FastMLDNN`, `CGDNet`, `PETCGDNN`, and `MCformer`. `MCLDNN` and `CNN2` are kept as diagnostic or ablation models only.
 
 Execute the same matrix:
 
@@ -41,7 +59,7 @@ Run a one-seed calibration pilot on the stronger AMC models:
 
 ```bash
 python tools/rcps/run_calibration_grid.py \
-  --models mcldnn cgdnet petcgdnn mcformer \
+  --models mldnn fastmldnn cgdnet petcgdnn mcformer \
   --methods hard-ce rcps-uniform \
   --seeds 2026 \
   --max-epochs 1 \

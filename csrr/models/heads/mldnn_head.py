@@ -58,6 +58,16 @@ class MLDNNHead(BaseModule):
         self.loss_snr = loss_snr
         self.cal_acc = cal_acc
 
+    @staticmethod
+    def _call_loss(loss_module: nn.Module, cls_score: torch.Tensor,
+                   target: torch.Tensor, avg_factor: int,
+                   data_samples: Optional[List[MultiTaskDataSample]] = None,
+                   **kwargs) -> torch.Tensor:
+        loss_kwargs = dict(avg_factor=avg_factor, **kwargs)
+        if getattr(loss_module, 'requires_data_samples', False):
+            loss_kwargs['data_samples'] = data_samples
+        return loss_module(cls_score, target, **loss_kwargs)
+
     def pre_logits(self, feats: Tuple[torch.Tensor]) -> torch.Tensor:
         """The process before the final classification head.
 
@@ -116,9 +126,12 @@ class MLDNNHead(BaseModule):
 
         # compute loss
         losses = dict()
-        loss_amc_merge = self.loss_amc_merge(feats[0], amc_target, avg_factor=feats[0].size(0), **kwargs)
-        loss_amc_ap = self.loss_amc_ap(feats[1], amc_target, avg_factor=feats[1].size(0), **kwargs)
-        loss_amc_iq = self.loss_amc_iq(feats[2], amc_target, avg_factor=feats[2].size(0), **kwargs)
+        loss_amc_merge = self._call_loss(
+            self.loss_amc_merge, feats[0], amc_target, feats[0].size(0), data_samples, **kwargs)
+        loss_amc_ap = self._call_loss(
+            self.loss_amc_ap, feats[1], amc_target, feats[1].size(0), data_samples, **kwargs)
+        loss_amc_iq = self._call_loss(
+            self.loss_amc_iq, feats[2], amc_target, feats[2].size(0), data_samples, **kwargs)
         loss_snr = self.loss_snr(feats[3], snr_target, avg_factor=feats[3].size(0), **kwargs)
 
         losses['loss_amc_merge'] = loss_amc_merge
