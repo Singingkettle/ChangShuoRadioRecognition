@@ -109,3 +109,14 @@
 - Selected `Static LS`: `CGDNet 0.05`, `MCformer 0.05`, `MCLDNN 0.3`, `PETCGDNN 0.05`.
 - Main-run scope: `RadioML.2016.10A`, seeds `{2026, 2027, 2028}`, 10 epochs, validation and test reliability metrics.
 - Interpretation caveat: this is a 3-seed stability run under the 10-epoch calibration budget, not the final extended-budget experiment.
+
+## Iteration 10: Three-Seed Main Run Launch
+
+- Launch time: 2026-05-08 09:45 CST.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/main_10ep_3seed`.
+- GPU0 queue: `CGDNet` and `MCformer`; GPU1 queue: `MCLDNN` and `PETCGDNN`.
+- Families: `Hard CE`, selected `Static LS`, selected `RCPS-Uniform`, and selected `RCPS-Confusion`.
+- Seeds: `{2026, 2027, 2028}`.
+- Training budget: 10 epochs, matching the calibration budget; `num_workers=0`.
+- Outputs: validation and test predictions plus reliability metrics under `main_10ep_3seed/metrics/main`.
+- Conservative policy: do not alter model set, seeds, epochs, or selected hyperparameters during this run unless a hard failure occurs.
