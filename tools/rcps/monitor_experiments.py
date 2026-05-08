@@ -191,7 +191,7 @@ def main():
     parser.add_argument('--expected-calibration', type=int, default=68)
     parser.add_argument('--expected-confusion', type=int, default=48)
     parser.add_argument('--expected-main', type=int, default=96)
-    parser.add_argument('--expected-baseline', type=int, default=3)
+    parser.add_argument('--expected-baseline', type=int, default=4)
     parser.add_argument('--latest', type=int, default=10)
     args = parser.parse_args()
 
