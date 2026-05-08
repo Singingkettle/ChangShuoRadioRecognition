@@ -2,12 +2,15 @@ import argparse
 import os
 import os.path as osp
 import pickle
+from copy import deepcopy
 
 import numpy as np
 import torch
-from mmengine.config import Config, DictAction
+from mmengine.config import Config, ConfigDict, DictAction
 from mmengine.registry import init_default_scope
 from mmengine.runner import Runner, load_checkpoint
+from mmengine.utils import digit_version
+from mmengine.utils.dl_utils import TORCH_VERSION
 
 
 SPLIT_TO_DATALOADER = {
@@ -16,6 +19,21 @@ SPLIT_TO_DATALOADER = {
     'val': 'val_dataloader',
     'test': 'test_dataloader',
 }
+
+
+def set_default_dataloader_cfg(cfg, field):
+    """Mirror tools/train.py dataloader defaults for standalone export."""
+    if cfg.get(field, None) is None:
+        return
+    dataloader_cfg = ConfigDict(
+        pin_memory=True,
+        persistent_workers=True,
+        collate_fn=dict(type='default_collate'),
+    )
+    if digit_version(TORCH_VERSION) < digit_version('1.8.0'):
+        dataloader_cfg.persistent_workers = False
+    dataloader_cfg.update(deepcopy(cfg[field]))
+    cfg[field] = dataloader_cfg
 
 
 def parse_args():
@@ -39,6 +57,7 @@ def main():
     cfg = Config.fromfile(args.config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
+    set_default_dataloader_cfg(cfg, SPLIT_TO_DATALOADER[args.split])
 
     work_dir = args.work_dir or cfg.get(
         'work_dir', osp.join('./work_dirs', osp.splitext(osp.basename(args.config))[0]))
