@@ -1,5 +1,5 @@
 scenario,dataset,model,reference,threshold_accuracy,observed_accuracy,margin,gate_status,metric_path,notes
-AMC,RadioML2016.10A,MLDNN,CSRR historical run; FastMLDNN paper family,61.0,62.860795,1.860795,pass,/home/citybuster/Data/RCPS/work_dirs/baseline_gate/metrics/baseline_gate/deepsig201610A_mldnn_hard-ce_seed2026_2027_test_mean.csv,Existing checkpoint best accuracy around 62.97; this is the first baseline gate.
+AMC,RadioML2016.10A,MLDNN,CSRR historical run; FastMLDNN paper family,61.0,62.962500,1.962500,pass,/home/citybuster/Data/RCPS/work_dirs/baseline_gate/metrics/baseline_gate/deepsig201610A_mldnn_hard-ce_seed2026_2027_2028_test_mean.csv,Existing checkpoint best accuracy around 62.97; this is the first baseline gate.
 AMC,RadioML2016.10A,MCLDNN,AMR-Benchmark / original MCLDNN,,,,reference_only,,The stopped 10-epoch run is invalid diagnostic evidence only.
 AMC,RadioML2016.10A,CGDNet,AMR-Benchmark,,,,reference_only,,
 AMC,RadioML2016.10A,PETCGDNN,AMR-Benchmark,,,,reference_only,,
