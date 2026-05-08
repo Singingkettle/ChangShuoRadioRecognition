@@ -81,6 +81,26 @@ Snapshots are appended to
 and
 `/home/citybuster/Data/RCPS/work_dirs/logs/rcps_monitor_snapshots.md`.
 
+## Selected Main Runs
+
+Build the per-family selected config table from calibration metrics:
+
+```bash
+python tools/rcps/select_main_configs.py
+```
+
+Run selected 3-seed main experiments:
+
+```bash
+python tools/rcps/run_selected_main.py \
+  --seeds 2026 2027 2028 \
+  --max-epochs 10 \
+  --collect-splits validation test \
+  --analyze \
+  --skip-existing \
+  --execute
+```
+
 ## Prior and Confusion Bases
 
 Build the prior base from the training annotation:

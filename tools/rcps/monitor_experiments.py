@@ -64,6 +64,7 @@ def git_info(repo):
 def collect_snapshot(args):
     calibration_metrics = Path(args.work_root) / 'calibration_10ep' / 'metrics' / 'calibration'
     confusion_metrics = Path(args.work_root) / 'calibration_10ep_confusion' / 'metrics' / 'calibration'
+    main_metrics = Path(args.work_root) / 'main_10ep_3seed' / 'metrics' / 'main'
     log_dir = Path(args.work_root) / 'logs'
 
     snapshot = {
@@ -89,6 +90,11 @@ def collect_snapshot(args):
                 'expected': args.expected_confusion,
                 'latest': latest_csv(confusion_metrics, args.latest),
             },
+            'main_10ep_3seed': {
+                'count': count_csv(main_metrics),
+                'expected': args.expected_main,
+                'latest': latest_csv(main_metrics, args.latest),
+            },
         },
         'artifacts': {
             'selected_static_uniform': str(
@@ -111,7 +117,9 @@ def collect_snapshot(args):
             [
                 'calibration_10ep_gpu*.log',
                 'calibration_10ep_confusion_gpu*.log',
+                'main_10ep_3seed_gpu*.log',
                 'rcps_calibration_watchdog.log',
+                'rcps_main_10ep_watchdog.log',
             ]),
     }
 
@@ -119,6 +127,12 @@ def collect_snapshot(args):
     if (snapshot['metrics']['calibration_10ep']['count'] >= args.expected_calibration
             and snapshot['metrics']['calibration_10ep_confusion']['count'] >= args.expected_confusion):
         snapshot['status'] = 'complete' if not snapshot['errors'] else 'error'
+    if snapshot['metrics']['main_10ep_3seed']['count'] > 0:
+        snapshot['status'] = 'main-running'
+        if snapshot['metrics']['main_10ep_3seed']['count'] >= args.expected_main:
+            snapshot['status'] = 'main-complete'
+        if snapshot['errors']:
+            snapshot['status'] = 'error'
     return snapshot
 
 
@@ -134,17 +148,21 @@ def append_markdown(path, snapshot):
     path.parent.mkdir(parents=True, exist_ok=True)
     cal = snapshot['metrics']['calibration_10ep']
     conf = snapshot['metrics']['calibration_10ep_confusion']
+    main = snapshot['metrics']['main_10ep_3seed']
     with path.open('a', encoding='utf-8') as f:
         f.write(f'\n## {snapshot["timestamp"]} - {snapshot["status"]}\n\n')
         f.write(f'- Commit: `{snapshot["repo"]["commit"]}` on `{snapshot["repo"]["branch"]}`\n')
         f.write(f'- Calibration CSV: {cal["count"]}/{cal["expected"]}\n')
         f.write(f'- Confusion CSV: {conf["count"]}/{conf["expected"]}\n')
+        f.write(f'- Main CSV: {main["count"]}/{main["expected"]}\n')
         f.write(f'- Active processes: {len(snapshot["processes"])}\n')
         f.write(f'- GPUs: {"; ".join(snapshot["gpus"])}\n')
         if cal['latest']:
             f.write(f'- Latest calibration CSV: `{cal["latest"][-1]}`\n')
         if conf['latest']:
             f.write(f'- Latest confusion CSV: `{conf["latest"][-1]}`\n')
+        if main['latest']:
+            f.write(f'- Latest main CSV: `{main["latest"][-1]}`\n')
         if snapshot['errors']:
             f.write('- Error hits:\n')
             for hit in snapshot['errors'][-5:]:
@@ -161,6 +179,7 @@ def main():
     parser.add_argument('--markdown', default='/home/citybuster/Data/RCPS/work_dirs/logs/rcps_monitor_snapshots.md')
     parser.add_argument('--expected-calibration', type=int, default=68)
     parser.add_argument('--expected-confusion', type=int, default=48)
+    parser.add_argument('--expected-main', type=int, default=96)
     parser.add_argument('--latest', type=int, default=10)
     args = parser.parse_args()
 
