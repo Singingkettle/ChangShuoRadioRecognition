@@ -36,6 +36,31 @@ def set_default_dataloader_cfg(cfg, field):
     cfg[field] = dataloader_cfg
 
 
+def needs_mldnn_probability_recovery(cfg):
+    """Return whether MLDNN predictions need double-softmax recovery."""
+    model_cfg = cfg.get('model', {})
+    backbone_type = model_cfg.get('backbone', {}).get('type', '')
+    head_type = model_cfg.get('head', {}).get('type', '')
+    return backbone_type == 'MLDNN' and head_type == 'MLDNNHead'
+
+
+def recover_mldnn_merge_probability(score):
+    """Undo the MLDNNHead softmax applied to an already-probabilistic merge.
+
+    The current MLDNN backbone returns ``merge`` as a convex combination of
+    AP/IQ softmax probabilities at evaluation time. ``MLDNNHead.predict`` then
+    applies another softmax before storing ``pred_score``. Accuracy is nearly
+    unchanged by this monotone transform, but confidence, NLL, ECE, and Brier
+    become systematically under-confident. If q = softmax(p) and sum(p)=1,
+    then p_i = log(q_i) + c with c chosen so the recovered vector sums to one.
+    """
+    score = np.asarray(score, dtype=np.float64)
+    log_score = np.log(np.clip(score, 1e-12, 1.0))
+    recovered = log_score + (1.0 - log_score.sum()) / log_score.size
+    recovered = np.clip(recovered, 0.0, None)
+    return recovered / np.clip(recovered.sum(), 1e-12, None)
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Collect probabilities, labels, and reliability metadata for RCPS analysis.')
@@ -78,12 +103,18 @@ def main():
     classes = list(dataset.CLASSES)
 
     all_pps, all_gts, all_snrs = [], [], []
+    recover_mldnn_probs = needs_mldnn_probability_recovery(cfg)
+    if recover_mldnn_probs:
+        print('Recovering MLDNN merge probabilities from double-softmax pred_score.')
     print(f'Collecting {args.split} predictions on {len(dataset)} samples ...')
     with torch.no_grad():
         for i, data in enumerate(dataloader):
             results = model.test_step(data)
             for sample in results:
-                all_pps.append(sample.pred_score.cpu().numpy())
+                score = sample.pred_score.cpu().numpy()
+                if recover_mldnn_probs:
+                    score = recover_mldnn_merge_probability(score)
+                all_pps.append(score)
                 all_gts.append(sample.gt_label.item())
                 idx = sample.get('sample_idx')
                 if idx is not None:
