@@ -286,3 +286,13 @@
   - High-SNR bins are retained: at `10 dB`, accuracy `+0.1212` and NLL `-0.0013`; at `18 dB`, accuracy `+0.0682` and NLL `-0.0011`.
 - Interpretation: `RCPS-LowGate` is a valid candidate improvement over hard CE and is at least competitive with Static LS on calibration/probabilistic metrics, but it is not yet a decisive TPAMI-level algorithmic result. The central evidence supports a narrower claim: reliability-conditioned supervision can improve posterior calibration and uncertainty alignment while preserving high-reliability accuracy. The remaining weakness is transition-bin handling around `-12/-10 dB`.
 - Next action: do not expand to more AMC backbones yet. Run a focused validation-calibrated LowGate tuning pass over cutoff/epsilon strength to reduce transition-bin harm, then repeat only the best candidate before scaling.
+
+## Iteration 23: Conservative LowGate Tuning Launch
+
+- Launch time: 2026-05-11 04:23 CST.
+- Code commit: `1decad1`.
+- Scope: `MLDNN + RadioML2016.10A`, seed `2026`, original 400-epoch schedule, same hard CE baseline gate pipeline.
+- Motivation: Iteration 22 showed overall LowGate gains over hard CE but transition-bin weakness around `-12/-10 dB`. This tuning pass tests two conservative schedules designed to reduce transition-bin smoothing while preserving the extreme low-SNR benefit.
+- Candidate A: `RCPS-LowGate-C14`, cutoff mapped to approximately `-14 dB`, `epsilon_max=0.7`, `gamma=1.0`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14_iq-ap-snr-deepsig-201610A.py`; GPU0 log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate-c14_tuning_seed2026_gpu0.log`.
+- Candidate B: `RCPS-LowGate-G2`, cutoff remains approximately `-10 dB` but `gamma=2.0`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-g2_iq-ap-snr-deepsig-201610A.py`; GPU1 log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate-g2_tuning_seed2026_gpu1.log`.
+- Decision rule: select a candidate only if it improves the seed-2026 transition bins (`-12/-10 dB`) relative to the original LowGate without losing the overall Hard CE gains. Do not expand either candidate before seed-2026 test CSVs are available.
