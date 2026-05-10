@@ -263,3 +263,26 @@
   - GPU0: seed `2027`, log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate_iter2_seed2027_gpu0.log`.
   - GPU1: seed `2028`, log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate_iter2_seed2028_gpu1.log`.
 - Decision rule: after both seeds finish, compare three-seed LowGate against hard CE and Static LS. If gains remain small or mainly calibration-only, the paper framing stays focused on posterior calibration/uncertainty alignment and the next algorithm iteration should tune low-reliability cutoff/epsilon or redesign base allocation before expanding to more models.
+
+## Iteration 22: RCPS-LowGate Multi-Seed Diagnostic Completed
+
+- Completion time: 2026-05-11 04:20 CST.
+- Scope: `MLDNN + RadioML2016.10A`, `RCPS-LowGate`, seeds `2026/2027/2028`, same 400-epoch training/export/analyze pipeline as the hard CE baseline gate.
+- Completion status: seeds `2027/2028` completed after the seed-2026 diagnostic; all three test CSVs are present and the error scan is clean for traceback, CUDA OOM, file-handle errors, and subprocess failures.
+- Summary files:
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_posterior_iter2_400ep/summary/deepsig201610A_mldnn_lowgate_vs_baselines_seed2026_2027_2028_mean_std.csv`.
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_posterior_iter2_400ep/summary/deepsig201610A_mldnn_lowgate_vs_baselines_deltas.csv`.
+- Three-seed overall metrics:
+  - hard CE: acc `62.9625 +/- 0.2137`, NLL `1.0562 +/- 0.0046`, ECE `0.0325 +/- 0.0001`, Brier `0.4444 +/- 0.0021`.
+  - Static LS: acc `63.1098 +/- 0.0625`, NLL `1.0614 +/- 0.0049`, ECE `0.0267 +/- 0.0045`, Brier `0.4424 +/- 0.0013`.
+  - RCPS-LowGate: acc `63.0792 +/- 0.1876`, NLL `1.0496 +/- 0.0030`, ECE `0.0255 +/- 0.0045`, Brier `0.4419 +/- 0.0017`.
+- Mean deltas:
+  - LowGate minus hard CE: accuracy `+0.1167`, NLL `-0.0066`, ECE `-0.0069`, Brier `-0.0025`.
+  - LowGate minus Static LS: accuracy `-0.0307`, NLL `-0.0118`, ECE `-0.0012`, Brier `-0.0005`.
+- Reliability-bin finding relative to hard CE:
+  - `-20 dB`: accuracy `+0.1212`, NLL `-0.0351`, ECE `-0.0131`, Brier `-0.0077`.
+  - `-12 dB`: accuracy `-1.3636`, NLL `+0.0225`, ECE `+0.0023`, Brier `+0.0049`.
+  - `-10 dB`: accuracy `-0.5076`, NLL `+0.0098`, ECE `-0.0081`, Brier `-0.0010`.
+  - High-SNR bins are retained: at `10 dB`, accuracy `+0.1212` and NLL `-0.0013`; at `18 dB`, accuracy `+0.0682` and NLL `-0.0011`.
+- Interpretation: `RCPS-LowGate` is a valid candidate improvement over hard CE and is at least competitive with Static LS on calibration/probabilistic metrics, but it is not yet a decisive TPAMI-level algorithmic result. The central evidence supports a narrower claim: reliability-conditioned supervision can improve posterior calibration and uncertainty alignment while preserving high-reliability accuracy. The remaining weakness is transition-bin handling around `-12/-10 dB`.
+- Next action: do not expand to more AMC backbones yet. Run a focused validation-calibrated LowGate tuning pass over cutoff/epsilon strength to reduce transition-bin harm, then repeat only the best candidate before scaling.
