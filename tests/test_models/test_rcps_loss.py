@@ -85,3 +85,38 @@ def test_rcps_requires_reliability_metadata():
     loss = RCPSCrossEntropyLoss()
     with pytest.raises(KeyError):
         loss(logits, labels, data_samples=[DataSample().set_gt_label(0)])
+
+
+def test_low_reliability_power_only_smooths_low_reliability():
+    labels = torch.tensor([0, 1, 2])
+    targets = build_rcps_targets(
+        labels,
+        torch.tensor([0.0, 0.25, 1.0]),
+        num_classes=3,
+        reliability_map=dict(type='identity'),
+        epsilon=dict(type='low_reliability_power', max=0.9, gamma=1.0, cutoff=0.25),
+        base=dict(type='uniform'))
+
+    assert not torch.allclose(targets[0], F.one_hot(labels[0], 3).float())
+    assert torch.allclose(targets[1], F.one_hot(labels[1], 3).float())
+    assert torch.allclose(targets[2], F.one_hot(labels[2], 3).float())
+    assert torch.allclose(targets.sum(dim=1), torch.ones(3))
+
+
+def test_reliability_confusion_base_selects_nearest_bin():
+    labels = torch.tensor([0, 1])
+    matrix = torch.tensor([
+        [[0.7, 0.2, 0.1], [0.1, 0.8, 0.1], [0.2, 0.2, 0.6]],
+        [[0.9, 0.05, 0.05], [0.05, 0.9, 0.05], [0.05, 0.05, 0.9]],
+    ])
+    targets = build_rcps_targets(
+        labels,
+        torch.tensor([0.05, 0.95]),
+        num_classes=3,
+        reliability_map=dict(type='identity'),
+        epsilon=dict(type='constant', value=1.0),
+        base=dict(type='reliability_confusion', matrix=matrix, bins=[0.0, 1.0]))
+
+    assert torch.allclose(targets[0], matrix[0, 0], atol=1e-6)
+    assert torch.allclose(targets[1], matrix[1, 1], atol=1e-6)
+    assert torch.allclose(targets.sum(dim=1), torch.ones(2))

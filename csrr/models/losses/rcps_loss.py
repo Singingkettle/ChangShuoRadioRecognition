@@ -28,6 +28,9 @@ def _load_array(source: Union[str, Path]):
     if suffix in {'.pkl', '.pickle'}:
         with source.open('rb') as f:
             return pickle.load(f)
+    if suffix == '.npz':
+        with np.load(source, allow_pickle=False) as data:
+            return {key: data[key] for key in data.files}
     if suffix in {'.pt', '.pth'}:
         return torch.load(source, map_location='cpu')
     raise ValueError(f'Unsupported RCPS source file: {source}')
@@ -99,6 +102,14 @@ def build_epsilon(reliability: torch.Tensor,
         else:
             gate = ((retain_min - reliability) / transition).clamp(0.0, 1.0)
             epsilon = epsilon * gate
+    elif eps_type in {'low_reliability_power', 'low_power'}:
+        eps_max = float(cfg.get('max', 1.0))
+        gamma = float(cfg.get('gamma', 1.0))
+        cutoff = float(cfg.get('cutoff', 0.25))
+        if cutoff <= 0.0:
+            raise ValueError('low_reliability_power requires cutoff > 0.')
+        scaled = ((cutoff - reliability) / cutoff).clamp(0.0, 1.0)
+        epsilon = eps_max * torch.pow(scaled, gamma)
     else:
         raise ValueError(f'Unsupported epsilon type: {eps_type}')
 
@@ -163,6 +174,69 @@ def _build_confusion_base(label: torch.Tensor, num_classes: int, cfg: Dict,
     return base
 
 
+
+def _build_reliability_confusion_base(label: torch.Tensor, num_classes: int,
+                                      cfg: Dict,
+                                      reliability: Optional[torch.Tensor] = None) -> torch.Tensor:
+    if reliability is None:
+        raise ValueError('Reliability-conditioned confusion base requires reliability.')
+    device = label.device
+    if 'source' in cfg:
+        payload = _load_array(cfg['source'])
+    else:
+        payload = cfg
+
+    if isinstance(payload, dict):
+        if 'base' in payload:
+            matrix = torch.as_tensor(payload['base'], dtype=torch.float32, device=device)
+        elif 'matrix' in payload:
+            matrix = torch.as_tensor(payload['matrix'], dtype=torch.float32, device=device)
+        else:
+            raise ValueError('Reliability confusion payload requires "base" or "matrix".')
+        if 'bins' in cfg:
+            bins = torch.as_tensor(cfg['bins'], dtype=torch.float32, device=device)
+        elif 'bins' in payload:
+            bins = torch.as_tensor(payload['bins'], dtype=torch.float32, device=device)
+        else:
+            raise ValueError('Reliability confusion payload requires "bins".')
+    else:
+        matrix = torch.as_tensor(payload, dtype=torch.float32, device=device)
+        if 'bins' not in cfg:
+            raise ValueError('Reliability confusion array source requires cfg["bins"].')
+        bins = torch.as_tensor(cfg['bins'], dtype=torch.float32, device=device)
+
+    if matrix.ndim != 3 or matrix.shape[1:] != (num_classes, num_classes):
+        raise ValueError(
+            f'Reliability confusion base shape {tuple(matrix.shape)} must be (B, {num_classes}, {num_classes}).')
+    if bins.ndim != 1 or bins.numel() != matrix.shape[0]:
+        raise ValueError('Reliability bins must be 1-D and match the first base dimension.')
+
+    distances = torch.abs(reliability.reshape(-1, 1) - bins.reshape(1, -1))
+    bin_idx = distances.argmin(dim=1)
+    selected = matrix[bin_idx]
+    base = selected[torch.arange(label.size(0), device=device), label.long()].float()
+
+    laplace = float(cfg.get('laplace', 0.0))
+    if laplace > 0.0:
+        base = base + laplace
+    temperature = float(cfg.get('temperature', 1.0))
+    if not math.isclose(temperature, 1.0):
+        base = torch.pow(base.clamp_min(1e-12), 1.0 / temperature)
+    base = _normalize_distribution(base)
+
+    prior_blend = float(cfg.get('prior_blend', 0.0))
+    if prior_blend > 0.0:
+        prior_cfg = cfg.get('prior', dict(type='uniform'))
+        if isinstance(prior_cfg, (list, tuple)):
+            prior_cfg = dict(type='prior', prior=prior_cfg)
+        if prior_cfg.get('type', 'uniform') == 'uniform':
+            prior = _build_uniform_base(label, num_classes)
+        else:
+            prior = _build_prior_base(label, num_classes, prior_cfg)
+        alpha = (prior_blend * (1.0 - reliability)).clamp(0.0, 1.0).reshape(-1, 1)
+        base = _normalize_distribution((1.0 - alpha) * base + alpha * prior)
+    return base
+
 def build_base_distribution(label: torch.Tensor,
                             num_classes: int,
                             cfg: Optional[Dict] = None,
@@ -175,6 +249,8 @@ def build_base_distribution(label: torch.Tensor,
         return _build_prior_base(label, num_classes, cfg)
     if base_type == 'confusion':
         return _build_confusion_base(label, num_classes, cfg, reliability)
+    if base_type in {'reliability_confusion', 'bin_confusion', 'posterior_table'}:
+        return _build_reliability_confusion_base(label, num_classes, cfg, reliability)
     raise ValueError(f'Unsupported RCPS base type: {base_type}')
 
 
