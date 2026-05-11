@@ -331,3 +331,7 @@
 - Candidate B: `RCPS-LowGate-C14-Posterior-E0p5`, same base and cutoff but `epsilon_max=0.5`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14-posterior-e0p5_iq-ap-snr-deepsig-201610A.py`.
 - Decision rule: expand only if a candidate preserves the C14 accuracy/ECE transition repair while reducing NLL/Brier harm and remaining competitive with Static LS on seed `2026`.
 
+- Runtime:
+  - GPU0: `RCPS-LowGate-C14-Posterior-E0p7`, launcher PID `2668658`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-e0p7_seed2026_gpu0.log`.
+  - GPU1: the first `E0p5` launch failed because a Windows carriage return was appended to the config path in the shell wrapper; this did not affect code or data. It was recovered once with the same config and seed. Retry launcher PID `2670245`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-e0p5_seed2026_gpu1_retry1.log`.
+
