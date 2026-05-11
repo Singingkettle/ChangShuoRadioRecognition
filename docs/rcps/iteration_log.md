@@ -404,3 +404,11 @@
 - Candidate A: RCPS-LowGate-C14-Posterior-T2-B0p5-E0p5, posterior base temperature 2.0, prior_blend 0.5, uniform prior.
 - Candidate B: RCPS-LowGate-C14-Posterior-T2-B1p0-E0p5, posterior base temperature 2.0, prior_blend 1.0, uniform prior.
 - Decision rule: a candidate must preserve the transition-region NLL/Brier and high-reliability retention while reducing the overall ECE penalty relative to the unblended posterior T2 candidate. If both fail, the theory should emphasize that structured posterior allocation helps likelihood and accuracy but requires separate calibration, rather than claiming calibration improvement from posterior bases.
+
+## Iteration 27: Prior-Blend Posterior-Base LowGate Launch
+
+- Launch time: 2026-05-11 19:40 CST.
+- Code commit at launch: 0fcab70.
+- Runtime: GPU0 candidate B0p5 launcher PID 2781599, child train PID 2781608, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p5-e0p5_seed2026_gpu0.log.
+- Runtime: GPU1 candidate B1p0 launcher PID 2781600, child train PID 2781609, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b1p0-e0p5_seed2026_gpu1.log.
+- Monitoring rule: no matrix expansion during this run. If one candidate fails from export or file-handle recovery issues, rerun export only from the same checkpoint. If training code fails, stop and diagnose before changing parameters.
