@@ -322,3 +322,12 @@
   - The theory should remain conservative: finite-reliability target allocation is a modeling choice, and the useful empirical principle is not generic smoothing but reliability-gated posterior relaxation with validation constraints.
 - Next action: before expanding to more AMC backbones, test one improved target that uses `C14`-style conservative activation but replaces the uniform base in transition/noisy bins with a validation-estimated class-overlap base or adds an explicit transition-retention constraint. The goal is to preserve C14's accuracy/ECE transition repair while reducing NLL/Brier harm.
 
+## Iteration 25: C14 Posterior-Base LowGate Launch
+
+- Launch time: 2026-05-11 09:02 CST.
+- Code basis: follows `RCPS-LowGate-C14` from Iteration 24 but replaces the uniform base with the validation hard-CE reliability-bin posterior base `/home/citybuster/Data/RCPS/work_dirs/mldnn_supervision_400ep/posterior_bases/deepsig201610A_mldnn_hardce_validation_meanprob.npz`.
+- Motivation: Iteration 24 showed that conservative C14 gating repairs transition-bin accuracy/ECE relative to hard CE, but NLL/Brier remain worse at `-12/-10 dB`. The hypothesis is that low-reliability mass should be allocated to empirically confused classes rather than uniformly to every class.
+- Candidate A: `RCPS-LowGate-C14-Posterior-E0p7`, cutoff approximately `-14 dB`, `epsilon_max=0.7`, `gamma=1.0`, reliability-bin posterior base; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14-posterior-e0p7_iq-ap-snr-deepsig-201610A.py`.
+- Candidate B: `RCPS-LowGate-C14-Posterior-E0p5`, same base and cutoff but `epsilon_max=0.5`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14-posterior-e0p5_iq-ap-snr-deepsig-201610A.py`.
+- Decision rule: expand only if a candidate preserves the C14 accuracy/ECE transition repair while reducing NLL/Brier harm and remaining competitive with Static LS on seed `2026`.
+
