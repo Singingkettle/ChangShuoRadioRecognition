@@ -372,34 +372,35 @@
 - Runtime: GPU0 `T2-E0p7` launcher PID `2723091`, child train PID `2723100`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-e0p7_seed2026_gpu0.log`; GPU1 `T2-E0p5` launcher PID `2723092`, child train PID `2723099`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-e0p5_seed2026_gpu1.log`.
 
 
+
 ## Iteration 26: Soft Posterior-Base LowGate Completed
 
 - Completion time: 2026-05-11 19:28 CST.
-- Scope: , seed , same validated 400-epoch train/export/analyze pipeline.
+- Scope: MLDNN + RadioML2016.10A, seed 2026, same validated 400-epoch train/export/analyze pipeline.
 - Completed candidates:
-  - : test CSV .
-  - : test CSV .
-- Summary files are under .
+  - RCPS-LowGate-C14-Posterior-T2-E0p5: test CSV /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_soft_tuning_400ep/metrics/mldnn_lowgate_posterior_soft_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-t2-e0p5_seed2026_test.csv.
+  - RCPS-LowGate-C14-Posterior-T2-E0p7: test CSV /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_soft_tuning_400ep/metrics/mldnn_lowgate_posterior_soft_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-t2-e0p7_seed2026_test.csv.
+- Summary files are under /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_soft_tuning_400ep/summary/.
 - Seed-2026 overall metrics:
-  - hard CE: acc , NLL , ECE , Brier .
-  - Static LS: acc , NLL , ECE , Brier .
-  - C14 uniform E0p7: acc , NLL , ECE , Brier .
-  - C14 posterior T1 E0p5: acc , NLL , ECE , Brier .
-  - C14 posterior T1 E0p7: acc , NLL , ECE , Brier .
-  - C14 posterior T2 E0p5: acc , NLL , ECE , Brier .
-  - C14 posterior T2 E0p7: acc , NLL , ECE , Brier .
+  - hard CE: acc 62.7398, NLL 1.0567, ECE 0.0325, Brier 0.4465.
+  - Static LS: acc 63.0625, NLL 1.0596, ECE 0.0250, Brier 0.4418.
+  - C14 uniform E0p7: acc 63.0352, NLL 1.0543, ECE 0.0283, Brier 0.4443.
+  - C14 posterior T1 E0p5: acc 63.0875, NLL 1.0479, ECE 0.0373, Brier 0.4429.
+  - C14 posterior T1 E0p7: acc 63.2102, NLL 1.0453, ECE 0.0437, Brier 0.4423.
+  - C14 posterior T2 E0p5: acc 63.1477, NLL 1.0490, ECE 0.0389, Brier 0.4433.
+  - C14 posterior T2 E0p7: acc 63.1193, NLL 1.0535, ECE 0.0409, Brier 0.4444.
 - Diagnostic finding:
-  - Temperature softening alone does not fix the overall ECE penalty of posterior-base RCPS. T2 E0p5 still worsens overall ECE by  relative to hard CE.
-  - T2 E0p5 is nevertheless informative: in the transition region , it improves accuracy by  pp, NLL by , ECE by , and Brier by ; high-SNR accuracy is retained.
+  - Temperature softening alone does not fix the overall ECE penalty of posterior-base RCPS. T2 E0p5 still worsens overall ECE by +0.0064 relative to hard CE.
+  - T2 E0p5 is nevertheless informative: in the transition region -12/-10 dB, it improves accuracy by +1.9886 pp, NLL by -0.0264, ECE by -0.0072, and Brier by -0.0098; high-SNR accuracy is retained.
   - Region diagnostics show the remaining ECE problem comes from very-low and gate bins, where posterior base still increases confidence and lowers entropy. The empirical posterior base is still too sharp in the lowest-reliability regime.
 - Decision:
   - Do not expand T2 posterior candidates to three seeds.
-  - The next minimal algorithmic diagnostic is to blend the reliability-conditioned posterior base with uniform/prior mass at low reliability, while keeping the same C14 gate, , temperature , model, seed, and training schedule.
+  - The next minimal algorithmic diagnostic is to blend the reliability-conditioned posterior base with uniform or prior mass at low reliability, while keeping the same C14 gate, epsilon_max 0.5, temperature 2.0, model, seed, and training schedule.
 
 ## Iteration 27: Prior-Blend Posterior-Base LowGate Plan
 
-- Launch scope: , seed , same 400-epoch schedule/export/analyze pipeline.
+- Launch scope: MLDNN + RadioML2016.10A, seed 2026, same 400-epoch schedule/export/analyze pipeline.
 - Motivation: Iteration 26 indicates that the posterior base is useful for transition NLL/Brier and accuracy, but remains overconfident in very-low reliability bins. Prior blending should move the finite-reliability base toward the low-information limit without discarding structured class-overlap information.
-- Candidate A: , posterior base temperature , , uniform prior.
-- Candidate B: , posterior base temperature , , uniform prior.
+- Candidate A: RCPS-LowGate-C14-Posterior-T2-B0p5-E0p5, posterior base temperature 2.0, prior_blend 0.5, uniform prior.
+- Candidate B: RCPS-LowGate-C14-Posterior-T2-B1p0-E0p5, posterior base temperature 2.0, prior_blend 1.0, uniform prior.
 - Decision rule: a candidate must preserve the transition-region NLL/Brier and high-reliability retention while reducing the overall ECE penalty relative to the unblended posterior T2 candidate. If both fail, the theory should emphasize that structured posterior allocation helps likelihood and accuracy but requires separate calibration, rather than claiming calibration improvement from posterior bases.
