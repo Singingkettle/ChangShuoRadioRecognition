@@ -335,3 +335,28 @@
   - GPU0: `RCPS-LowGate-C14-Posterior-E0p7`, launcher PID `2668658`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-e0p7_seed2026_gpu0.log`.
   - GPU1: the first `E0p5` launch failed because a Windows carriage return was appended to the config path in the shell wrapper; this did not affect code or data. It was recovered once with the same config and seed. Retry launcher PID `2670245`, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-e0p5_seed2026_gpu1_retry1.log`.
 
+## Iteration 25: C14 Posterior-Base LowGate Completed
+
+- Completion time: 2026-05-11 13:54 CST.
+- Scope: `MLDNN + RadioML2016.10A`, seed `2026`, same 400-epoch schedule/export/analyze pipeline as the validated baseline gate.
+- Completed candidates:
+  - `RCPS-LowGate-C14-Posterior-E0p5`: early-stopped at epoch `307`; test CSV `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_tuning_400ep/metrics/mldnn_lowgate_posterior_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-e0p5_seed2026_test.csv`.
+  - `RCPS-LowGate-C14-Posterior-E0p7`: early-stopped at epoch `295`; test CSV `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_tuning_400ep/metrics/mldnn_lowgate_posterior_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-e0p7_seed2026_test.csv`.
+- Summary files:
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_tuning_400ep/summary/deepsig201610A_mldnn_posterior_tuning_seed2026_overall.csv`.
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_tuning_400ep/summary/deepsig201610A_mldnn_posterior_tuning_seed2026_delta_vs_hard.csv`.
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_tuning_400ep/summary/deepsig201610A_mldnn_posterior_tuning_seed2026_candidate_criteria.csv`.
+- Seed-2026 overall metrics:
+  - hard CE: acc `62.7398`, NLL `1.0567`, ECE `0.0325`, Brier `0.4465`.
+  - Static LS: acc `63.0625`, NLL `1.0596`, ECE `0.0250`, Brier `0.4418`.
+  - C14 uniform: acc `63.0352`, NLL `1.0543`, ECE `0.0283`, Brier `0.4443`.
+  - C14 posterior E0p5: acc `63.0875`, NLL `1.0479`, ECE `0.0373`, Brier `0.4429`.
+  - C14 posterior E0p7: acc `63.2102`, NLL `1.0453`, ECE `0.0437`, Brier `0.4423`.
+- Diagnostic finding relative to hard CE:
+  - Posterior allocation improves overall accuracy, NLL, and Brier more than the uniform C14 target. E0p7 gives the strongest same-seed overall accuracy and NLL/Brier gains: accuracy `+0.4705` pp, NLL `-0.0114`, Brier `-0.0042`.
+  - The same posterior allocation increases confidence and worsens ECE: E0p5 ECE `+0.0048`, E0p7 ECE `+0.0112` relative to hard CE. This is not acceptable as a calibration-improving claim.
+  - In the transition region `-12/-10 dB`, posterior E0p5 improves accuracy by `+1.0227` pp and reduces NLL/Brier by `-0.0102/-0.0047`, but does not preserve C14's ECE repair. Posterior E0p7 has stronger overall metrics but worse transition ECE and gate-bin `-14 dB` NLL/Brier.
+- Interpretation:
+  - The result supports the paper's posterior-allocation idea: reliability-conditioned mass should not be uniformly spread across all classes when empirical class overlap is structured.
+  - It also reveals a finite-reliability modeling issue: using the hard-CE validation posterior base directly is too sharp and can convert calibration gains into accuracy/NLL gains with overconfidence.
+  - Do not expand either posterior candidate to three seeds yet. The next algorithmic step should soften the posterior base, for example by temperature scaling or blending the posterior base with the uniform/prior base, and then retest only seed `2026` before scaling.
