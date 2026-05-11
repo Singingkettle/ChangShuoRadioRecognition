@@ -360,3 +360,12 @@
   - The result supports the paper's posterior-allocation idea: reliability-conditioned mass should not be uniformly spread across all classes when empirical class overlap is structured.
   - It also reveals a finite-reliability modeling issue: using the hard-CE validation posterior base directly is too sharp and can convert calibration gains into accuracy/NLL gains with overconfidence.
   - Do not expand either posterior candidate to three seeds yet. The next algorithmic step should soften the posterior base, for example by temperature scaling or blending the posterior base with the uniform/prior base, and then retest only seed `2026` before scaling.
+
+## Iteration 26: Soft Posterior-Base LowGate Launch
+
+- Launch time: 2026-05-11 14:00 CST.
+- Scope: `MLDNN + RadioML2016.10A`, seed `2026`, same 400-epoch schedule/export/analyze pipeline.
+- Motivation: Iteration 25 showed that reliability-bin posterior allocation improves accuracy, NLL, and Brier but worsens ECE because the hard-CE posterior base is too sharp. This launch tests whether temperature-softening the posterior base preserves posterior mass allocation while reducing overconfidence.
+- Candidate A: `RCPS-LowGate-C14-Posterior-T2-E0p7`, cutoff approximately `-14 dB`, `epsilon_max=0.7`, posterior base temperature `2.0`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14-posterior-t2-e0p7_iq-ap-snr-deepsig-201610A.py`.
+- Candidate B: `RCPS-LowGate-C14-Posterior-T2-E0p5`, same but `epsilon_max=0.5`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14-posterior-t2-e0p5_iq-ap-snr-deepsig-201610A.py`.
+- Decision rule: select only if the candidate keeps the posterior-base accuracy/NLL/Brier gains while materially reducing the ECE penalty relative to Iteration 25. If temperature alone fails, the next candidate should blend posterior with uniform/prior base rather than expanding seeds.
