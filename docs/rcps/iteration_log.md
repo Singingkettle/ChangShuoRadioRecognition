@@ -296,3 +296,29 @@
 - Candidate A: `RCPS-LowGate-C14`, cutoff mapped to approximately `-14 dB`, `epsilon_max=0.7`, `gamma=1.0`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-c14_iq-ap-snr-deepsig-201610A.py`; GPU0 log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate-c14_tuning_seed2026_gpu0.log`.
 - Candidate B: `RCPS-LowGate-G2`, cutoff remains approximately `-10 dB` but `gamma=2.0`; config `configs/rcps/mldnn/mldnn_rcps-lowgate-g2_iq-ap-snr-deepsig-201610A.py`; GPU1 log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-lowgate-g2_tuning_seed2026_gpu1.log`.
 - Decision rule: select a candidate only if it improves the seed-2026 transition bins (`-12/-10 dB`) relative to the original LowGate without losing the overall Hard CE gains. Do not expand either candidate before seed-2026 test CSVs are available.
+
+## Iteration 24: Conservative LowGate Tuning Completed
+
+- Completion time: 2026-05-11 08:59 CST.
+- Scope: `MLDNN + RadioML2016.10A`, seed `2026`, same 400-epoch schedule/export/analyze pipeline as the validated baseline gate.
+- Completed candidates:
+  - `RCPS-LowGate-C14`: cutoff mapped to approximately `-14 dB`, `epsilon_max=0.7`, `gamma=1.0`; early-stopped at epoch `295`; best validation checkpoint `best_accuracy_top1_epoch_245.pth`; test CSV `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_tuning_400ep/metrics/mldnn_lowgate_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14_seed2026_test.csv`.
+  - `RCPS-LowGate-G2`: cutoff approximately `-10 dB`, `epsilon_max=0.7`, `gamma=2.0`; early-stopped at epoch `306`; best validation checkpoint `best_accuracy_top1_epoch_256.pth`; test CSV `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_tuning_400ep/metrics/mldnn_lowgate_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-g2_seed2026_test.csv`.
+- Summary files:
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_tuning_400ep/summary/deepsig201610A_mldnn_lowgate_tuning_seed2026_key_metrics.csv`.
+  - `/home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_tuning_400ep/summary/deepsig201610A_mldnn_lowgate_tuning_seed2026_deltas.csv`.
+- Seed-2026 overall metrics:
+  - hard CE: acc `62.7398`, NLL `1.0567`, ECE `0.0325`, Brier `0.4465`.
+  - Static LS: acc `63.0625`, NLL `1.0596`, ECE `0.0250`, Brier `0.4418`.
+  - Original RCPS-LowGate: acc `62.9432`, NLL `1.0518`, ECE `0.0278`, Brier `0.4435`.
+  - RCPS-LowGate-C14: acc `63.0352`, NLL `1.0543`, ECE `0.0283`, Brier `0.4443`.
+  - RCPS-LowGate-G2: acc `63.0670`, NLL `1.0520`, ECE `0.0328`, Brier `0.4436`.
+- Transition-bin result relative to hard CE:
+  - `C14` improves accuracy at `-20/-12/-10 dB` by `+0.4545/+0.5000/+0.3409` pp and improves ECE by `-0.0168/-0.0103/-0.0034`, but NLL/Brier remain worse at `-12/-10 dB`.
+  - `G2` improves overall accuracy and NLL/Brier but does not fix transition bins: at `-12/-10 dB`, accuracy changes are `-0.2955/-1.1591` pp and NLL increases by `+0.0325/+0.0412`.
+- Interpretation:
+  - `C14` is the only tuning candidate that addresses the Iteration 22 transition-bin accuracy/ECE weakness relative to hard CE and improves substantially over the original LowGate at `-12/-10 dB`; it is the better RCPS candidate if we continue this branch.
+  - Neither tuning candidate is a decisive TPAMI-level result yet. Static LS still remains very competitive and often stronger in low/transition SNR bins, while RCPS shows its clearest benefit as selective posterior calibration with high-reliability retention.
+  - The theory should remain conservative: finite-reliability target allocation is a modeling choice, and the useful empirical principle is not generic smoothing but reliability-gated posterior relaxation with validation constraints.
+- Next action: before expanding to more AMC backbones, test one improved target that uses `C14`-style conservative activation but replaces the uniform base in transition/noisy bins with a validation-estimated class-overlap base or adds an explicit transition-retention constraint. The goal is to preserve C14's accuracy/ECE transition repair while reducing NLL/Brier harm.
+
