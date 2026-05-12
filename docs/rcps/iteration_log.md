@@ -544,3 +544,11 @@
   - The final paper must state the validation protocol explicitly.
   - Results selected with test-as-validation must not be reported as final results.
 
+
+### Strict-Split Launch Update: 2026-05-13 02:58 CST
+
+- Commit: `fa74c89`.
+- Seed 2026 launched cleanly on GPU0.
+- Seed 2027 first launch was stopped because the PowerShell-to-bash here-string preserved a CR in the seed/log path. The polluted partial work directory and log were moved to `aborted_cr_polluted`; no metrics from that launch will be used.
+- Seed 2027 relaunched cleanly on GPU1 via a `tr -d \r | bash -s` launch path.
+- No RCPS/static/temperature experiments are launched until strict hard CE baseline gate is complete.
