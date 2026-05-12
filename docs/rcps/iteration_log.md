@@ -495,3 +495,33 @@
   - /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2027_gpu0.log
   - /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2028_gpu1.log
 - Monitoring rule: if training succeeds but export fails, rerun export/analyze only from the same checkpoint; do not change the algorithm or schedule mid-run.
+
+## Iteration 29: B0p25 Robustness Expansion Completed
+
+- Completion time: 2026-05-13 02:33 CST.
+- Actual code commit at completion: d1160f0. The launch record used 2a8735b, and the later alignment commit moved HEAD to d1160f0 without changing the running config semantics.
+- Scope: MLDNN + RadioML2016.10A, seeds 2026/2027/2028, same 400-epoch train/export/analyze pipeline with early stopping.
+- Completed robustness seeds:
+  - seed 2027 completed at 2026-05-13 00:56 CST; test CSV: /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/metrics/mldnn_lowgate_posterior_blend_fine_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2027_test.csv.
+  - seed 2028 completed at 2026-05-13 02:29 CST; test CSV: /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/metrics/mldnn_lowgate_posterior_blend_fine_tuning_400ep/deepsig201610A_mldnn_rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2028_test.csv.
+- Three-seed B0p25 overall metrics:
+  - acc 63.1587 +/- 0.0451; NLL 1.0460 +/- 0.0049; ECE 0.0343 +/- 0.0038; Brier 0.4415 +/- 0.0004.
+- Comparison against established three-seed baselines:
+  - hard CE: acc 62.9625, NLL 1.0562, ECE 0.0325, Brier 0.4444.
+  - Static LS: acc 63.1098, NLL 1.0614, ECE 0.0267, Brier 0.4424.
+  - RCPS-LowGate: acc 63.0792, NLL 1.0496, ECE 0.0255, Brier 0.4419.
+  - B0p25 relative to hard CE: acc +0.1962 pp, NLL -0.0102, ECE +0.0018, Brier -0.0029.
+  - B0p25 relative to RCPS-LowGate: acc +0.0795 pp, NLL -0.0036, ECE +0.0088, Brier -0.0004.
+- Region-level diagnostic summary:
+  - B0p25 improves the transition region (-12/-10 dB) relative to hard CE: acc +0.3864 pp, NLL -0.0123, Brier -0.0034, with a small ECE penalty (+0.0012).
+  - B0p25 improves mid-reliability and high-reliability NLL/Brier while preserving high-SNR accuracy retention.
+  - B0p25 worsens the very-low-reliability region relative to hard CE on NLL/ECE/Brier, whereas Static LS and RCPS-LowGate remain better calibration-oriented choices there.
+- Decision:
+  - B0p25 is robust as a posterior-allocation / likelihood-accuracy branch: three-seed accuracy, NLL, and Brier improve over hard CE, and NLL/Brier slightly improve over RCPS-LowGate.
+  - B0p25 is not a calibration-superiority branch because overall ECE is worse than hard CE, Static LS, and RCPS-LowGate.
+  - The paper theory should explicitly separate two effects: reliability-conditioned entropy control for calibration, and posterior/confusion-aware mass allocation for transition-region likelihood and accuracy. Do not claim a single target parameterization dominates all metrics.
+  - Next algorithmic step should be a calibration-constrained posterior target, e.g., posterior allocation with temperature or validation-calibrated post-hoc temperature on logits, but only after preserving this baseline-first evidence chain.
+- Summary files:
+  - /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/summary/deepsig201610A_mldnn_b0p25_3seed_overall_summary.csv
+  - /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/summary/deepsig201610A_mldnn_b0p25_3seed_region_summary.csv
+
