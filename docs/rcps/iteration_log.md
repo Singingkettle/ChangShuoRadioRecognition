@@ -412,3 +412,33 @@
 - Runtime: GPU0 candidate B0p5 launcher PID 2781599, child train PID 2781608, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p5-e0p5_seed2026_gpu0.log.
 - Runtime: GPU1 candidate B1p0 launcher PID 2781600, child train PID 2781609, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b1p0-e0p5_seed2026_gpu1.log.
 - Monitoring rule: no matrix expansion during this run. If one candidate fails from export or file-handle recovery issues, rerun export only from the same checkpoint. If training code fails, stop and diagnose before changing parameters.
+
+
+## Iteration 27: Prior-Blend Posterior-Base LowGate Completed
+
+- Completion time: 2026-05-12 01:35 CST.
+- Scope: MLDNN + RadioML2016.10A, seed 2026, same 400-epoch train/export/analyze pipeline.
+- Completed candidates:
+  - RCPS-LowGate-C14-Posterior-T2-B0p5-E0p5 completed at 2026-05-11 23:36 CST.
+  - RCPS-LowGate-C14-Posterior-T2-B1p0-E0p5 completed at 2026-05-12 01:35 CST.
+- Summary files are under /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_tuning_400ep/summary/.
+- Seed-2026 overall metrics:
+  - hard CE: acc 62.7398, NLL 1.0567, ECE 0.0325, Brier 0.4465.
+  - Static LS: acc 63.0625, NLL 1.0596, ECE 0.0250, Brier 0.4418.
+  - C14 posterior T2 E0p5 without blend: acc 63.1477, NLL 1.0490, ECE 0.0389, Brier 0.4433.
+  - C14 posterior T2 B0p5 E0p5: acc 62.7886, NLL 1.0570, ECE 0.0318, Brier 0.4469.
+  - C14 posterior T2 B1p0 E0p5: acc 63.1705, NLL 1.0644, ECE 0.0402, Brier 0.4456.
+- Diagnostic finding:
+  - Prior blending partially controls overconfidence. B0p5 slightly improves overall ECE relative to hard CE, but loses the likelihood and Brier gains of posterior allocation.
+  - B1p0 improves accuracy and very-low ECE, but worsens overall NLL and ECE.
+  - No Iteration 27 candidate should be expanded to three seeds.
+- Decision:
+  - Run a narrower blend fine-tuning pass between no blend and B0p5.
+  - Candidate blend strengths are 0.25 and 0.35 with temperature 2.0, epsilon_max 0.5, same C14 gate, same model/data/seed/schedule.
+
+## Iteration 28: Fine Prior-Blend Posterior-Base Plan
+
+- Scope: MLDNN + RadioML2016.10A, seed 2026, same 400-epoch schedule/export/analyze pipeline.
+- Candidate A: RCPS-LowGate-C14-Posterior-T2-B0p25-E0p5, prior_blend 0.25.
+- Candidate B: RCPS-LowGate-C14-Posterior-T2-B0p35-E0p5, prior_blend 0.35.
+- Decision rule: select only if the candidate preserves part of the posterior-base NLL/Brier gain and reduces the ECE penalty versus the unblended T2 E0p5 candidate. Do not expand to three seeds unless it also keeps high-reliability accuracy retention.
