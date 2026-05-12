@@ -525,3 +525,22 @@
   - /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/summary/deepsig201610A_mldnn_b0p25_3seed_overall_summary.csv
   - /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/summary/deepsig201610A_mldnn_b0p25_3seed_region_summary.csv
 
+## Iteration 30: Strict-Split Baseline Gate Plan
+
+- Discovery time: 2026-05-13 02:45 CST.
+- Issue found during temperature-scaling pilot: the current RadioML2016.10A MLDNN RCPS configs use `train_and_validation.json` for training and `test.json` for both validation and testing. This is acceptable only as a legacy diagnostic setting, not as a final TPAMI protocol, because early stopping and hyperparameter decisions can observe the test split.
+- Immediate decision:
+  - Quarantine all previous 400-epoch MLDNN results as diagnostic/development evidence only.
+  - Establish a strict split gate with `train.json`, `validation.json`, and `test.json`.
+  - First rerun only MLDNN hard CE on RadioML2016.10A with the strict split. Do not launch RCPS/static/temperature variants until this strict baseline is stable.
+- New strict config:
+  - `configs/rcps/mldnn/mldnn_hard-ce_strict_iq-ap-snr-deepsig-201610A.py`.
+  - train ann_file: `train.json`; val ann_file: `validation.json`; test ann_file: `test.json`.
+- Baseline gate:
+  - seeds: 2026/2027/2028.
+  - same MLDNN backbone/loss/export/analyze path.
+  - acceptance target: reproduce a credible hard CE baseline under the strict split before any RCPS claims are made.
+- Paper implication:
+  - The final paper must state the validation protocol explicitly.
+  - Results selected with test-as-validation must not be reported as final results.
+
