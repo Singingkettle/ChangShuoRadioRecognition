@@ -475,3 +475,23 @@
   - Treat B0p25 as a diagnostic candidate for robustness testing because it preserves the main accuracy/NLL/Brier benefit while partially reducing posterior overconfidence.
   - Do not claim calibration superiority for the posterior-blend branch. Current evidence supports a tradeoff: posterior allocation improves likelihood/accuracy/Brier, while ECE needs an explicit calibration constraint or separate temperature/post-hoc calibration.
   - Next step is a narrow robustness expansion of B0p25 to seeds 2027 and 2028 on MLDNN + RadioML2016.10A only, before any model/dataset expansion.
+
+## Iteration 29: B0p25 Robustness Expansion Plan
+
+- Scope: MLDNN + RadioML2016.10A, seeds 2027 and 2028, same 400-epoch train/export/analyze pipeline.
+- Candidate: RCPS-LowGate-C14-Posterior-T2-B0p25-E0p5 only.
+- Motivation: Iteration 28 seed 2026 showed the best fine-blend accuracy/NLL/Brier tradeoff, but ECE remained worse than hard CE and Static LS. This expansion tests whether the accuracy/NLL/Brier benefit is stable across seeds before any model or dataset expansion.
+- Decision rule:
+  - If the three-seed mean keeps accuracy/NLL/Brier improvements over hard CE while ECE remains worse, the paper must present this branch as a likelihood/accuracy tradeoff rather than a calibration solution.
+  - If the benefit disappears across seeds, do not use posterior-blend as a main method; keep it as diagnostic evidence that posterior mass allocation needs stronger calibration constraints.
+  - Do not launch broader AMC/cross-modal runs until this robustness check is summarized.
+
+## Iteration 29: B0p25 Robustness Expansion Launch
+
+- Launch time: 2026-05-12 20:47 CST.
+- Code commit at launch: 32b36b6.
+- Runtime plan: GPU0 seed 2027, GPU1 seed 2028.
+- Logs:
+  - /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2027_gpu0.log
+  - /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2028_gpu1.log
+- Monitoring rule: if training succeeds but export fails, rerun export/analyze only from the same checkpoint; do not change the algorithm or schedule mid-run.
