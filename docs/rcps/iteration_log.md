@@ -450,3 +450,28 @@
 - Runtime: GPU0 candidate B0p25 launcher PID 2938388, child train PID 2938398, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2026_gpu0.log.
 - Runtime: GPU1 candidate B0p35 launcher PID 2938389, child train PID 2938397, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p35-e0p5_seed2026_gpu1.log.
 - Monitoring rule: keep the matrix fixed; no new model or dataset expansion until both test CSV files and the fine-blend summary exist.
+
+## Iteration 28: Fine Prior-Blend Posterior-Base Completed
+
+- Completion time: 2026-05-12 20:36 CST.
+- Scope: MLDNN + RadioML2016.10A, seed 2026, same 400-epoch train/export/analyze pipeline.
+- Completed candidates:
+  - RCPS-LowGate-C14-Posterior-T2-B0p25-E0p5 completed at 2026-05-12 20:00 CST.
+  - RCPS-LowGate-C14-Posterior-T2-B0p35-E0p5 completed at 2026-05-12 20:31 CST.
+- Summary files are under /home/citybuster/Data/RCPS/work_dirs/mldnn_lowgate_posterior_blend_fine_tuning_400ep/summary/.
+- Seed-2026 overall metrics:
+  - hard CE: acc 62.7398, NLL 1.0567, ECE 0.0325, Brier 0.4465.
+  - Static LS: acc 63.0625, NLL 1.0596, ECE 0.0250, Brier 0.4418.
+  - C14 posterior T2 E0p5 without blend: acc 63.1477, NLL 1.0490, ECE 0.0389, Brier 0.4433.
+  - C14 posterior T2 B0p25 E0p5: acc 63.2011, NLL 1.0507, ECE 0.0366, Brier 0.4420.
+  - C14 posterior T2 B0p35 E0p5: acc 63.0977, NLL 1.0551, ECE 0.0355, Brier 0.4431.
+  - C14 posterior T2 B0p5 E0p5: acc 62.7886, NLL 1.0570, ECE 0.0318, Brier 0.4469.
+- Diagnostic finding:
+  - B0p25 is the strongest fine-blend candidate on overall accuracy, NLL, and Brier among the fine blends. Relative to hard CE it improves accuracy by +0.4614 pp, NLL by -0.0060, and Brier by -0.0045.
+  - B0p25 reduces the ECE penalty of the unblended posterior T2 candidate (+0.0040 vs +0.0064 relative to hard CE), but still does not beat hard CE or Static LS on overall ECE.
+  - B0p35 further reduces overall ECE penalty (+0.0029 relative to hard CE) and improves very-low-reliability ECE, but gives up most of the posterior-base NLL gain and worsens transition-region NLL/Brier.
+  - Both fine blends satisfy the high-reliability retention check. B0p25 has high-SNR accuracy +0.4795 pp relative to hard CE; B0p35 has +0.3341 pp.
+- Decision:
+  - Treat B0p25 as a diagnostic candidate for robustness testing because it preserves the main accuracy/NLL/Brier benefit while partially reducing posterior overconfidence.
+  - Do not claim calibration superiority for the posterior-blend branch. Current evidence supports a tradeoff: posterior allocation improves likelihood/accuracy/Brier, while ECE needs an explicit calibration constraint or separate temperature/post-hoc calibration.
+  - Next step is a narrow robustness expansion of B0p25 to seeds 2027 and 2028 on MLDNN + RadioML2016.10A only, before any model/dataset expansion.
