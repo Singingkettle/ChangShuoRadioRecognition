@@ -442,3 +442,11 @@
 - Candidate A: RCPS-LowGate-C14-Posterior-T2-B0p25-E0p5, prior_blend 0.25.
 - Candidate B: RCPS-LowGate-C14-Posterior-T2-B0p35-E0p5, prior_blend 0.35.
 - Decision rule: select only if the candidate preserves part of the posterior-base NLL/Brier gain and reduces the ECE penalty versus the unblended T2 E0p5 candidate. Do not expand to three seeds unless it also keeps high-reliability accuracy retention.
+
+## Iteration 28: Fine Prior-Blend Posterior-Base Launch
+
+- Launch time: 2026-05-12 14:34 CST.
+- Code commit at launch: adf24ce.
+- Runtime: GPU0 candidate B0p25 launcher PID 2938388, child train PID 2938398, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2026_gpu0.log.
+- Runtime: GPU1 candidate B0p35 launcher PID 2938389, child train PID 2938397, log /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p35-e0p5_seed2026_gpu1.log.
+- Monitoring rule: keep the matrix fixed; no new model or dataset expansion until both test CSV files and the fine-blend summary exist.
