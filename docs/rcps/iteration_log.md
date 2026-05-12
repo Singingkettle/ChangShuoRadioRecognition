@@ -489,7 +489,7 @@
 ## Iteration 29: B0p25 Robustness Expansion Launch
 
 - Launch time: 2026-05-12 20:47 CST.
-- Code commit at launch: 32b36b6.
+- Code commit at launch: 2a8735b.
 - Runtime plan: GPU0 seed 2027, GPU1 seed 2028.
 - Logs:
   - /home/citybuster/Data/RCPS/work_dirs/logs/rcps-lowgate-c14-posterior-t2-b0p25-e0p5_seed2027_gpu0.log
