@@ -586,3 +586,11 @@
 - First pilot launch: `static-ls-strict` seed `2026` and `rcps-lowgate-c14-strict` seed `2026`.
 - Rationale: avoid teacher/posterior bases until strict validation posterior bases are rebuilt; first compare label smoothing and a purely reliability-conditioned uniform RCPS target.
 - Success criteria for expansion: no export/analyze errors; compare same-seed hard CE seed `2026` on accuracy/NLL/ECE/Brier and reliability-bin behavior before launching three-seed expansion.
+
+### Iteration 31 Pilot Launch: 2026-05-13 12:36 CST
+
+- Commit: `cb7997b`.
+- GPU0: `static-ls-strict`, seed `2026`.
+- GPU1: `rcps-lowgate-c14-strict`, seed `2026`.
+- Both use strict split and identical MLDNN schedule/backbone/export/analyze.
+- These are same-seed pilots against strict hard CE seed `2026`, not final paper claims.
