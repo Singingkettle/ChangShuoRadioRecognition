@@ -552,3 +552,13 @@
 - Seed 2027 first launch was stopped because the PowerShell-to-bash here-string preserved a CR in the seed/log path. The polluted partial work directory and log were moved to `aborted_cr_polluted`; no metrics from that launch will be used.
 - Seed 2027 relaunched cleanly on GPU1 via a `tr -d \r | bash -s` launch path.
 - No RCPS/static/temperature experiments are launched until strict hard CE baseline gate is complete.
+
+### Strict-Split Baseline Gate Partial Result: 2026-05-13 09:50 CST
+
+- Seeds completed: `2026`, `2027`.
+- Protocol: train=`train.json`, validation=`validation.json`, test=`test.json`; previous test-as-validation runs remain diagnostic only.
+- Seed 2026 test: acc `62.6250`, NLL `1.0735`, ECE `0.0358`, Brier `0.4502`; best validation checkpoint epoch `262`.
+- Seed 2027 test: acc `62.4557`, NLL `1.0710`, ECE `0.0356`, Brier `0.4515`; best validation checkpoint epoch `272`.
+- Two-seed mean: acc `62.5403 +/- 0.1197`, NLL `1.0723 +/- 0.0018`, ECE `0.0357 +/- 0.0001`, Brier `0.4509 +/- 0.0009`.
+- Baseline gate status: partial pass against threshold `61.0%`; seed `2028` is still required before final hard CE baseline closure.
+- Interpretation: strict validation produces a credible MLDNN baseline near the expected 0.63 level; no RCPS/static result will be promoted until the strict three-seed baseline is complete.
