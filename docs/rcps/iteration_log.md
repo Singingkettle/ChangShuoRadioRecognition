@@ -569,3 +569,11 @@
 - Work dir: `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/amc/deepsig201610A/mldnn_hard-ce-strict/seed_2028`.
 - Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_hard-ce-strict_seed2028_gpu0.log`.
 - Scope remains baseline gate only; RCPS/static experiments remain blocked until strict three-seed hard CE closure.
+
+### Strict-Split Baseline Gate Closure: 2026-05-13 12:31 CST
+
+- Seed `2028` completed without runtime/export/analyze errors. Test metrics: acc `62.5750`, NLL `1.0494`, ECE `0.0244`, Brier `0.4461`; best validation checkpoint epoch `196`.
+- Strict three-seed hard CE MLDNN baseline on RadioML2016.10A: acc `62.5519 +/- 0.0870`, NLL `1.0646 +/- 0.0133`, ECE `0.0319 +/- 0.0066`, Brier `0.4493 +/- 0.0028`.
+- Baseline gate report: `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/summary/deepsig201610A_mldnn_hard-ce-strict_seed2026_2027_2028_gate_report.csv`; status `pass`, threshold `61.0`, margin `1.5519 pp`.
+- This closes the first strict baseline gate. The old train+validation/test-as-validation runs remain diagnostic only and must not be reported as final.
+- Next allowed step: strict-split Static LS and RCPS comparisons using identical backbone, optimizer, splits, export, and analysis.
