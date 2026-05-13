@@ -577,3 +577,12 @@
 - Baseline gate report: `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/summary/deepsig201610A_mldnn_hard-ce-strict_seed2026_2027_2028_gate_report.csv`; status `pass`, threshold `61.0`, margin `1.5519 pp`.
 - This closes the first strict baseline gate. The old train+validation/test-as-validation runs remain diagnostic only and must not be reported as final.
 - Next allowed step: strict-split Static LS and RCPS comparisons using identical backbone, optimizer, splits, export, and analysis.
+
+## Iteration 31: Strict-Split Supervision Comparison Pilot
+
+- Start decision time: 2026-05-13 12:35 CST.
+- Precondition satisfied: strict MLDNN hard CE baseline gate passed with three-seed accuracy `62.5519 +/- 0.0870`.
+- New strict configs added for Static LS, RCPS-LowGate-C14, RCPS-Retention, and RCPS-Uniform. All use train=`train.json`, validation=`validation.json`, test=`test.json`.
+- First pilot launch: `static-ls-strict` seed `2026` and `rcps-lowgate-c14-strict` seed `2026`.
+- Rationale: avoid teacher/posterior bases until strict validation posterior bases are rebuilt; first compare label smoothing and a purely reliability-conditioned uniform RCPS target.
+- Success criteria for expansion: no export/analyze errors; compare same-seed hard CE seed `2026` on accuracy/NLL/ECE/Brier and reliability-bin behavior before launching three-seed expansion.
