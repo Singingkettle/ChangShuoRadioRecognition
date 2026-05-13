@@ -562,3 +562,10 @@
 - Two-seed mean: acc `62.5403 +/- 0.1197`, NLL `1.0723 +/- 0.0018`, ECE `0.0357 +/- 0.0001`, Brier `0.4509 +/- 0.0009`.
 - Baseline gate status: partial pass against threshold `61.0%`; seed `2028` is still required before final hard CE baseline closure.
 - Interpretation: strict validation produces a credible MLDNN baseline near the expected 0.63 level; no RCPS/static result will be promoted until the strict three-seed baseline is complete.
+
+### Strict-Split Seed 2028 Launch: 2026-05-13 09:52 CST
+
+- Seed `2028` launched on GPU0 using commit `d17edbf`.
+- Work dir: `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/amc/deepsig201610A/mldnn_hard-ce-strict/seed_2028`.
+- Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_hard-ce-strict_seed2028_gpu0.log`.
+- Scope remains baseline gate only; RCPS/static experiments remain blocked until strict three-seed hard CE closure.
