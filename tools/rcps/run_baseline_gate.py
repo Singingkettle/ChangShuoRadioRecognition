@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 from run_amc_matrix import CONFIGS
@@ -15,7 +16,7 @@ def run(cmd, execute, env=None):
 
 def analyze_cmd(dataset, model, method, pred_path, out_csv):
     return [
-        'python', 'tools/rcps/analyze_reliability.py',
+        sys.executable, 'tools/rcps/analyze_reliability.py',
         '--run', f'{dataset}={model}={method}={pred_path.as_posix()}',
         '--out-csv', out_csv.as_posix(),
     ]
@@ -23,7 +24,7 @@ def analyze_cmd(dataset, model, method, pred_path, out_csv):
 
 def efficiency_cmd(dataset, model, method, seed, work_dir, out_csv, target_accuracy):
     cmd = [
-        'python', 'tools/rcps/analyze_training_efficiency.py',
+        sys.executable, 'tools/rcps/analyze_training_efficiency.py',
         '--run', f'{dataset}={model}={method}={seed}={work_dir.as_posix()}',
         '--out-csv', out_csv.as_posix(),
     ]

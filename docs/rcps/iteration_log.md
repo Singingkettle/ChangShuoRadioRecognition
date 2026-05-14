@@ -681,3 +681,11 @@ Guardrails:
 - Current `CGDNet` rerun with restored GRU initializer and `RNN` alias is still low (~52% by epoch 86). It will be allowed to finish/export, but current evidence marks it as a parity-debug candidate rather than a main-table model.
 
 Decision: no RCPS comparison is launched on parity-failed models. The next goal is to identify at least two stable AMC backbones from the classic/strong candidate pool before testing RCPS variants.
+
+
+### Iteration 33 Runner Environment Fix: 2026-05-14 17:40 CST
+
+- The first classic baseline queue failed before training because `run_baseline_gate.py` spawned child commands with literal `python`, while the nohup environment did not expose `python` on PATH.
+- Fix: changed RCPS runner scripts to spawn child processes with `sys.executable` so the same conda interpreter is used in foreground and background sessions.
+- Verification: dry-run commands now expand to `/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python`.
+- Relaunched `CNN4 -> GRU2 -> CLDNNW` on GPU1. `CNN4` started normally and reached `40.18%` validation accuracy by epoch 3, so the queue is now healthy.

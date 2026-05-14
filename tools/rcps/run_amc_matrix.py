@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -119,11 +120,11 @@ def main():
                             'val_dataloader.persistent_workers=False',
                             'test_dataloader.persistent_workers=False',
                         ])
-                run(['python', 'tools/train.py', config, '--cfg-options', *cfg_options], args.execute)
+                run([sys.executable, 'tools/train.py', config, '--cfg-options', *cfg_options], args.execute)
                 if args.test:
                     matches = sorted(work_dir.glob('best_accuracy_top1_epoch_*.pth'))
                     checkpoint = matches[-1] if matches else work_dir / 'best_accuracy_top1_epoch_*.pth'
-                    test_cmd = ['python', 'tools/test.py', config, checkpoint.as_posix(), '--work-dir', work_dir.as_posix()]
+                    test_cmd = [sys.executable, 'tools/test.py', config, checkpoint.as_posix(), '--work-dir', work_dir.as_posix()]
                     if args.num_workers is not None:
                         test_cmd.extend(['--cfg-options', f'test_dataloader.num_workers={args.num_workers}'])
                         if args.num_workers == 0:

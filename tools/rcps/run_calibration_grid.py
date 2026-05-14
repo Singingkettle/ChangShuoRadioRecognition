@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 from run_amc_matrix import CONFIGS
@@ -57,13 +58,13 @@ def train_cmd(config, work_dir, seed, max_epochs, cfg_options):
     if max_epochs is not None:
         options.append(f'train_cfg.max_epochs={max_epochs}')
     options.extend(cfg_options)
-    return ['python', 'tools/train.py', config, '--cfg-options', *options]
+    return [sys.executable, 'tools/train.py', config, '--cfg-options', *options]
 
 
 def collect_cmd(config, checkpoint, work_dir, split, num_workers):
     pred_path = work_dir / 'predictions' / f'{split}.pkl'
     cmd = [
-        'python', 'tools/rcps/collect_predictions.py', config, checkpoint.as_posix(),
+        sys.executable, 'tools/rcps/collect_predictions.py', config, checkpoint.as_posix(),
         '--split', split, '--work-dir', work_dir.as_posix(), '--out', pred_path.as_posix(),
     ]
     opts = split_worker_options(split, num_workers)
@@ -74,7 +75,7 @@ def collect_cmd(config, checkpoint, work_dir, split, num_workers):
 
 def analyze_cmd(dataset, model, method, pred_path, out_csv):
     return [
-        'python', 'tools/rcps/analyze_reliability.py',
+        sys.executable, 'tools/rcps/analyze_reliability.py',
         '--run', f'{dataset}={model}={method}={pred_path.as_posix()}',
         '--out-csv', out_csv.as_posix(),
     ]
