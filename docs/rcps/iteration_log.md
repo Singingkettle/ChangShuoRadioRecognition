@@ -803,3 +803,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: framework/parity details materially affect AMC baseline reproduction. Keras-style Conv/Dense/RNN initialization brings PETCGDNN close to the 60% diagnostic line and prevents us from incorrectly dismissing it as a weak model. The main experiment should use parity-corrected baselines where justified, not raw PyTorch-default reproductions.
 - The same parity queue has moved to MCLDNN Keras-init; early epochs are still at chance level, so this variant is under watch and will be diagnosed if it does not leave the plateau.
 
+### Iteration 42 MCLDNN Parity Probe Stop and PETCGDNN Seed Expansion: 2026-05-14 22:32 CST
+
+- MCLDNN Keras-init parity probe stayed at chance accuracy (`9.0909%`) through epoch `40`, with validation loss near `2.3979` and no sign of learning.
+- Intervention: stopped the MCLDNN Keras-init run to avoid wasting GPU time. This is recorded as a parity-probe failure for this particular initialization override, not as evidence against MCLDNN generally.
+- PETCGDNN Keras-init completed earlier with test acc `59.9909`, a `+2.5318 pp` improvement over the original PETCGDNN reproduction. Because this is now a plausible parity-corrected baseline, launched PETCGDNN Keras-init seeds `2027` and `2028` on GPU0 for a three-seed baseline gate.
+- New work root: `/home/citybuster/Data/RCPS/work_dirs/petcgdnn_kerasinit_gate_amr`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/petcgdnn_kerasinit_gate_gpu0.log`.
+
