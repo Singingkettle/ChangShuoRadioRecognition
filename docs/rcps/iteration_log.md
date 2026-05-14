@@ -920,3 +920,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Delta versus hard CE: accuracy `+1.2364 pp`, NLL `+0.0122`, ECE `+0.0085`, Brier `-0.0156`.
 - Reliability-bin deltas: low-SNR NLL `-0.0236`, low-SNR ECE `-0.0431`, high-SNR accuracy `+2.5364 pp`, high-SNR ECE `+0.0124`.
 - Interpretation: the steeper `gamma=2` schedule makes `epsilon_max=0.7` much safer than the shallow `gamma=1` schedule, and it improves accuracy/Brier plus low-SNR posterior behavior. However, it still worsens global NLL/ECE compared with hard CE. The current GRU2 best remains `rcps-retention_eps0.5_gamma2.0`, which is the completed candidate that improves overall accuracy, NLL, ECE, and Brier simultaneously.
+
+### Iteration 52 PETCGDNN Keras-Init RCPS-Retention eps0.3/gamma1 Diagnostic: 2026-05-15 02:08 CST
+
+- PETCGDNN Keras-init `rcps-retention_eps0.3_gamma1.0` completed and exported validation/test predictions. The run stopped after patience expired with best validation accuracy `60.6682` at epoch `67`; test accuracy is `60.5273`.
+- Same-seed test comparison against hard CE Keras-init:
+  - Hard CE: acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`.
+  - Static LS `0.05`: acc `59.5068`, NLL `1.1431`, ECE `0.0267`, Brier `0.4880`.
+  - Static LS `0.1`: acc `60.2955`, NLL `1.1567`, ECE `0.0325`, Brier `0.4791`.
+  - RCPS-Retention `eps0.3/gamma1`: acc `60.5273`, NLL `1.1403`, ECE `0.0229`, Brier `0.4743`.
+- Delta versus hard CE: accuracy `+0.5364 pp`, NLL `+0.0209`, ECE `-0.0042`, Brier `-0.0081`.
+- Reliability-bin deltas: low-SNR NLL `+0.0061`, low-SNR ECE `-0.0053`, high-SNR accuracy `+1.3909 pp`, high-SNR ECE `+0.0198`.
+- Interpretation: this is the first PETCGDNN paired result where RCPS beats static label smoothing on accuracy, ECE, and Brier under the same seed and training budget. The NLL regression means the method is still not publication-ready as-is for this backbone. Continue with `gamma=2`, posterior base, and entropy matching to test whether the target schedule can retain the accuracy/Brier benefit while fixing likelihood quality.
