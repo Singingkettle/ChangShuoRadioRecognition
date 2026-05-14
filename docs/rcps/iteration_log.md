@@ -698,3 +698,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Added `tools/rcps/prepare_amr_compatible_split.py` and generated `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A` with train `132000`, validation `44000`, test `44000`; `iq/` is a symlink to the original converted dataset.
 - Added `--data-root` support to RCPS runners and fixed prediction export so data-root overrides are applied consistently during train, collect, and test stages.
 - Policy: AMR-compatible split will be used for external baseline parity; server-strict split remains a robustness protocol. Results from the two protocols will not be mixed in the same table.
+
+
+### Iteration 34 Runtime Adjustment: 2026-05-14 18:15 CST
+
+- Strict-server split diagnostic results so far:
+  - `CNN4`: validation acc `50.5318`, test acc `50.5170`; parity-failed for main use.
+  - `LSTM2`: stopped at best epoch `65`, validation acc `40.8864`, test acc `40.6466`; parity-failed for main use.
+  - `GRU2`: still running and promising relative to the other classic candidates, reaching about `57.3%` validation accuracy by epoch `58`.
+- Action: stopped the low-value `LSTM2 -> CLDNNL -> DSCLDNN` strict queue after exporting `LSTM2` metrics. This frees GPU0 for the more relevant AMR-compatible protocol.
+- Launched AMR-compatible strong-model screen on GPU0: `CGDNet -> PETCGDNN -> MCformer`, seed `2026`, max `400` epochs, data root `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A`, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split`, log `/home/citybuster/Data/RCPS/work_dirs/logs/stage_a_amr_split_strong_gpu0.log`.
+- Rationale: AMR-compatible split aligns with the external AMR-Benchmark 600/200/200 protocol and is the correct place to judge framework parity for these strong baselines.
