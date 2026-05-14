@@ -910,3 +910,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: static label smoothing can improve accuracy/Brier slightly on this seed, but it does not improve posterior quality. It worsens NLL and ECE overall and does not improve low-SNR calibration. This supports the claim that sample-independent smoothing is an incomplete baseline for degraded-observation supervision.
 - PETCGDNN paired queue has advanced to `rcps-retention_eps0.3_gamma1.0`; keep monitoring before making any RCPS claim on PETCGDNN.
 
+### Iteration 51 GRU2 Retention eps0.7/gamma2 Diagnostic: 2026-05-15 01:58 CST
+
+- Foreground monitor status: PETCGDNN Keras-init `rcps-retention_eps0.3_gamma1.0` is still running normally on GPU0; GRU2 has completed `rcps-retention_eps0.7_gamma2.0` and automatically advanced to `rcps-entropy_eps0.3_gamma1.0` on GPU1. No new `Traceback`, CUDA OOM, or file-handle failure was observed. The only error scan hit remains the previously intentional `SIGTERM` for `gru2_static-ls_ls0.2`.
+- GRU2 `rcps-retention_eps0.7_gamma2.0` exported validation/test predictions.
+- Same-seed test comparison against hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Retention `eps0.7/gamma2`: acc `61.7955`, NLL `1.1141`, ECE `0.0398`, Brier `0.4599`.
+- Delta versus hard CE: accuracy `+1.2364 pp`, NLL `+0.0122`, ECE `+0.0085`, Brier `-0.0156`.
+- Reliability-bin deltas: low-SNR NLL `-0.0236`, low-SNR ECE `-0.0431`, high-SNR accuracy `+2.5364 pp`, high-SNR ECE `+0.0124`.
+- Interpretation: the steeper `gamma=2` schedule makes `epsilon_max=0.7` much safer than the shallow `gamma=1` schedule, and it improves accuracy/Brier plus low-SNR posterior behavior. However, it still worsens global NLL/ECE compared with hard CE. The current GRU2 best remains `rcps-retention_eps0.5_gamma2.0`, which is the completed candidate that improves overall accuracy, NLL, ECE, and Brier simultaneously.
