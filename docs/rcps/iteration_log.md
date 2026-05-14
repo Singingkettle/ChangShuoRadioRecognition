@@ -709,3 +709,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Action: stopped the low-value `LSTM2 -> CLDNNL -> DSCLDNN` strict queue after exporting `LSTM2` metrics. This frees GPU0 for the more relevant AMR-compatible protocol.
 - Launched AMR-compatible strong-model screen on GPU0: `CGDNet -> PETCGDNN -> MCformer`, seed `2026`, max `400` epochs, data root `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A`, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split`, log `/home/citybuster/Data/RCPS/work_dirs/logs/stage_a_amr_split_strong_gpu0.log`.
 - Rationale: AMR-compatible split aligns with the external AMR-Benchmark 600/200/200 protocol and is the correct place to judge framework parity for these strong baselines.
+
+
+### Iteration 34 Classic Screen Update: 2026-05-14 18:45 CST
+
+- Strict-server split classic metrics:
+  - `GRU2`: validation acc `58.9227`, test acc `58.6500`, test NLL `1.1341`, ECE `0.0339`, Brier `0.4970`. This is the strongest non-MLDNN classic candidate so far, but still below the MLDNN anchor.
+  - `CLDNNW`: stopped at best epoch `60`, validation acc `53.7273`, test acc `53.6602`; parity-failed for main use.
+- Action: stopped the remaining strict classic queue after exporting `CLDNNW` metrics. The strict protocol has now served its diagnostic purpose: `CNN4/LSTM2/CLDNNW` are weak, `GRU2` is usable but not main-strength.
+- Launched AMR-compatible classic/anchor queue on GPU1: `GRU2 -> MLDNN`, seed `2026`, max `400` epochs, data root `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A`, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_classic`, log `/home/citybuster/Data/RCPS/work_dirs/logs/stage_a_amr_split_classic_gpu1.log`.
