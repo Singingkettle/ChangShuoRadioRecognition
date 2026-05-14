@@ -763,3 +763,19 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: static smoothing supports the phenomenon claim (low-reliability hard CE is overconfident) but does not solve the main tradeoff. It reduces low-SNR overconfidence at the cost of overall sharpness/high-reliability performance.
 - Intervention: stopped the remaining Static-LS `0.20` run and the original grid runner after preserving the landed `0.05/0.10` metrics. Relaunched GPU1 with only RCPS candidates: `RCPS-Retention`, `RCPS-EntropyMatch`, and `RCPS-PosteriorBase`.
 - This is a deliberate matrix reduction to prioritize hypotheses that can address the observed tradeoff. The skipped `ls=0.20` is recorded as a low-value static-smoothing candidate, not as a completed result.
+
+### Iteration 39 Baseline Stability and Keras-Init Parity Probe: 2026-05-14 21:45 CST
+
+- AMR-compatible `GRU2` hard CE three-seed baseline is complete:
+  - seed `2026`: test acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - seed `2027`: test acc `58.1523`, NLL `1.1262`, ECE `0.0296`, Brier `0.4974`.
+  - seed `2028`: test acc `58.2568`, NLL `1.1201`, ECE `0.0270`, Brier `0.4956`.
+  - mean/std: acc `58.9894 +/- 1.3604`, NLL `1.1161 +/- 0.0127`, ECE `0.0293 +/- 0.0022`, Brier `0.4895 +/- 0.0121`.
+- Interpretation: GRU2 is useful for supervision diagnostics but has too much seed variance to serve as a main TPAMI evidence backbone by itself.
+- AMR-Benchmark audit confirms its Keras implementations use `glorot_uniform` Conv/Dense kernels and recurrent defaults, while several PyTorch baselines in this repo lacked explicit initialization. This is a plausible framework-parity gap because the already-stable MLDNN anchor includes Xavier/RNN initialization.
+- Added parity-only configs:
+  - `configs/rcps/parity/petcgdnn_hard-ce_kerasinit_iq-snr-deepsig-201610A.py`
+  - `configs/rcps/parity/mcldnn_hard-ce_kerasinit_iq-snr-deepsig-201610A.py`
+- Launched GPU0 Keras-init parity probe on AMR-compatible split: `PETCGDNN -> MCLDNN`, seed `2026`, max `400` epochs, same optimizer/loss/split as baseline, only initialization changed. Log: `/home/citybuster/Data/RCPS/work_dirs/logs/parity_kerasinit_gpu0.log`.
+- GPU1 continues the GRU2 RCPS-only grid. The first candidate, `rcps-retention_eps0.3_gamma1.0`, has validation accuracy around `61.5%` by epoch `90+`, above hard CE seed `2026`; no conclusion until test CSV lands.
+
