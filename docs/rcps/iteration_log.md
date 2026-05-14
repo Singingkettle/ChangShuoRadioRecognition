@@ -848,3 +848,18 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Compared with hard CE, `eps0.5/gamma1` improves overall accuracy by `+1.2523 pp`, improves Brier by `-0.0094`, improves low-SNR NLL/ECE/Brier, and improves high-SNR accuracy/NLL/Brier. However, it worsens overall ECE by `+0.0330` and high-SNR ECE by `+0.0198`.
 - Interpretation: this candidate strengthens the evidence that reliability-conditioned retention targets can improve accuracy and reliability-stratified Brier/low-SNR behavior, but it also shows that schedule-only RCPS can distort calibration shape. The next algorithmic priority is entropy matching, posterior-base targets, or temperature treatment rather than simply increasing epsilon.
 - GPU1 automatically advanced to `rcps-retention_eps0.5_gamma2.0`. PETCGDNN Keras-init seed `2028` remains running normally.
+
+### Iteration 46 PETCGDNN Keras-Init Baseline Gate Complete: 2026-05-15 00:02 CST
+
+- PETCGDNN Keras-init hard CE baseline gate completed all three seeds on the AMR-compatible RadioML2016.10A split.
+- Test metrics:
+  - seed `2026`: acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`;
+  - seed `2027`: acc `60.3182`, NLL `1.1062`, ECE `0.0298`, Brier `0.4753`;
+  - seed `2028`: acc `59.5023`, NLL `1.1296`, ECE `0.0295`, Brier `0.4879`.
+- Three-seed mean/std: acc `59.9371 +/- 0.4106`, NLL `1.1184 +/- 0.0117`, ECE `0.0288 +/- 0.0015`, Brier `0.4819 +/- 0.0063`.
+- Interpretation: although the mean accuracy is slightly below the 60% diagnostic line, the variance is small and the Keras-init correction gives a clear improvement over the raw PETCGDNN reproduction. PETCGDNN Keras-init is therefore promoted to paired RCPS comparison as a stable non-MLDNN candidate.
+- Added Keras-init PETCGDNN paired configs for `static-ls`, `rcps-retention`, `rcps-entropy`, and `rcps-posterior`, and registered the `petcgdnn_kerasinit` model alias in the RCPS matrix runner.
+- Built validation-only tables from PETCGDNN Keras-init seed `2026`:
+  - entropy match table: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_entropy_match.npz`;
+  - reliability-conditioned posterior base: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_reliability_base.npz`.
+- Next action: launch PETCGDNN Keras-init paired comparison on GPU0 using the same AMR-compatible split, seed `2026`, and max `400` epochs; this is a diagnostic paired comparison before any three-seed RCPS claim.
