@@ -753,3 +753,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `GRU2` paired comparison on GPU1 is still running normally. The first candidate, Static LS `0.05`, has recovered to roughly `59.8%` validation accuracy by epoch `130`, close to but below hard CE (`60.62%` validation for seed `2026`). No conclusions are drawn before CSV export.
 - GPU0 was freed after MCformer. Action: launched AMR-compatible `GRU2` hard CE seeds `2027` and `2028` on GPU0 to test baseline stability before any three-seed RCPS claim.
 - Rationale: GRU2 is currently the cleanest non-MLDNN baseline candidate. Completing hard CE three seeds is more useful than spending the freed GPU on the MLDNN anchor, whose current config trains on train+validation and validates on test.
+
+
+### Iteration 38 Static-LS Triage and RCPS Focus: 2026-05-14 21:10 CST
+
+- GRU2 Static-LS diagnostics on AMR-compatible split, seed `2026`:
+  - `ls=0.05`: test acc `59.9750`, NLL `1.1370`, ECE `0.0276`, Brier `0.4853`; low-SNR NLL/ECE improve but overall NLL/Brier and high-SNR accuracy worsen relative to hard CE.
+  - `ls=0.10`: test acc `59.8977`, NLL `1.1517`, ECE `0.0323`, Brier `0.4840`; low-SNR NLL/ECE improve further, but overall ECE and NLL do not beat hard CE.
+- Interpretation: static smoothing supports the phenomenon claim (low-reliability hard CE is overconfident) but does not solve the main tradeoff. It reduces low-SNR overconfidence at the cost of overall sharpness/high-reliability performance.
+- Intervention: stopped the remaining Static-LS `0.20` run and the original grid runner after preserving the landed `0.05/0.10` metrics. Relaunched GPU1 with only RCPS candidates: `RCPS-Retention`, `RCPS-EntropyMatch`, and `RCPS-PosteriorBase`.
+- This is a deliberate matrix reduction to prioritize hypotheses that can address the observed tradeoff. The skipped `ls=0.20` is recorded as a low-value static-smoothing candidate, not as a completed result.
