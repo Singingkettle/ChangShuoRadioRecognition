@@ -23,6 +23,16 @@ This registry is the gatekeeper for RCPS experiments. A model is not eligible fo
 ## Next Gate Order
 
 1. Reproduce `MLDNN + RadioML2016.10A` hard CE with original 400-epoch schedule.
-2. Reproduce `CGDNet`, `PETCGDNN`, `FastMLDNN`, and `MCformer` with their maintained schedules.
-3. Only after passing hard CE parity, run static label smoothing and RCPS variants with identical training budgets.
-4. Extend the same baseline-first discipline to RadioML2016.10B and RadioML2018.01A.
+2. Reproduce `CGDNet`, `PETCGDNN`, `FastMLDNN`, and `MCformer` with maintained schedules and strict `train/validation/test` splits.
+3. For each passing hard CE baseline, build validation-only RCPS tables: entropy-matched epsilon and reliability-conditioned posterior base.
+4. Only after passing hard CE parity, run static label smoothing, confidence penalty, `RCPS-Retention`, `RCPS-EntropyMatch`, and `RCPS-PosteriorBase` with identical training budgets.
+5. Extend the same baseline-first discipline to RadioML2016.10B and RadioML2018.01A.
+
+## TPAMI Evidence Axes
+
+- Accuracy: overall and reliability/SNR-stratified.
+- Posterior quality: NLL, ECE, Brier score, mean confidence, and mean entropy.
+- Reliability retention: high-SNR accuracy drop must remain within 1 percentage point unless explicitly discussed as a tradeoff.
+- Low-reliability behavior: low-SNR NLL/ECE/Brier should improve for most passing models before the paper claims posterior alignment.
+- Training efficiency: best epoch, validation AULC, time/epoch to target validation accuracy, and seed variance.
+- Compute cost: parameter and runtime overhead should be reported; loss-only RCPS is expected to leave the backbone unchanged.

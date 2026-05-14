@@ -110,6 +110,34 @@ def build_epsilon(reliability: torch.Tensor,
             raise ValueError('low_reliability_power requires cutoff > 0.')
         scaled = ((cutoff - reliability) / cutoff).clamp(0.0, 1.0)
         epsilon = eps_max * torch.pow(scaled, gamma)
+    elif eps_type in {'table', 'piecewise_linear', 'entropy_match'}:
+        if 'source' in cfg:
+            payload = _load_array(cfg['source'])
+            if isinstance(payload, dict):
+                bins = payload.get('bins')
+                values = payload.get('values', payload.get('epsilon'))
+            else:
+                raise ValueError('Epsilon table source must contain "bins" and "values".')
+        else:
+            bins = cfg.get('bins')
+            values = cfg.get('values', cfg.get('epsilon'))
+        if bins is None or values is None:
+            raise ValueError('Epsilon table requires bins and values.')
+        bins = torch.as_tensor(bins, dtype=reliability.dtype, device=reliability.device).flatten()
+        values = torch.as_tensor(values, dtype=reliability.dtype, device=reliability.device).flatten()
+        if bins.numel() != values.numel() or bins.numel() < 2:
+            raise ValueError('Epsilon table bins and values must have the same length >= 2.')
+        order = torch.argsort(bins)
+        bins = bins[order]
+        values = values[order]
+        idx = torch.bucketize(reliability, bins).clamp(1, bins.numel() - 1)
+        left = bins[idx - 1]
+        right = bins[idx]
+        denom = (right - left).clamp_min(1e-12)
+        alpha = ((reliability - left) / denom).clamp(0.0, 1.0)
+        epsilon = values[idx - 1] * (1.0 - alpha) + values[idx] * alpha
+        epsilon = torch.where(reliability <= bins[0], values[0], epsilon)
+        epsilon = torch.where(reliability >= bins[-1], values[-1], epsilon)
     else:
         raise ValueError(f'Unsupported epsilon type: {eps_type}')
 

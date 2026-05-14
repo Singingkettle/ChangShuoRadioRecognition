@@ -622,3 +622,24 @@ Expected metrics:
 - `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/metrics/deepsig201610A_mldnn_rcps-uniform-strict_seed2026_test.csv`
 
 No paper claim is changed yet. The current working hypothesis is that the theory needs to emphasize posterior calibration/uncertainty alignment, while the algorithm may need a broader or entropy-matched epsilon schedule rather than the narrow `SNR <= -14 dB` lowgate.
+
+## Iteration 33 - TPAMI baseline-first redesign implementation
+
+Time: 2026-05-14 14:45 CST
+
+User direction: stop treating MLDNN as the main evidence carrier; use it as a reproducibility anchor, then move the primary AMC evidence to stronger and more representative model families. The paper evidence must include accuracy, calibration, reliability-bin behavior, training efficiency, seed stability, and compute overhead rather than final accuracy alone.
+
+Implemented infrastructure:
+
+- Added Stage-A hard-label baseline gate runner for `CGDNet`, `PETCGDNN`, `MCformer`, and `FastMLDNN`.
+- Added validation-curve training-efficiency analysis: best epoch, validation AULC, wall time, time/epoch to target validation accuracy.
+- Added cross-seed metric summarization for reliability CSVs.
+- Added entropy-matched RCPS epsilon table support and a builder that derives reliability-bin epsilon from validation prediction entropy.
+- Added `RCPS-EntropyMatch` and `RCPS-PosteriorBase` configs for the four primary AMC model families.
+
+Guardrails:
+
+- No new main claim is made from the existing MLDNN pilot.
+- The currently running MLDNN `rcps-retention-strict` and `rcps-uniform-strict` jobs remain diagnostic only.
+- RCPS comparisons on primary models are blocked until hard CE parity gates are available.
+- Any final paper statement must be backed by landed CSV/PKL outputs and manifest entries, not by training-log snippets.
