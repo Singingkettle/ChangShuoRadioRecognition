@@ -25,6 +25,7 @@ model = dict(
         num_classes=11,
         init_cfg=[
             dict(type='Kaiming', layer='Linear', mode='fan_in'),
+            dict(type='RNN', layer='GRU', gain=1),
             dict(
                 type='Xavier',
                 layer='Conv2d',
