@@ -643,3 +643,16 @@ Guardrails:
 - The currently running MLDNN `rcps-retention-strict` and `rcps-uniform-strict` jobs remain diagnostic only.
 - RCPS comparisons on primary models are blocked until hard CE parity gates are available.
 - Any final paper statement must be backed by landed CSV/PKL outputs and manifest entries, not by training-log snippets.
+
+### Iteration 33 Resource Intervention: 2026-05-14 15:30 CST
+
+- Rationale: `MLDNN` is now only a diagnostic/appendix model, while the TPAMI evidence path requires strong-model baseline gates. Continuing the two MLDNN diagnostic jobs to natural completion would occupy both GPUs and delay the actual Stage-A parity gates.
+- Action: stopped `mldnn_rcps-retention-strict` and `mldnn_rcps-uniform-strict` after preserving their best checkpoints, then exported test predictions and reliability metrics from those checkpoints.
+- Diagnostic results on seed `2026`:
+  - `rcps-retention-strict`: checkpoint epoch `241`, test acc `62.6000`, NLL `1.1311`, ECE `0.0744`, Brier `0.4589`, mean confidence `0.5516`, mean entropy `1.3992`.
+  - `rcps-uniform-strict`: checkpoint epoch `230`, test acc `62.0670`, NLL `1.2186`, ECE `0.1198`, Brier `0.4861`, mean confidence `0.5009`, mean entropy `1.5730`.
+- Interpretation: broad uniform smoothing and the current retention smoothing are not viable final RCPS variants on this MLDNN diagnostic. They increase entropy but damage NLL/ECE/Brier. This supports moving the algorithm toward validation-derived `RCPS-EntropyMatch` and reliability-conditioned posterior bases.
+- Stage-A launched immediately afterward:
+  - GPU0 queue: `CGDNet`, then `MCformer`, hard CE seeds `2026/2027/2028`.
+  - GPU1 queue: `PETCGDNN`, then `FastMLDNN`, hard CE seeds `2026/2027/2028`.
+  - Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_v2`.
