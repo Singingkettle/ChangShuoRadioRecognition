@@ -821,3 +821,16 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: a steeper reliability schedule (`gamma=2`) strongly improves ECE but loses the accuracy/Brier advantage of `gamma=1` and still does not repair NLL. This suggests that the RCPS schedule controls a real accuracy-calibration tradeoff rather than giving a free universal improvement.
 - Current working hypothesis: `eps0.3/gamma1` remains the best GRU2 diagnostic candidate for balanced accuracy/ECE/Brier, while `eps0.3/gamma2` is useful evidence for uncertainty alignment. Continue the grid to test whether higher `epsilon_max`, entropy-matched, or posterior-base variants improve NLL without losing retention.
 - GPU1 automatically advanced to `rcps-retention_eps0.5_gamma1.0`. GPU0 continues PETCGDNN Keras-init seed `2027`, which has reached approximately `60.15%` validation accuracy by epoch `52`, close to seed `2026`.
+
+### Iteration 44 PETCGDNN Keras-Init Seed 2027 Complete: 2026-05-14 23:15 CST
+
+- PETCGDNN Keras-init baseline gate expansion progressed normally; no export or file-handle failure occurred.
+- Seed `2027` completed on the AMR-compatible split:
+  - validation accuracy `60.5159`;
+  - test accuracy `60.3182`;
+  - test NLL `1.1062`;
+  - test ECE `0.0298`;
+  - test Brier `0.4753`.
+- Two available PETCGDNN Keras-init seeds now give mean test acc `60.1545 +/- 0.2314`, mean NLL `1.1128 +/- 0.0093`, mean ECE `0.0285 +/- 0.0019`, and mean Brier `0.4789 +/- 0.0050`.
+- Interpretation: PETCGDNN with Keras-compatible initialization is currently the most stable non-MLDNN baseline candidate on the AMR-compatible protocol. Seed `2028` has started automatically; wait for it before deciding baseline-gate pass/fail or launching PETCGDNN RCPS variants.
+- GRU2 `rcps-retention_eps0.5_gamma1.0` is still running and has reached validation accuracy above `61.7%`, so it remains a promising diagnostic candidate pending test export.
