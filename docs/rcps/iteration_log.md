@@ -656,3 +656,15 @@ Guardrails:
   - GPU0 queue: `CGDNet`, then `MCformer`, hard CE seeds `2026/2027/2028`.
   - GPU1 queue: `PETCGDNN`, then `FastMLDNN`, hard CE seeds `2026/2027/2028`.
   - Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_v2`.
+
+### Iteration 33 Stage-A Screen Adjustment: 2026-05-14 16:00 CST
+
+- First seed-2026 hard CE screen completed for two models:
+  - `CGDNet`: validation acc `52.8455`, test acc `52.8523`, NLL `1.2477`, ECE `0.0247`, Brier `0.5587`.
+  - `PETCGDNN`: validation acc `57.4955`, test acc `57.3682`, NLL `1.1342`, ECE `0.0193`, Brier `0.5020`.
+- Both are below the expected AMR-Benchmark/literature range for strong AMC baselines, especially `CGDNet`. Continuing full three-seed runs before checking other families would waste GPU time.
+- Action: stopped the queued `CGDNet/PETCGDNN` seed-2027 continuations and switched Stage-A to one-seed screening for all primary families.
+- Launched:
+  - GPU0: `MCformer` hard CE seed `2026`.
+  - GPU1: `FastMLDNN` hard CE seed `2026`.
+- Decision rule: after all four one-seed screens are available, only models with credible parity or a clear, fixable parity gap are expanded to three seeds. Low-parity models enter parity debugging instead of RCPS comparison.
