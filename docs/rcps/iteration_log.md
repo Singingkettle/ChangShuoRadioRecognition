@@ -779,3 +779,18 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Launched GPU0 Keras-init parity probe on AMR-compatible split: `PETCGDNN -> MCLDNN`, seed `2026`, max `400` epochs, same optimizer/loss/split as baseline, only initialization changed. Log: `/home/citybuster/Data/RCPS/work_dirs/logs/parity_kerasinit_gpu0.log`.
 - GPU1 continues the GRU2 RCPS-only grid. The first candidate, `rcps-retention_eps0.3_gamma1.0`, has validation accuracy around `61.5%` by epoch `90+`, above hard CE seed `2026`; no conclusion until test CSV lands.
 
+### Iteration 40 First GRU2 RCPS-Retention Result: 2026-05-14 21:58 CST
+
+- First RCPS candidate on AMR-compatible `GRU2` seed `2026` completed: `rcps-retention_eps0.3_gamma1.0`.
+- Test comparison against same-seed hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - Static LS `0.05`: acc `59.9750`, NLL `1.1370`, ECE `0.0276`, Brier `0.4853`.
+  - Static LS `0.10`: acc `59.8977`, NLL `1.1517`, ECE `0.0323`, Brier `0.4840`.
+  - RCPS-Retention `eps0.3/gamma1`: acc `61.6614`, NLL `1.1175`, ECE `0.0250`, Brier `0.4625`.
+- Reliability-bin behavior for RCPS-Retention vs hard CE:
+  - Low SNR (`<= -10 dB`) NLL improves by `-0.0267`, ECE by `-0.0266`, Brier by `-0.0106`.
+  - High SNR (`>= 10 dB`) accuracy improves by `+1.7091 pp`, while high-SNR ECE worsens.
+- Interpretation: this supports the central observation that reliability-conditioned targets can improve low-reliability posterior quality and avoid the high-SNR accuracy loss of static smoothing. However, overall NLL worsens and high-SNR ECE worsens, so the claim remains a tradeoff-aware `posterior calibration / uncertainty alignment` claim rather than a universal all-metric win.
+- Training-efficiency summary using target accuracy `57.5916` (95% of hard CE best validation): hard CE reaches target at epoch `42`; RCPS-Retention also reaches target at epoch `42`; Static LS `0.05` reaches it at epoch `48`; Static LS `0.10` at epoch `41`. RCPS has the highest validation AULC among these four (`55.7713`).
+- Next action: continue the RCPS grid to test whether entropy/posterior variants can repair the NLL/ECE tradeoff; do not expand to three seeds until a variant beats hard CE on a clearer metric set or the tradeoff is theoretically justified.
+
