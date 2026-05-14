@@ -834,3 +834,17 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Two available PETCGDNN Keras-init seeds now give mean test acc `60.1545 +/- 0.2314`, mean NLL `1.1128 +/- 0.0093`, mean ECE `0.0285 +/- 0.0019`, and mean Brier `0.4789 +/- 0.0050`.
 - Interpretation: PETCGDNN with Keras-compatible initialization is currently the most stable non-MLDNN baseline candidate on the AMR-compatible protocol. Seed `2028` has started automatically; wait for it before deciding baseline-gate pass/fail or launching PETCGDNN RCPS variants.
 - GRU2 `rcps-retention_eps0.5_gamma1.0` is still running and has reached validation accuracy above `61.7%`, so it remains a promising diagnostic candidate pending test export.
+
+### Iteration 45 GRU2 Retention eps0.5/gamma1 Diagnostic: 2026-05-14 23:38 CST
+
+- GRU2 `rcps-retention_eps0.5_gamma1.0` completed and exported validation/test predictions.
+- Overall test comparison against same-seed hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Retention `eps0.3/gamma1`: acc `61.6614`, NLL `1.1175`, ECE `0.0250`, Brier `0.4625`.
+  - RCPS-Retention `eps0.5/gamma1`: acc `61.8114`, NLL `1.1451`, ECE `0.0644`, Brier `0.4661`.
+- Reliability-bin aggregates for `eps0.5/gamma1`:
+  - Low SNR (`<= -10 dB`): acc `13.0379`, NLL `2.3448`, ECE `0.1098`, Brier `0.9070`.
+  - High SNR (`>= 10 dB`): acc `92.2818`, NLL `0.3031`, ECE `0.0892`, Brier `0.1485`.
+- Compared with hard CE, `eps0.5/gamma1` improves overall accuracy by `+1.2523 pp`, improves Brier by `-0.0094`, improves low-SNR NLL/ECE/Brier, and improves high-SNR accuracy/NLL/Brier. However, it worsens overall ECE by `+0.0330` and high-SNR ECE by `+0.0198`.
+- Interpretation: this candidate strengthens the evidence that reliability-conditioned retention targets can improve accuracy and reliability-stratified Brier/low-SNR behavior, but it also shows that schedule-only RCPS can distort calibration shape. The next algorithmic priority is entropy matching, posterior-base targets, or temperature treatment rather than simply increasing epsilon.
+- GPU1 automatically advanced to `rcps-retention_eps0.5_gamma2.0`. PETCGDNN Keras-init seed `2028` remains running normally.
