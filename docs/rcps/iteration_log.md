@@ -863,3 +863,18 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - entropy match table: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_entropy_match.npz`;
   - reliability-conditioned posterior base: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_reliability_base.npz`.
 - Next action: launch PETCGDNN Keras-init paired comparison on GPU0 using the same AMR-compatible split, seed `2026`, and max `400` epochs; this is a diagnostic paired comparison before any three-seed RCPS claim.
+
+### Iteration 47 GRU2 Retention eps0.5/gamma2 Diagnostic and PETCGDNN Paired Monitor: 2026-05-15 00:20 CST
+
+- Foreground monitor status: GPU0 is running PETCGDNN Keras-init paired diagnostics (`static-ls` first stage); GPU1 is running the GRU2 RCPS grid. No new `Traceback`, `CUDA out of memory`, or `Too many open files` was found. The only error line remains the previously intentional `SIGTERM` for `gru2_static-ls_ls0.2`.
+- GRU2 `rcps-retention_eps0.5_gamma2.0` completed and exported validation/test predictions.
+- Overall test comparison against same-seed hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Retention `eps0.5/gamma2`: acc `62.1068`, NLL `1.0943`, ECE `0.0186`, Brier `0.4546`.
+- Delta versus hard CE: accuracy `+1.5477 pp`, NLL `-0.0075`, ECE `-0.0128`, Brier `-0.0209`.
+- Reliability-bin aggregates for `eps0.5/gamma2`:
+  - Low SNR (`<= -10 dB`): acc `13.2273`, NLL `2.3612`, ECE `0.1388`, Brier `0.9146`.
+  - High SNR (`>= 10 dB`): acc `92.3909`, NLL `0.2804`, ECE `0.0803`, Brier `0.1429`.
+- Interpretation: this is the strongest GRU2 single-seed RCPS candidate so far because it improves all four overall metrics and improves low-SNR NLL/ECE/Brier. High-SNR accuracy/NLL/Brier also improve, but high-SNR ECE remains worse than hard CE, so the theory should still emphasize reliability-conditioned posterior alignment rather than claiming uniformly better calibration in every reliability bin.
+- PETCGDNN Keras-init paired diagnostic is still in progress: `static-ls_ls0.05` reached validation accuracy above `57.6%` by epoch `37`; no intervention is needed yet.
+
