@@ -61,13 +61,15 @@ def train_cmd(config, work_dir, seed, max_epochs, cfg_options):
     return [sys.executable, 'tools/train.py', config, '--cfg-options', *options]
 
 
-def collect_cmd(config, checkpoint, work_dir, split, num_workers):
+def collect_cmd(config, checkpoint, work_dir, split, num_workers, extra_cfg_options=None):
     pred_path = work_dir / 'predictions' / f'{split}.pkl'
     cmd = [
         sys.executable, 'tools/rcps/collect_predictions.py', config, checkpoint.as_posix(),
         '--split', split, '--work-dir', work_dir.as_posix(), '--out', pred_path.as_posix(),
     ]
     opts = split_worker_options(split, num_workers)
+    if extra_cfg_options:
+        opts.extend(extra_cfg_options)
     if opts:
         cmd.extend(['--cfg-options', *opts])
     return cmd, pred_path
@@ -114,6 +116,7 @@ def main():
     parser.add_argument('--seeds', nargs='+', type=int, default=[2026])
     parser.add_argument('--dataset', default='deepsig201610A')
     parser.add_argument('--work-root', default='/home/citybuster/Data/RCPS/work_dirs')
+    parser.add_argument('--data-root', default=None, help='Override train/val/test dataset.data_root')
     parser.add_argument('--max-epochs', type=int, default=1)
     parser.add_argument('--epsilon-max', nargs='+', type=float, default=[0.3, 0.5, 0.7, 1.0])
     parser.add_argument('--epsilon-gamma', nargs='+', type=float, default=[0.5, 1.0, 2.0])
@@ -125,6 +128,14 @@ def main():
     args = parser.parse_args()
 
     train_worker_opts = worker_options(args.num_workers)
+    data_root_opts = []
+    if args.data_root is not None:
+        data_root_opts = [
+            f'train_dataloader.dataset.data_root={args.data_root}',
+            f'val_dataloader.dataset.data_root={args.data_root}',
+            f'test_dataloader.dataset.data_root={args.data_root}',
+        ]
+        train_worker_opts.extend(data_root_opts)
     for model in args.models:
         for method in args.methods:
             config = CONFIGS[(model, method)]
@@ -139,7 +150,7 @@ def main():
                         continue
                     checkpoint = checkpoint_for(work_dir)
                     for split in args.collect_splits:
-                        cmd, pred_path = collect_cmd(config, checkpoint, work_dir, split, args.num_workers)
+                        cmd, pred_path = collect_cmd(config, checkpoint, work_dir, split, args.num_workers, data_root_opts)
                         run(cmd, args.execute)
                         if args.analyze:
                             out_dir = Path(args.work_root) / 'metrics' / 'calibration'

@@ -39,6 +39,7 @@ def main():
     parser.add_argument('--seeds', nargs='+', type=int, default=[2026, 2027, 2028])
     parser.add_argument('--dataset', default='deepsig201610A')
     parser.add_argument('--work-root', default='/home/citybuster/Data/RCPS/work_dirs/baseline_gate_v2')
+    parser.add_argument('--data-root', default=None, help='Override train/val/test dataset.data_root')
     parser.add_argument('--max-epochs', type=int, default=None)
     parser.add_argument('--num-workers', type=int, default=0)
     parser.add_argument('--gpu', default=None)
@@ -53,6 +54,14 @@ def main():
         env['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
     cfg_worker_options = worker_options(args.num_workers)
+    data_root_opts = []
+    if args.data_root is not None:
+        data_root_opts = [
+            f'train_dataloader.dataset.data_root={args.data_root}',
+            f'val_dataloader.dataset.data_root={args.data_root}',
+            f'test_dataloader.dataset.data_root={args.data_root}',
+        ]
+        cfg_worker_options.extend(data_root_opts)
     work_root = Path(args.work_root)
     metrics_root = work_root / 'metrics'
     efficiency_root = work_root / 'efficiency'
@@ -70,7 +79,7 @@ def main():
             run(train_cmd(config, work_dir, seed, args.max_epochs, cfg_worker_options), args.execute, env)
             checkpoint = checkpoint_for(work_dir)
             for split in args.collect_splits:
-                cmd, pred_path = collect_cmd(config, checkpoint, work_dir, split, args.num_workers)
+                cmd, pred_path = collect_cmd(config, checkpoint, work_dir, split, args.num_workers, data_root_opts)
                 run(cmd, args.execute, env)
                 out_csv = metrics_root / f'{args.dataset}_{model}_{method}_seed{seed}_{split}.csv'
                 run(analyze_cmd(args.dataset, model, method, pred_path, out_csv), args.execute, env)

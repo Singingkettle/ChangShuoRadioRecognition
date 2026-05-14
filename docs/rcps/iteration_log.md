@@ -689,3 +689,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Fix: changed RCPS runner scripts to spawn child processes with `sys.executable` so the same conda interpreter is used in foreground and background sessions.
 - Verification: dry-run commands now expand to `/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python`.
 - Relaunched `CNN4 -> GRU2 -> CLDNNW` on GPU1. `CNN4` started normally and reached `40.18%` validation accuracy by epoch 3, so the queue is now healthy.
+
+
+### Iteration 34 - AMR-compatible Split Support: 2026-05-14 17:50 CST
+
+- Reference audit of AMR-Benchmark showed that its RadioML2016.10A loader uses a per modulation/SNR split of `600/200/200` for train/validation/test with seed `2016`.
+- Server converted JSONs currently use `500/100/400`, so external parity and strict-server robustness must be treated as two different protocols.
+- Added `tools/rcps/prepare_amr_compatible_split.py` and generated `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A` with train `132000`, validation `44000`, test `44000`; `iq/` is a symlink to the original converted dataset.
+- Added `--data-root` support to RCPS runners and fixed prediction export so data-root overrides are applied consistently during train, collect, and test stages.
+- Policy: AMR-compatible split will be used for external baseline parity; server-strict split remains a robustness protocol. Results from the two protocols will not be mixed in the same table.

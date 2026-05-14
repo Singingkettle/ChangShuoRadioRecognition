@@ -81,6 +81,7 @@ def main():
     parser.add_argument('--seeds', nargs='+', type=int, default=[2026, 2027, 2028])
     parser.add_argument('--dataset', default='deepsig201610A')
     parser.add_argument('--work-root', default='/home/citybuster/Data/RCPS/work_dirs')
+    parser.add_argument('--data-root', default=None, help='Override train/val/test dataset.data_root')
     parser.add_argument('--max-epochs', type=int, default=None)
     parser.add_argument('--num-workers', type=int, default=None)
     parser.add_argument('--epsilon-max', type=float, default=None)
@@ -99,6 +100,12 @@ def main():
                 cfg_options = [f'randomness.seed={seed}', f'work_dir={work_dir.as_posix()}']
                 if args.max_epochs is not None:
                     cfg_options.append(f'train_cfg.max_epochs={args.max_epochs}')
+                if args.data_root is not None:
+                    cfg_options.extend([
+                        f'train_dataloader.dataset.data_root={args.data_root}',
+                        f'val_dataloader.dataset.data_root={args.data_root}',
+                        f'test_dataloader.dataset.data_root={args.data_root}',
+                    ])
                 if method.startswith('rcps-'):
                     for prefix in prefixes:
                         if args.epsilon_max is not None:
@@ -125,10 +132,15 @@ def main():
                     matches = sorted(work_dir.glob('best_accuracy_top1_epoch_*.pth'))
                     checkpoint = matches[-1] if matches else work_dir / 'best_accuracy_top1_epoch_*.pth'
                     test_cmd = [sys.executable, 'tools/test.py', config, checkpoint.as_posix(), '--work-dir', work_dir.as_posix()]
+                    test_cfg_options = []
                     if args.num_workers is not None:
-                        test_cmd.extend(['--cfg-options', f'test_dataloader.num_workers={args.num_workers}'])
+                        test_cfg_options.append(f'test_dataloader.num_workers={args.num_workers}')
                         if args.num_workers == 0:
-                            test_cmd.append('test_dataloader.persistent_workers=False')
+                            test_cfg_options.append('test_dataloader.persistent_workers=False')
+                    if args.data_root is not None:
+                        test_cfg_options.append(f'test_dataloader.dataset.data_root={args.data_root}')
+                    if test_cfg_options:
+                        test_cmd.extend(['--cfg-options', *test_cfg_options])
                     run(test_cmd, args.execute)
 
 
