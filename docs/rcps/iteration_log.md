@@ -899,3 +899,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Reliability-bin deltas: low-SNR NLL improves by `-0.0168`, but high-SNR ECE worsens by `+0.0247` while global posterior metrics degrade.
 - Interpretation: increasing `epsilon_max` to `0.7` with a shallow schedule over-softens the targets. It may still improve accuracy relative to hard CE, but it damages NLL/ECE/Brier and should not be a main RCPS candidate. Current GRU2 best remains `eps0.5/gamma2`, which is the only completed GRU2 candidate that improves accuracy, NLL, ECE, and Brier together.
 
+### Iteration 50 PETCGDNN Keras-Init Static LS 0.1 Diagnostic: 2026-05-15 01:32 CST
+
+- PETCGDNN Keras-init paired diagnostic exported `static-ls_ls0.1` validation/test predictions on the AMR-compatible RadioML2016.10A split, seed `2026`.
+- Same-seed test comparison against hard CE Keras-init:
+  - Hard CE: acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`.
+  - Static LS `0.1`: acc `60.2955`, NLL `1.1567`, ECE `0.0325`, Brier `0.4791`.
+- Delta versus hard CE: accuracy `+0.3045 pp`, NLL `+0.0374`, ECE `+0.0054`, Brier `-0.0033`.
+- Reliability-bin deltas: low-SNR NLL `+0.0030`, low-SNR ECE `+0.0015`, high-SNR accuracy `+1.0636 pp`, high-SNR ECE `+0.0520`.
+- Interpretation: static label smoothing can improve accuracy/Brier slightly on this seed, but it does not improve posterior quality. It worsens NLL and ECE overall and does not improve low-SNR calibration. This supports the claim that sample-independent smoothing is an incomplete baseline for degraded-observation supervision.
+- PETCGDNN paired queue has advanced to `rcps-retention_eps0.3_gamma1.0`; keep monitoring before making any RCPS claim on PETCGDNN.
+
