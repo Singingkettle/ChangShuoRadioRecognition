@@ -20,6 +20,16 @@ This registry is the gatekeeper for RCPS experiments. A model is not eligible fo
 - RobustBench: https://github.com/RobustBench/robustbench
 - Speech Commands: https://tensorflow.google.cn/datasets/catalog/speech_commands
 
+
+## Current AMC Gate Status
+
+- MLDNN on the native server split is a chain-health anchor, not a main model: three-seed hard CE test accuracy is `62.5519 +/- 0.0870`.
+- GRU2 on the AMR-compatible split is useful for RCPS diagnostics but has high seed variance: three-seed hard CE test accuracy is `58.9894 +/- 1.3604`.
+- PETCGDNN with Keras-compatible initialization is the current stable non-MLDNN candidate: three-seed hard CE test accuracy is `59.9371 +/- 0.4106`, and paired RCPS diagnostics are running.
+- MCLDNN with the current Keras-init override failed to learn and is not used for RCPS claims until the parity issue is debugged.
+
+Decision rule: passing a gate does not mean the model is strong enough for the main TPAMI table. It only means paired RCPS comparison is scientifically meaningful. The main table should keep models that are both stable and externally defensible.
+
 ## Next Gate Order
 
 1. Reproduce `MLDNN + RadioML2016.10A` hard CE with original 400-epoch schedule.
@@ -36,3 +46,12 @@ This registry is the gatekeeper for RCPS experiments. A model is not eligible fo
 - Low-reliability behavior: low-SNR NLL/ECE/Brier should improve for most passing models before the paper claims posterior alignment.
 - Training efficiency: best epoch, validation AULC, time/epoch to target validation accuracy, and seed variance.
 - Compute cost: parameter and runtime overhead should be reported; loss-only RCPS is expected to leave the backbone unchanged.
+
+
+## Claim Gate
+
+- Accuracy claim: RCPS must improve mean accuracy over hard CE or static label smoothing on at least two AMC datasets and two model families while keeping high-reliability accuracy drop within `1 pp`.
+- Calibration claim: low-reliability bins must improve on most of NLL, ECE, and Brier versus hard CE and static label smoothing.
+- Efficiency claim: RCPS must reduce epoch/time to a fixed validation target or improve validation AULC in at least two stable model settings before the paper claims training-efficiency benefits.
+- Generality claim: AMC is the main controlled setting, but at least one vision corruption benchmark and one noisy-audio benchmark must reproduce the reliability-conditioned posterior-quality effect before the paper claims cross-domain generality.
+- If accuracy gains are inconsistent but posterior-quality gains are stable, the manuscript claim must be narrowed to posterior calibration and uncertainty alignment.
