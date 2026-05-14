@@ -35,6 +35,7 @@ def rnn_init(module: nn.Module, gain: float = 1.0) -> None:
             nn.init.zeros_(param)
 
 
+@WEIGHT_INITIALIZERS.register_module(name='RNN')
 @WEIGHT_INITIALIZERS.register_module(name='LSTM')
 class LSTMInit(BaseInit):
     def __init__(self, gain: float, layer: Union[str, List, None] = None):
