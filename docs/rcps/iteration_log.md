@@ -668,3 +668,16 @@ Guardrails:
   - GPU0: `MCformer` hard CE seed `2026`.
   - GPU1: `FastMLDNN` hard CE seed `2026`.
 - Decision rule: after all four one-seed screens are available, only models with credible parity or a clear, fixable parity gap are expanded to three seeds. Low-parity models enter parity debugging instead of RCPS comparison.
+
+
+### Iteration 33 Baseline Parity Debug: 2026-05-14 17:35 CST
+
+- Foreground monitoring found that `FastMLDNN` was using a 3200-epoch schedule without EarlyStopping in the current config. At epoch 180 it remained around 54-55% validation accuracy, so continuing would occupy GPU1 for many hours without credible baseline-gate value.
+- Action: stopped the `FastMLDNN` seed-2026 screen after preserving `best_accuracy_top1_epoch_180.pth`; exported validation/test predictions from that checkpoint.
+- Landed FastMLDNN metrics: validation acc `54.8318`, test acc `54.6568`, test NLL `1.3360`, ECE `0.0753`, Brier `0.5513`. This model/config is marked parity-failed for now and will not enter RCPS comparisons before deeper reproduction debugging.
+- Added a reliability-metadata fallback in `tools/rcps/collect_predictions.py`: if an original baseline config does not pack `sample_idx`, validation/test export now recovers SNR from the sequential dataset index. This enables original repository configs to be used for baseline gate and reliability-bin analysis.
+- Extended `tools/rcps/run_amc_matrix.py` with hard-CE entries for classic baseline candidates: `CNN4`, `GRU2`, `LSTM2`, `CLDNNL`, `CLDNNW`, `DSCLDNN`, `HCGDNN`, `MCNet`, and `DensCNN`.
+- Launched classic one-seed screen on GPU1: `CNN4 -> GRU2 -> CLDNNW`, max `400` epochs, num_workers `0`, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_classic_screen`, log `/home/citybuster/Data/RCPS/work_dirs/logs/stage_a_classic_screen_gpu1.log`.
+- Current `CGDNet` rerun with restored GRU initializer and `RNN` alias is still low (~52% by epoch 86). It will be allowed to finish/export, but current evidence marks it as a parity-debug candidate rather than a main-table model.
+
+Decision: no RCPS comparison is launched on parity-failed models. The next goal is to identify at least two stable AMC backbones from the classic/strong candidate pool before testing RCPS variants.

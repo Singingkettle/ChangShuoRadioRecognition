@@ -107,6 +107,7 @@ def main():
     if recover_mldnn_probs:
         print('Recovering MLDNN merge probabilities from double-softmax pred_score.')
     print(f'Collecting {args.split} predictions on {len(dataset)} samples ...')
+    sample_counter = 0
     with torch.no_grad():
         for i, data in enumerate(dataloader):
             results = model.test_step(data)
@@ -121,7 +122,13 @@ def main():
                     info = dataset.get_data_info(idx)
                     all_snrs.append(info.get('snr', 0))
                 else:
-                    all_snrs.append(0)
+                    # Original baseline configs often do not pack sample_idx into
+                    # metainfo. Validation/test samplers are deterministic, so the
+                    # running dataset index recovers SNR metadata for reliability
+                    # analysis without changing the model input pipeline.
+                    info = dataset.get_data_info(sample_counter)
+                    all_snrs.append(info.get('snr', 0))
+                sample_counter += 1
             if (i + 1) % 50 == 0:
                 print(f'  [{i + 1}/{len(dataloader)}]')
 
