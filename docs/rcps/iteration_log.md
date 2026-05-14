@@ -594,3 +594,31 @@
 - GPU1: `rcps-lowgate-c14-strict`, seed `2026`.
 - Both use strict split and identical MLDNN schedule/backbone/export/analyze.
 - These are same-seed pilots against strict hard CE seed `2026`, not final paper claims.
+
+## Iteration 32 - Strict MLDNN seed-2026 supervision pilot result and follow-up launch
+
+Time: 2026-05-14 11:35 CST
+Commit before follow-up launch: e5b5148
+Dataset/protocol: RadioML2016.10A strict split (`train.json` / `validation.json` / `test.json`), MLDNN, seed 2026.
+
+Completed same-seed test metrics:
+
+| method | test acc (%) | NLL | ECE | Brier | mean confidence | mean entropy |
+|---|---:|---:|---:|---:|---:|---:|
+| hard-ce-strict | 62.6250 | 1.0735 | 0.0358 | 0.4502 | 0.6621 | 0.9512 |
+| static-ls-strict | 62.4989 | 1.0695 | 0.0217 | 0.4478 | 0.6210 | 1.1608 |
+| rcps-lowgate-c14-strict | 62.9761 | 1.0756 | 0.0420 | 0.4476 | 0.6717 | 0.9446 |
+
+Interpretation: Static label smoothing gives the cleanest calibration signal on this seed (lower NLL/ECE/Brier with a small accuracy drop). The current `rcps-lowgate-c14` variant improves overall accuracy (+0.351 pp) and Brier slightly, but worsens NLL/ECE and does not sufficiently raise predictive entropy in low-to-middle SNR. This variant should be treated as a diagnostic discriminative-gain signal, not yet as the final RCPS formulation.
+
+Action: launched two stricter RCPS follow-up pilots on the same protocol and seed to test whether wider reliability-conditioned smoothing improves calibration while retaining accuracy:
+
+- `rcps-retention-strict`, GPU0, log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-retention-strict_seed2026_gpu0.log`
+- `rcps-uniform-strict`, GPU1, log `/home/citybuster/Data/RCPS/work_dirs/logs/mldnn_rcps-uniform-strict_seed2026_gpu1.log`
+
+Expected metrics:
+
+- `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/metrics/deepsig201610A_mldnn_rcps-retention-strict_seed2026_test.csv`
+- `/home/citybuster/Data/RCPS/work_dirs/strict_split_400ep/metrics/deepsig201610A_mldnn_rcps-uniform-strict_seed2026_test.csv`
+
+No paper claim is changed yet. The current working hypothesis is that the theory needs to emphasize posterior calibration/uncertainty alignment, while the algorithm may need a broader or entropy-matched epsilon schedule rather than the narrow `SNR <= -14 dB` lowgate.
