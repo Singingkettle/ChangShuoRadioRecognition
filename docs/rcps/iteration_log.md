@@ -794,3 +794,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Training-efficiency summary using target accuracy `57.5916` (95% of hard CE best validation): hard CE reaches target at epoch `42`; RCPS-Retention also reaches target at epoch `42`; Static LS `0.05` reaches it at epoch `48`; Static LS `0.10` at epoch `41`. RCPS has the highest validation AULC among these four (`55.7713`).
 - Next action: continue the RCPS grid to test whether entropy/posterior variants can repair the NLL/ECE tradeoff; do not expand to three seeds until a variant beats hard CE on a clearer metric set or the tradeoff is theoretically justified.
 
+### Iteration 41 PETCGDNN Keras-Init Parity Result: 2026-05-14 22:22 CST
+
+- PETCGDNN Keras-compatible initialization parity probe completed on AMR-compatible RadioML2016.10A, seed `2026`.
+- Original PETCGDNN hard CE on the same AMR-compatible protocol: test acc `57.4591`, NLL `1.1321`, ECE `0.0262`, Brier `0.4998`.
+- Keras-init PETCGDNN: validation acc `60.2159`, test acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`.
+- Delta vs original: accuracy `+2.5318 pp`, NLL `-0.0128`, Brier `-0.0174`; ECE slightly worsens by `+0.0009`.
+- Interpretation: framework/parity details materially affect AMC baseline reproduction. Keras-style Conv/Dense/RNN initialization brings PETCGDNN close to the 60% diagnostic line and prevents us from incorrectly dismissing it as a weak model. The main experiment should use parity-corrected baselines where justified, not raw PyTorch-default reproductions.
+- The same parity queue has moved to MCLDNN Keras-init; early epochs are still at chance level, so this variant is under watch and will be diagnosed if it does not leave the plateau.
+
