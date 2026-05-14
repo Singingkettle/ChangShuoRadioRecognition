@@ -889,3 +889,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: static label smoothing is not solving the degraded-observation mismatch for this stable PETCGDNN candidate. It slightly changes global ECE but hurts accuracy, NLL, Brier, and low-SNR posterior quality. This strengthens the need for reliability-conditioned and retention-aware targets rather than sample-independent smoothing.
 - Tooling update: `tools/rcps/compare_reliability_metrics.py` now supports `--ignore-model` so parity-corrected aliases such as `petcgdnn` versus `petcgdnn_kerasinit` can be compared against the same hard-CE baseline without hand editing CSV files.
 
+### Iteration 49 GRU2 Retention eps0.7/gamma1 Diagnostic: 2026-05-15 01:11 CST
+
+- GRU2 `rcps-retention_eps0.7_gamma1.0` completed and exported validation/test predictions.
+- Same-seed test comparison against hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Retention `eps0.7/gamma1`: acc `61.7205`, NLL `1.1975`, ECE `0.0988`, Brier `0.4821`.
+- Delta versus hard CE: accuracy `+1.1614 pp`, NLL `+0.0957`, ECE `+0.0675`, Brier `+0.0066`.
+- Reliability-bin deltas: low-SNR NLL improves by `-0.0168`, but high-SNR ECE worsens by `+0.0247` while global posterior metrics degrade.
+- Interpretation: increasing `epsilon_max` to `0.7` with a shallow schedule over-softens the targets. It may still improve accuracy relative to hard CE, but it damages NLL/ECE/Brier and should not be a main RCPS candidate. Current GRU2 best remains `eps0.5/gamma2`, which is the only completed GRU2 candidate that improves accuracy, NLL, ECE, and Brier together.
+
