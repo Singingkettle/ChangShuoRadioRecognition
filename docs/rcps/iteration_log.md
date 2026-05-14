@@ -878,3 +878,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: this is the strongest GRU2 single-seed RCPS candidate so far because it improves all four overall metrics and improves low-SNR NLL/ECE/Brier. High-SNR accuracy/NLL/Brier also improve, but high-SNR ECE remains worse than hard CE, so the theory should still emphasize reliability-conditioned posterior alignment rather than claiming uniformly better calibration in every reliability bin.
 - PETCGDNN Keras-init paired diagnostic is still in progress: `static-ls_ls0.05` reached validation accuracy above `57.6%` by epoch `37`; no intervention is needed yet.
 
+### Iteration 48 PETCGDNN Keras-Init Static LS 0.05 Diagnostic: 2026-05-15 00:49 CST
+
+- PETCGDNN Keras-init paired diagnostic exported `static-ls_ls0.05` validation/test predictions on the AMR-compatible RadioML2016.10A split, seed `2026`.
+- Same-seed test comparison against hard CE Keras-init:
+  - Hard CE: acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`.
+  - Static LS `0.05`: acc `59.5068`, NLL `1.1431`, ECE `0.0267`, Brier `0.4880`.
+- Delta versus hard CE: accuracy `-0.4841 pp`, NLL `+0.0238`, ECE `-0.0004`, Brier `+0.0056`.
+- Reliability-bin deltas: low-SNR NLL `+0.0171`, low-SNR ECE `+0.0214`, high-SNR accuracy `-0.7909 pp`, high-SNR ECE `+0.0160`.
+- Interpretation: static label smoothing is not solving the degraded-observation mismatch for this stable PETCGDNN candidate. It slightly changes global ECE but hurts accuracy, NLL, Brier, and low-SNR posterior quality. This strengthens the need for reliability-conditioned and retention-aware targets rather than sample-independent smoothing.
+- Tooling update: `tools/rcps/compare_reliability_metrics.py` now supports `--ignore-model` so parity-corrected aliases such as `petcgdnn` versus `petcgdnn_kerasinit` can be compared against the same hard-CE baseline without hand editing CSV files.
+
