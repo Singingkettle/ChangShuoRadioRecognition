@@ -718,3 +718,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - `CLDNNW`: stopped at best epoch `60`, validation acc `53.7273`, test acc `53.6602`; parity-failed for main use.
 - Action: stopped the remaining strict classic queue after exporting `CLDNNW` metrics. The strict protocol has now served its diagnostic purpose: `CNN4/LSTM2/CLDNNW` are weak, `GRU2` is usable but not main-strength.
 - Launched AMR-compatible classic/anchor queue on GPU1: `GRU2 -> MLDNN`, seed `2026`, max `400` epochs, data root `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10A`, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_classic`, log `/home/citybuster/Data/RCPS/work_dirs/logs/stage_a_amr_split_classic_gpu1.log`.
+
+
+### Iteration 35 GRU2 RCPS Readiness: 2026-05-14 19:20 CST
+
+- Foreground monitoring status:
+  - AMR-compatible strong queue is running `PETCGDNN` seed `2026`; validation accuracy is around `57.5%` by epoch `73`, with no `Traceback`, CUDA OOM, file-handle error, or subprocess error.
+  - AMR-compatible classic queue is running `GRU2` seed `2026`; validation accuracy crossed `60%` and is plateauing around `60.2-60.5%` by epoch `115`, with no runtime errors.
+  - `CGDNet` on AMR-compatible split completed earlier with validation acc `53.8227`, test acc `53.4727`, NLL `1.2199`, ECE `0.0241`, Brier `0.5485`; it remains parity-failed and will not enter RCPS comparisons before deeper reproduction debugging.
+- Added GRU2 RCPS-ready configs that preserve the original `GRU2` backbone and data transform while packing reliability metadata: hard CE with metadata, Static LS, RCPS-Uniform, RCPS-Retention, RCPS-Confusion, RCPS-EntropyMatch, and RCPS-PosteriorBase.
+- Added GRU2 method entries to `tools/rcps/run_amc_matrix.py` so paired comparisons can use the same runner and data-root overrides as the baseline gate.
+- Verification: all new GRU2 configs parse with `mmengine.Config.fromfile`, expose `('sample_idx', 'snr', 'snr_label', 'modulation')`, and the runner scripts pass `py_compile`.
+- Decision: no RCPS job is launched until the AMR-compatible `GRU2` test metrics are exported. If its test accuracy remains near or above `60%`, it becomes the first candidate for paired `Hard CE / Static LS / RCPS-Retention / RCPS-PosteriorBase` comparison; otherwise it remains diagnostic.
