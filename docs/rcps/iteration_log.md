@@ -810,3 +810,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - PETCGDNN Keras-init completed earlier with test acc `59.9909`, a `+2.5318 pp` improvement over the original PETCGDNN reproduction. Because this is now a plausible parity-corrected baseline, launched PETCGDNN Keras-init seeds `2027` and `2028` on GPU0 for a three-seed baseline gate.
 - New work root: `/home/citybuster/Data/RCPS/work_dirs/petcgdnn_kerasinit_gate_amr`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/petcgdnn_kerasinit_gate_gpu0.log`.
 
+### Iteration 43 GRU2 Retention Gamma-2 Diagnostic: 2026-05-14 22:50 CST
+
+- GRU2 paired RCPS grid continued on the AMR-compatible RadioML2016.10A split, seed `2026`.
+- New completed candidate: `rcps-retention_eps0.3_gamma2.0`.
+- Test comparison against same-seed hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Retention `eps0.3/gamma1`: acc `61.6614`, NLL `1.1175`, ECE `0.0250`, Brier `0.4625`.
+  - RCPS-Retention `eps0.3/gamma2`: acc `60.3818`, NLL `1.1137`, ECE `0.0098`, Brier `0.4746`.
+- Interpretation: a steeper reliability schedule (`gamma=2`) strongly improves ECE but loses the accuracy/Brier advantage of `gamma=1` and still does not repair NLL. This suggests that the RCPS schedule controls a real accuracy-calibration tradeoff rather than giving a free universal improvement.
+- Current working hypothesis: `eps0.3/gamma1` remains the best GRU2 diagnostic candidate for balanced accuracy/ECE/Brier, while `eps0.3/gamma2` is useful evidence for uncertainty alignment. Continue the grid to test whether higher `epsilon_max`, entropy-matched, or posterior-base variants improve NLL without losing retention.
+- GPU1 automatically advanced to `rcps-retention_eps0.5_gamma1.0`. GPU0 continues PETCGDNN Keras-init seed `2027`, which has reached approximately `60.15%` validation accuracy by epoch `52`, close to seed `2026`.
