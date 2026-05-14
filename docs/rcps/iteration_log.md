@@ -745,3 +745,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - class confusion base: `/home/citybuster/Data/RCPS/work_dirs/confusion_bases/deepsig201610A_gru2_seed2026.npy`
 - Launched GRU2 paired comparison on GPU1 with work root `/home/citybuster/Data/RCPS/work_dirs/gru2_paired_amr_400ep` and log `/home/citybuster/Data/RCPS/work_dirs/logs/gru2_paired_amr_gpu1.log`.
 - Paired methods: `Static LS`, `RCPS-Retention`, `RCPS-EntropyMatch`, and `RCPS-PosteriorBase`; all use the same GRU2 backbone, AMR-compatible split, seed `2026`, and training schedule. This is a diagnostic paired comparison, not yet a paper claim.
+
+
+### Iteration 37 GRU2 Three-Seed Baseline Expansion: 2026-05-14 20:20 CST
+
+- AMR-compatible `MCformer` seed `2026` completed: validation accuracy `58.35%`, test accuracy `57.97%`. It is below the current GRU2 hard-CE baseline and is not promoted to RCPS comparison at this stage.
+- `GRU2` paired comparison on GPU1 is still running normally. The first candidate, Static LS `0.05`, has recovered to roughly `59.8%` validation accuracy by epoch `130`, close to but below hard CE (`60.62%` validation for seed `2026`). No conclusions are drawn before CSV export.
+- GPU0 was freed after MCformer. Action: launched AMR-compatible `GRU2` hard CE seeds `2027` and `2028` on GPU0 to test baseline stability before any three-seed RCPS claim.
+- Rationale: GRU2 is currently the cleanest non-MLDNN baseline candidate. Completing hard CE three seeds is more useful than spending the freed GPU on the MLDNN anchor, whose current config trains on train+validation and validates on test.
