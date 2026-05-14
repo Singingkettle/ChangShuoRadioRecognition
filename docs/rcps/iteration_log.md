@@ -730,3 +730,18 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Added GRU2 method entries to `tools/rcps/run_amc_matrix.py` so paired comparisons can use the same runner and data-root overrides as the baseline gate.
 - Verification: all new GRU2 configs parse with `mmengine.Config.fromfile`, expose `('sample_idx', 'snr', 'snr_label', 'modulation')`, and the runner scripts pass `py_compile`.
 - Decision: no RCPS job is launched until the AMR-compatible `GRU2` test metrics are exported. If its test accuracy remains near or above `60%`, it becomes the first candidate for paired `Hard CE / Static LS / RCPS-Retention / RCPS-PosteriorBase` comparison; otherwise it remains diagnostic.
+
+
+### Iteration 36 AMR GRU2 Gate and Paired Launch: 2026-05-14 19:35 CST
+
+- AMR-compatible baseline results landed:
+  - `GRU2` seed `2026`: validation acc `60.6227`, test acc `60.5591`, test NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - `PETCGDNN` seed `2026`: validation acc `57.6182`, test acc `57.4591`, test NLL `1.1321`, ECE `0.0262`, Brier `0.4998`.
+- `GRU2` is not a final TPAMI main model yet, but it is the first non-MLDNN candidate on the AMR-compatible protocol to clear the 60% diagnostic threshold. It is therefore eligible for a one-seed paired supervision comparison.
+- The AMR-compatible MLDNN anchor failed before training because the MLDNN config expects `train_and_validation.json`. This was a data-entry issue; generated a correct merged JSON with `176000` records from AMR-compatible train and validation splits.
+- Built GRU2 validation-derived RCPS tables from validation predictions only:
+  - entropy table: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/gru2_hard-ce_seed2026_entropy_match.npz`
+  - reliability-conditioned posterior base: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/gru2_hard-ce_seed2026_reliability_base.npz`
+  - class confusion base: `/home/citybuster/Data/RCPS/work_dirs/confusion_bases/deepsig201610A_gru2_seed2026.npy`
+- Launched GRU2 paired comparison on GPU1 with work root `/home/citybuster/Data/RCPS/work_dirs/gru2_paired_amr_400ep` and log `/home/citybuster/Data/RCPS/work_dirs/logs/gru2_paired_amr_gpu1.log`.
+- Paired methods: `Static LS`, `RCPS-Retention`, `RCPS-EntropyMatch`, and `RCPS-PosteriorBase`; all use the same GRU2 backbone, AMR-compatible split, seed `2026`, and training schedule. This is a diagnostic paired comparison, not yet a paper claim.
