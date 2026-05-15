@@ -15,6 +15,12 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=2016)
     parser.add_argument('--train-per-group', type=int, default=600)
     parser.add_argument('--val-per-group', type=int, default=200)
+    parser.add_argument(
+        '--test-per-group',
+        type=int,
+        default=200,
+        help='Number of held-out test samples per modulation/SNR group. '
+        'Use a negative value to keep the full remainder as test.')
     return parser.parse_args()
 
 
@@ -58,13 +64,19 @@ def main():
     for key in sorted(groups):
         group = sorted(groups[key], key=lambda x: x['file_name'])
         n = len(group)
-        if n < args.train_per_group + args.val_per_group:
+        fixed_test = args.test_per_group >= 0
+        requested = args.train_per_group + args.val_per_group + (args.test_per_group if fixed_test else 0)
+        if n < requested:
             raise ValueError(f'Group {key} has only {n} samples')
         indices = np.arange(n)
         train_idx = rng.choice(indices, size=args.train_per_group, replace=False)
         rest = np.array(sorted(set(indices.tolist()) - set(train_idx.tolist())))
         val_idx = rng.choice(rest, size=args.val_per_group, replace=False)
-        test_idx = np.array(sorted(set(rest.tolist()) - set(val_idx.tolist())))
+        rest_after_val = np.array(sorted(set(rest.tolist()) - set(val_idx.tolist())))
+        if fixed_test:
+            test_idx = rng.choice(rest_after_val, size=args.test_per_group, replace=False)
+        else:
+            test_idx = rest_after_val
         train.extend(group[i] for i in train_idx.tolist())
         val.extend(group[i] for i in val_idx.tolist())
         test.extend(group[i] for i in test_idx.tolist())
@@ -84,7 +96,8 @@ def main():
         f.write(f'- source_root: `{source_root}`\n')
         f.write(f'- out_root: `{out_root}`\n')
         f.write(f'- seed: `{args.seed}`\n')
-        f.write(f'- per modulation/SNR split: train `{args.train_per_group}`, validation `{args.val_per_group}`, test remainder\n')
+        test_desc = 'remainder' if args.test_per_group < 0 else str(args.test_per_group)
+        f.write(f'- per modulation/SNR split: train `{args.train_per_group}`, validation `{args.val_per_group}`, test `{test_desc}`\n')
         f.write(f'- total train: `{len(train)}`\n')
         f.write(f'- total validation: `{len(val)}`\n')
         f.write(f'- total test: `{len(test)}`\n\n')
