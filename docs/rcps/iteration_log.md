@@ -945,3 +945,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - GRU2 posterior-base `eps0.3/gamma2` also gives a consistent single-seed improvement: accuracy `+0.9386 pp`, NLL `-0.0267`, ECE `-0.0159`, Brier `-0.0158`, with low-SNR NLL `-0.0123`.
 - Interpretation: the strongest evidence now favors the theory variant where the low-reliability base is not merely uniform but a reliability-conditioned posterior/confusion base estimated on validation data. This better matches class-overlap structure and fixes the NLL/ECE weakness seen in uniform/retention-only smoothing. The manuscript should move `RCPS-PosteriorBase` to the algorithmic center and treat uniform/retention as ablations, pending multi-seed confirmation.
 - Action: start PETCGDNN Keras-init posterior-base `eps0.3/gamma1` for seeds `2027` and `2028` on GPU0, using the same AMR-compatible split and training budget. The hard-CE PETCGDNN Keras-init baseline already has seeds `2026/2027/2028`, so this is the first multi-seed confirmation step for the emerging main method.
+
+### Iteration 54 GRU2 Posterior eps0.5/gamma1 Diagnostic: 2026-05-15 10:37 CST
+
+- Foreground monitor status: PETCGDNN Keras-init posterior-base seed `2027` is running normally on GPU0; GRU2 posterior grid is running on GPU1; CIFAR-10-C is downloading in the background and has grown beyond the earlier incomplete 21MB archive. No new runtime error was observed.
+- GRU2 `rcps-posterior_eps0.5_gamma1.0` completed and exported validation/test predictions.
+- Same-seed test comparison against hard CE:
+  - Hard CE: acc `60.5591`, NLL `1.1019`, ECE `0.0313`, Brier `0.4755`.
+  - RCPS-Posterior `eps0.5/gamma1`: acc `61.7136`, NLL `1.0824`, ECE `0.0111`, Brier `0.4565`.
+- Delta versus hard CE: accuracy `+1.1545 pp`, NLL `-0.0195`, ECE `-0.0202`, Brier `-0.0189`.
+- Reliability-bin deltas: low-SNR NLL `-0.0113`, low-SNR ECE `-0.0093`, high-SNR accuracy `+2.2000 pp`, high-SNR ECE `+0.0049`.
+- Interpretation: GRU2 now has two posterior-base candidates that improve all overall metrics versus hard CE. This reinforces the emerging algorithmic decision that validation-estimated posterior/confusion bases are central, while uniform, entropy-only, and retention-only variants should be treated as ablations.
