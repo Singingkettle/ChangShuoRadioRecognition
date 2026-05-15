@@ -956,3 +956,25 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Delta versus hard CE: accuracy `+1.1545 pp`, NLL `-0.0195`, ECE `-0.0202`, Brier `-0.0189`.
 - Reliability-bin deltas: low-SNR NLL `-0.0113`, low-SNR ECE `-0.0093`, high-SNR accuracy `+2.2000 pp`, high-SNR ECE `+0.0049`.
 - Interpretation: GRU2 now has two posterior-base candidates that improve all overall metrics versus hard CE. This reinforces the emerging algorithmic decision that validation-estimated posterior/confusion bases are central, while uniform, entropy-only, and retention-only variants should be treated as ablations.
+
+### Iteration 55 PETCGDNN 10B Ensemble Posterior Correction: 2026-05-16 04:57 CST
+
+- PETCGDNN Keras-init `RadioML2016.10B` ensemble posterior-base confirmation completed for seeds `2026/2027/2028`.
+- Important correction: the legacy work directory name says `eps0p3_g1p0`, but the actual config used the default retention-power schedule from `petcgdnn_rcps-posterior_kerasinit_iq-snr-deepsig-201610A.py`: `epsilon.max=0.7`, `gamma=1.0`, `retain_min=0.8`, with the 3-teacher validation posterior table. Corrected metrics were regenerated under `metrics_corrected` with method name `rcps-posterior-ens3_retmax0p7_g1p0_retain0p8`.
+- Three-seed test deltas versus hard CE on the AMR-compatible RadioML2016.10B split:
+  - mean accuracy `+1.4508 pp` (`61.6133%` absolute);
+  - mean NLL `-0.0110`;
+  - mean ECE `-0.0121`;
+  - mean Brier `-0.0190`.
+- Reliability-bin behavior:
+  - low-SNR mean ECE `-0.0196` and Brier `-0.0029`, but low-SNR accuracy `-0.3528 pp`;
+  - high-SNR accuracy `+2.0400 pp` and Brier `-0.0269`, but high-SNR ECE `+0.0106`.
+- Interpretation: ensemble posterior bases stabilize PETCGDNN on a second AMC dataset and provide accuracy, ECE, and Brier gains. The low-SNR accuracy and high-SNR ECE tradeoffs mean the paper should not claim universal accuracy gains in every reliability bin. The stronger, defensible claim is posterior-quality and reliability-alignment improvement, with accuracy gains observed in aggregate and high-reliability bins for this model/dataset.
+
+### Iteration 56 CGDNet Baseline Gate Launched: 2026-05-16 04:58 CST
+
+- GPU0 became free after PETCGDNN 10B ensemble posterior export and corrected analysis.
+- Launched `CGDNet + RadioML2016.10A_AMR + hard CE` baseline parity gate for seeds `2026/2027/2028`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2`.
+- Log: `/home/citybuster/Data/RCPS/work_dirs/logs/cgdnet_hard_gate_10A_2026_2028_gpu0.log`.
+- This is a baseline-first step only. No RCPS result will be run on CGDNet until hard CE is stable enough to pass the parity gate.
