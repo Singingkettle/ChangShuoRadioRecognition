@@ -1,5 +1,6 @@
 import argparse
 import json
+import shutil
 import tarfile
 import urllib.request
 from pathlib import Path
@@ -9,19 +10,39 @@ import numpy as np
 
 CIFAR10C_URL = 'https://zenodo.org/records/2535967/files/CIFAR-10-C.tar?download=1'
 DEFAULT_CORRUPTIONS = ('gaussian_noise', 'motion_blur', 'brightness')
+REQUIRED_MEMBERS = ('CIFAR-10-C/labels.npy',) + tuple(
+    f'CIFAR-10-C/{name}.npy' for name in DEFAULT_CORRUPTIONS
+)
 CLASS_NAMES = (
     'airplane', 'automobile', 'bird', 'cat', 'deer',
     'dog', 'frog', 'horse', 'ship', 'truck',
 )
 
 
+def archive_has_members(archive, members):
+    if not archive.exists() or archive.stat().st_size <= 0:
+        return False
+    try:
+        with tarfile.open(archive) as tar:
+            names = set(tar.getnames())
+    except tarfile.TarError:
+        return False
+    return all(member in names for member in members)
+
+
 def download(url, out_path):
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    if out_path.exists() and out_path.stat().st_size > 0:
-        print(f'Using existing archive: {out_path}')
+    if archive_has_members(out_path, REQUIRED_MEMBERS):
+        print(f'Using verified archive: {out_path}')
         return
+    if out_path.exists():
+        backup = out_path.with_suffix(out_path.suffix + '.partial')
+        print(f'Existing archive is incomplete; moving {out_path} -> {backup}')
+        shutil.move(str(out_path), str(backup))
     print(f'Downloading {url} -> {out_path}')
     urllib.request.urlretrieve(url, out_path)
+    if not archive_has_members(out_path, REQUIRED_MEMBERS):
+        raise RuntimeError(f'Downloaded archive is incomplete: {out_path}')
 
 
 def extract(archive, out_dir):
@@ -80,8 +101,10 @@ def main():
     archive = raw_dir / 'CIFAR-10-C.tar'
     if args.download:
         download(CIFAR10C_URL, archive)
-    if not archive.exists():
-        raise FileNotFoundError(f'Missing {archive}; rerun with --download.')
+    if not archive_has_members(archive, REQUIRED_MEMBERS):
+        raise FileNotFoundError(
+            f'Missing or incomplete {archive}; rerun with --download.'
+        )
     cifar10c_dir = extract(archive, raw_dir)
     out_dir = args.rcps_root / 'processed' / 'ReliabilityClassification' / 'Vision' / 'CIFAR-10-C'
     build_annotations(cifar10c_dir, out_dir, args.corruptions)
