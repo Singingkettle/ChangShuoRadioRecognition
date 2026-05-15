@@ -978,3 +978,17 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2`.
 - Log: `/home/citybuster/Data/RCPS/work_dirs/logs/cgdnet_hard_gate_10A_2026_2028_gpu0.log`.
 - This is a baseline-first step only. No RCPS result will be run on CGDNet until hard CE is stable enough to pass the parity gate.
+
+### Iteration 57 CGDNet Baseline Gate Paused: 2026-05-16 05:42 CST
+
+- CGDNet hard-CE seed `2026` completed on the AMR-compatible RadioML2016.10A split with validation accuracy `54.60%` and test accuracy `54.33%`.
+- Public/secondary AMR-Benchmark-style summaries place CGDNet on RadioML2016.10A around the high-50s rather than the low-50s; the observed result is therefore below the parity target by roughly `3 pp`.
+- The RCPS config inherits the repository CGDNet backbone/init/schedule, so the likely causes are protocol differences, split differences, or a CGDNet-specific sensitivity rather than the RCPS loss.
+- Action: stopped the remaining CGDNet gate queue after preserving seed `2026` metrics and logs. CGDNet is not removed from the study, but it is quarantined for parity debugging and will not be used as RCPS evidence until the hard baseline is repaired or the gap is explained.
+
+### Iteration 58 MCformer Baseline Gate Launched: 2026-05-16 05:43 CST
+
+- GPU0 was reassigned to `MCformer + RadioML2016.10A_AMR + hard CE` baseline parity gate for seeds `2026/2027/2028`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2`.
+- Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_gate_10A_2026_2028_gpu0.log`.
+- Rationale: MCformer gives a transformer/attention-family baseline, which is more suitable for the main TPAMI evidence chain than a parity-failed CGDNet run.
