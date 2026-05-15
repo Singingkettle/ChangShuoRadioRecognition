@@ -992,3 +992,25 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2`.
 - Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_gate_10A_2026_2028_gpu0.log`.
 - Rationale: MCformer gives a transformer/attention-family baseline, which is more suitable for the main TPAMI evidence chain than a parity-failed CGDNet run.
+
+### Iteration 59 GRU2 Ensemble Posterior Three-Seed Confirmation: 2026-05-16 07:11 CST
+
+- GRU2 `RCPS-PosteriorBase` with a three-teacher validation posterior base completed seeds `2026/2027/2028` on the AMR-compatible RadioML2016.10A split.
+- Method label: `rcps-posterior-ens3_retmax0p5_g2p0`; posterior base: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/gru2_ensemble3_reliability_base.npz`.
+- Three-seed test deltas versus hard CE:
+  - mean accuracy `+2.0523 pp`;
+  - mean NLL `-0.0252`;
+  - mean ECE `-0.0101`;
+  - mean Brier `-0.0226`.
+- Reliability-bin behavior:
+  - high-SNR mean accuracy `+3.9364 pp`, NLL `-0.0459`, ECE `-0.0002`, Brier `-0.0399`;
+  - low-SNR mean accuracy `-0.7778 pp`, NLL `+0.0069`, ECE `+0.0061`, Brier `+0.0032`.
+- Interpretation: this is a clean second-model-family confirmation that posterior-base RCPS can improve aggregate accuracy and posterior quality without changing the backbone. The low-SNR tradeoff prevents a blanket claim that every reliability bin improves. The theory should emphasize reliability-conditioned posterior allocation and uncertainty alignment, with aggregate and high-reliability accuracy gains reported as empirical benefits rather than guaranteed consequences.
+- Summary CSV: `/home/citybuster/Data/RCPS/work_dirs/gru2_main_posterior_ens3_400ep/summary/gru2_ens3_3seed_compare.csv`.
+
+### Iteration 60 MCformer/FastMLDNN Baseline Gates Continue: 2026-05-16 07:13 CST
+
+- MCformer hard-CE seed `2026` completed on the AMR-compatible RadioML2016.10A split and exported validation/test predictions.
+- MCformer seed `2026` test metrics: accuracy `58.15%`, NLL `1.1062`, ECE `0.0136`, Brier `0.4908`. Seed `2027` is running normally on GPU0.
+- GPU1 was reassigned to `FastMLDNN + RadioML2016.10A_AMR + hard CE` baseline parity gate for seeds `2026/2027/2028`.
+- FastMLDNN is a baseline-only step at this stage. No RCPS modification will be treated as evidence until its hard CE baseline is stable enough or any gap to external/reference behavior is explained.
