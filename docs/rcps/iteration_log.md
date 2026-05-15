@@ -932,3 +932,16 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Delta versus hard CE: accuracy `+0.5364 pp`, NLL `+0.0209`, ECE `-0.0042`, Brier `-0.0081`.
 - Reliability-bin deltas: low-SNR NLL `+0.0061`, low-SNR ECE `-0.0053`, high-SNR accuracy `+1.3909 pp`, high-SNR ECE `+0.0198`.
 - Interpretation: this is the first PETCGDNN paired result where RCPS beats static label smoothing on accuracy, ECE, and Brier under the same seed and training budget. The NLL regression means the method is still not publication-ready as-is for this backbone. Continue with `gamma=2`, posterior base, and entropy matching to test whether the target schedule can retain the accuracy/Brier benefit while fixing likelihood quality.
+
+### Iteration 53 Posterior-Base Candidate Emerges: 2026-05-15 10:16 CST
+
+- The overnight paired diagnostics completed a full PETCGDNN Keras-init single-seed sweep and several GRU2 posterior-base points. GPU0 is now free; GPU1 continues the GRU2 posterior grid.
+- PETCGDNN Keras-init single-seed test comparison against hard CE:
+  - Hard CE: acc `59.9909`, NLL `1.1193`, ECE `0.0271`, Brier `0.4824`.
+  - Best static LS (`0.1` by accuracy/Brier): acc `60.2955`, NLL `1.1567`, ECE `0.0325`, Brier `0.4791`.
+  - Best retention by accuracy (`eps0.5/gamma1`): acc `61.2455`, NLL `1.1638`, ECE `0.0596`, Brier `0.4717`.
+  - Best posterior-base candidate (`eps0.3/gamma1`): acc `61.0591`, NLL `1.0882`, ECE `0.0104`, Brier `0.4622`.
+- PETCGDNN posterior-base `eps0.3/gamma1` delta versus hard CE: accuracy `+1.0682 pp`, NLL `-0.0311`, ECE `-0.0167`, Brier `-0.0202`; low-SNR NLL `-0.0193` and low-SNR ECE `-0.0080`; high-SNR accuracy `+2.3091 pp` with only `+0.0017` high-SNR ECE.
+- GRU2 posterior-base `eps0.3/gamma2` also gives a consistent single-seed improvement: accuracy `+0.9386 pp`, NLL `-0.0267`, ECE `-0.0159`, Brier `-0.0158`, with low-SNR NLL `-0.0123`.
+- Interpretation: the strongest evidence now favors the theory variant where the low-reliability base is not merely uniform but a reliability-conditioned posterior/confusion base estimated on validation data. This better matches class-overlap structure and fixes the NLL/ECE weakness seen in uniform/retention-only smoothing. The manuscript should move `RCPS-PosteriorBase` to the algorithmic center and treat uniform/retention as ablations, pending multi-seed confirmation.
+- Action: start PETCGDNN Keras-init posterior-base `eps0.3/gamma1` for seeds `2027` and `2028` on GPU0, using the same AMR-compatible split and training budget. The hard-CE PETCGDNN Keras-init baseline already has seeds `2026/2027/2028`, so this is the first multi-seed confirmation step for the emerging main method.
