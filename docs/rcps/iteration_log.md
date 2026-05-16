@@ -1331,3 +1331,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Other UCSD candidates are not usable without adaptation: `GRU2` failed with `input.size(-1) must be equal to input_size`, `FastMLDNN` failed with a batch-size mismatch, `PETCGDNN` failed with kernel/input-size mismatch, and `MCLDNN` remained at `10%` accuracy through 15 epochs before being stopped.
 - Decision: promote `CNN4` as the feasible UCSD/RML22 baseline family for third-AMC-dataset supplementary evidence. This does not replace the strong-model evidence on 10A/10B.
 - Launched `CNN4 + UCSD/RML22 + hard CE` seeds `2027` and `2028`, each with the same 30-epoch budget and export/analysis chain. If they match seed `2026`, the next step is a matched RCPS comparison on the same CNN4 backbone and budget.
+
+
+## Iteration 95 - UCSD/RML22 CNN4 matched RCPS comparison completed (2026-05-17 01:30:00 CST)
+
+- Completed the matched `CNN4 + UCSD/RML22` 30-epoch comparison for `Hard CE`, `Static LS`, and `RCPS-Retention` with seeds `2026/2027/2028`.
+- Hard-CE seed `2026` comes from the promoted screen run; hard-CE seeds `2027/2028` come from the formal gate. Static LS and RCPS-Retention were run under the same CNN4 backbone, UCSD/RML22 split, epoch budget, optimizer schedule, export path, and reliability-bin analysis chain.
+- Summary files were written under `/home/citybuster/Data/RCPS/work_dirs/ucsd_rml22_matched_30ep/summary`.
+- Three-seed test aggregate: hard CE accuracy `48.4992 +/- 6.5126`, NLL `1.2705`, ECE `0.0250`, Brier `0.5769`; Static LS accuracy `48.9032 +/- 6.3672`, NLL `1.3150`, ECE `0.0491`, Brier `0.5827`; RCPS-Retention accuracy `49.8081 +/- 4.9086`, NLL `1.2508`, ECE `0.0329`, Brier `0.5685`.
+- Mean deltas versus hard CE: Static LS gives accuracy `+0.4040 pp` but worsens NLL by `+0.0445`, ECE by `+0.0241`, and Brier by `+0.0058`; RCPS-Retention gives accuracy `+1.3089 pp`, NLL `-0.0197`, Brier `-0.0084`, but ECE `+0.0079`.
+- Reliability-band deltas for RCPS-Retention versus hard CE: low-SNR accuracy `+0.9278 pp`, NLL `-0.0060`, Brier `-0.0020`, ECE `+0.0028`; high-SNR accuracy `+1.6042 pp`, NLL `-0.0415`, ECE `-0.0055`, Brier `-0.0169`.
+- Interpretation: UCSD/RML22 provides useful supplementary evidence that RCPS-Retention is stronger than Static LS and can improve accuracy/NLL/Brier on a third AMC dataset. Because the feasible UCSD backbone is CNN4 and the hard-CE seed variance is high, this result should remain supplementary rather than a primary TPAMI claim.
