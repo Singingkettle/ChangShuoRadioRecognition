@@ -1089,3 +1089,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Seed-2026 deltas versus hard CE for `eps0.3`: overall accuracy `+0.1364 pp`, NLL `-0.0002`, ECE `-0.0023`, Brier `-0.0012`; low-SNR NLL `-0.0054`, ECE `-0.0046`, Brier `-0.0012`; high-SNR accuracy `+0.5818 pp`, NLL `-0.0048`, ECE `+0.0006`, Brier `-0.0024`.
 - Decision: do not promote `eps0.3` yet; keep it as a useful pilot point. `eps0.1` remains the three-seed confirmation candidate because it improves aggregate NLL/ECE/Brier and low/high reliability metrics more consistently on seed `2026`.
 - Launched a midpoint pilot `rcps-hybrid-prior1_eps0p2_g2_retain0p8` on GPU1 to check whether `epsilon_max=0.2` provides a better accuracy/calibration tradeoff. Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p2_2026_gpu1.log`.
+
+
+## Iteration 70 - MCformer hybrid eps0.2 promoted to three-seed confirmation (2026-05-16 14:15:01 CST)
+
+- Foreground monitoring confirmed `MCformer + rcps-hybrid-prior1_eps0p2_g2_retain0p8` seed `2026` completed without export or dataloader errors. Validation/test prediction export succeeded with `num_workers=0`.
+- Seed-2026 comparison against hard CE and prior pilots was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep/summary/mcformer_seed2026_hard_static_posterior_hybrid_eps_compare.csv`.
+- Seed-2026 deltas versus hard CE: overall accuracy `+0.2068 pp`; low-SNR NLL `-0.0126`; high-SNR ECE `-0.0032`. This is a stronger single-seed balance than `eps0.1` on low-SNR NLL and high-SNR ECE, while remaining less aggressive than the pure posterior variant.
+- Decision: promote `eps0.2` to seeds `2027` and `2028` on GPU1 for confirmation, while `eps0.1` seed `2028` continues on GPU0. Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p2_2027_2028_gpu1.log`.
+- No paper conclusion is updated yet. The current decision only expands a promising pilot to a paired three-seed test.
