@@ -1189,3 +1189,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Per-seed summary: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/summary/mcformer_hard_ce_10B_3seed_per_seed.csv`.
 - Reliability-bin aggregate: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/summary/mcformer_hard_ce_10B_3seed_aggregate.csv`.
 - Interpretation: the second AMC dataset baseline gate is stable enough to proceed to matched RCPS construction. The next step is to build a validation-only posterior/confusion base for `RadioML2016.10B_AMR` and launch matched MCformer RCPS-Hybrid eps0.1 runs, without changing backbone, split, seed, optimizer, or epoch budget.
+
+
+## Iteration 81 - RadioML2016.10B MCformer class-count mismatch diagnosed (2026-05-16 18:28:00 CST)
+
+- The first `MCformer + RadioML2016.10B_AMR + hard CE` gate used the 10A MCformer base config without overriding `model.backbone.num_classes`.
+- Audit showed `RadioML2016.10B_AMR` has `10` classes (`classes` in exported prediction files are length 10 and labels are `0..9`), while the model emitted `11` probabilities because the 10A config sets `num_classes=11`.
+- The resulting three-seed 10B hard-CE metrics are therefore quarantined as diagnostic-only and must not be used as paper evidence or as an RCPS teacher.
+- The invalid posterior table was moved to `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610B_amr/mcformer_hard-ce_3seed_reliability_base.invalid_numcls11.npz`.
+- Corrected baseline gate is restarted under `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep` with `model.backbone.num_classes=10`, same data split, same seeds, same optimizer, same epoch budget, and `num_workers=0`.
