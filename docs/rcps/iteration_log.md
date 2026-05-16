@@ -1322,3 +1322,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Decision: do not use either failed strong-model UCSD attempt as evidence. Treat them as baseline-gate diagnostics.
 - Launched a 30-epoch UCSD/RML22 screen with more stable candidate backbones: `CNN4 + hard CE + seed 2026` on GPU0 and `GRU2 + hard CE + seed 2026` on GPU1.
 - The screen goal is only to find a backbone whose UCSD data/label/shape path actually learns. If one passes, it can be promoted to a formal baseline gate and later to a matched RCPS comparison.
+
+
+## Iteration 94 - UCSD/RML22 CNN4 baseline gate promoted (2026-05-17 00:11:00 CST)
+
+- UCSD/RML22 screen outcome: `CNN4 + hard CE + seed 2026` is the first stable candidate. It learned normally and produced validation accuracy `53.48%` and test accuracy `53.37%` at the best checkpoint (`epoch 22`) under a 30-epoch budget.
+- Reliability-bin metrics were exported to `/home/citybuster/Data/RCPS/work_dirs/ucsd_rml22_baseline_screen_30ep/metrics/ucsd_rml22_cnn4_hard-ce-screen_seed2026_test.csv`.
+- Other UCSD candidates are not usable without adaptation: `GRU2` failed with `input.size(-1) must be equal to input_size`, `FastMLDNN` failed with a batch-size mismatch, `PETCGDNN` failed with kernel/input-size mismatch, and `MCLDNN` remained at `10%` accuracy through 15 epochs before being stopped.
+- Decision: promote `CNN4` as the feasible UCSD/RML22 baseline family for third-AMC-dataset supplementary evidence. This does not replace the strong-model evidence on 10A/10B.
+- Launched `CNN4 + UCSD/RML22 + hard CE` seeds `2027` and `2028`, each with the same 30-epoch budget and export/analysis chain. If they match seed `2026`, the next step is a matched RCPS comparison on the same CNN4 backbone and budget.
