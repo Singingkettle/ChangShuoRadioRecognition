@@ -1302,3 +1302,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Running jobs: `MCformer + hard CE + seed 2026` on GPU0 and `CGDNet + hard CE + seed 2026` on GPU1, each with `max_epochs=400`, `num_workers=0`, and unchanged train/validation/test split files.
 - At launch monitoring, both processes were alive with no `Traceback`, CUDA OOM, file-handle error, or shape error. Logs had not yet reached epoch output, consistent with large cached dataset preparation.
 - This is a baseline-first third-dataset gate. No RCPS run will be launched for `RadioML2018.01A` until at least one current-code baseline produces sane validation/test metrics.
+
+
+## Iteration 92 - RadioML2018.01A full-gate stopped and UCSD/RML22 gate launched (2026-05-16 23:40:00 CST)
+
+- Intervention was required on the attempted full `RadioML2018.01A` current-code gate.
+- `CGDNet + RadioML2018.01A + hard CE` failed immediately with a backbone shape error: `shape '[-1, 50, 472]' is invalid for input of size 81120000`. This is a model/config compatibility issue for the current 2018 pipeline, not an RCPS result.
+- `MCformer + RadioML2018.01A + hard CE` entered epoch 1, but the logged ETA was about `13 days` for the configured `400`-epoch run because the full 2018 split has `3195` train iterations per epoch. The run was stopped before wasting resources.
+- Decision: `RadioML2018.01A` remains an important benchmark, but it needs a separate feasible protocol such as a faster compatible backbone, a reduced/validated epoch budget, or a reliability-balanced subset. The stopped logs are diagnostics only and are not used as paper evidence.
+- To keep the AMC evidence chain moving, launched a third-dataset baseline gate on `UCSD/RML22`, which is much smaller (`2.8G`) and has explicit SNR metadata in `train/validation/test.json`.
+- Launched `MCformer + UCSD/RML22 + hard CE + seed 2026` on GPU0 and `PETCGDNN + UCSD/RML22 + hard CE + seed 2026` on GPU1 with the same current-code training/export/analysis chain, `max_epochs=400`, and `num_workers=0` for stability.
+- No RCPS comparison will be run on UCSD/RML22 until these hard-CE baselines produce sane validation/test metrics.
