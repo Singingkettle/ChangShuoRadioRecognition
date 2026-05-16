@@ -1409,3 +1409,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - RCPS-Retention `eps0.10` is too strong for audio: accuracy `+0.0260 pp`, but NLL `+0.0376`, ECE `+0.0350`, and Brier `+0.0109` versus Hard CE.
 - A weaker sweep improved the tradeoff. `eps0.03` gives accuracy `+0.1195 pp` but still worsens NLL/ECE/Brier slightly. `eps0.05` gives the best accuracy gain (`+0.4364 pp`) and slightly improves Brier (`-0.0004`), but still worsens NLL (`+0.0074`) and ECE (`+0.0146`).
 - Interpretation: this pilot does not support fixed-strength uniform RCPS as a universal audio solution. It supports the need for validation-constrained or entropy-matched RCPS: if a reliability bin is already under-confident, additional smoothing should be reduced or disabled. A 20-epoch check is launched to verify whether this is a short-training artifact before expanding audio experiments.
+
+
+## Iteration 103 - Speech Commands 20-epoch check completed (2026-05-17 03:53:00 CST)
+
+- Completed the 20-epoch Speech Commands check for `DS-CNN + seed 2026`, comparing Hard CE with the best 10-epoch RCPS candidate (`RCPS-Retention eps0.05`).
+- Hard CE improves substantially with the longer schedule: test accuracy `82.6078`, NLL `0.5252`, ECE `0.0238`, Brier `0.2434`, mean confidence `0.8024`, and mean entropy `0.5877`.
+- `RCPS-Retention eps0.05` gives almost identical accuracy (`+0.0468 pp`) and slightly better Brier (`-0.0002`), but worsens NLL by `+0.0072` and ECE by `+0.0261` versus Hard CE.
+- SNR-bin behavior confirms the diagnosis: RCPS lowers confidence in bins where the hard-CE model is already close to calibrated or under-confident, so fixed uniform smoothing is not appropriate for this audio setup.
+- Decision: do not expand fixed-uniform RCPS on Speech Commands as a main result. Audio should be used to motivate validation-constrained RCPS/EntropyMatch or PosteriorBase rather than a universal smoothing rule. This is a theory-shaping negative result, not a failed baseline.
