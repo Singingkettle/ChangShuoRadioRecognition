@@ -1282,3 +1282,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Mean deltas versus hard CE for `eps0.05`: overall accuracy `+0.0458 pp`, NLL `-0.0040`, ECE `-0.0006`, Brier `-0.0009`; low-SNR accuracy `+0.0389 pp`, NLL `-0.0036`, ECE `-0.0024`, Brier `+0.0000`; high-SNR accuracy `-0.0667 pp`, NLL `-0.0006`, ECE `-0.0038`, Brier `+0.0002`.
 - Comparison with `eps0.1`: `eps0.1` gives slightly larger overall accuracy/NLL/Brier gains but weakens high-SNR accuracy and high-SNR NLL/Brier; `eps0.05` is the cleaner retention-oriented 10B candidate.
 - Interpretation: the 10B evidence supports reliability-conditioned smoothing as a modest but consistent posterior-quality improvement when `epsilon` is selected conservatively under a high-reliability retention constraint. The paper should present this as calibration/uncertainty alignment with validation-constrained retention, not as a theorem-level guarantee of large accuracy gains.
+
+
+## Iteration 90 - MCformer RadioML2016.10B eps0.05 confirmation finalized (2026-05-16 23:05:00 CST)
+
+- Completed all promoted `MCformer + RadioML2016.10B_AMR + RCPS-Hybrid eps0.05 + num_classes=10` seeds `2026/2027/2028`.
+- All test prediction tensors were checked as `(40000, 10)` with `10` classes.
+- The final three-seed aggregate is stored at `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p05_g2_10B_numcls10_400ep/summary/mcformer_10B_numcls10_hard_vs_hybrid_eps0p05_3seed_aggregate.csv`.
+- Key deltas versus corrected hard CE: overall accuracy `+0.0458 pp`, NLL `-0.0040`, ECE `-0.0006`, Brier `-0.0009`; low-SNR accuracy `+0.0389 pp`, NLL `-0.0036`, ECE `-0.0024`; high-SNR accuracy `-0.0667 pp`, high-SNR NLL `-0.0006`, high-SNR ECE `-0.0038`.
+- Compared with `eps0.1`, `eps0.05` is the cleaner retention-constrained choice for 10B; compared with 10A, the preferred epsilon appears dataset-dependent. This supports a validation-constrained calibration view of `epsilon`, not a fixed universal smoothing constant.
+- Next evidence step: inspect `RadioML2018.01A` historical checkpoints and/or launch a carefully staged third-dataset baseline gate, while continuing to avoid unsupported claims.
