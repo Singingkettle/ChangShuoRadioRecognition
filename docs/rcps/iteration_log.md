@@ -1215,3 +1215,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Exported validation accuracy was `58.87%`; test accuracy was `58.96%`.
 - Metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2027_test.csv`.
 - Seed `2026` remains running on GPU0. Seed `2028` was launched on GPU1 with the same corrected `num_classes=10` override and identical training/data settings.
+
+
+## Iteration 84 - Corrected MCformer RadioML2016.10B seed-2026 completed (2026-05-16 19:25:00 CST)
+
+- Corrected `MCformer + RadioML2016.10B_AMR + hard CE + num_classes=10` seed `2026` completed validation/test export and reliability-bin analysis.
+- Exported validation accuracy was `58.35%`; test accuracy was `58.30%`.
+- Overall test metrics: NLL `0.9892`, ECE `0.0120`, Brier `0.4577`.
+- Metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2026_test.csv`.
+- Seed `2028` remains running on GPU1 and will complete the corrected three-seed baseline gate.
