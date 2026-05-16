@@ -1055,3 +1055,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Static LS vs hard CE: overall accuracy `+0.0523 pp`, NLL `+0.0295`, ECE `+0.0161`, Brier `+0.0017`. Low-SNR metrics improve, but overall/high-SNR calibration worsens.
 - RCPS-PosteriorBase vs hard CE: overall accuracy `+0.2568 pp`, ECE `-0.0017`, high-SNR accuracy `+0.8273 pp`, high-SNR NLL/Brier improve, while low-SNR metrics worsen.
 - Interpretation: on this seed, RCPS is stronger than static uniform smoothing on overall accuracy/ECE and high-reliability behavior, but static smoothing is more conservative at low reliability. The paper should separate low-reliability calibration from high-reliability retention instead of treating all reliability bins as one monotone story.
+
+### Iteration 66 MCformer Three-Seed Paired Control Completed: 2026-05-16 11:58 CST
+
+- `MCformer + RadioML2016.10A_AMR` completed the three-way paired control for `Hard CE`, `Static LS (0.1)`, and `RCPS-PosteriorBase ensemble` on seeds `2026/2027/2028`.
+- Summary CSVs:
+  - comparison rows: `/home/citybuster/Data/RCPS/work_dirs/mcformer_main_posterior_ens3_400ep/summary/mcformer_hard_static_rcps_3seed_compare.csv`;
+  - aggregate mean/std: `/home/citybuster/Data/RCPS/work_dirs/mcformer_main_posterior_ens3_400ep/summary/mcformer_hard_static_rcps_3seed_aggregate.csv`.
+- Three-seed aggregate versus hard CE:
+  - `RCPS-PosteriorBase`: overall accuracy `+0.5371 pp`, NLL `-0.0027`, ECE `-0.0035`, Brier `-0.0030`; high-SNR accuracy `+1.0364 pp`, NLL `-0.0082`, Brier `-0.0054`; low-SNR accuracy `-0.8258 pp`, NLL `+0.0104`, ECE `+0.0063`, Brier `+0.0043`.
+  - `Static LS (0.1)`: overall accuracy `+0.0424 pp`, NLL `+0.0285`, ECE `+0.0171`, Brier `+0.0016`; low-SNR NLL `-0.0223`, ECE `-0.0227`, Brier `-0.0078`; high-SNR accuracy `-0.3848 pp`, NLL `+0.0596`, ECE `+0.0321`, Brier `+0.0077`.
+- Interpretation: MCformer provides a clean attention-family confirmation that posterior-base RCPS can improve aggregate and high-reliability behavior while keeping the backbone unchanged. However, the low-SNR degradation means the current posterior-base target is not the final TPAMI method. Static uniform smoothing has the opposite failure mode: it improves low-reliability calibration but damages high-reliability behavior and overall NLL/ECE.
+- Next algorithmic adjustment: test a reliability-gated hybrid RCPS variant that uses stronger prior/uniform mass at very low reliability while preserving posterior-base allocation and retention at mid/high reliability. The theory should describe this as reliability-conditioned posterior approximation with retention constraints, not as a theorem that a single uniform smoothing schedule improves every reliability bin.
