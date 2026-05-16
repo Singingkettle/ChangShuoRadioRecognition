@@ -1399,3 +1399,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - The first Speech Commands pilot launch was stopped before any epoch completed because GPU utilization stayed near zero for several minutes. Process inspection showed the bottleneck was CPU-side per-sample log-mel extraction inside the dataset, which would make training-efficiency comparisons unreliable.
 - Updated `run_crossmodal_audio.py` so the dataset returns fixed-length waveforms and a `LogMelFeature` module computes log-mel features on the GPU batch. This keeps the model/loss comparison unchanged while removing an avoidable preprocessing bottleneck.
 - A post-patch speed check with 7,700 train, 3,850 validation, and 3,850 test examples completed one epoch plus test export in about 67 seconds wall time, compared with no epoch output after several minutes before the patch. The stopped pilot is diagnostic only and will not be used as evidence.
+
+
+## Iteration 102 - Speech Commands 10-epoch pilot analyzed (2026-05-17 03:38:00 CST)
+
+- Completed the repaired 10-epoch Speech Commands pilot for `DS-CNN + seed 2026` on a balanced `label x SNR` subset.
+- Hard CE is a valid baseline in this setting: test accuracy and macro accuracy are both `79.1429`, NLL `0.6479`, ECE `0.0777`, and Brier `0.2960`.
+- Static LS improves accuracy slightly (`+0.2338 pp`) but substantially worsens posterior metrics: NLL `+0.0923`, ECE `+0.0806`, and Brier `+0.0272` versus Hard CE.
+- RCPS-Retention `eps0.10` is too strong for audio: accuracy `+0.0260 pp`, but NLL `+0.0376`, ECE `+0.0350`, and Brier `+0.0109` versus Hard CE.
+- A weaker sweep improved the tradeoff. `eps0.03` gives accuracy `+0.1195 pp` but still worsens NLL/ECE/Brier slightly. `eps0.05` gives the best accuracy gain (`+0.4364 pp`) and slightly improves Brier (`-0.0004`), but still worsens NLL (`+0.0074`) and ECE (`+0.0146`).
+- Interpretation: this pilot does not support fixed-strength uniform RCPS as a universal audio solution. It supports the need for validation-constrained or entropy-matched RCPS: if a reliability bin is already under-confident, additional smoothing should be reduced or disabled. A 20-epoch check is launched to verify whether this is a short-training artifact before expanding audio experiments.
