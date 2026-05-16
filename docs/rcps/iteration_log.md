@@ -1154,3 +1154,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Aggregate mean/std was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep/summary/mcformer_hard_static_posterior_hybrid_eps0p2_3seed_aggregate.csv`.
 - Mean deltas versus hard CE for `eps0.2`: overall accuracy `+0.2614 pp`, NLL `-0.0058`, ECE `-0.0031`, Brier `-0.0018`; low-SNR accuracy `-0.1515 pp`, NLL `-0.0113`, ECE `-0.0075`, Brier `-0.0029`; high-SNR accuracy `+0.4545 pp`, NLL `-0.0009`, ECE `-0.0012`, Brier `-0.0003`.
 - Interpretation: `eps0.2` is a useful calibration-oriented ablation. It improves low-reliability NLL/ECE/Brier more strongly than `eps0.1`, but introduces a small low-SNR accuracy loss and weaker aggregate accuracy than `eps0.1`. The most balanced MCformer candidate remains `eps0.1`; `eps0.2` should be reported as a tradeoff/ablation rather than the default method.
+
+
+## Iteration 77 - MCformer RadioML2016.10B hard-CE seed-2027 launched (2026-05-16 17:13:00 CST)
+
+- After MCformer 10A hybrid eps0.2 completed and released GPU1, the `RadioML2016.10B_AMR + MCformer + hard CE` baseline gate was extended to seed `2027` on GPU1.
+- Seed `2026` continues on GPU0; seed `2027` uses the same config, data root, max epochs, and dataloader settings.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep`; seed-2027 log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_seed2027_gpu1.log`.
+- This is still baseline-first work. No 10B RCPS run will be launched until hard-CE baseline metrics are exported and checked.
