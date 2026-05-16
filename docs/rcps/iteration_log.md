@@ -1026,3 +1026,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Per-seed test accuracy: `58.15%`, `58.30%`, `58.09%`.
 - Interpretation: MCformer is highly stable under the current protocol and can serve as an attention/transformer-family baseline, but it is not a stronger baseline than PETCGDNN or the existing MLDNN anchor. Any RCPS result on MCformer should be interpreted as cross-family stability evidence rather than the central strongest-result table.
 - Summary CSV: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2/summary/mcformer_hard_ce_3seed_summary.csv`.
+
+### Iteration 62 FastMLDNN Parity Correction: 2026-05-16 08:55 CST
+
+- Stopped the active `FastMLDNN` hard-CE gate in `baseline_gate_amr_split_strong_v2` because the maintained config reproduced the same parity-failed behavior as the previous diagnostic run.
+- Exported the current best seed-2026 checkpoint (`best_accuracy_top1_epoch_129.pth`) before stopping: test accuracy `53.2068`, test NLL `1.3988`, ECE `0.1338`, Brier `0.5817`.
+- Root cause identified from config comparison: the maintained hard-CE config uses `dp=0.5`, `beta=0`, and plain CE, whereas the paper-style FastMLDNN configuration uses low dropout (`dp=0.07`), class-distance regularization (`beta/balance=0.5`), FocalLoss, and a lower Adam learning rate. The current hard-CE FastMLDNN config is therefore marked parity-failed and excluded from RCPS evidence.
+- Added a paper-like diagnostic config: `configs/rcps/parity/fastmldnn_paperlike_focal-beta_iq-ap-snr-deepsig-201610A.py`.
