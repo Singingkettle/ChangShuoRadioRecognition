@@ -1014,3 +1014,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - MCformer seed `2026` test metrics: accuracy `58.15%`, NLL `1.1062`, ECE `0.0136`, Brier `0.4908`. Seed `2027` is running normally on GPU0.
 - GPU1 was reassigned to `FastMLDNN + RadioML2016.10A_AMR + hard CE` baseline parity gate for seeds `2026/2027/2028`.
 - FastMLDNN is a baseline-only step at this stage. No RCPS modification will be treated as evidence until its hard CE baseline is stable enough or any gap to external/reference behavior is explained.
+
+### Iteration 61 MCformer Hard-CE Three-Seed Baseline Gate: 2026-05-16 08:42 CST
+
+- MCformer hard CE completed seeds `2026/2027/2028` on the AMR-compatible RadioML2016.10A split.
+- Three-seed test metrics:
+  - mean accuracy `58.1795%` with std `0.1043`;
+  - mean NLL `1.1058`;
+  - mean ECE `0.0134`;
+  - mean Brier `0.4906`.
+- Per-seed test accuracy: `58.15%`, `58.30%`, `58.09%`.
+- Interpretation: MCformer is highly stable under the current protocol and can serve as an attention/transformer-family baseline, but it is not a stronger baseline than PETCGDNN or the existing MLDNN anchor. Any RCPS result on MCformer should be interpreted as cross-family stability evidence rather than the central strongest-result table.
+- Summary CSV: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_amr_split_strong_v2/summary/mcformer_hard_ce_3seed_summary.csv`.
