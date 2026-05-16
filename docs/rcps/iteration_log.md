@@ -1353,3 +1353,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_vision_cifar10c_30ep`.
 - Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/cifar10c_resnet18_seed2026_gpu0_hard_static.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/cifar10c_resnet18_seed2026_gpu1_rcps.log`.
 - Early monitor at epoch `3/30` showed both Hard CE and RCPS learning normally on clean validation (`~48%`) with no `Traceback`, CUDA OOM, file-handle error, or shape error. No conclusion will be drawn until test CSVs land.
+
+
+## Iteration 97 - CIFAR-10-C seed-2026 pilot summarized and eps0.10 promoted (2026-05-17 02:20:00 CST)
+
+- Completed the first CIFAR-10-C seed `2026` comparison for `Hard CE`, `Static LS`, and `RCPS-Retention` under the standalone ResNet18-CIFAR runner.
+- Initial `RCPS-Retention eps0.30` improved overall corrupted accuracy by `+0.4967 pp`, ECE by `-0.0210`, and Brier by `-0.0031`, but worsened NLL by `+0.0166`. This indicated that the smoothing strength was useful for calibration but too strong for likelihood.
+- Ran a same-seed epsilon tuning check for `eps0.15` and `eps0.10`. `eps0.10` was the cleanest setting: overall corrupted accuracy `+0.3073 pp`, NLL `-0.0015`, ECE `-0.0240`, and Brier `-0.0036` versus Hard CE. Clean test accuracy also improved by `+0.18 pp`, with clean ECE `-0.0125`.
+- Static LS was not competitive in this pilot: overall corrupted accuracy `-0.2927 pp`, NLL `+0.0556`, ECE `+0.0213`, and Brier `+0.0066` versus Hard CE.
+- Decision: promote `RCPS-Retention eps0.10` to seeds `2027/2028` and run matched Hard CE / Static LS / RCPS comparisons. This is cross-modal validation evidence, not yet a final paper claim until the three-seed aggregate is complete.
+- Launched seed `2027` full queue on GPU0 and seed `2028` full queue on GPU1. Each queue runs Hard CE, Static LS, then RCPS-Retention eps0.10 with identical backbone/data/epoch setup.
