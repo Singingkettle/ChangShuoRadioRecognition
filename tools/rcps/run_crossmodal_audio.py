@@ -128,15 +128,6 @@ class SpeechCommandsReliability(Dataset):
         self.split = split
         self.seed = int(seed)
         self.train = bool(train)
-        self.mel = torchaudio.transforms.MelSpectrogram(
-            sample_rate=SAMPLE_RATE,
-            n_fft=400,
-            win_length=400,
-            hop_length=160,
-            n_mels=40,
-            f_min=20.0,
-            f_max=7600.0,
-            power=2.0)
 
     def __len__(self) -> int:
         return len(self.rows)
@@ -154,11 +145,30 @@ class SpeechCommandsReliability(Dataset):
             noise = cached_load_wav(str(bg_path))
             mixed = add_noise_at_snr(wav, noise, float(snr), rng)
             snr_label = str(snr)
-        feat = self.mel(mixed.reshape(1, -1)).clamp_min(1e-8).log()
-        feat = (feat - feat.mean()) / feat.std().clamp_min(1e-5)
         label = self.class_to_idx[row['label_name']]
         reliability = float(row['reliability'])
-        return feat, int(label), reliability, snr_label
+        return mixed.reshape(1, -1), int(label), reliability, snr_label
+
+
+class LogMelFeature(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.mel = torchaudio.transforms.MelSpectrogram(
+            sample_rate=SAMPLE_RATE,
+            n_fft=400,
+            win_length=400,
+            hop_length=160,
+            n_mels=40,
+            f_min=20.0,
+            f_max=7600.0,
+            power=2.0)
+
+    def forward(self, wav: torch.Tensor) -> torch.Tensor:
+        feat = self.mel(wav).clamp_min(1e-8).log()
+        dims = tuple(range(1, feat.ndim))
+        mean = feat.mean(dim=dims, keepdim=True)
+        std = feat.std(dim=dims, keepdim=True).clamp_min(1e-5)
+        return (feat - mean) / std
 
 
 class DepthwiseSeparableBlock(nn.Module):
@@ -322,13 +332,16 @@ def metrics_for(probs: np.ndarray, labels: np.ndarray, num_classes: int) -> Dict
     }
 
 
-def evaluate_loader(model: nn.Module, loader: DataLoader, device: torch.device):
+def evaluate_loader(model: nn.Module, feature_extractor: nn.Module,
+                    loader: DataLoader, device: torch.device):
     model.eval()
+    feature_extractor.eval()
     acc = EvalAccumulator.empty()
     with torch.no_grad():
-        for x, y, r, snr in loader:
-            x = x.to(device, non_blocking=True)
+        for wav, y, r, snr in loader:
+            wav = wav.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
+            x = feature_extractor(wav)
             logits = model(x)
             probs = F.softmax(logits, dim=1)
             acc.add(probs, y, r, snr)
@@ -425,6 +438,7 @@ def main():
         'classes': train_ds.classes,
     }), flush=True)
 
+    feature_extractor = LogMelFeature().to(device)
     model = build_model(args.model, num_classes).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
@@ -435,18 +449,19 @@ def main():
     for epoch in range(1, args.epochs + 1):
         model.train()
         losses = []
-        for x, y, r, _ in train_loader:
-            x = x.to(device, non_blocking=True)
+        for wav, y, r, _ in train_loader:
+            wav = wav.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
             r = r.to(device, non_blocking=True).float()
             optimizer.zero_grad(set_to_none=True)
+            x = feature_extractor(wav)
             logits = model(x)
             loss = compute_loss(args.method, logits, y, r, num_classes, args)
             loss.backward()
             optimizer.step()
             losses.append(float(loss.detach().cpu()))
         scheduler.step()
-        val_probs, val_labels, _, _ = evaluate_loader(model, val_loader, device)
+        val_probs, val_labels, _, _ = evaluate_loader(model, feature_extractor, val_loader, device)
         val_metrics = metrics_for(val_probs, val_labels, num_classes)
         elapsed = time.time() - start
         row = {
@@ -469,7 +484,7 @@ def main():
 
     payload = torch.load(best_path, map_location=device)
     model.load_state_dict(payload['model'])
-    probs, labels, reliabilities, snrs = evaluate_loader(model, test_loader, device)
+    probs, labels, reliabilities, snrs = evaluate_loader(model, feature_extractor, test_loader, device)
     metric_rows: List[Dict] = []
     append_metrics(metric_rows, 'speechcommands-noisy', args.model, args.method, args.seed,
                    'test', 'all', 'all', probs, labels, num_classes)

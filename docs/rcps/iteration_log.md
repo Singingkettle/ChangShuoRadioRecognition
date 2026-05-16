@@ -1392,3 +1392,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - GPU0 runs Hard CE followed by Static LS; GPU1 runs RCPS-Retention. Logs are `/home/citybuster/Data/RCPS/work_dirs/logs/speechcommands_ds_cnn_seed2026_gpu0_hard_static.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/speechcommands_ds_cnn_seed2026_gpu1_rcps.log`.
 - The run uses balanced sampling with `500` train, `150` validation, and `250` test samples per `label x SNR` bucket, giving 38,500 train, 11,550 validation, and 19,250 test examples per method. This avoids an inflated baseline caused by the large `unknown` class.
 - Initial logs show dataset construction succeeded and no `Traceback`, CUDA OOM, file-handle, or missing-file error has appeared. These pilot results will decide whether to expand to full-test and three-seed audio validation.
+
+
+## Iteration 101 - Speech Commands audio pipeline intervention (2026-05-17 03:31:00 CST)
+
+- The first Speech Commands pilot launch was stopped before any epoch completed because GPU utilization stayed near zero for several minutes. Process inspection showed the bottleneck was CPU-side per-sample log-mel extraction inside the dataset, which would make training-efficiency comparisons unreliable.
+- Updated `run_crossmodal_audio.py` so the dataset returns fixed-length waveforms and a `LogMelFeature` module computes log-mel features on the GPU batch. This keeps the model/loss comparison unchanged while removing an avoidable preprocessing bottleneck.
+- A post-patch speed check with 7,700 train, 3,850 validation, and 3,850 test examples completed one epoch plus test export in about 67 seconds wall time, compared with no epoch output after several minutes before the patch. The stopped pilot is diagnostic only and will not be used as evidence.
