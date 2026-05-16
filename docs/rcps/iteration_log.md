@@ -1033,3 +1033,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Exported the current best seed-2026 checkpoint (`best_accuracy_top1_epoch_129.pth`) before stopping: test accuracy `53.2068`, test NLL `1.3988`, ECE `0.1338`, Brier `0.5817`.
 - Root cause identified from config comparison: the maintained hard-CE config uses `dp=0.5`, `beta=0`, and plain CE, whereas the paper-style FastMLDNN configuration uses low dropout (`dp=0.07`), class-distance regularization (`beta/balance=0.5`), FocalLoss, and a lower Adam learning rate. The current hard-CE FastMLDNN config is therefore marked parity-failed and excluded from RCPS evidence.
 - Added a paper-like diagnostic config: `configs/rcps/parity/fastmldnn_paperlike_focal-beta_iq-ap-snr-deepsig-201610A.py`.
+
+### Iteration 63 MCformer Paired Control Launched: 2026-05-16 09:10 CST
+
+- `MCformer + RCPS-PosteriorBase ensemble` seed 2026 is healthy and reached validation accuracy `58.2841` by epoch 56, already matching or slightly exceeding the hard-CE three-seed test mean (`58.1795`). This is an early training-efficiency signal only; final claims require exported test metrics.
+- Stopped the FastMLDNN paper-like diagnostic at epoch 20 after exporting validation/test metrics. Test accuracy was `28.9364`; the quick parity fix is insufficient. FastMLDNN remains quarantined until the old paper FMLNet/init/head details are reproduced more faithfully.
+- Reassigned GPU1 to `MCformer + Static LS (0.1)` seeds `2026/2027/2028` so the MCformer RCPS run has a same-backbone paired smoothing baseline.
