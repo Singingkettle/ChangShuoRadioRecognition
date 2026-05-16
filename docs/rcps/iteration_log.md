@@ -1383,3 +1383,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - The runner keeps the comparison paired: Hard CE, Static LS, and RCPS-Retention share the same data split, balanced sampling policy, model, optimizer, epoch budget, and evaluation code; only the supervision target/loss changes.
 - A minimal hard-CE smoke test completed successfully with 231 train, 154 validation, and 154 test examples. It exercised waveform loading, SNR mixing, feature extraction, training, checkpoint selection, test export, and reliability/SNR-bin metrics writing.
 - Smoke metrics landed at `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_smoke/metrics/speechcommands_ds-cnn_hard-ce_seed2026_test.csv`. These numbers are not paper evidence; they only validate the execution path.
+
+
+## Iteration 100 - Speech Commands DS-CNN pilot launched (2026-05-17 03:23:00 CST)
+
+- Launched the first noisy-audio pilot on Speech Commands v0.02 using `DS-CNN + seed 2026` for `Hard CE`, `Static LS`, and `RCPS-Retention eps0.10`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_pilot_15ep`.
+- GPU0 runs Hard CE followed by Static LS; GPU1 runs RCPS-Retention. Logs are `/home/citybuster/Data/RCPS/work_dirs/logs/speechcommands_ds_cnn_seed2026_gpu0_hard_static.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/speechcommands_ds_cnn_seed2026_gpu1_rcps.log`.
+- The run uses balanced sampling with `500` train, `150` validation, and `250` test samples per `label x SNR` bucket, giving 38,500 train, 11,550 validation, and 19,250 test examples per method. This avoids an inflated baseline caused by the large `unknown` class.
+- Initial logs show dataset construction succeeded and no `Traceback`, CUDA OOM, file-handle, or missing-file error has appeared. These pilot results will decide whether to expand to full-test and three-seed audio validation.
