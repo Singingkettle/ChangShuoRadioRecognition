@@ -1418,3 +1418,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `RCPS-Retention eps0.05` gives almost identical accuracy (`+0.0468 pp`) and slightly better Brier (`-0.0002`), but worsens NLL by `+0.0072` and ECE by `+0.0261` versus Hard CE.
 - SNR-bin behavior confirms the diagnosis: RCPS lowers confidence in bins where the hard-CE model is already close to calibrated or under-confident, so fixed uniform smoothing is not appropriate for this audio setup.
 - Decision: do not expand fixed-uniform RCPS on Speech Commands as a main result. Audio should be used to motivate validation-constrained RCPS/EntropyMatch or PosteriorBase rather than a universal smoothing rule. This is a theory-shaping negative result, not a failed baseline.
+
+
+## Iteration 104 - CIFAR-10-C ResNet34 pilot support added (2026-05-17 04:00:00 CST)
+
+- Extended `run_crossmodal_vision.py` with a `--model` argument supporting both `resnet18-cifar` and `resnet34-cifar` while preserving the existing ResNet18 output naming and behavior.
+- A minimal ResNet34-CIFAR smoke run completed and wrote metrics, validating the model switch, path layout, and CSV export. The smoke subset is intentionally tiny and not evidence.
+- Next step: launch a matched seed-2026 ResNet34 pilot for Hard CE, Static LS, and RCPS-Retention eps0.10 on CIFAR-10-C. If the trend matches ResNet18, this becomes the second vision backbone for cross-modal robustness evidence.

@@ -192,8 +192,13 @@ def seed_worker(worker_id: int):
     random.seed(worker_seed)
 
 
-def build_model(num_classes: int = 10) -> nn.Module:
-    model = tv_models.resnet18(weights=None, num_classes=num_classes)
+def build_model(model_name: str = 'resnet18-cifar', num_classes: int = 10) -> nn.Module:
+    if model_name == 'resnet18-cifar':
+        model = tv_models.resnet18(weights=None, num_classes=num_classes)
+    elif model_name == 'resnet34-cifar':
+        model = tv_models.resnet34(weights=None, num_classes=num_classes)
+    else:
+        raise ValueError(f'Unsupported model: {model_name}')
     model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
     model.maxpool = nn.Identity()
     return model
@@ -326,11 +331,11 @@ def evaluate_cifar10c(model, args, device, batch_size, workers):
         ds = CIFAR10CTest(raw_dir, args.corruptions, severity)
         loader = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=workers, pin_memory=True)
         probs, labels, _, corruptions, severities = evaluate_loader(model, loader, device)
-        append_metrics(rows, 'cifar10c', 'resnet18-cifar', args.method, args.seed,
+        append_metrics(rows, 'cifar10c', args.model, args.method, args.seed,
                        'test', 'severity', str(severity), probs, labels)
         for corruption in args.corruptions:
             mask = corruptions == corruption
-            append_metrics(rows, 'cifar10c', 'resnet18-cifar', args.method, args.seed,
+            append_metrics(rows, 'cifar10c', args.model, args.method, args.seed,
                            'test', corruption, str(severity), probs[mask], labels[mask])
         all_probs.append(probs)
         all_labels.append(labels)
@@ -338,7 +343,7 @@ def evaluate_cifar10c(model, args, device, batch_size, workers):
         all_severities.append(severities)
     probs = np.concatenate(all_probs, axis=0)
     labels = np.concatenate(all_labels, axis=0)
-    append_metrics(rows, 'cifar10c', 'resnet18-cifar', args.method, args.seed,
+    append_metrics(rows, 'cifar10c', args.model, args.method, args.seed,
                    'test', 'all', 'all', probs, labels)
     return rows
 
@@ -346,6 +351,7 @@ def evaluate_cifar10c(model, args, device, batch_size, workers):
 def main():
     parser = argparse.ArgumentParser(description='Run CIFAR-10-C RCPS cross-modal experiments.')
     parser.add_argument('--method', choices=['hard-ce', 'static-ls', 'rcps-retention'], required=True)
+    parser.add_argument('--model', choices=['resnet18-cifar', 'resnet34-cifar'], default='resnet18-cifar')
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--epochs', type=int, default=30)
     parser.add_argument('--batch-size', type=int, default=256)
@@ -367,7 +373,7 @@ def main():
 
     set_seed(args.seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    work_dir = Path(args.work_root) / 'vision' / 'cifar10c' / 'resnet18-cifar' / args.method / f'seed_{args.seed}'
+    work_dir = Path(args.work_root) / 'vision' / 'cifar10c' / args.model / args.method / f'seed_{args.seed}'
     metrics_dir = Path(args.work_root) / 'metrics'
     work_dir.mkdir(parents=True, exist_ok=True)
     metrics_dir.mkdir(parents=True, exist_ok=True)
@@ -390,7 +396,7 @@ def main():
                               pin_memory=True, worker_init_fn=seed_worker, generator=gen)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=True)
 
-    model = build_model().to(device)
+    model = build_model(args.model).to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
@@ -438,10 +444,10 @@ def main():
                               shuffle=False, num_workers=args.workers, pin_memory=True)
     clean_probs, clean_labels, _, _, _ = evaluate_loader(model, clean_loader, device)
     metric_rows: List[Dict] = []
-    append_metrics(metric_rows, 'cifar10c', 'resnet18-cifar', args.method, args.seed,
+    append_metrics(metric_rows, 'cifar10c', args.model, args.method, args.seed,
                    'test', 'clean', 'clean', clean_probs, clean_labels)
     metric_rows.extend(evaluate_cifar10c(model, args, device, args.batch_size, args.workers))
-    out_csv = metrics_dir / f'cifar10c_resnet18-cifar_{args.method}_seed{args.seed}_test.csv'
+    out_csv = metrics_dir / f'cifar10c_{args.model}_{args.method}_seed{args.seed}_test.csv'
     write_metric_rows(out_csv, metric_rows)
     print(f'Wrote metrics: {out_csv}', flush=True)
 
