@@ -1198,3 +1198,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - The resulting three-seed 10B hard-CE metrics are therefore quarantined as diagnostic-only and must not be used as paper evidence or as an RCPS teacher.
 - The invalid posterior table was moved to `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610B_amr/mcformer_hard-ce_3seed_reliability_base.invalid_numcls11.npz`.
 - Corrected baseline gate is restarted under `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep` with `model.backbone.num_classes=10`, same data split, same seeds, same optimizer, same epoch budget, and `num_workers=0`.
+
+
+## Iteration 82 - Corrected MCformer RadioML2016.10B hard-CE numcls10 gate launched (2026-05-16 18:32:00 CST)
+
+- Corrected `MCformer + RadioML2016.10B_AMR + hard CE` baseline runs were launched with explicit `model.backbone.num_classes=10`.
+- Seed `2026` runs on GPU0 and seed `2027` runs on GPU1. Seed `2028` will be launched after one GPU is released.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep`.
+- Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_numcls10_seed2026_gpu0.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_numcls10_seed2027_gpu1.log`.
+- This correction is required before any 10B RCPS teacher/base construction. The previous 11-output 10B baseline remains quarantined.
