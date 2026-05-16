@@ -1082,3 +1082,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Seed-2026 deltas versus hard CE: overall accuracy `+0.1773 pp`, NLL `-0.0051`, ECE `-0.0026`, Brier `-0.0006`; low-SNR NLL `-0.0056`, ECE `-0.0032`, Brier `-0.0004`; high-SNR accuracy `+0.3545 pp`, NLL `-0.0029`, ECE `-0.0027`, Brier `-0.0002`.
 - Interpretation: unlike the stronger posterior-base variant, this hybrid setting improves low-reliability posterior metrics while retaining aggregate and high-reliability gains on the first seed. It is therefore promoted to seeds `2027/2028` for confirmation.
 - Launched seeds `2027/2028` on GPU0 with log `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p1_2027_2028_gpu0.log`.
+
+### Iteration 69 MCformer Hybrid eps0.3 Pilot and eps0.2 Launch: 2026-05-16 13:09 CST
+
+- `MCformer + rcps-hybrid-prior1_eps0p3_g2_retain0p8` seed `2026` completed. It improved low-SNR NLL/ECE/Brier versus hard CE, but was less balanced than `eps0.1` on aggregate NLL and high-SNR ECE.
+- Seed-2026 deltas versus hard CE for `eps0.3`: overall accuracy `+0.1364 pp`, NLL `-0.0002`, ECE `-0.0023`, Brier `-0.0012`; low-SNR NLL `-0.0054`, ECE `-0.0046`, Brier `-0.0012`; high-SNR accuracy `+0.5818 pp`, NLL `-0.0048`, ECE `+0.0006`, Brier `-0.0024`.
+- Decision: do not promote `eps0.3` yet; keep it as a useful pilot point. `eps0.1` remains the three-seed confirmation candidate because it improves aggregate NLL/ECE/Brier and low/high reliability metrics more consistently on seed `2026`.
+- Launched a midpoint pilot `rcps-hybrid-prior1_eps0p2_g2_retain0p8` on GPU1 to check whether `epsilon_max=0.2` provides a better accuracy/calibration tradeoff. Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p2_2026_gpu1.log`.
