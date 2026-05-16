@@ -1098,3 +1098,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Seed-2026 deltas versus hard CE: overall accuracy `+0.2068 pp`; low-SNR NLL `-0.0126`; high-SNR ECE `-0.0032`. This is a stronger single-seed balance than `eps0.1` on low-SNR NLL and high-SNR ECE, while remaining less aggressive than the pure posterior variant.
 - Decision: promote `eps0.2` to seeds `2027` and `2028` on GPU1 for confirmation, while `eps0.1` seed `2028` continues on GPU0. Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p2_2027_2028_gpu1.log`.
 - No paper conclusion is updated yet. The current decision only expands a promising pilot to a paired three-seed test.
+
+
+## Iteration 71 - MCformer hybrid eps0.1 three-seed result (2026-05-16 15:18:05 CST)
+
+- `MCformer + rcps-hybrid-prior1_eps0p1_g2_retain0p8` completed all three seeds on `RadioML.2016.10A` with validation/test prediction export and reliability-bin analysis.
+- Paired comparison against hard CE, static label smoothing, and posterior-base RCPS was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_400ep/summary/mcformer_hard_static_posterior_hybrid_eps0p1_3seed_compare.csv`.
+- Aggregate summary was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_400ep/summary/mcformer_hard_static_posterior_hybrid_eps0p1_3seed_aggregate.csv`.
+- Mean deltas versus hard CE for the hybrid eps0.1 method: overall accuracy `+0.2970 pp`, NLL `-0.0064`, ECE `-0.0022`, Brier `-0.0018`; low-SNR accuracy `+0.2955 pp`, NLL `-0.0061`, ECE `-0.0044`, Brier `-0.0011`; high-SNR accuracy `+0.2333 pp`, NLL `-0.0030`, ECE `-0.0016`, Brier `-0.0006`.
+- Interpretation: `eps0.1` is currently the most balanced MCformer variant. It avoids the low-reliability degradation seen in pure posterior-base RCPS and avoids the high-reliability NLL/ECE damage of static label smoothing. This is still one model and one dataset, so it is a candidate result, not a final paper claim.
+- Ongoing: `eps0.2` seeds `2027/2028` are running to test whether the midpoint gives a stronger tradeoff.
