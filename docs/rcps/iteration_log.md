@@ -1224,3 +1224,27 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Overall test metrics: NLL `0.9892`, ECE `0.0120`, Brier `0.4577`.
 - Metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2026_test.csv`.
 - Seed `2028` remains running on GPU1 and will complete the corrected three-seed baseline gate.
+
+
+## Iteration 85 - Corrected MCformer RadioML2016.10B hard-CE numcls10 gate completed (2026-05-16 20:08:00 CST)
+
+- Corrected `MCformer + RadioML2016.10B_AMR + hard CE + num_classes=10` seed `2028` completed validation/test export and reliability-bin analysis.
+- Exported validation accuracy was `58.18%`; test accuracy was `58.39%`.
+- Sanity check confirmed all corrected test prediction files emit probability tensors of shape `(40000, 10)` and class lists of length `10`; the earlier 11-output run remains quarantined and is not used as evidence.
+- Corrected three-seed test accuracies are `58.30%`, `58.96%`, and `58.39%`; the mean/std is `58.5517 +/- 0.3565`.
+- Corrected aggregate metrics: NLL `0.9908`, ECE `0.0117`, Brier `0.4574`.
+- Per-seed summary: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/summary/mcformer_hard_ce_10B_numcls10_3seed_per_seed.csv`.
+- Reliability-bin aggregate: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/summary/mcformer_hard_ce_10B_numcls10_3seed_aggregate.csv`.
+- Interpretation: the corrected second-dataset MCformer baseline gate is stable enough for matched RCPS construction. The next step is to build a validation-only 10-class posterior base and launch `RCPS-Hybrid eps0.1` under identical backbone, data split, seeds, optimizer, and epoch budget.
+
+
+## Iteration 86 - MCformer RadioML2016.10B RCPS-Hybrid numcls10 eps0.1 launched (2026-05-16 20:12:00 CST)
+
+- Built a validation-only posterior base from corrected 10-class hard-CE validation predictions for seeds `2026/2027/2028`.
+- Posterior base path: `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610B_amr/mcformer_hard-ce_numcls10_3seed_reliability_base.npz`.
+- Sanity check: `base` shape `(20, 10, 10)`, `counts` shape `(20, 10)`, all class/bin counts are nonzero, and base rows sum to one up to floating-point tolerance.
+- Launched matched `MCformer + RadioML2016.10B_AMR + RCPS-Hybrid eps0.1` runs with `model.backbone.num_classes=10`, `prior_blend=1.0`, `epsilon.max=0.1`, `gamma=2.0`, and `retain_min=0.8`.
+- Seed `2026` runs on GPU0; seed `2027` runs on GPU1 and the same GPU1 script will continue to seed `2028` after seed `2027` completes.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_10B_numcls10_400ep`.
+- Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p1_seed2026_gpu0.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p1_seed2027_2028_gpu1.log`.
+- This is the first matched second-dataset RCPS check after the corrected 10-class baseline gate; the previous 11-output 10B run remains excluded.
