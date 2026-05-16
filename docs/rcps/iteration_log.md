@@ -1136,3 +1136,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Low-SNR posterior quality worsened for this seed: low-SNR NLL `+0.0058`, ECE `+0.0091`, and Brier `+0.0044`, despite a small low-SNR accuracy gain of `+0.0682 pp`.
 - Existing `PETCGDNN Keras-init + RCPS-PosteriorBase` remains stronger on the same seed: overall accuracy `+1.0682 pp`, NLL `-0.0311`, ECE `-0.0167`, and Brier `-0.0202` versus hard CE, with low-SNR NLL/ECE/Brier also improved.
 - Decision: do not promote PETCGDNN hybrid eps0.2 to three seeds. Keep it as a negative/boundary algorithmic iteration and retain PosteriorBase as the PETCGDNN candidate unless later evidence changes the tradeoff.
+
+
+## Iteration 75 - MCformer RadioML2016.10B hard-CE baseline gate launched (2026-05-16 16:18:00 CST)
+
+- GPU0 was released after the PETCGDNN hybrid pilot, so the next baseline-first step was launched on the second AMC dataset: `MCformer + RadioML2016.10B_AMR + hard CE`, seed `2026`.
+- This is a baseline gate, not an RCPS run. The goal is to establish a trustworthy MCformer baseline on `RadioML2016.10B` before constructing any 10B posterior tables or RCPS variants.
+- Config base: `configs/rcps/mcformer/mcformer_hard-ce_iq-snr-deepsig-201610A.py`; data root overridden to `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10B`; max epochs `400`; all dataloaders use `num_workers=0`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_seed2026_gpu0.log`.
+- Existing `MCformer + RadioML2016.10A` hybrid eps0.2 seed `2028` continues on GPU1.
