@@ -1162,3 +1162,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Seed `2026` continues on GPU0; seed `2027` uses the same config, data root, max epochs, and dataloader settings.
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep`; seed-2027 log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_seed2027_gpu1.log`.
 - This is still baseline-first work. No 10B RCPS run will be launched until hard-CE baseline metrics are exported and checked.
+
+
+## Iteration 78 - MCformer RadioML2016.10B hard-CE seed-2026 completed and seed-2028 launched (2026-05-16 17:24:10 CST)
+
+- `MCformer + RadioML2016.10B_AMR + hard CE` seed `2026` completed training, validation/test export, and reliability analysis without runtime errors. Validation accuracy from the exported best checkpoint was `58.57%`; test accuracy was `58.44%`.
+- The metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2026_test.csv`.
+- Seed `2027` continues on GPU1. GPU0 was released after seed `2026`, so seed `2028` was launched with the same data root, config, and dataloader settings.
+- Seed-2028 log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_seed2028_gpu0.log`.
+- The 10B work remains baseline-gate only; no 10B RCPS run is launched until the hard-CE three-seed baseline is complete and inspected.
