@@ -1039,3 +1039,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `MCformer + RCPS-PosteriorBase ensemble` seed 2026 is healthy and reached validation accuracy `58.2841` by epoch 56, already matching or slightly exceeding the hard-CE three-seed test mean (`58.1795`). This is an early training-efficiency signal only; final claims require exported test metrics.
 - Stopped the FastMLDNN paper-like diagnostic at epoch 20 after exporting validation/test metrics. Test accuracy was `28.9364`; the quick parity fix is insufficient. FastMLDNN remains quarantined until the old paper FMLNet/init/head details are reproduced more faithfully.
 - Reassigned GPU1 to `MCformer + Static LS (0.1)` seeds `2026/2027/2028` so the MCformer RCPS run has a same-backbone paired smoothing baseline.
+
+### Iteration 64 MCformer RCPS Seed-2026 Landed: 2026-05-16 10:08 CST
+
+- `MCformer + RCPS-PosteriorBase ensemble` seed 2026 completed and exported validation/test reliability metrics.
+- Test comparison against same-seed hard CE: overall accuracy `+0.2568 pp`, NLL `+0.0050`, ECE `-0.0017`, Brier `+0.0006`.
+- High-SNR comparison: accuracy `+0.8273 pp`, NLL `-0.0034`, ECE `+0.0027`, Brier `-0.0015`.
+- Low-SNR comparison: accuracy `-0.8182 pp`, NLL `+0.0152`, ECE `+0.0078`, Brier `+0.0059`.
+- Interpretation: this seed supports modest aggregate/high-reliability benefits and slight overall calibration improvement, but does not support a blanket low-SNR improvement claim. The manuscript should keep the theory centered on reliability-conditioned posterior allocation and report low-SNR tradeoffs honestly.
+- `MCformer + Static LS (0.1)` is still running as the same-backbone smoothing control.
