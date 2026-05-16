@@ -1259,3 +1259,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p05_g2_10B_numcls10_400ep`.
 - Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p05_seed2026_gpu0.log`.
 - This is an algorithmic iteration, not a replacement for the ongoing `eps0.1` confirmation. Promotion requires completed CSV comparison against hard CE.
+
+
+## Iteration 88 - MCformer RadioML2016.10B eps0.1 completed and eps0.05 promoted (2026-05-16 22:03:00 CST)
+
+- `MCformer + RadioML2016.10B_AMR + RCPS-Hybrid eps0.1 + num_classes=10` completed seeds `2026/2027/2028` with validation/test export and reliability-bin analysis.
+- Prediction sanity check confirmed all three test probability tensors are `(40000, 10)` with `10` classes.
+- Three-seed comparison versus corrected hard CE was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_10B_numcls10_400ep/summary/mcformer_10B_numcls10_hard_vs_hybrid_eps0p1_3seed_compare.csv`.
+- Aggregate summary was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_10B_numcls10_400ep/summary/mcformer_10B_numcls10_hard_vs_hybrid_eps0p1_3seed_aggregate.csv`.
+- Mean deltas versus hard CE for `eps0.1`: overall accuracy `+0.0842 pp`, NLL `-0.0052`, ECE `-0.0002`, Brier `-0.0011`; low-SNR accuracy `+0.0361 pp`, NLL `-0.0051`, ECE `-0.0032`, Brier `-0.0002`; high-SNR accuracy `-0.4267 pp`, NLL `+0.0027`, ECE `-0.0037`, Brier `+0.0021`.
+- Interpretation: `eps0.1` remains within the high-SNR retention constraint and improves aggregate/low-reliability posterior metrics, but high-SNR NLL/Brier and high-SNR accuracy weaken. It is useful evidence, not yet the cleanest 10B setting.
+- The `eps0.05` seed `2026` pilot was cleaner: overall accuracy `+0.3500 pp`, NLL `-0.0080`, ECE `-0.0020`, Brier `-0.0029`; low-SNR accuracy `+0.4417 pp`; high-SNR NLL/ECE/Brier also improved with high-SNR accuracy `-0.1800 pp`.
+- Decision: promote `eps0.05` to seeds `2027/2028` for confirmation. These two runs were launched on GPU0/GPU1 with the same corrected 10-class base and unchanged training setup.
