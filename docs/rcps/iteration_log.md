@@ -1292,3 +1292,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Key deltas versus corrected hard CE: overall accuracy `+0.0458 pp`, NLL `-0.0040`, ECE `-0.0006`, Brier `-0.0009`; low-SNR accuracy `+0.0389 pp`, NLL `-0.0036`, ECE `-0.0024`; high-SNR accuracy `-0.0667 pp`, high-SNR NLL `-0.0006`, high-SNR ECE `-0.0038`.
 - Compared with `eps0.1`, `eps0.05` is the cleaner retention-constrained choice for 10B; compared with 10A, the preferred epsilon appears dataset-dependent. This supports a validation-constrained calibration view of `epsilon`, not a fixed universal smoothing constant.
 - Next evidence step: inspect `RadioML2018.01A` historical checkpoints and/or launch a carefully staged third-dataset baseline gate, while continuing to avoid unsupported claims.
+
+
+## Iteration 91 - RadioML2018.01A checkpoint audit and current-code gate launch (2026-05-16 23:24:00 CST)
+
+- Audited available historical `RadioML2018.01A` checkpoints before using them as evidence. They are not usable as reliable baselines in the current code path: the historical MLDNN checkpoint cannot be read by PyTorch, and the historical CNN4/DSCLDNN checkpoints show state-dict incompatibility with near-random validation accuracy around `4%`.
+- Decision: quarantine those historical audits as diagnostics only. They must not enter paper tables or RCPS comparisons.
+- Launched current-code `RadioML2018.01A` hard-CE baseline gates instead, using the present configs and explicit data root `/home/citybuster/Data/WirelessRadio/data/ModulationClassification/DeepSig/RadioML.2018.01A`.
+- Running jobs: `MCformer + hard CE + seed 2026` on GPU0 and `CGDNet + hard CE + seed 2026` on GPU1, each with `max_epochs=400`, `num_workers=0`, and unchanged train/validation/test split files.
+- At launch monitoring, both processes were alive with no `Traceback`, CUDA OOM, file-handle error, or shape error. Logs had not yet reached epoch output, consistent with large cached dataset preparation.
+- This is a baseline-first third-dataset gate. No RCPS run will be launched for `RadioML2018.01A` until at least one current-code baseline produces sane validation/test metrics.
