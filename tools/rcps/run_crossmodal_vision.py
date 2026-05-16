@@ -91,12 +91,15 @@ def corrupt_image(img: Image.Image, corruption: str, severity: int, rng: random.
     if corruption == 'motion_blur':
         sizes = {1: 3, 2: 5, 3: 7, 4: 9, 5: 11}
         k = sizes[int(severity)]
-        kernel = np.zeros((k, k), dtype=np.float32)
+        pad = k // 2
+        arr = np.asarray(img).astype(np.float32)
         if rng.random() < 0.5:
-            kernel[k // 2, :] = 1.0 / k
+            padded = np.pad(arr, ((0, 0), (pad, pad), (0, 0)), mode='edge')
+            out = sum(padded[:, offset:offset + arr.shape[1], :] for offset in range(k)) / k
         else:
-            kernel[:, k // 2] = 1.0 / k
-        return img.filter(ImageFilter.Kernel((k, k), kernel.flatten().tolist(), scale=1.0))
+            padded = np.pad(arr, ((pad, pad), (0, 0), (0, 0)), mode='edge')
+            out = sum(padded[offset:offset + arr.shape[0], :, :] for offset in range(k)) / k
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
     if corruption == 'gaussian_noise':
         sigmas = {1: 7.0, 2: 14.0, 3: 21.0, 4: 32.0, 5: 45.0}
         arr = np.asarray(img).astype(np.float32)
