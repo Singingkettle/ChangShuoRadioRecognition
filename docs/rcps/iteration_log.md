@@ -1179,3 +1179,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Exported best-checkpoint validation accuracy was `58.46%`; test accuracy was `58.69%`.
 - Metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2027_test.csv`.
 - Seed `2028` remains running on GPU0 and reached validation best `58.7550%` by epoch `77` during the foreground patrol. The 10B stage remains a baseline gate; no RCPS variant is launched until the three-seed hard baseline is complete and summarized.
+
+
+## Iteration 80 - MCformer RadioML2016.10B hard-CE three-seed baseline completed (2026-05-16 18:20:00 CST)
+
+- `MCformer + RadioML2016.10B_AMR + hard CE` completed seeds `2026/2027/2028` with validation/test prediction export and reliability-bin analysis.
+- Test accuracies were `58.44%`, `58.69%`, and `58.64%`; the three-seed mean/std is `58.5883 +/- 0.1338`.
+- Aggregate metrics: NLL `0.9891`, ECE `0.0134`, Brier `0.4565`.
+- Per-seed summary: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/summary/mcformer_hard_ce_10B_3seed_per_seed.csv`.
+- Reliability-bin aggregate: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep/summary/mcformer_hard_ce_10B_3seed_aggregate.csv`.
+- Interpretation: the second AMC dataset baseline gate is stable enough to proceed to matched RCPS construction. The next step is to build a validation-only posterior/confusion base for `RadioML2016.10B_AMR` and launch matched MCformer RCPS-Hybrid eps0.1 runs, without changing backbone, split, seed, optimizer, or epoch budget.
