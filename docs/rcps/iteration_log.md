@@ -1207,3 +1207,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep`.
 - Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_numcls10_seed2026_gpu0.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_numcls10_seed2027_gpu1.log`.
 - This correction is required before any 10B RCPS teacher/base construction. The previous 11-output 10B baseline remains quarantined.
+
+
+## Iteration 83 - Corrected MCformer RadioML2016.10B seed-2027 completed and seed-2028 launched (2026-05-16 19:14:00 CST)
+
+- Corrected `MCformer + RadioML2016.10B_AMR + hard CE + num_classes=10` seed `2027` completed validation/test export and reliability analysis.
+- Exported validation accuracy was `58.87%`; test accuracy was `58.96%`.
+- Metrics landed at `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_numcls10_400ep/metrics/deepsig201610B_amr_mcformer_hard-ce_seed2027_test.csv`.
+- Seed `2026` remains running on GPU0. Seed `2028` was launched on GPU1 with the same corrected `num_classes=10` override and identical training/data settings.
