@@ -1248,3 +1248,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_10B_numcls10_400ep`.
 - Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p1_seed2026_gpu0.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p1_seed2027_2028_gpu1.log`.
 - This is the first matched second-dataset RCPS check after the corrected 10-class baseline gate; the previous 11-output 10B run remains excluded.
+
+
+## Iteration 87 - MCformer RadioML2016.10B eps0.05 retention pilot launched (2026-05-16 21:12:00 CST)
+
+- `RCPS-Hybrid eps0.1` completed test export for seeds `2026/2027` while seed `2028` continued running.
+- Partial test metrics are mixed: seed `2026` improves accuracy/NLL/Brier but worsens ECE; seed `2027` improves ECE but loses accuracy/NLL/Brier.
+- Decision: keep the planned `eps0.1` three-seed run unchanged, but use the released GPU0 for a conservative `eps0.05` pilot on seed `2026` to test whether weaker smoothing improves retention on `RadioML2016.10B_AMR`.
+- Launched `MCformer + RadioML2016.10B_AMR + RCPS-Hybrid eps0.05 + num_classes=10` seed `2026` on GPU0.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p05_g2_10B_numcls10_400ep`.
+- Log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_10B_numcls10_eps0p05_seed2026_gpu0.log`.
+- This is an algorithmic iteration, not a replacement for the ongoing `eps0.1` confirmation. Promotion requires completed CSV comparison against hard CE.
