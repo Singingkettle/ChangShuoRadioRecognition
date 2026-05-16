@@ -1126,3 +1126,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - In the low-SNR bins, `eps0.2` reduced NLL by `-0.0076`, ECE by `-0.0076`, and Brier by `-0.0018`, while low-SNR accuracy changed by `-0.1742 pp`.
 - In the high-SNR bins, `eps0.2` improved accuracy by `+0.7273 pp`, NLL by `-0.0035`, ECE by `-0.0019`, and Brier by `-0.0026`.
 - Interpretation: seed `2027` strengthens the case that the hybrid target can combine the low-reliability calibration behavior of smoothing with the high-reliability retention of posterior-base RCPS. The low-SNR accuracy dip remains a tradeoff to track in the three-seed aggregate.
+
+
+## Iteration 74 - PETCGDNN hybrid eps0.2 pilot completed and not promoted (2026-05-16 16:17:00 CST)
+
+- `PETCGDNN Keras-init + rcps-hybrid-prior1_eps0p2_g2_retain0p8` seed `2026` completed training, validation/test export, and reliability-bin analysis without runtime errors. Best validation accuracy was `60.5227` at epoch `64`; test accuracy was `60.45%`.
+- Paired comparison was written to `/home/citybuster/Data/RCPS/work_dirs/petcgdnn_kerasinit_hybrid_prior1_eps0p2_g2_400ep/summary/petcgdnn_kerasinit_seed2026_hard_static_retention_posterior_hybrid_compare.csv`.
+- Versus same-seed hard CE, the hybrid improved overall accuracy by `+0.4591 pp`, NLL by `-0.0079`, ECE by `-0.0054`, and Brier by `-0.0064`; high-SNR accuracy improved by `+0.7455 pp`, NLL by `-0.0156`, ECE by `-0.0047`, and Brier by `-0.0122`.
+- Low-SNR posterior quality worsened for this seed: low-SNR NLL `+0.0058`, ECE `+0.0091`, and Brier `+0.0044`, despite a small low-SNR accuracy gain of `+0.0682 pp`.
+- Existing `PETCGDNN Keras-init + RCPS-PosteriorBase` remains stronger on the same seed: overall accuracy `+1.0682 pp`, NLL `-0.0311`, ECE `-0.0167`, and Brier `-0.0202` versus hard CE, with low-SNR NLL/ECE/Brier also improved.
+- Decision: do not promote PETCGDNN hybrid eps0.2 to three seeds. Keep it as a negative/boundary algorithmic iteration and retain PosteriorBase as the PETCGDNN candidate unless later evidence changes the tradeoff.
