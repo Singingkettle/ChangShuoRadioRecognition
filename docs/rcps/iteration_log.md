@@ -1342,3 +1342,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Mean deltas versus hard CE: Static LS gives accuracy `+0.4040 pp` but worsens NLL by `+0.0445`, ECE by `+0.0241`, and Brier by `+0.0058`; RCPS-Retention gives accuracy `+1.3089 pp`, NLL `-0.0197`, Brier `-0.0084`, but ECE `+0.0079`.
 - Reliability-band deltas for RCPS-Retention versus hard CE: low-SNR accuracy `+0.9278 pp`, NLL `-0.0060`, Brier `-0.0020`, ECE `+0.0028`; high-SNR accuracy `+1.6042 pp`, NLL `-0.0415`, ECE `-0.0055`, Brier `-0.0169`.
 - Interpretation: UCSD/RML22 provides useful supplementary evidence that RCPS-Retention is stronger than Static LS and can improve accuracy/NLL/Brier on a third AMC dataset. Because the feasible UCSD backbone is CNN4 and the hard-CE seed variance is high, this result should remain supplementary rather than a primary TPAMI claim.
+
+
+## Iteration 96 - CIFAR-10-C cross-modal runner added and seed-2026 pilot launched (2026-05-17 01:36:00 CST)
+
+- Added a standalone `tools/rcps/run_crossmodal_vision.py` runner for cross-modal RCPS validation on CIFAR-10-C. It uses a CIFAR-style ResNet18 backbone, controlled train-time corruptions, and the shared RCPS target builder from `csrr.models.losses.rcps_loss`.
+- Data sources: clean CIFAR-10 images from `/home/citybuster/Data/Visual/CIFAR-10` and CIFAR-10-C arrays from `/home/citybuster/Data/RCPS/raw/CIFAR-10-C/CIFAR-10-C`.
+- The first launch exposed a motion-blur implementation error (`PIL.ImageFilter.Kernel` rejected larger kernels). The corruption code was fixed with a numpy one-dimensional averaging implementation and committed before relaunch.
+- Launched seed `2026` pilot with identical backbone/data/epoch setup for `Hard CE`, `Static LS`, and `RCPS-Retention`; GPU0 runs Hard CE then Static LS, GPU1 runs RCPS-Retention.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_vision_cifar10c_30ep`.
+- Logs: `/home/citybuster/Data/RCPS/work_dirs/logs/cifar10c_resnet18_seed2026_gpu0_hard_static.log` and `/home/citybuster/Data/RCPS/work_dirs/logs/cifar10c_resnet18_seed2026_gpu1_rcps.log`.
+- Early monitor at epoch `3/30` showed both Hard CE and RCPS learning normally on clean validation (`~48%`) with no `Traceback`, CUDA OOM, file-handle error, or shape error. No conclusion will be drawn until test CSVs land.
