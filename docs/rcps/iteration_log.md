@@ -1145,3 +1145,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Config base: `configs/rcps/mcformer/mcformer_hard-ce_iq-snr-deepsig-201610A.py`; data root overridden to `/home/citybuster/Data/RCPS/processed/amr_compatible/RadioML.2016.10B`; max epochs `400`; all dataloaders use `num_workers=0`.
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/mcformer_gate_10B_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hard_ce_10B_seed2026_gpu0.log`.
 - Existing `MCformer + RadioML2016.10A` hybrid eps0.2 seed `2028` continues on GPU1.
+
+
+## Iteration 76 - MCformer hybrid eps0.2 three-seed aggregate completed (2026-05-16 17:12:00 CST)
+
+- `MCformer + rcps-hybrid-prior1_eps0p2_g2_retain0p8` completed seeds `2026/2027/2028` on `RadioML.2016.10A_AMR` with validation/test export and reliability-bin analysis.
+- Three-seed comparison rows were written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep/summary/mcformer_hard_static_posterior_hybrid_eps0p2_3seed_compare.csv`.
+- Aggregate mean/std was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep/summary/mcformer_hard_static_posterior_hybrid_eps0p2_3seed_aggregate.csv`.
+- Mean deltas versus hard CE for `eps0.2`: overall accuracy `+0.2614 pp`, NLL `-0.0058`, ECE `-0.0031`, Brier `-0.0018`; low-SNR accuracy `-0.1515 pp`, NLL `-0.0113`, ECE `-0.0075`, Brier `-0.0029`; high-SNR accuracy `+0.4545 pp`, NLL `-0.0009`, ECE `-0.0012`, Brier `-0.0003`.
+- Interpretation: `eps0.2` is a useful calibration-oriented ablation. It improves low-reliability NLL/ECE/Brier more strongly than `eps0.1`, but introduces a small low-SNR accuracy loss and weaker aggregate accuracy than `eps0.1`. The most balanced MCformer candidate remains `eps0.1`; `eps0.2` should be reported as a tradeoff/ablation rather than the default method.
