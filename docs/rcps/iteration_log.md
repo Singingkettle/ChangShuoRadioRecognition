@@ -1116,3 +1116,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Setup matches the MCformer hybrid logic: same Keras-init PETCGDNN backbone and AMR-compatible split as the hard-CE gate, posterior table `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_reliability_base.npz`, `prior_blend=1.0`, `epsilon.max=0.2`, `gamma=2.0`, `retain_min=0.8`, max epochs `400`, and all dataloaders set to `num_workers=0`.
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/petcgdnn_kerasinit_hybrid_prior1_eps0p2_g2_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/petcgdnn_kerasinit_hybrid_eps0p2_seed2026_gpu0.log`.
 - This is a single-seed pilot, not a paper result. It will be promoted only if paired comparison against PETCGDNN hard CE, static LS, and posterior-base results shows a better reliability tradeoff.
+
+
+## Iteration 73 - MCformer hybrid eps0.2 seed-2027 comparison landed (2026-05-16 15:43:30 CST)
+
+- `MCformer + rcps-hybrid-prior1_eps0p2_g2_retain0p8` seed `2027` completed training, validation/test prediction export, and reliability-bin analysis without runtime errors. The sequential runner then started seed `2028` automatically on GPU1.
+- Paired comparison was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p2_g2_400ep/summary/mcformer_seed2027_hard_static_posterior_hybrid_eps_compare.csv`.
+- Versus same-seed hard CE, `eps0.2` improved overall accuracy by `+0.4114 pp`, NLL by `-0.0069`, ECE by `-0.0051`, and Brier by `-0.0031`.
+- In the low-SNR bins, `eps0.2` reduced NLL by `-0.0076`, ECE by `-0.0076`, and Brier by `-0.0018`, while low-SNR accuracy changed by `-0.1742 pp`.
+- In the high-SNR bins, `eps0.2` improved accuracy by `+0.7273 pp`, NLL by `-0.0035`, ECE by `-0.0019`, and Brier by `-0.0026`.
+- Interpretation: seed `2027` strengthens the case that the hybrid target can combine the low-reliability calibration behavior of smoothing with the high-reliability retention of posterior-base RCPS. The low-SNR accuracy dip remains a tradeoff to track in the three-seed aggregate.
