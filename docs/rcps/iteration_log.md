@@ -1048,3 +1048,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Low-SNR comparison: accuracy `-0.8182 pp`, NLL `+0.0152`, ECE `+0.0078`, Brier `+0.0059`.
 - Interpretation: this seed supports modest aggregate/high-reliability benefits and slight overall calibration improvement, but does not support a blanket low-SNR improvement claim. The manuscript should keep the theory centered on reliability-conditioned posterior allocation and report low-SNR tradeoffs honestly.
 - `MCformer + Static LS (0.1)` is still running as the same-backbone smoothing control.
+
+### Iteration 65 MCformer Seed-2026 Three-Way Control: 2026-05-16 10:23 CST
+
+- `MCformer + Static LS (0.1)` seed 2026 completed and was compared with same-seed hard CE and RCPS-PosteriorBase.
+- Static LS vs hard CE: overall accuracy `+0.0523 pp`, NLL `+0.0295`, ECE `+0.0161`, Brier `+0.0017`. Low-SNR metrics improve, but overall/high-SNR calibration worsens.
+- RCPS-PosteriorBase vs hard CE: overall accuracy `+0.2568 pp`, ECE `-0.0017`, high-SNR accuracy `+0.8273 pp`, high-SNR NLL/Brier improve, while low-SNR metrics worsen.
+- Interpretation: on this seed, RCPS is stronger than static uniform smoothing on overall accuracy/ECE and high-reliability behavior, but static smoothing is more conservative at low reliability. The paper should separate low-reliability calibration from high-reliability retention instead of treating all reliability bins as one monotone story.
