@@ -1313,3 +1313,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - To keep the AMC evidence chain moving, launched a third-dataset baseline gate on `UCSD/RML22`, which is much smaller (`2.8G`) and has explicit SNR metadata in `train/validation/test.json`.
 - Launched `MCformer + UCSD/RML22 + hard CE + seed 2026` on GPU0 and `PETCGDNN + UCSD/RML22 + hard CE + seed 2026` on GPU1 with the same current-code training/export/analysis chain, `max_epochs=400`, and `num_workers=0` for stability.
 - No RCPS comparison will be run on UCSD/RML22 until these hard-CE baselines produce sane validation/test metrics.
+
+
+## Iteration 93 - UCSD/RML22 strong-model gate failed and lightweight screen launched (2026-05-16 23:53:00 CST)
+
+- `PETCGDNN + UCSD/RML22 + hard CE` failed with a kernel/input-size incompatibility: `Kernel size: (2 x 8). Kernel size can't be greater than actual input size`. This is a config/backbone compatibility issue for the current UCSD pipeline.
+- `MCformer + UCSD/RML22 + hard CE` ran quickly, but validation accuracy stayed exactly `10.0000%` and loss stayed near `2.3026` through epoch `21`. The run was stopped as a non-learning baseline.
+- Decision: do not use either failed strong-model UCSD attempt as evidence. Treat them as baseline-gate diagnostics.
+- Launched a 30-epoch UCSD/RML22 screen with more stable candidate backbones: `CNN4 + hard CE + seed 2026` on GPU0 and `GRU2 + hard CE + seed 2026` on GPU1.
+- The screen goal is only to find a backbone whose UCSD data/label/shape path actually learns. If one passes, it can be promoted to a formal baseline gate and later to a matched RCPS comparison.
