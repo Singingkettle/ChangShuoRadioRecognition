@@ -1425,3 +1425,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Extended `run_crossmodal_vision.py` with a `--model` argument supporting both `resnet18-cifar` and `resnet34-cifar` while preserving the existing ResNet18 output naming and behavior.
 - A minimal ResNet34-CIFAR smoke run completed and wrote metrics, validating the model switch, path layout, and CSV export. The smoke subset is intentionally tiny and not evidence.
 - Next step: launch a matched seed-2026 ResNet34 pilot for Hard CE, Static LS, and RCPS-Retention eps0.10 on CIFAR-10-C. If the trend matches ResNet18, this becomes the second vision backbone for cross-modal robustness evidence.
+
+
+## Iteration 105 - CIFAR-10-C ResNet34 pilot completed (2026-05-17 04:38:00 CST)
+
+- Completed the seed-2026 CIFAR-10-C ResNet34-CIFAR pilot for Hard CE, Static LS, RCPS-Retention eps0.10, and a weaker RCPS-Retention eps0.05 check.
+- Hard CE test: clean accuracy `87.65`, corrupted accuracy `84.8467`, NLL `0.4626`, ECE `0.0461`, and Brier `0.2195` on the corrupted aggregate.
+- Static LS is again not competitive: corrupted accuracy `-0.3420 pp`, NLL `+0.0490`, ECE `+0.0001`, and Brier `+0.0050` versus Hard CE.
+- RCPS eps0.10 improves corrupted ECE by `-0.0184` but hurts accuracy by `-0.4220 pp`, NLL by `+0.0069`, and Brier by `+0.0046`. RCPS eps0.05 reduces the tradeoff but still hurts corrupted accuracy by `-0.3020 pp`, NLL by `+0.0015`, and Brier by `+0.0027`, while improving ECE by `-0.0168`.
+- Decision: do not expand ResNet34-CIFAR to three seeds under fixed uniform RCPS. The pilot is useful as a constraint: the successful ResNet18 setting should be described as validation-selected, not as a universal epsilon. For deeper/stronger backbones, RCPS needs retention/entropy constraints that explicitly prevent accuracy and Brier loss.
