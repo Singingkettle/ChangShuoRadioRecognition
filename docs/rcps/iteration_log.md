@@ -1375,3 +1375,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Severity-wise RCPS deltas are consistently favorable: severity 1/2/3/4/5 accuracy deltas are `+0.4667/+0.2744/+0.3533/+0.4200/+0.3167 pp`, NLL deltas are `-0.0064/-0.0045/-0.0047/-0.0045/-0.0076`, ECE deltas are `-0.0149/-0.0189/-0.0249/-0.0262/-0.0304`, and Brier deltas are `-0.0050/-0.0046/-0.0043/-0.0045/-0.0057`.
 - Training-efficiency diagnostics show a small but useful trend: RCPS-Retention eps0.10 reaches 95% of the Hard-CE best validation accuracy in `19.67` epochs on average versus `20.33` for Hard CE, with slightly higher validation AULC (`76.38` vs `76.31`) and no added model parameters.
 - Interpretation: this is the strongest cross-modal evidence so far. It supports the paper's general degraded-observation claim beyond AMC and suggests that RCPS can improve posterior quality and modest accuracy under controlled visual corruptions, while Static LS is not an adequate substitute.
+
+
+## Iteration 99 - Speech Commands audio runner added and smoke-tested (2026-05-17 03:18:00 CST)
+
+- Added `tools/rcps/run_crossmodal_audio.py`, a standalone Speech Commands runner for noisy-audio RCPS validation. It uses balanced `label x SNR` sampling, additive background noise from the official `_background_noise_` files, log-mel features, DS-CNN/log-mel ResNet backbones, and the shared `build_rcps_targets` implementation.
+- The runner keeps the comparison paired: Hard CE, Static LS, and RCPS-Retention share the same data split, balanced sampling policy, model, optimizer, epoch budget, and evaluation code; only the supervision target/loss changes.
+- A minimal hard-CE smoke test completed successfully with 231 train, 154 validation, and 154 test examples. It exercised waveform loading, SNR mixing, feature extraction, training, checkpoint selection, test export, and reliability/SNR-bin metrics writing.
+- Smoke metrics landed at `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_smoke/metrics/speechcommands_ds-cnn_hard-ce_seed2026_test.csv`. These numbers are not paper evidence; they only validate the execution path.
