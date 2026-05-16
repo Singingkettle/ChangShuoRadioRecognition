@@ -1363,3 +1363,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Static LS was not competitive in this pilot: overall corrupted accuracy `-0.2927 pp`, NLL `+0.0556`, ECE `+0.0213`, and Brier `+0.0066` versus Hard CE.
 - Decision: promote `RCPS-Retention eps0.10` to seeds `2027/2028` and run matched Hard CE / Static LS / RCPS comparisons. This is cross-modal validation evidence, not yet a final paper claim until the three-seed aggregate is complete.
 - Launched seed `2027` full queue on GPU0 and seed `2028` full queue on GPU1. Each queue runs Hard CE, Static LS, then RCPS-Retention eps0.10 with identical backbone/data/epoch setup.
+
+
+## Iteration 98 - CIFAR-10-C ResNet18 three-seed RCPS validation completed (2026-05-17 03:08:00 CST)
+
+- Completed the matched CIFAR-10-C cross-modal comparison for `ResNet18-CIFAR` with seeds `2026/2027/2028` under the same clean-CIFAR training set, controlled train-time corruptions, 30-epoch budget, optimizer schedule, and evaluation protocol.
+- Summary files were written under `/home/citybuster/Data/RCPS/work_dirs/crossmodal_vision_cifar10c_30ep/summary`, with the promoted RCPS setting stored under `/home/citybuster/Data/RCPS/work_dirs/crossmodal_vision_cifar10c_eps0p10_30ep`.
+- Three-seed corrupted-test aggregate: Hard CE accuracy `85.3071 +/- 0.1743`, NLL `0.4432`, ECE `0.0396`, Brier `0.2122`; Static LS accuracy `85.4242 +/- 0.5231`, NLL `0.4852`, ECE `0.0550`, Brier `0.2132`; RCPS-Retention eps0.10 accuracy `85.6733 +/- 0.3387`, NLL `0.4377`, ECE `0.0160`, Brier `0.2074`.
+- Mean deltas on CIFAR-10-C versus Hard CE: Static LS gives accuracy `+0.1171 pp` but worsens NLL by `+0.0420`, ECE by `+0.0154`, and Brier by `+0.0009`; RCPS-Retention eps0.10 gives accuracy `+0.3662 pp`, NLL `-0.0055`, ECE `-0.0236`, and Brier `-0.0048`.
+- Clean-test retention is also positive: RCPS-Retention eps0.10 improves clean accuracy by `+0.2233 pp`, NLL by `-0.0014`, ECE by `-0.0093`, and Brier by `-0.0022` versus Hard CE. This is important because the reliability-conditioned target does not trade away high-reliability clean performance in this setting.
+- Severity-wise RCPS deltas are consistently favorable: severity 1/2/3/4/5 accuracy deltas are `+0.4667/+0.2744/+0.3533/+0.4200/+0.3167 pp`, NLL deltas are `-0.0064/-0.0045/-0.0047/-0.0045/-0.0076`, ECE deltas are `-0.0149/-0.0189/-0.0249/-0.0262/-0.0304`, and Brier deltas are `-0.0050/-0.0046/-0.0043/-0.0045/-0.0057`.
+- Training-efficiency diagnostics show a small but useful trend: RCPS-Retention eps0.10 reaches 95% of the Hard-CE best validation accuracy in `19.67` epochs on average versus `20.33` for Hard CE, with slightly higher validation AULC (`76.38` vs `76.31`) and no added model parameters.
+- Interpretation: this is the strongest cross-modal evidence so far. It supports the paper's general degraded-observation claim beyond AMC and suggests that RCPS can improve posterior quality and modest accuracy under controlled visual corruptions, while Static LS is not an adequate substitute.
