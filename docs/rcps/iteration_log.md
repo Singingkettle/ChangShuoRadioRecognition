@@ -1108,3 +1108,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Mean deltas versus hard CE for the hybrid eps0.1 method: overall accuracy `+0.2970 pp`, NLL `-0.0064`, ECE `-0.0022`, Brier `-0.0018`; low-SNR accuracy `+0.2955 pp`, NLL `-0.0061`, ECE `-0.0044`, Brier `-0.0011`; high-SNR accuracy `+0.2333 pp`, NLL `-0.0030`, ECE `-0.0016`, Brier `-0.0006`.
 - Interpretation: `eps0.1` is currently the most balanced MCformer variant. It avoids the low-reliability degradation seen in pure posterior-base RCPS and avoids the high-reliability NLL/ECE damage of static label smoothing. This is still one model and one dataset, so it is a candidate result, not a final paper claim.
 - Ongoing: `eps0.2` seeds `2027/2028` are running to test whether the midpoint gives a stronger tradeoff.
+
+## Iteration 72 - PETCGDNN hybrid eps0.2 second-family pilot launched (2026-05-16 15:32:10 CST)
+
+- Foreground monitoring confirmed `MCformer + rcps-hybrid-prior1_eps0p2_g2_retain0p8` seed `2027` is still running normally on GPU1. At launch time it had reached around epoch `148`, with best validation accuracy `58.8023`, and no `Traceback`, CUDA OOM, file-handle, or dataloader errors in the log.
+- GPU0 was idle, so a conservative second-model-family pilot was launched for `PETCGDNN Keras-init + rcps-hybrid-prior1_eps0p2_g2_retain0p8` on `RadioML.2016.10A_AMR`, seed `2026` only.
+- Setup matches the MCformer hybrid logic: same Keras-init PETCGDNN backbone and AMR-compatible split as the hard-CE gate, posterior table `/home/citybuster/Data/RCPS/work_dirs/rcps_tables/deepsig201610A/petcgdnn_kerasinit_seed2026_reliability_base.npz`, `prior_blend=1.0`, `epsilon.max=0.2`, `gamma=2.0`, `retain_min=0.8`, max epochs `400`, and all dataloaders set to `num_workers=0`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/petcgdnn_kerasinit_hybrid_prior1_eps0p2_g2_400ep`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/petcgdnn_kerasinit_hybrid_eps0p2_seed2026_gpu0.log`.
+- This is a single-seed pilot, not a paper result. It will be promoted only if paired comparison against PETCGDNN hard CE, static LS, and posterior-base results shows a better reliability tradeoff.
