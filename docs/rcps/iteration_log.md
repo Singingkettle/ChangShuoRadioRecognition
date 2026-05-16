@@ -1075,3 +1075,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - GPU0 variant: `rcps-hybrid-prior1_eps0p1_g2_retain0p8`, work root `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p1_g2_400ep`, log `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p1_2026_gpu0.log`.
 - GPU1 variant: `rcps-hybrid-prior1_eps0p3_g2_retain0p8`, work root `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p3_g2_400ep`, log `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p3_2026_gpu1.log`.
 - Evaluation rule: compare seed `2026` against hard CE, Static LS, and RCPS-PosteriorBase. If a hybrid variant recovers low-SNR NLL/ECE/Brier without losing the aggregate/high-SNR gains, promote it to three-seed confirmation. Otherwise, keep it as a negative algorithmic iteration.
+
+### Iteration 68 MCformer Hybrid eps0.1 Promoted to Three-Seed Confirmation: 2026-05-16 13:02 CST
+
+- `MCformer + rcps-hybrid-prior1_eps0p1_g2_retain0p8` seed `2026` completed and was compared against same-seed hard CE, Static LS, and RCPS-PosteriorBase.
+- Seed-2026 deltas versus hard CE: overall accuracy `+0.1773 pp`, NLL `-0.0051`, ECE `-0.0026`, Brier `-0.0006`; low-SNR NLL `-0.0056`, ECE `-0.0032`, Brier `-0.0004`; high-SNR accuracy `+0.3545 pp`, NLL `-0.0029`, ECE `-0.0027`, Brier `-0.0002`.
+- Interpretation: unlike the stronger posterior-base variant, this hybrid setting improves low-reliability posterior metrics while retaining aggregate and high-reliability gains on the first seed. It is therefore promoted to seeds `2027/2028` for confirmation.
+- Launched seeds `2027/2028` on GPU0 with log `/home/citybuster/Data/RCPS/work_dirs/logs/mcformer_hybrid_eps0p1_2027_2028_gpu0.log`.
