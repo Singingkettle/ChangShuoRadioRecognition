@@ -1271,3 +1271,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Interpretation: `eps0.1` remains within the high-SNR retention constraint and improves aggregate/low-reliability posterior metrics, but high-SNR NLL/Brier and high-SNR accuracy weaken. It is useful evidence, not yet the cleanest 10B setting.
 - The `eps0.05` seed `2026` pilot was cleaner: overall accuracy `+0.3500 pp`, NLL `-0.0080`, ECE `-0.0020`, Brier `-0.0029`; low-SNR accuracy `+0.4417 pp`; high-SNR NLL/ECE/Brier also improved with high-SNR accuracy `-0.1800 pp`.
 - Decision: promote `eps0.05` to seeds `2027/2028` for confirmation. These two runs were launched on GPU0/GPU1 with the same corrected 10-class base and unchanged training setup.
+
+
+## Iteration 89 - MCformer RadioML2016.10B eps0.05 three-seed aggregate completed (2026-05-16 23:04:00 CST)
+
+- `MCformer + RadioML2016.10B_AMR + RCPS-Hybrid eps0.05 + num_classes=10` completed seeds `2026/2027/2028` with validation/test export and reliability-bin analysis.
+- Prediction sanity check confirmed all three test probability tensors are `(40000, 10)` with `10` classes.
+- Three-seed comparison versus corrected hard CE was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p05_g2_10B_numcls10_400ep/summary/mcformer_10B_numcls10_hard_vs_hybrid_eps0p05_3seed_compare.csv`.
+- Aggregate summary was written to `/home/citybuster/Data/RCPS/work_dirs/mcformer_hybrid_prior1_eps0p05_g2_10B_numcls10_400ep/summary/mcformer_10B_numcls10_hard_vs_hybrid_eps0p05_3seed_aggregate.csv`.
+- Mean deltas versus hard CE for `eps0.05`: overall accuracy `+0.0458 pp`, NLL `-0.0040`, ECE `-0.0006`, Brier `-0.0009`; low-SNR accuracy `+0.0389 pp`, NLL `-0.0036`, ECE `-0.0024`, Brier `+0.0000`; high-SNR accuracy `-0.0667 pp`, NLL `-0.0006`, ECE `-0.0038`, Brier `+0.0002`.
+- Comparison with `eps0.1`: `eps0.1` gives slightly larger overall accuracy/NLL/Brier gains but weakens high-SNR accuracy and high-SNR NLL/Brier; `eps0.05` is the cleaner retention-oriented 10B candidate.
+- Interpretation: the 10B evidence supports reliability-conditioned smoothing as a modest but consistent posterior-quality improvement when `epsilon` is selected conservatively under a high-reliability retention constraint. The paper should present this as calibration/uncertainty alignment with validation-constrained retention, not as a theorem-level guarantee of large accuracy gains.
