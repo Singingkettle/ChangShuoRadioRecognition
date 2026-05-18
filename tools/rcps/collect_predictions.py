@@ -102,7 +102,7 @@ def main():
     dataset = dataloader.dataset
     classes = list(dataset.CLASSES)
 
-    all_pps, all_gts, all_snrs = [], [], []
+    all_pps, all_gts, all_snrs, all_sample_idx = [], [], [], []
     recover_mldnn_probs = needs_mldnn_probability_recovery(cfg)
     if recover_mldnn_probs:
         print('Recovering MLDNN merge probabilities from double-softmax pred_score.')
@@ -119,6 +119,7 @@ def main():
                 all_gts.append(sample.gt_label.item())
                 idx = sample.get('sample_idx')
                 if idx is not None:
+                    idx = int(idx)
                     info = dataset.get_data_info(idx)
                     all_snrs.append(info.get('snr', 0))
                 else:
@@ -127,7 +128,9 @@ def main():
                     # running dataset index recovers SNR metadata for reliability
                     # analysis without changing the model input pipeline.
                     info = dataset.get_data_info(sample_counter)
+                    idx = sample_counter
                     all_snrs.append(info.get('snr', 0))
+                all_sample_idx.append(idx)
                 sample_counter += 1
             if (i + 1) % 50 == 0:
                 print(f'  [{i + 1}/{len(dataloader)}]')
@@ -136,6 +139,7 @@ def main():
         pps=np.stack(all_pps),
         gts=np.array(all_gts, dtype=np.int64),
         snrs=np.array(all_snrs),
+        sample_idx=np.array(all_sample_idx, dtype=np.int64),
         classes=classes,
         split=args.split,
     )
