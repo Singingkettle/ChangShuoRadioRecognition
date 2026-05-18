@@ -1434,3 +1434,28 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Static LS is again not competitive: corrupted accuracy `-0.3420 pp`, NLL `+0.0490`, ECE `+0.0001`, and Brier `+0.0050` versus Hard CE.
 - RCPS eps0.10 improves corrupted ECE by `-0.0184` but hurts accuracy by `-0.4220 pp`, NLL by `+0.0069`, and Brier by `+0.0046`. RCPS eps0.05 reduces the tradeoff but still hurts corrupted accuracy by `-0.3020 pp`, NLL by `+0.0015`, and Brier by `+0.0027`, while improving ECE by `-0.0168`.
 - Decision: do not expand ResNet34-CIFAR to three seeds under fixed uniform RCPS. The pilot is useful as a constraint: the successful ResNet18 setting should be described as validation-selected, not as a universal epsilon. For deeper/stronger backbones, RCPS needs retention/entropy constraints that explicitly prevent accuracy and Brier loss.
+
+
+## Iteration 106 - DPC-RCPS theory upgrade and AMC 10A evidence (2026-05-18 22:00:00 CST)
+
+- Upgraded the method line from fixed reliability smoothing to `DPC-RCPS` (Degradation-Posterior Consistent RCPS), motivated by posterior consistency along a degradation path.
+- Implemented sample-posterior target support, entropy-projected variants, reliability-conditioned temperature scaling, and MCformer DPC configs. Key commits include `a20525c`, `4e4f9a2`, `a9f8438`, `28d136c`, and `d97a589`.
+- PETCGDNN on RadioML2016.10A completed a paired three-seed DPC comparison. Hard CE reached `56.08 +/- 1.56` accuracy, while DPC-v1 reached `59.10 +/- 1.25`, with paired deltas of `+3.03 pp` accuracy, `-0.0585` NLL, `-0.0113` ECE, and `-0.0328` Brier. Entropy-projected DPC with reliability-temperature scaling reached `59.51 +/- 1.71` accuracy and stronger NLL/Brier/low-SNR ECE gains, but worsened aggregate ECE.
+- MCformer on RadioML2016.10A completed a DPC-v1 three-seed check. DPC-v1 gave modest but stable deltas: `+0.085 pp` accuracy, `-0.0014` NLL, `+0.0012` ECE, and `-0.0003` Brier. Reliability-temperature scaling improved NLL and reliability-bin ECE but worsened aggregate ECE.
+- Interpretation: 10A supports DPC as a posterior-quality and retention framework, with PETCGDNN giving strong positive evidence and MCformer showing a model-dependent boundary case. This shaped the manuscript claim away from universal smoothing and toward posterior consistency with validation constraints.
+
+
+## Iteration 107 - MCformer RadioML2016.10B DPC-RCPS three-seed result (2026-05-19 06:52:00 CST)
+
+- Added RadioML2016.10B MCformer DPC configs in commit `fda7149`. The valid 10B setup uses `num_classes=10`, with 600k train, 120k validation, and 480k test samples.
+- Built the sample-posterior teacher from the valid MCformer hard-CE seed-2026 checkpoint:
+  `/home/citybuster/Data/RCPS/work_dirs/dpc_teacher_posteriors/deepsig201610B/mcformer_hard-ce_seed2026_train.npz`.
+  The artifact contains 600000 train samples, 10 classes, normalized probabilities, and full `sample_idx` coverage.
+- Completed DPC-RCPS seeds `2026/2027/2028` and summarized them against the valid hard-CE `num_classes=10` baseline:
+  `/home/citybuster/Data/RCPS/work_dirs/dpc_main/summary/dpc_mcformer_10B_three_seed_summary.csv`.
+- Three-seed hard CE: accuracy `58.55 +/- 0.36`, NLL `0.9908 +/- 0.0064`, ECE `0.0117 +/- 0.0010`, Brier `0.4574 +/- 0.0031`.
+- Three-seed DPC-RCPS: accuracy `64.06 +/- 0.22`, NLL `0.9088 +/- 0.0053`, ECE `0.0130 +/- 0.0008`, Brier `0.3986 +/- 0.0035`.
+- Paired DPC minus hard-CE deltas: accuracy `+5.51 +/- 0.36 pp`, NLL `-0.0820 +/- 0.0027`, ECE `+0.0012 +/- 0.0013`, Brier `-0.0588 +/- 0.0024`.
+- Low-SNR deltas: accuracy `-0.18 +/- 0.23 pp`, NLL `-0.0047 +/- 0.0035`, ECE `-0.0045 +/- 0.0042`, Brier approximately unchanged.
+- High-SNR deltas: accuracy `+8.50 +/- 0.46 pp`, NLL `-0.1230 +/- 0.0088`, ECE `-0.0013 +/- 0.0057`, Brier `-0.0918 +/- 0.0065`.
+- Interpretation: this is currently the strongest AMC evidence. It supports the DPC-RCPS claim that degradation-aware posterior targets can improve accuracy, likelihood, Brier score, and high-reliability retention under a stable baseline. Aggregate ECE is slightly worse, so the paper should not claim universal ECE improvement; it should emphasize reliability-stratified calibration and posterior recovery.

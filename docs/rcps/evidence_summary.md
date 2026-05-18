@@ -6,6 +6,9 @@ This document separates main positive evidence from diagnostic tradeoffs. Diagno
 
 | Tier | Modality | Dataset | Model | Method | Seeds | dAcc(pp) | dNLL | dECE | dBrier | Interpretation |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---|
+| main-positive-dpc | AMC | RadioML2016.10B | MCformer | DPC-RCPS | 3 | 5.5075 | -0.0820 | +0.0012 | -0.0588 | strongest current AMC result; large accuracy/NLL/Brier and high-SNR retention gain; aggregate ECE slightly worse |
+| main-positive-dpc | AMC | RadioML2016.10A | PETCGDNN | DPC-RCPS | 3 | 3.0250 | -0.0585 | -0.0113 | -0.0328 | strong DPC positive result on first AMC dataset/backbone |
+| diagnostic-dpc | AMC | RadioML2016.10A | MCformer | DPC-RCPS | 3 | 0.0852 | -0.0014 | +0.0012 | -0.0003 | strong-model boundary case; modest NLL/Brier/high-SNR benefit but no large overall gain |
 | main-positive | AMC | RadioML2016.10A | PETCGDNN | RCPS-PosteriorBase | 3 | 0.8621 | -0.0200 | -0.0178 | -0.0139 | strong AMC positive result |
 | main-positive | AMC | RadioML2016.10A | MCformer | RCPS-Hybrid eps0.10 | 3 | 0.2970 | -0.0064 | -0.0022 | -0.0018 | strong-model AMC positive result |
 | main-positive-retention | AMC | RadioML2016.10B | MCformer | RCPS-Hybrid eps0.05 | 3 | 0.0458 | -0.0040 | -0.0006 | -0.0009 | second AMC dataset; conservative retention setting |
@@ -16,7 +19,7 @@ This document separates main positive evidence from diagnostic tradeoffs. Diagno
 
 ## Current Reading
 
-- The defensible main claim is posterior calibration and uncertainty alignment with high-reliability retention; accuracy gains are present in several AMC and CIFAR-10-C settings but are not universal.
+- The defensible main claim is now stronger than fixed smoothing: DPC-RCPS provides degradation-posterior consistency, posterior-quality gains, and high-reliability retention. Accuracy gains are large in `MCformer + RadioML2016.10B` and `PETCGDNN + RadioML2016.10A`, modest in `MCformer + RadioML2016.10A`, and positive in the selected CIFAR-10-C ResNet18 setting.
 - Static label smoothing is not a sufficient baseline substitute: it repeatedly worsens NLL/ECE/Brier in CIFAR-10-C, UCSD/RML22, and Speech Commands diagnostics.
-- Fixed uniform RCPS should not be presented as the final theory. The manuscript now frames finite-reliability smoothing as validation-constrained posterior approximation.
-- Next experimental priority: consolidate main AMC and CIFAR-10-C figures/tables, then add a stronger adaptive/PosteriorBase audio variant only if validation diagnostics justify it.
+- Fixed uniform RCPS should not be presented as the final theory. The manuscript now frames finite-reliability smoothing as a low-cost approximation and DPC-RCPS as the main posterior-path method.
+- Next experimental priority: consolidate DPC main AMC and CIFAR-10-C figures/tables, then decide whether to run DPC/PosteriorBase audio only if validation diagnostics justify it.
