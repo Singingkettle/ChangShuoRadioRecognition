@@ -1459,3 +1459,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Low-SNR deltas: accuracy `-0.18 +/- 0.23 pp`, NLL `-0.0047 +/- 0.0035`, ECE `-0.0045 +/- 0.0042`, Brier approximately unchanged.
 - High-SNR deltas: accuracy `+8.50 +/- 0.46 pp`, NLL `-0.1230 +/- 0.0088`, ECE `-0.0013 +/- 0.0057`, Brier `-0.0918 +/- 0.0065`.
 - Interpretation: this is currently the strongest AMC evidence. It supports the DPC-RCPS claim that degradation-aware posterior targets can improve accuracy, likelihood, Brier score, and high-reliability retention under a stable baseline. Aggregate ECE is slightly worse, so the paper should not claim universal ECE improvement; it should emphasize reliability-stratified calibration and posterior recovery.
+
+
+## Iteration 108 - RadioML2018.01A PETCGDNN DPC preparation (2026-05-19 07:52:00 CST)
+
+- While `PETCGDNN + RadioML2018.01A + hard CE + seed 2026` baseline gate was running, added SNR-aware PETCGDNN 2018A config for future DPC training without touching the active process.
+- Added `configs/rcps/_base_/models/petcgdnn_iq-snr-deepsig-201801A.py` with `sample_idx`, `snr`, `snr_label`, and `modulation` metadata packed for all splits.
+- Added `configs/rcps/dpc/petcgdnn_dpc-rcps_iq-snr-deepsig-201801A.py` with `sample_posterior` base pointing to the planned train-split teacher artifact.
+- Verified both configs with `mmengine.Config.fromfile`: 24 classes, correct absolute data root, correct metadata, and expected hard/DPC loss types.
+- No experiment matrix expansion has been launched yet. The next decision remains gated on the completed hard-CE seed-2026 test metrics for RadioML2018.01A.
