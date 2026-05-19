@@ -1478,3 +1478,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `PETCGDNN + RadioML2018.01A + hard CE + seed 2027` is running on GPU0. It reached `60.7607%` validation accuracy at epoch 19, then entered a low-accuracy oscillatory phase and was recovering to `58.1468%` by epoch 42.
 - Both seeds show substantial validation oscillation after initially crossing 60%. This does not invalidate the baseline because the checkpoint hook preserves the best validation checkpoint, but any 2018A evidence must use best-checkpoint test CSVs, paired seeds, and explicit training-stability discussion.
 - No RadioML2018.01A DPC result is claimed yet. DPC remains gated on completed hard-CE test metrics.
+
+
+## Iteration 110 - RadioML2018.01A PETCGDNN hard-CE gate two seeds completed (2026-05-19 22:55:00 CST)
+
+- The first two `PETCGDNN + RadioML2018.01A + hard CE` baseline seeds completed naturally and successfully exported test predictions and reliability-bin CSVs.
+- Seed 2026 test overall: accuracy `62.7312`, NLL `1.1236`, ECE `0.0043`, Brier `0.3962`, mean confidence `0.6312`, mean entropy `1.1208`.
+- Seed 2027 test overall: accuracy `60.7220`, NLL `1.1789`, ECE `0.0065`, Brier `0.4198`, mean confidence `0.6080`, mean entropy `1.1859`.
+- Two-seed mean so far: accuracy `61.7266`, NLL `1.1512`, ECE `0.0054`, Brier `0.4080`.
+- The export path is now verified for the large 2018A test split (`1,022,736` samples), with no recurrence of the earlier file-handle issue.
+- Because both completed seeds pass the baseline gate, launched the third hard-CE seed (`2028`) using the same data, backbone, optimizer, worker settings, and export path:
+  `/home/citybuster/Data/RCPS/work_dirs/logs/baseline_2018A_petcgdnn_hard_seed2028_gpu1.log`.
+- No DPC/RCPS experiment is claimed or launched for 2018A yet. DPC remains gated on the completed three-seed hard-CE baseline summary.
