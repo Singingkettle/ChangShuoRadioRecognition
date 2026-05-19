@@ -1468,3 +1468,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Added `configs/rcps/dpc/petcgdnn_dpc-rcps_iq-snr-deepsig-201801A.py` with `sample_posterior` base pointing to the planned train-split teacher artifact.
 - Verified both configs with `mmengine.Config.fromfile`: 24 classes, correct absolute data root, correct metadata, and expected hard/DPC loss types.
 - No experiment matrix expansion has been launched yet. The next decision remains gated on the completed hard-CE seed-2026 test metrics for RadioML2018.01A.
+
+
+## Iteration 109 - RadioML2018.01A PETCGDNN baseline gate in progress (2026-05-19 11:00:00 CST)
+
+- `PETCGDNN + RadioML2018.01A + hard CE + seed 2026` is running on GPU1 with `num_workers=0`; no traceback, CUDA OOM, file-handle error, or export error has been observed.
+- Seed 2026 validation accuracy has repeatedly improved despite oscillations, reaching `62.1133%` at epoch 57. No test CSV has landed yet because early stopping has not triggered.
+- After MCformer 2018A 1-epoch smoke completed (`34.9935%` validation accuracy with high per-epoch cost), GPU0 was used only for a second hard-CE baseline seed, not for DPC/RCPS.
+- `PETCGDNN + RadioML2018.01A + hard CE + seed 2027` is running on GPU0. It reached `60.7607%` validation accuracy at epoch 19, then entered a low-accuracy oscillatory phase and was recovering to `58.1468%` by epoch 42.
+- Both seeds show substantial validation oscillation after initially crossing 60%. This does not invalidate the baseline because the checkpoint hook preserves the best validation checkpoint, but any 2018A evidence must use best-checkpoint test CSVs, paired seeds, and explicit training-stability discussion.
+- No RadioML2018.01A DPC result is claimed yet. DPC remains gated on completed hard-CE test metrics.
