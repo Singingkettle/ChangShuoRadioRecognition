@@ -1490,3 +1490,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Because both completed seeds pass the baseline gate, launched the third hard-CE seed (`2028`) using the same data, backbone, optimizer, worker settings, and export path:
   `/home/citybuster/Data/RCPS/work_dirs/logs/baseline_2018A_petcgdnn_hard_seed2028_gpu1.log`.
 - No DPC/RCPS experiment is claimed or launched for 2018A yet. DPC remains gated on the completed three-seed hard-CE baseline summary.
+
+
+## Iteration 111 - RadioML2018.01A PETCGDNN DPC teacher artifact prepared (2026-05-19 23:16:00 CST)
+
+- Prepared the DPC teacher posterior artifact for RadioML2018.01A using the completed seed-2026 PETCGDNN hard-CE checkpoint:
+  `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A/petcgdnn/hard-ce/seed_2026/best_accuracy_top1_epoch_176.pth`.
+- Exported train-split predictions with SNR/sample-index metadata to:
+  `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A/petcgdnn/hard-ce/seed_2026/predictions/train_snr_meta.pkl`.
+- Built sample-posterior artifact:
+  `/home/citybuster/Data/RCPS/work_dirs/dpc_teacher_posteriors/deepsig201801A/petcgdnn_hard-ce_seed2026_train.npz`.
+- Artifact validation: `1,277,952` train samples, `24` classes, unique sample-index coverage, probability sums within `[0.9999999, 1.0000001]`, and train prediction accuracy `63.10%`.
+- This is preparation only. No DPC/RCPS 2018A training is launched until the hard-CE three-seed baseline gate completes.
