@@ -1502,3 +1502,12 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   `/home/citybuster/Data/RCPS/work_dirs/dpc_teacher_posteriors/deepsig201801A/petcgdnn_hard-ce_seed2026_train.npz`.
 - Artifact validation: `1,277,952` train samples, `24` classes, unique sample-index coverage, probability sums within `[0.9999999, 1.0000001]`, and train prediction accuracy `63.10%`.
 - This is preparation only. No DPC/RCPS 2018A training is launched until the hard-CE three-seed baseline gate completes.
+
+## Iteration 112 - RadioML2018.01A PETCGDNN hard-CE baseline gate passed (2026-05-20 12:16:00 CST)
+
+- The third `PETCGDNN + RadioML2018.01A + hard CE` seed completed naturally. Seed 2028 used `best_accuracy_top1_epoch_160.pth` and exported the large test split successfully with `num_workers=0`.
+- Seed 2028 test overall: accuracy `62.4828`, NLL `1.1259`, ECE `0.0043`, Brier `0.3997`, mean confidence `0.6278`, mean entropy `1.1242`.
+- Three-seed hard-CE summary: accuracy `61.9787±1.0954`, NLL `1.1428±0.0313`, ECE `0.0050±0.0013`, Brier `0.4052±0.0127`.
+- The baseline gate threshold of `>=61.0%` mean test accuracy is passed. DPC-RCPS on RadioML2018.01A is now allowed under the baseline-first protocol.
+- A non-fatal CRLF issue in the seed-2028 helper script produced `date: command not found` after all metrics were already written; it did not affect the checkpoint, prediction file, or CSV.
+
