@@ -1593,3 +1593,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Schedule: `epsilon(type=low_reliability_power, max=0.3, gamma=2.0, cutoff=0.4)` under the same [-20, 30] SNR map; `consistency_weight=0.1`.
 - Safety checks passed before launch: config builds, Python compile passes, toy loss test confirms `consistency_weight=0` is exactly hard CE, and missing `sample_idx` raises a `KeyError`.
 - Acceptance for expansion: this single-seed pilot must not reproduce the DPC-v2 instability, must keep high-SNR accuracy drop within 1%, and should improve at least a majority of low-SNR NLL/ECE/Brier metrics relative to hard CE or current DPC variants.
+
+
+## Iteration 118 - DPC posterior-consistency pilot launched and early curve normal (2026-05-20 21:52:00 CST)
+
+- Commit at launch: 4f88694.
+- Run: PETCGDNN / RadioML2018.01A / DPC posterior-consistency / seed 2026.
+- Work dir: `/home/citybuster/Data/RCPS/work_dirs/dpc_consistency/amc/deepsig201801A/petcgdnn_dpc-consistency-eps03/seed_2026`.
+- Log: `/home/citybuster/Data/RCPS/work_dirs/logs/dpc_consistency_2018A_petcgdnn_eps03_seed2026_gpu0.log`.
+- First-run observation: data/cache startup took several minutes on the large 2018A split, with heavy CPU/I/O and no file descriptor leak. Training then entered normal GPU execution.
+- Early validation curve: epoch 1 = 41.8226%, epoch 2 = 48.4186%, epoch 3 = 52.0073%, epoch 4 = 54.8892%. No early collapse like DPC-v2 has appeared so far.
+- Current decision: continue the single-seed pilot. Do not expand to more seeds or models until the run finishes and test reliability-bin metrics are compared against the admitted hard-CE seed-2026 baseline.
