@@ -1521,3 +1521,25 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work dir: `/home/citybuster/Data/RCPS/work_dirs/dpc_main/amc/deepsig201801A/petcgdnn_dpc-rcps/seed_2026`.
 - Foreground monitor target log: `/home/citybuster/Data/RCPS/work_dirs/logs/dpc_2018A_petcgdnn_seed2026_gpu0.log`; launch PID `4073004`.
 - No additional datasets, models, or RCPS variants are launched in this step.
+
+## Iteration 114 - RadioML2018.01A PETCGDNN DPC-v1 boundary result (2026-05-20 18:45:00 CST)
+
+- Stage: DPC-RCPS diagnostic pilot after PETCGDNN hard-CE baseline gate passed on RadioML2018.01A.
+- Commit: ba6a96b.
+- Run: PETCGDNN / DPC-RCPS v1 / seed 2026.
+- Work dir: /home/citybuster/Data/RCPS/work_dirs/dpc_main/amc/deepsig201801A/petcgdnn_dpc-rcps/seed_2026.
+- Best validation checkpoint: best_accuracy_top1_epoch_40.pth, validation top-1 = 62.1858%.
+- Training ended by early stopping at epoch 90 after the monitored metric did not improve for 50 records.
+- Test metrics path: /home/citybuster/Data/RCPS/work_dirs/dpc_main/metrics/deepsig201801A_petcgdnn_dpc-rcps_seed2026_test.csv.
+- Overall test comparison against hard CE seed 2026:
+  - DPC-RCPS v1: accuracy 62.1759%, NLL 1.1561, ECE 0.0162, Brier 0.4030, confidence 0.6071, entropy 1.2740.
+  - Hard CE: accuracy 62.7312%, NLL 1.1236, ECE 0.0043, Brier 0.3962, confidence 0.6312, entropy 1.1208.
+  - Delta DPC - hard: accuracy -0.555 pp, NLL +0.0325, ECE +0.0119, Brier +0.0068.
+- Reliability-bin diagnosis:
+  - At -20 dB, DPC gives a small uncertainty benefit: NLL -0.0204, ECE -0.0037, Brier -0.0014, but accuracy is essentially unchanged/slightly lower.
+  - Averaged over low SNR bins (<=0 dB), DPC is worse: accuracy -0.384 pp, NLL +0.0298, ECE +0.0051, Brier +0.0037.
+  - Averaged over high SNR bins (>=20 dB), DPC is also worse: accuracy -0.302 pp, NLL +0.0158, ECE +0.0093, Brier +0.0042.
+- Decision:
+  - Do not expand DPC-v1 on RadioML2018.01A to seeds 2027/2028.
+  - Treat this as a boundary/diagnostic result: the sample-posterior target transferred from the seed-2026 teacher over-softens PETCGDNN on the larger 2018A setting.
+  - Next candidate must use a more conservative target: stronger high-reliability retention, smaller epsilon, validation-constrained entropy/temperature, or a hard-CE warmup before posterior supervision.
