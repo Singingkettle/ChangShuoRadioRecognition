@@ -1543,3 +1543,17 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - Do not expand DPC-v1 on RadioML2018.01A to seeds 2027/2028.
   - Treat this as a boundary/diagnostic result: the sample-posterior target transferred from the seed-2026 teacher over-softens PETCGDNN on the larger 2018A setting.
   - Next candidate must use a more conservative target: stronger high-reliability retention, smaller epsilon, validation-constrained entropy/temperature, or a hard-CE warmup before posterior supervision.
+
+## Iteration 115 - Conservative DPC-v2 low-only pilot launched (2026-05-20 18:49:23 CST)
+
+- Motivation: DPC-v1 on RadioML2018.01A/PETCGDNN over-softened the model and degraded overall accuracy, NLL, ECE, and Brier relative to hard CE.
+- Change: added configs/rcps/dpc/petcgdnn_dpc-lowonly-eps03_iq-snr-deepsig-201801A.py.
+- Commit: cb98cdc.
+- DPC-v2 target schedule:
+  - psilon(type=low_reliability_power, max=0.3, gamma=2.0, cutoff=0.4) under the linear SNR map [-20, 30] -> [0, 1].
+  - Effective epsilon: -20 dB = 0.300, -15 dB = 0.16875, -10 dB = 0.075, >=0 dB = 0.
+  - Teacher posterior base is sharpened with temperature 0.75 and a smaller low-reliability prior blend 0.10.
+- Run: PETCGDNN / RadioML2018.01A / seed 2026 / DPC-v2 low-only.
+- Work dir: /home/citybuster/Data/RCPS/work_dirs/dpc_v2/amc/deepsig201801A/petcgdnn_dpc-lowonly-eps03/seed_2026.
+- Log: /home/citybuster/Data/RCPS/work_dirs/logs/dpc_v2_2018A_petcgdnn_lowonly_eps03_seed2026_gpu0.log.
+- Acceptance for expansion: must improve low-SNR NLL/Brier without degrading high-SNR accuracy by more than 1%; if overall metrics remain worse than hard CE, do not expand to more seeds.
