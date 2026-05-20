@@ -546,6 +546,118 @@ class RCPSCrossEntropyLoss(nn.Module):
             avg_factor=avg_factor)
 
 
+
+@MODELS.register_module()
+class DPCConsistencyLoss(nn.Module):
+    """Hard CE with degradation-posterior consistency regularization.
+
+    Unlike RCPSCrossEntropyLoss, this loss does not replace the hard label
+    target. The class label remains the primary training signal, while a
+    reliability-gated KL term softly aligns predictions with a posterior-path
+    teacher on degraded samples.
+    """
+
+    requires_data_samples = True
+
+    def __init__(self,
+                 reliability_key: str = 'snr',
+                 reliability_map: Optional[Dict] = None,
+                 epsilon: Optional[Dict] = None,
+                 base: Optional[Dict] = None,
+                 consistency_weight: float = 0.1,
+                 sample_weight: Optional[Dict] = None,
+                 reduction: str = 'mean',
+                 loss_weight: float = 1.0,
+                 class_weight: Optional[Sequence[float]] = None):
+        super().__init__()
+        self.reliability_key = reliability_key
+        self.reliability_map = reliability_map or dict(type='identity')
+        self.epsilon = epsilon or dict(type='power', max=1.0, gamma=1.0)
+        self.base = base or dict(type='sample_posterior')
+        self.consistency_weight = float(consistency_weight)
+        self.sample_weight = sample_weight or dict(type='none')
+        self.reduction = reduction
+        self.loss_weight = loss_weight
+        self.class_weight = class_weight
+        self.sample_index_key = self.base.get('sample_index_key', 'sample_idx')
+
+        if self.base.get('type') not in {'sample_posterior', 'dpc_sample_posterior'}:
+            raise ValueError('DPCConsistencyLoss currently requires a sample_posterior base.')
+        if 'source' not in self.base:
+            raise ValueError('DPCConsistencyLoss sample_posterior base requires "source".')
+        payload = _load_array(self.base['source'])
+        if not isinstance(payload, dict):
+            raise ValueError('DPCConsistencyLoss posterior source must be an npz/dict payload.')
+        for required in ('sample_idx', 'probs'):
+            if required not in payload:
+                raise ValueError(f'DPCConsistencyLoss posterior source missing "{required}".')
+        indices = torch.as_tensor(payload['sample_idx'], dtype=torch.long).flatten()
+        probs = torch.as_tensor(payload['probs'], dtype=torch.float32)
+        if probs.ndim != 2 or probs.size(0) != indices.numel():
+            raise ValueError('DPCConsistencyLoss probs must have shape (N, C) matching sample_idx.')
+        order = torch.argsort(indices)
+        self.register_buffer('sample_posterior_indices', indices[order], persistent=False)
+        self.register_buffer('sample_posterior_probs', probs[order], persistent=False)
+        if 'label' in payload:
+            labels = torch.as_tensor(payload['label'], dtype=torch.long).flatten()
+            if labels.numel() != indices.numel():
+                raise ValueError('DPCConsistencyLoss label must match sample_idx length.')
+            self.register_buffer('sample_posterior_labels', labels[order], persistent=False)
+        else:
+            self.sample_posterior_labels = None
+
+    def forward(self,
+                cls_score: torch.Tensor,
+                label: torch.Tensor,
+                weight: Optional[torch.Tensor] = None,
+                avg_factor: Optional[int] = None,
+                reduction_override: Optional[str] = None,
+                data_samples: Optional[List[DataSample]] = None,
+                **kwargs) -> torch.Tensor:
+        if data_samples is None:
+            raise ValueError('DPCConsistencyLoss requires data_samples.')
+        if label.ndim != 1:
+            raise ValueError('DPCConsistencyLoss expects hard class labels, not gt_score.')
+
+        raw_reliability = collect_reliability(data_samples, self.reliability_key, cls_score.device)
+        reliability = map_reliability(raw_reliability, self.reliability_map)
+        sample_indices = collect_sample_indices(data_samples, self.sample_index_key, cls_score.device)
+
+        class_weight = None
+        if self.class_weight is not None:
+            class_weight = cls_score.new_tensor(self.class_weight)
+        ce = F.cross_entropy(
+            cls_score,
+            label.long().flatten(),
+            weight=class_weight,
+            reduction='none')
+
+        teacher = build_base_distribution(
+            label,
+            cls_score.size(1),
+            self.base,
+            reliability=reliability,
+            sample_indices=sample_indices,
+            posterior_indices=self.sample_posterior_indices,
+            posterior_probs=self.sample_posterior_probs,
+            posterior_labels=self.sample_posterior_labels).detach()
+        teacher = _normalize_distribution(teacher)
+        log_prob = F.log_softmax(cls_score, dim=-1)
+        consistency = (teacher * (teacher.clamp_min(1e-12).log() - log_prob)).sum(dim=-1)
+        eps = build_epsilon(reliability, self.epsilon).reshape(-1)
+        loss = ce + self.consistency_weight * eps * consistency
+
+        dpc_weight = build_sample_weight(reliability, self.sample_weight)
+        if weight is not None and dpc_weight is not None:
+            weight = weight.to(cls_score.device).float() * dpc_weight
+        elif dpc_weight is not None:
+            weight = dpc_weight
+
+        reduction = reduction_override if reduction_override else self.reduction
+        loss = weight_reduce_loss(loss, weight=weight, reduction=reduction, avg_factor=avg_factor)
+        return self.loss_weight * loss
+
+
 @MODELS.register_module()
 class LabelSmoothingCrossEntropyLoss(nn.Module):
     """Static label smoothing baseline implemented as soft cross entropy."""
