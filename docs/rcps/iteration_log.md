@@ -1582,3 +1582,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - DPC-v2 is less over-soft than DPC-v1 in aggregate ECE, but it still loses accuracy, NLL, and Brier and is dynamically unstable.
   - Next algorithmic direction should not directly replace labels with teacher posterior targets on 2018A. Prefer a hard-CE primary objective plus a posterior-consistency regularizer or entropy-bounded auxiliary loss, with validation-gated activation and explicit stability checks.
 - Housekeeping: cleaned CRLF-contaminated log filenames produced by the PowerShell-to-SSH launch script.
+
+
+## Iteration 117 - DPC posterior-consistency pilot prepared (2026-05-20 22:42:00 CST)
+
+- Motivation: DPC-v1 and DPC-v2 on RadioML2018.01A/PETCGDNN showed that directly replacing hard labels with sample posterior targets can over-soften or destabilize strong baselines.
+- Algorithm change: added `DPCConsistencyLoss`, which keeps hard cross-entropy as the primary objective and adds a reliability-gated KL consistency term to the sample posterior teacher.
+- Commit: e837e9f.
+- Config: `configs/rcps/dpc/petcgdnn_dpc-consistency-eps03_iq-snr-deepsig-201801A.py`.
+- Schedule: `epsilon(type=low_reliability_power, max=0.3, gamma=2.0, cutoff=0.4)` under the same [-20, 30] SNR map; `consistency_weight=0.1`.
+- Safety checks passed before launch: config builds, Python compile passes, toy loss test confirms `consistency_weight=0` is exactly hard CE, and missing `sample_idx` raises a `KeyError`.
+- Acceptance for expansion: this single-seed pilot must not reproduce the DPC-v2 instability, must keep high-SNR accuracy drop within 1%, and should improve at least a majority of low-SNR NLL/ECE/Brier metrics relative to hard CE or current DPC variants.
