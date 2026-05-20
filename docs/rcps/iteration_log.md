@@ -1640,3 +1640,17 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - `configs/rcps/dpc/petcgdnn_rcps-hybrid-eps01_iq-snr-deepsig-201801A.py`: `retention_power(max=0.1, gamma=2.0, retain_min=0.8)`.
   - `configs/rcps/dpc/petcgdnn_rcps-hybrid-eps02_iq-snr-deepsig-201801A.py`: `retention_power(max=0.2, gamma=2.0, retain_min=0.8)`.
 - Acceptance gate for expansion: relative to hard CE seed 2026, a pilot must improve validation/test NLL or Brier without high-SNR accuracy drop above 1%. If both fail, 2018A remains a boundary dataset and the paper should not claim the current RCPS family universally improves large-scale AMC.
+
+
+## Iteration 121 - RadioML2018.01A class-level RCPS-Hybrid pilots launched (2026-05-20 22:56:00 CST)
+
+- Commit at launch: 90194aa.
+- Runs launched in parallel:
+  - GPU0: PETCGDNN / RadioML2018.01A / `rcps-hybrid-eps01` / seed 2026.
+  - GPU1: PETCGDNN / RadioML2018.01A / `rcps-hybrid-eps02` / seed 2026.
+- Both runs use the same backbone, split, optimizer, 400-epoch budget, early stopping, and `num_workers=0`; only the RCPS target changes.
+- Startup note: both processes spent several minutes in CPU/I/O while loading the large 2018A split, then entered normal GPU training with no traceback/OOM/file-handle errors.
+- First validation checkpoint:
+  - eps0.1 epoch 1 validation accuracy: 41.0245%.
+  - eps0.2 epoch 1 validation accuracy: 39.4529%.
+- Current action: keep both running. eps0.1 is early-stabler, but no pilot is admitted or rejected until validation/test reliability-bin CSVs are generated from the best checkpoints.
