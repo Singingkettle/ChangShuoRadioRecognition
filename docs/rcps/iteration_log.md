@@ -1509,5 +1509,15 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Seed 2028 test overall: accuracy `62.4828`, NLL `1.1259`, ECE `0.0043`, Brier `0.3997`, mean confidence `0.6278`, mean entropy `1.1242`.
 - Three-seed hard-CE summary: accuracy `61.9787±1.0954`, NLL `1.1428±0.0313`, ECE `0.0050±0.0013`, Brier `0.4052±0.0127`.
 - The baseline gate threshold of `>=61.0%` mean test accuracy is passed. DPC-RCPS on RadioML2018.01A is now allowed under the baseline-first protocol.
-- A non-fatal CRLF issue in the seed-2028 helper script produced `date: command not found` after all metrics were already written; it did not affect the checkpoint, prediction file, or CSV.
+- A non-fatal CRLF issue in the seed-2028 helper script produced `date
+: command not found` after all metrics were already written; it did not affect the checkpoint, prediction file, or CSV.
 
+
+## Iteration 113 - DPC-RCPS RadioML2018.01A PETCGDNN seed 2026 launched (2026-05-20 12:35:00 CST)
+
+- After the three-seed hard-CE baseline gate passed, launched the first DPC-RCPS pilot on `PETCGDNN + RadioML2018.01A + seed 2026`.
+- The DPC run uses the same backbone, data split, optimizer schedule, and export/analyze path as the admitted hard-CE baseline. Only the supervision target changes to the training-split sample-posterior artifact from the admitted seed-2026 teacher.
+- Teacher artifact: `/home/citybuster/Data/RCPS/work_dirs/dpc_teacher_posteriors/deepsig201801A/petcgdnn_hard-ce_seed2026_train.npz`.
+- Work dir: `/home/citybuster/Data/RCPS/work_dirs/dpc_main/amc/deepsig201801A/petcgdnn_dpc-rcps/seed_2026`.
+- Foreground monitor target log: `/home/citybuster/Data/RCPS/work_dirs/logs/dpc_2018A_petcgdnn_seed2026_gpu0.log`; launch PID `4073004`.
+- No additional datasets, models, or RCPS variants are launched in this step.
