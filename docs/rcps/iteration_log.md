@@ -1604,3 +1604,26 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - First-run observation: data/cache startup took several minutes on the large 2018A split, with heavy CPU/I/O and no file descriptor leak. Training then entered normal GPU execution.
 - Early validation curve: epoch 1 = 41.8226%, epoch 2 = 48.4186%, epoch 3 = 52.0073%, epoch 4 = 54.8892%. No early collapse like DPC-v2 has appeared so far.
 - Current decision: continue the single-seed pilot. Do not expand to more seeds or models until the run finishes and test reliability-bin metrics are compared against the admitted hard-CE seed-2026 baseline.
+
+
+## Iteration 119 - DPC posterior-consistency diagnostic result (2026-05-20 22:22:00 CST)
+
+- Stage: DPC posterior-consistency pilot after direct DPC-v1/v2 target replacement failed on RadioML2018.01A/PETCGDNN.
+- Code commit: e837e9f; launch/docs commit: e038570.
+- Config: `configs/rcps/dpc/petcgdnn_dpc-consistency-eps03_iq-snr-deepsig-201801A.py`.
+- Intervention: stopped training during epoch 10 after a clear instability signal. Validation climbed normally through epoch 8 but then collapsed at epoch 9:
+  - epoch 1: 41.8226%; epoch 2: 48.4186%; epoch 3: 52.0073%; epoch 4: 54.8892%; epoch 5: 56.6818%; epoch 6: 55.0036%; epoch 7: 58.1703%; epoch 8: 58.9172%; epoch 9: 37.5870%.
+  - Training loss jumped at epoch 9 around iteration 1850 (4.1923), then remained elevated.
+- Best checkpoint evaluated: `/home/citybuster/Data/RCPS/work_dirs/dpc_consistency/amc/deepsig201801A/petcgdnn_dpc-consistency-eps03/seed_2026/best_accuracy_top1_epoch_8.pth`.
+- Test metrics path: `/home/citybuster/Data/RCPS/work_dirs/dpc_consistency/metrics/deepsig201801A_petcgdnn_dpc-consistency-eps03_seed2026_test.csv`.
+- Overall test comparison against admitted hard-CE seed 2026:
+  - DPC-consistency: accuracy 58.9566%, NLL 1.2235, ECE 0.0073, Brier 0.4399, confidence 0.5888, entropy 1.2412.
+  - Hard CE: accuracy 62.7312%, NLL 1.1236, ECE 0.0043, Brier 0.3962, confidence 0.6312, entropy 1.1208.
+  - Delta DPC-consistency - hard: accuracy -3.775 pp, NLL +0.1000, ECE +0.0030, Brier +0.0437.
+- Reliability-bin diagnosis:
+  - Low bins (<=0 dB) average delta: accuracy -2.142 pp, NLL +0.0871, ECE +0.0020, Brier +0.0194.
+  - High bins (>=20 dB) average delta: accuracy -3.695 pp, NLL +0.0864, ECE +0.0108, Brier +0.0512.
+- Decision:
+  - Do not expand DPC-consistency on RadioML2018.01A.
+  - Treat sample-posterior teacher injection as a diagnostic failure mode, not the paper's main algorithm.
+  - Keep the degradation-posterior consistency theorem as a conceptual constraint, but practical RCPS should use validation-constrained class-level posterior bases, explicit high-reliability retention, and only include sample-adaptive teachers if a future stability mechanism passes the baseline gate.
