@@ -1557,3 +1557,28 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Work dir: /home/citybuster/Data/RCPS/work_dirs/dpc_v2/amc/deepsig201801A/petcgdnn_dpc-lowonly-eps03/seed_2026.
 - Log: /home/citybuster/Data/RCPS/work_dirs/logs/dpc_v2_2018A_petcgdnn_lowonly_eps03_seed2026_gpu0.log.
 - Acceptance for expansion: must improve low-SNR NLL/Brier without degrading high-SNR accuracy by more than 1%; if overall metrics remain worse than hard CE, do not expand to more seeds.
+
+
+## Iteration 116 - RadioML2018.01A PETCGDNN DPC-v2 low-only diagnostic result (2026-05-20 21:16:00 CST)
+
+- Stage: conservative DPC-v2 pilot after DPC-v1 over-softened RadioML2018.01A/PETCGDNN.
+- Commit: 11c0e69 for launch; config introduced in cb98cdc.
+- Config: configs/rcps/dpc/petcgdnn_dpc-lowonly-eps03_iq-snr-deepsig-201801A.py.
+- Schedule: epsilon(type=low_reliability_power, max=0.3, gamma=2.0, cutoff=0.4), so posterior supervision is active only below roughly 0 dB under the [-20, 30] SNR map.
+- Intervention: stopped training after epoch 31 because validation collapsed for three consecutive epochs after the best point:
+  - best epoch 28 validation accuracy 61.1180%;
+  - epoch 29 12.8381%, epoch 30 23.3939%, epoch 31 25.1975%.
+- Best checkpoint: /home/citybuster/Data/RCPS/work_dirs/dpc_v2/amc/deepsig201801A/petcgdnn_dpc-lowonly-eps03/seed_2026/best_accuracy_top1_epoch_28.pth.
+- Test metrics path: /home/citybuster/Data/RCPS/work_dirs/dpc_v2/metrics/deepsig201801A_petcgdnn_dpc-lowonly-eps03_seed2026_test.csv.
+- Overall test comparison against hard CE seed 2026:
+  - DPC-v2 low-only: accuracy 61.1777%, NLL 1.1654, ECE 0.0056, Brier 0.4145, confidence 0.6159, entropy 1.1615.
+  - Hard CE: accuracy 62.7312%, NLL 1.1236, ECE 0.0043, Brier 0.3962, confidence 0.6312, entropy 1.1208.
+  - Delta DPC-v2 - hard: accuracy -1.554 pp, NLL +0.0418, ECE +0.0013, Brier +0.0184.
+- Reliability-bin diagnosis:
+  - Low bins (<=0 dB) average delta: accuracy -1.132 pp, NLL +0.0361, ECE +0.0036, Brier +0.0109.
+  - High bins (>=20 dB) average delta: accuracy -0.968 pp, NLL +0.0262, ECE +0.0012, Brier +0.0147.
+- Decision:
+  - Do not expand DPC-v2 low-only on RadioML2018.01A to more seeds.
+  - DPC-v2 is less over-soft than DPC-v1 in aggregate ECE, but it still loses accuracy, NLL, and Brier and is dynamically unstable.
+  - Next algorithmic direction should not directly replace labels with teacher posterior targets on 2018A. Prefer a hard-CE primary objective plus a posterior-consistency regularizer or entropy-bounded auxiliary loss, with validation-gated activation and explicit stability checks.
+- Housekeeping: cleaned CRLF-contaminated log filenames produced by the PowerShell-to-SSH launch script.
