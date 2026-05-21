@@ -1680,3 +1680,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `rcps-hybrid-eps01` refreshed validation best at epoch 176: accuracy/top1 62.8029%, improving over the earlier epoch-142 best 62.7927% and remaining above the matched hard-CE validation plateau.
 - `rcps-hybrid-eps02` remains on a weaker plateau around 61.85%-61.87%, so it is not a likely expansion candidate unless final posterior metrics unexpectedly compensate.
 - No traceback, CUDA OOM, or file-handle error has appeared. Because eps0.1 refreshed its best checkpoint, early-stopping patience resets. Continue running to natural stop and evaluate only best-checkpoint validation/test CSVs.
+
+## Iteration 125 - 2018A RCPS-Hybrid eps0.1 refreshes again (2026-05-21 12:47:00 CST)
+
+- Stage: PETCGDNN / RadioML2018.01A / class-level RCPS-Hybrid / seed 2026 pilots.
+- `rcps-hybrid-eps01` refreshed validation best again at epoch 181: accuracy/top1 62.8048%, improving over the previous epoch-176 best of 62.8029%.
+- `rcps-hybrid-eps02` remains on a weaker plateau around 61.84%-61.86%; it is no longer a likely main candidate unless final NLL/Brier unexpectedly dominate.
+- Continue to natural early stopping. If eps0.1 passes validation/test posterior metrics and high-reliability retention gates, expand eps0.1 to seeds 2027/2028. No paper claim is updated until test CSVs are available.
