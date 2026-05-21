@@ -1702,3 +1702,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Test overall vs matched hard CE seed2026: accuracy 61.7957 vs 62.7312 (delta -0.936 pp), NLL 1.1470 vs 1.1236 (delta +0.0234), ECE 0.00542 vs 0.00428 (delta +0.00114), Brier 0.4057 vs 0.3962 (delta +0.00958).
 - Reliability-bin averages do not pass the retention gate: low-SNR accuracy delta -0.513 pp with NLL +0.0205 and Brier +0.00394; high-SNR accuracy delta -1.060 pp with NLL +0.0187 and Brier +0.0116.
 - Decision: `epsilon_max=0.2` is too strong for RadioML2018.01A/PETCGDNN, even with class-level posterior/confusion base. Do not admit it to main results and do not expand to more seeds. Continue monitoring `eps0.1`.
+
+### 2026-05-21 16:39 CST - 2018A eps0.1 seed2026 completed
+
+- `rcps-hybrid-eps01` stopped after epoch231 and exported validation/test predictions. Both pkl metadata fields confirm checkpoint `best_accuracy_top1_epoch_181.pth`.
+- Test overall vs matched hard CE seed2026: accuracy 62.7622 vs 62.7312 (delta +0.031 pp), NLL 1.12448 vs 1.12358 (delta +0.00090), ECE 0.00375 vs 0.00428 (delta -0.00053), Brier 0.39566 vs 0.39616 (delta -0.00050).
+- Reliability-bin averages: low-SNR accuracy -0.107 pp, NLL +0.00420, ECE -0.00106, Brier +0.00098; mid-SNR accuracy +0.151 pp, NLL -0.00152, Brier -0.00181; high-SNR accuracy +0.103 pp, NLL -0.00154, Brier -0.00126.
+- Decision: eps0.1 passes high-reliability retention and shows small ECE/Brier and mid/high-SNR posterior-quality gains, but overall NLL and low-SNR NLL/Brier are slightly worse. It is admitted only for stability checking with seeds 2027/2028, not as a standalone strong 2018A conclusion.
