@@ -1748,3 +1748,8 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Added config commit: `2d6da1b` with `configs/rcps/_base_/models/mcformer_iq-snr-deepsig-201801A.py` and `configs/rcps/mcformer/mcformer_hard-ce_iq-snr-deepsig-201801A.py`.
 - Launched hard CE baseline seeds 2026/2027 on GPU0/GPU1 via `/home/citybuster/Data/RCPS/work_dirs/logs/run_mcformer_2018A_baseline_gate.sh`.
 - Current status: processes initialized successfully, no shape/config errors; both are reading RadioML2018.01A `.npy` files during dataset cache warm-up. No RCPS run will be launched until baseline validation/test metrics are available.
+
+### 2026-05-22 06:38 CST - Stopped MCformer RadioML2018.01A baseline gate due to infeasible runtime
+- Observation: both MCformer 2018A hard CE seeds entered epoch 1 successfully with no shape/config/runtime errors, but each epoch has 3195 iterations at roughly 0.78--0.87 seconds/iteration, implying about 40+ minutes per epoch and an 11+ day 400-epoch ETA.
+- Action: stopped seed2026/2027 before completing epoch 1; no metrics are used or reported.
+- Interpretation: this is a resource/throughput diagnostic, not a model-quality failure. MCformer remains useful on 2016.10A/10B where existing 3-seed results are available. For 2018A cross-family replication, switch to a faster strong baseline such as CGDNet/FastMLDNN if its baseline gate is feasible.
