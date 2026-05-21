@@ -1722,3 +1722,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - seed2027 shows substantial early validation volatility: best 60.9217% at epoch22, followed by epoch24/25/26 at 40.1288%/47.2510%/52.3086%, then recovery to 60.4406% by epoch31. No traceback, CUDA OOM, or dataloader/file-handle errors were observed.
 - seed2028 reached best 61.2748% at epoch23, but later validation values include 54.9272% at epoch25, 51.6445% at epoch27, and 57.0485% at epoch29. No runtime errors were observed.
 - Interpretation: RadioML2018.01A/PETCGDNN with `rcps-hybrid-eps01` is a stability-check setting, not yet a strong main-result setting. Final admission requires 3-seed test CSVs, high-SNR retention, and NLL/ECE/Brier gates. Best-checkpoint export remains the intended guardrail.
+
+### 2026-05-21 22:02 CST - 2018A eps0.1 stability seeds recovered
+
+- Foreground monitoring resumed after interruption. Both stability runs are still active with no runtime errors.
+- seed2027 recovered from earlier validation volatility and reached best 62.6222% at epoch78.
+- seed2028 reached best 62.9028% at epoch74, exceeding seed2026 validation best 62.8048%.
+- Interpretation update: early validation volatility remains a diagnostic concern, but the two stability seeds are no longer stuck in low-quality regimes. Final admission still depends on best-checkpoint test CSVs and high-SNR/NLL/ECE/Brier gates.
