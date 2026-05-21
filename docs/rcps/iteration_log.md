@@ -1654,3 +1654,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - eps0.1 epoch 1 validation accuracy: 41.0245%.
   - eps0.2 epoch 1 validation accuracy: 39.4529%.
 - Current action: keep both running. eps0.1 is early-stabler, but no pilot is admitted or rejected until validation/test reliability-bin CSVs are generated from the best checkpoints.
+
+## Iteration 122 - 2018A RCPS-Hybrid foreground monitor and checkpoint-export fix (2026-05-21 09:38:00 CST)
+
+- Stage: PETCGDNN / RadioML2018.01A / class-level RCPS-Hybrid / seed 2026 pilots.
+- Runs remain healthy: no traceback, CUDA OOM, file-handle error, or data-loading error was detected.
+- Current validation status at the intervention point:
+  - `rcps-hybrid-eps01`: best validation accuracy 62.7927% at epoch 142.
+  - `rcps-hybrid-eps02`: best validation accuracy 61.8594% at epoch 164.
+- Post-processing risk found: the wrapper selected `ls -t best_accuracy_top1_epoch_*.pth epoch_*.pth | head -1`, which can choose a newer ordinary `epoch_*.pth` instead of the best checkpoint for prediction export.
+- Recovery action: patched `/home/citybuster/Data/RCPS/work_dirs/logs/run_rcps_hybrid_2018A_pilot.sh` so prediction export prioritizes `best_accuracy_top1_epoch_*.pth` and falls back to ordinary epoch checkpoints only if no best checkpoint exists.
+- Follow-up check: after metrics land, verify that validation/test predictions were generated from the best checkpoint. If the running shell used the old cached line, rerun collect/analyze from the best checkpoint and overwrite the CSVs. Training itself was not modified.
