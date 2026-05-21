@@ -1729,3 +1729,16 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - seed2027 recovered from earlier validation volatility and reached best 62.6222% at epoch78.
 - seed2028 reached best 62.9028% at epoch74, exceeding seed2026 validation best 62.8048%.
 - Interpretation update: early validation volatility remains a diagnostic concern, but the two stability seeds are no longer stuck in low-quality regimes. Final admission still depends on best-checkpoint test CSVs and high-SNR/NLL/ECE/Brier gates.
+
+### 2026-05-22 06:20 CST - RadioML2018.01A PETCGDNN RCPS-Hybrid eps0.1 stability run completed
+- Stage: 2018A/PETCGDNN RCPS-Hybrid eps0.1 stability check after eps0.2 was rejected.
+- Commit: `2be6428`.
+- Config: `configs/rcps/dpc/petcgdnn_rcps-hybrid-eps01_iq-snr-deepsig-201801A.py`.
+- Seeds: 2026, 2027, 2028; all validation/test predictions exported with best checkpoints.
+- Checkpoints used: seed2026 epoch181, seed2027 epoch149, seed2028 epoch128.
+- Test mean/std vs hard CE:
+  - Hard CE accuracy/NLL/ECE/Brier: 61.978686 +/- 1.095368, 1.142802 +/- 0.031264, 0.005021 +/- 0.001265, 0.405207 +/- 0.012744.
+  - RCPS-Hybrid eps0.1 accuracy/NLL/ECE/Brier: 62.932630 +/- 0.174679, 1.118974 +/- 0.005931, 0.003787 +/- 0.000191, 0.393793 +/- 0.001936.
+  - Mean paired deltas: accuracy +0.953944 pp, NLL -0.023827, ECE -0.001234, Brier -0.011413.
+- Interpretation: positive extension evidence on RadioML2018.01A with high-reliability retention satisfied in all inspected seeds, but paired delta variance is large because hard seed2027 is weak. Treat as encouraging but not standalone TPAMI-level proof; requires replication on another strong model/dataset pair before manuscript main claim is strengthened.
+- Artifacts: `/home/citybuster/Data/RCPS/work_dirs/rcps_hybrid_2018A/summary/deepsig201801A_petcgdnn_rcps-hybrid-eps01_vs_hard_3seed_overall.csv`.
