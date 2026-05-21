@@ -106,6 +106,7 @@ def main():
     recover_mldnn_probs = needs_mldnn_probability_recovery(cfg)
     if recover_mldnn_probs:
         print('Recovering MLDNN merge probabilities from double-softmax pred_score.')
+    print(f'Checkpoint: {args.checkpoint}')
     print(f'Collecting {args.split} predictions on {len(dataset)} samples ...')
     sample_counter = 0
     with torch.no_grad():
@@ -142,6 +143,8 @@ def main():
         sample_idx=np.array(all_sample_idx, dtype=np.int64),
         classes=classes,
         split=args.split,
+        checkpoint=osp.abspath(args.checkpoint),
+        config=args.config,
     )
 
     if args.out:
