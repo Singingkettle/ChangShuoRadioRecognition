@@ -1742,3 +1742,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - Mean paired deltas: accuracy +0.953944 pp, NLL -0.023827, ECE -0.001234, Brier -0.011413.
 - Interpretation: positive extension evidence on RadioML2018.01A with high-reliability retention satisfied in all inspected seeds, but paired delta variance is large because hard seed2027 is weak. Treat as encouraging but not standalone TPAMI-level proof; requires replication on another strong model/dataset pair before manuscript main claim is strengthened.
 - Artifacts: `/home/citybuster/Data/RCPS/work_dirs/rcps_hybrid_2018A/summary/deepsig201801A_petcgdnn_rcps-hybrid-eps01_vs_hard_3seed_overall.csv`.
+
+### 2026-05-22 06:25 CST - Launched MCformer RadioML2018.01A baseline gate
+- Motivation: replicate the positive 2018A PETCGDNN RCPS-Hybrid evidence on a different model family before strengthening manuscript claims.
+- Added config commit: `2d6da1b` with `configs/rcps/_base_/models/mcformer_iq-snr-deepsig-201801A.py` and `configs/rcps/mcformer/mcformer_hard-ce_iq-snr-deepsig-201801A.py`.
+- Launched hard CE baseline seeds 2026/2027 on GPU0/GPU1 via `/home/citybuster/Data/RCPS/work_dirs/logs/run_mcformer_2018A_baseline_gate.sh`.
+- Current status: processes initialized successfully, no shape/config errors; both are reading RadioML2018.01A `.npy` files during dataset cache warm-up. No RCPS run will be launched until baseline validation/test metrics are available.
