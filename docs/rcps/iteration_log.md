@@ -1695,3 +1695,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `rcps-hybrid-eps02` was stopped as a diagnostic branch because validation plateaued around 61.85%-61.87%, below hard CE and eps0.1.
 - During manual stop, eps0.2 appears to have been interrupted inside the best-checkpoint replacement window: previous best was removed and the new best file was not present. The only available checkpoint is `epoch_241.pth`.
 - Export script `/home/citybuster/Data/RCPS/work_dirs/logs/export_rcps_hybrid_eps02_best.sh` was patched to prefer best checkpoints and fall back to the newest epoch checkpoint when best is absent. eps0.2 validation/test exports must therefore be treated as fallback-checkpoint diagnostics, not standard best-checkpoint results.
+
+### 2026-05-21 14:47 CST - 2018A eps0.2 fallback diagnostic complete
+
+- `rcps-hybrid-eps02` fallback export completed using `epoch_241.pth`; prediction pkl metadata records the checkpoint and config.
+- Test overall vs matched hard CE seed2026: accuracy 61.7957 vs 62.7312 (delta -0.936 pp), NLL 1.1470 vs 1.1236 (delta +0.0234), ECE 0.00542 vs 0.00428 (delta +0.00114), Brier 0.4057 vs 0.3962 (delta +0.00958).
+- Reliability-bin averages do not pass the retention gate: low-SNR accuracy delta -0.513 pp with NLL +0.0205 and Brier +0.00394; high-SNR accuracy delta -1.060 pp with NLL +0.0187 and Brier +0.0116.
+- Decision: `epsilon_max=0.2` is too strong for RadioML2018.01A/PETCGDNN, even with class-level posterior/confusion base. Do not admit it to main results and do not expand to more seeds. Continue monitoring `eps0.1`.
