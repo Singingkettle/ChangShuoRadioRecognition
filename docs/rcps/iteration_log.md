@@ -1759,3 +1759,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Smoke run: seed2026, max_epochs=1.
 - Result: initialization passed, but training failed before epoch metrics with `RuntimeError: shape [-1, 50, 472] is invalid for input of size 81120000`.
 - Interpretation: CGDNet implementation is not directly compatible with the 1024-sample 2018A IQ shape under the current frame_length assumptions. This is a baseline parity issue; no RCPS conclusions are drawn. Do not use CGDNet on 2018A unless the architecture/input adapter is explicitly fixed and baseline-gated.
+
+### 2026-05-22 06:55 CST - FastMLDNN RadioML2018.01A smoke failed due to head/output mismatch
+- Added config commit: `5af0038` for FastMLDNN 2018A with SNR metadata.
+- Smoke run: seed2026, max_epochs=1.
+- Result: initialization passed, but training failed with `ValueError: Expected input batch_size (24) to match target batch_size (640)` from cross entropy.
+- Interpretation: FastMLDNN needs its dedicated output/head handling before it can enter the RCPS baseline-gate matrix. This is a head/interface parity issue, not an RCPS result. Do not use FastMLDNN on 2018A until the baseline head is adapted and gated.
