@@ -1665,3 +1665,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Post-processing risk found: the wrapper selected `ls -t best_accuracy_top1_epoch_*.pth epoch_*.pth | head -1`, which can choose a newer ordinary `epoch_*.pth` instead of the best checkpoint for prediction export.
 - Recovery action: patched `/home/citybuster/Data/RCPS/work_dirs/logs/run_rcps_hybrid_2018A_pilot.sh` so prediction export prioritizes `best_accuracy_top1_epoch_*.pth` and falls back to ordinary epoch checkpoints only if no best checkpoint exists.
 - Follow-up check: after metrics land, verify that validation/test predictions were generated from the best checkpoint. If the running shell used the old cached line, rerun collect/analyze from the best checkpoint and overwrite the CSVs. Training itself was not modified.
+
+## Iteration 123 - Prediction export metadata tightened (2026-05-21 09:44:00 CST)
+
+- Motivation: after finding the checkpoint-selection risk in the RCPS-Hybrid export wrapper, prediction artifacts should explicitly record which checkpoint produced them.
+- Code change: `tools/rcps/collect_predictions.py` now prints the checkpoint path and stores `checkpoint` and `config` fields in each exported prediction pkl.
+- Validation: `python3 -m py_compile tools/rcps/collect_predictions.py` passed.
+- Commit: 3364028.
+- Impact: this does not change training, model predictions, or metrics; it only improves traceability for validation/test CSVs generated after this commit.
