@@ -1709,3 +1709,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Test overall vs matched hard CE seed2026: accuracy 62.7622 vs 62.7312 (delta +0.031 pp), NLL 1.12448 vs 1.12358 (delta +0.00090), ECE 0.00375 vs 0.00428 (delta -0.00053), Brier 0.39566 vs 0.39616 (delta -0.00050).
 - Reliability-bin averages: low-SNR accuracy -0.107 pp, NLL +0.00420, ECE -0.00106, Brier +0.00098; mid-SNR accuracy +0.151 pp, NLL -0.00152, Brier -0.00181; high-SNR accuracy +0.103 pp, NLL -0.00154, Brier -0.00126.
 - Decision: eps0.1 passes high-reliability retention and shows small ECE/Brier and mid/high-SNR posterior-quality gains, but overall NLL and low-SNR NLL/Brier are slightly worse. It is admitted only for stability checking with seeds 2027/2028, not as a standalone strong 2018A conclusion.
+
+### 2026-05-21 16:43 CST - 2018A eps0.1 stability seeds launched
+
+- Launched `rcps-hybrid-eps01` stability runs for RadioML2018.01A/PETCGDNN with the same config and wrapper as seed2026.
+- GPU0: seed2027, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps_hybrid_2018A_petcgdnn_eps01_seed2027_gpu0.log`, launch PID 96643.
+- GPU1: seed2028, log `/home/citybuster/Data/RCPS/work_dirs/logs/rcps_hybrid_2018A_petcgdnn_eps01_seed2028_gpu1.log`, launch PID 96644.
+- Purpose: stability check only. The seed2026 result is marginal and cannot support a strong 2018A claim unless the remaining seeds consistently improve ECE/Brier while preserving high-SNR accuracy.
