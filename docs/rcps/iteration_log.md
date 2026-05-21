@@ -1673,3 +1673,10 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Validation: `python3 -m py_compile tools/rcps/collect_predictions.py` passed.
 - Commit: 3364028.
 - Impact: this does not change training, model predictions, or metrics; it only improves traceability for validation/test CSVs generated after this commit.
+
+## Iteration 124 - 2018A RCPS-Hybrid eps0.1 refreshes validation best (2026-05-21 12:16:00 CST)
+
+- Stage: PETCGDNN / RadioML2018.01A / class-level RCPS-Hybrid / seed 2026 pilots.
+- `rcps-hybrid-eps01` refreshed validation best at epoch 176: accuracy/top1 62.8029%, improving over the earlier epoch-142 best 62.7927% and remaining above the matched hard-CE validation plateau.
+- `rcps-hybrid-eps02` remains on a weaker plateau around 61.85%-61.87%, so it is not a likely expansion candidate unless final posterior metrics unexpectedly compensate.
+- No traceback, CUDA OOM, or file-handle error has appeared. Because eps0.1 refreshed its best checkpoint, early-stopping patience resets. Continue running to natural stop and evaluate only best-checkpoint validation/test CSVs.
