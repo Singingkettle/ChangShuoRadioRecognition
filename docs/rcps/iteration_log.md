@@ -1753,3 +1753,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Observation: both MCformer 2018A hard CE seeds entered epoch 1 successfully with no shape/config/runtime errors, but each epoch has 3195 iterations at roughly 0.78--0.87 seconds/iteration, implying about 40+ minutes per epoch and an 11+ day 400-epoch ETA.
 - Action: stopped seed2026/2027 before completing epoch 1; no metrics are used or reported.
 - Interpretation: this is a resource/throughput diagnostic, not a model-quality failure. MCformer remains useful on 2016.10A/10B where existing 3-seed results are available. For 2018A cross-family replication, switch to a faster strong baseline such as CGDNet/FastMLDNN if its baseline gate is feasible.
+
+### 2026-05-22 06:48 CST - CGDNet RadioML2018.01A smoke failed due to input-shape incompatibility
+- Added config commit: `53b7387` for CGDNet 2018A with SNR metadata.
+- Smoke run: seed2026, max_epochs=1.
+- Result: initialization passed, but training failed before epoch metrics with `RuntimeError: shape [-1, 50, 472] is invalid for input of size 81120000`.
+- Interpretation: CGDNet implementation is not directly compatible with the 1024-sample 2018A IQ shape under the current frame_length assumptions. This is a baseline parity issue; no RCPS conclusions are drawn. Do not use CGDNet on 2018A unless the architecture/input adapter is explicitly fixed and baseline-gated.
