@@ -1687,3 +1687,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - `rcps-hybrid-eps01` refreshed validation best again at epoch 181: accuracy/top1 62.8048%, improving over the previous epoch-176 best of 62.8029%.
 - `rcps-hybrid-eps02` remains on a weaker plateau around 61.84%-61.86%; it is no longer a likely main candidate unless final NLL/Brier unexpectedly dominate.
 - Continue to natural early stopping. If eps0.1 passes validation/test posterior metrics and high-reliability retention gates, expand eps0.1 to seeds 2027/2028. No paper claim is updated until test CSVs are available.
+
+### 2026-05-21 14:33 CST - 2018A RCPS-Hybrid foreground recovery
+
+- Foreground monitoring resumed after context interruption on branch `feature/rcps-experiments`, commit `a9d1ed8`.
+- `rcps-hybrid-eps01` remains active on GPU0. Recent validation accuracies: epoch205 = 62.7978%, epoch206 = 62.7841%. No `Traceback`, CUDA OOM, or file-handle errors observed.
+- `rcps-hybrid-eps02` was stopped as a diagnostic branch because validation plateaued around 61.85%-61.87%, below hard CE and eps0.1.
+- During manual stop, eps0.2 appears to have been interrupted inside the best-checkpoint replacement window: previous best was removed and the new best file was not present. The only available checkpoint is `epoch_241.pth`.
+- Export script `/home/citybuster/Data/RCPS/work_dirs/logs/export_rcps_hybrid_eps02_best.sh` was patched to prefer best checkpoints and fall back to the newest epoch checkpoint when best is absent. eps0.2 validation/test exports must therefore be treated as fallback-checkpoint diagnostics, not standard best-checkpoint results.
