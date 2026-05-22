@@ -1797,3 +1797,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Pilot remains healthy on GPU0 with no Traceback/OOM/Error.
 - Validation top-1 reached 52.4763% at epoch10; validation loss is 1.4571. Best checkpoint updated to epoch10.
 - Interpretation: the baseline is learning but remains far below the PETCGDNN 2018A baseline level. Continue to epoch20 before go/no-go. If it remains below roughly 55%, do not expand MCLDNN 2018A to three seeds or RCPS variants.
+### 2026-05-22 12:50 CST - MCLDNN RadioML2018.01A pilot stopped at epoch20
+- MCLDNN / RadioML2018.01A hard CE pilot remained healthy through epoch20, with no Traceback/OOM/file-handle errors.
+- Validation trajectory plateaued below the baseline gate: epoch18 = 54.1804%, epoch19 = 54.1639%, epoch20 = 54.3536%.
+- Decision: stop the branch at epoch20 and keep it as a baseline feasibility diagnostic only. Do not expand MCLDNN 2018A to three seeds and do not launch RCPS variants on this backbone/dataset pair.
+- Interpretation: this does not affect the admitted DPC-RCPS evidence. It confirms that the 2018A second-backbone path should not rely on the current MCLDNN configuration without additional architecture/input parity work.
+
+### 2026-05-22 12:45 CST - Audio posterior-base interface and hard teacher export launched
+- Added `rcps-confusion` support to `tools/rcps/run_crossmodal_audio.py`, plus optional validation/test posterior export through `--save-predictions`.
+- Commit: `70705c8`.
+- Launched DS-CNN Speech Commands hard teacher rerun on GPU1 with prediction export, work root `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_confusion_20ep`.
+- Purpose: build a validation-only confusion/posterior base for a posterior-aware audio RCPS pilot. No audio positive claim will be made until this passes validation diagnostics.
