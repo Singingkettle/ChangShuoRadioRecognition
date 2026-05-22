@@ -1792,3 +1792,8 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Pilot remains healthy on GPU0 with no Traceback/OOM/Error.
 - Validation trajectory reached epoch9: epoch8 top-1 = 50.9549%, epoch9 top-1 = 52.1887%; validation loss at epoch9 = 1.4688.
 - Interpretation: MCLDNN is learning and remains a feasible second-backbone candidate, but it has not yet passed a baseline admission point. Continue to epoch20 before deciding whether to expand to multi-seed hard CE or stop this branch.
+
+### 2026-05-22 11:24 CST - MCLDNN 2018A 50-epoch pilot epoch-10 check
+- Pilot remains healthy on GPU0 with no Traceback/OOM/Error.
+- Validation top-1 reached 52.4763% at epoch10; validation loss is 1.4571. Best checkpoint updated to epoch10.
+- Interpretation: the baseline is learning but remains far below the PETCGDNN 2018A baseline level. Continue to epoch20 before go/no-go. If it remains below roughly 55%, do not expand MCLDNN 2018A to three seeds or RCPS variants.
