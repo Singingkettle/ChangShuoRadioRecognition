@@ -8,8 +8,9 @@ from .base import BaseFilter
 
 @DATA_FILTERS.register_module()
 class FilterBySNR(BaseFilter):
-    def __init__(self, save_range: Tuple[float, float]):
+    def __init__(self, save_range: Tuple[float, float], preserve_classes: bool = False):
         self.save_range = save_range
+        self.preserve_classes = preserve_classes
 
     def filter(self, data_list, meta_info):
         new_data_list = []
@@ -23,7 +24,13 @@ class FilterBySNR(BaseFilter):
                 new_CLASSES.append(data['modulation'])
 
         new_SNRs = sorted(list(set(new_SNRs)))
-        new_CLASSES = sorted(list(set(new_CLASSES)))
+        if self.preserve_classes:
+            source_classes = list(meta_info.get('classes', meta_info.get('modulations', [])))
+            if not source_classes:
+                source_classes = sorted(list(set(new_CLASSES)))
+            new_CLASSES = source_classes
+        else:
+            new_CLASSES = sorted(list(set(new_CLASSES)))
 
         for idx, data in enumerate(new_data_list):
             gt_label = np.array(new_CLASSES.index(data['modulation']), dtype=np.int64)
@@ -39,5 +46,5 @@ class FilterBySNR(BaseFilter):
 
     def __repr__(self) -> str:
         repr_str = self.__class__.__name__
-        repr_str += f'(save_range={self.save_range})'
+        repr_str += f'(save_range={self.save_range}, preserve_classes={self.preserve_classes})'
         return repr_str

@@ -118,19 +118,25 @@ def main():
                     score = recover_mldnn_merge_probability(score)
                 all_pps.append(score)
                 all_gts.append(sample.gt_label.item())
-                idx = sample.get('sample_idx')
-                if idx is not None:
-                    idx = int(idx)
-                    info = dataset.get_data_info(idx)
-                    all_snrs.append(info.get('snr', 0))
+                packed_idx = sample.get('sample_idx')
+                global_idx = sample.get('global_sample_idx')
+                if packed_idx is not None:
+                    local_idx = int(packed_idx)
+                    info = dataset.get_data_info(local_idx)
                 else:
                     # Original baseline configs often do not pack sample_idx into
                     # metainfo. Validation/test samplers are deterministic, so the
-                    # running dataset index recovers SNR metadata for reliability
-                    # analysis without changing the model input pipeline.
+                    # running dataset index recovers reliability metadata without
+                    # changing the model input pipeline.
+                    local_idx = sample_counter
                     info = dataset.get_data_info(sample_counter)
-                    idx = sample_counter
-                    all_snrs.append(info.get('snr', 0))
+                if global_idx is not None:
+                    idx = int(global_idx)
+                elif 'global_sample_idx' in info:
+                    idx = int(info['global_sample_idx'])
+                else:
+                    idx = local_idx
+                all_snrs.append(info.get('snr', sample.get('snr', 0)))
                 all_sample_idx.append(idx)
                 sample_counter += 1
             if (i + 1) % 50 == 0:

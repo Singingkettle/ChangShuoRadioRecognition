@@ -12,7 +12,7 @@ model = dict(head=dict(loss=dict(
     base=dict(
         type='sample_posterior',
         source=strict_dpc_source,
-        sample_index_key='sample_idx',
+        sample_index_key='global_sample_idx',
         laplace=1e-6,
         temperature=1.0,
         prior_blend=0.0),

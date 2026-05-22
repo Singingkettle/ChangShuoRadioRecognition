@@ -13,6 +13,7 @@ snr_pipeline = [
         input_key='iq',
         meta_keys=(
             'sample_idx',
+            'global_sample_idx',
             'snr',
             'snr_label',
             'modulation',
