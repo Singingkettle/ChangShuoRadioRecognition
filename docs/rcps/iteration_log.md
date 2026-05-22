@@ -1765,3 +1765,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Smoke run: seed2026, max_epochs=1.
 - Result: initialization passed, but training failed with `ValueError: Expected input batch_size (24) to match target batch_size (640)` from cross entropy.
 - Interpretation: FastMLDNN needs its dedicated output/head handling before it can enter the RCPS baseline-gate matrix. This is a head/interface parity issue, not an RCPS result. Do not use FastMLDNN on 2018A until the baseline head is adapted and gated.
+
+### 2026-05-22 07:20 CST - Speech Commands audio diagnostic consolidated
+- Consolidated existing Speech Commands DS-CNN pilot metrics into `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_summary/summary/`.
+- 20-epoch seed2026 matched comparison: hard CE accuracy/NLL/ECE/Brier = 82.6078 / 0.5252 / 0.0238 / 0.2434; fixed RCPS-retention eps0.05 = 82.6545 / 0.5324 / 0.0498 / 0.2432.
+- Paired deltas: accuracy +0.047 pp and Brier -0.00023, but NLL +0.00718 and ECE +0.02606. At -10 dB, RCPS-retention worsens accuracy by -0.509 pp and worsens NLL/ECE/Brier.
+- Interpretation: fixed uniform/retention smoothing is not an admissible audio main result. This diagnostic supports the manuscript claim that RCPS target broadening must be validation-constrained and posterior/base-aware; audio should stay diagnostic unless a posterior-base or sample-posterior audio variant passes validation gates.
