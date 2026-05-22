@@ -1776,3 +1776,9 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Generated paired and aggregate SNR-bin summaries for `RadioML2018.01A / PETCGDNN / RCPS-Hybrid eps0.1` under `/home/citybuster/Data/RCPS/work_dirs/rcps_hybrid_2018A/summary/`.
 - Three-seed region deltas versus hard CE: low SNR accuracy/NLL/ECE/Brier = +0.390 / -0.0218 / -0.00146 / -0.00277; mid SNR = +1.277 / -0.0270 / -0.000995 / -0.0152; high SNR = +0.837 / -0.0197 / -0.00131 / -0.0117.
 - Interpretation: the 2018A improvement is not caused by sacrificing high-reliability recognition; high-SNR retention is satisfied in the region aggregate. The manuscript now reports these region values in the reliability-stratified AMC paragraph, while the detailed figure remains an auditable artifact rather than an additional main-text float.
+
+### 2026-05-22 09:45 CST - MCLDNN RadioML2018.01A baseline smoke
+- Added and parsed SNR-aware MCLDNN 2018A baseline-gate config in commit `e3b96f4`.
+- Smoke with batch size 256 completed one epoch without shape/head/runtime errors; epoch time is about 8--9 minutes and validation top-1 after one epoch is 38.93%.
+- Batch-size sweep: 1024 fails with CUDA OOM; 512 is stable but has similar epoch wall time to 256 and uses about 10.5 GB, so it provides no meaningful throughput advantage.
+- Interpretation: MCLDNN is a feasible 2018A second-backbone candidate but full 3-seed baseline gating is expensive. It should enter at most a 50-epoch pilot first; do not launch RCPS variants until the hard CE pilot demonstrates competitive baseline behavior.
