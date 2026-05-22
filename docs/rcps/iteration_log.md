@@ -1819,3 +1819,16 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - By SNR, RCPS-Confusion improves ECE in most bins and slightly improves low-SNR accuracy at -10 dB, but NLL worsens in every SNR bin and high-reliability accuracy/Brier degrade.
 - Decision: this audio posterior/confusion-aware pilot is a diagnostic result, not main positive evidence. It supports the paper stability gate: ECE-only gains are insufficient when NLL/Brier and high-reliability retention fail.
 - Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_confusion_20ep/summary/speechcommands_ds_cnn_rcps_confusion_vs_hard_seed2026.csv.
+
+
+## 2026-05-22 14:30 CST - Audio DPC-consistency pilots completed and rejected
+
+- Completed two Speech Commands / DS-CNN / seed2026 DPC-consistency pilots with hard CE plus clean-to-noisy posterior consistency.
+- Work roots:
+  - /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_dpc_consistency_w005_20ep
+  - /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_dpc_consistency_w010_20ep
+- Compared with the same hard CE baseline, weight 0.05 gives overall deltas: accuracy -0.9281 pp, NLL +0.0318, ECE -0.0010, Brier +0.0111.
+- Weight 0.10 gives overall deltas: accuracy -2.1237 pp, NLL +0.0599, ECE -0.0006, Brier +0.0276.
+- Low-SNR and clean bins both degrade in accuracy/NLL/Brier. Therefore same-model clean-view consistency is not admitted as positive audio evidence.
+- Decision: do not expand Speech Commands DPC-consistency. The result supports the theoretical boundary that DPC requires a reliable and calibrated teacher or validation-approved posterior projection; online same-backbone self-teaching can amplify bias.
+- Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_dpc_consistency_summary/speechcommands_ds_cnn_dpc_consistency_vs_hard_seed2026.csv.

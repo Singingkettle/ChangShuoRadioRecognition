@@ -26,3 +26,8 @@ This document separates main positive evidence from diagnostic tradeoffs. Diagno
 ### Audio posterior/confusion-aware diagnostic (2026-05-22)
 
 Speech Commands / DS-CNN / seed2026 / rcps-confusion improved overall ECE from 0.0199 to 0.0183, but reduced accuracy from 73.5977 to 73.5017, increased NLL from 0.7220 to 0.7360, and increased Brier from 0.3586 to 0.3613. The result remains diagnostic only and should not be used as cross-modal positive evidence.
+
+
+### Audio DPC-consistency diagnostic (2026-05-22)
+
+Speech Commands / DS-CNN / seed2026 DPC-consistency was tested with weights 0.05 and 0.10. Both variants slightly improved aggregate ECE but worsened accuracy, NLL, and Brier score, including clean and low-SNR bins. The result should be used only as a boundary case: degradation-path consistency requires a reliable calibrated teacher, not an unconditional same-model online teacher.
