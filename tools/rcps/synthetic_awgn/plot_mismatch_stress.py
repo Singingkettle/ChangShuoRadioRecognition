@@ -28,12 +28,12 @@ def load_delta(root: Path, stem: str) -> pd.DataFrame:
 
 def panel_delta(ax, df: pd.DataFrame, title: str) -> None:
     metrics = [
-        ("delta_overall_accuracy", "Acc. (pp)", 1.0),
+        ("delta_overall_accuracy", "Acc.", 1.0),
         ("delta_overall_nll", "NLL", -1.0),
         ("delta_overall_ece", "ECE", -1.0),
         ("delta_overall_brier", "Brier", -1.0),
-        ("delta_high_accuracy", "High-SNR acc. (pp)", 1.0),
-        ("delta_transition_nll", "Trans. NLL", -1.0),
+        ("delta_high_accuracy", "High acc.", 1.0),
+        ("delta_transition_nll", "Band NLL", -1.0),
     ]
     methods = ["strict_awgn_dpc", "critical_strict_dpc"]
     x = np.arange(len(metrics))
@@ -47,12 +47,9 @@ def panel_delta(ax, df: pd.DataFrame, title: str) -> None:
                color=CB[method], label=LABELS[method], edgecolor="black", linewidth=0.4)
     ax.axhline(0, color="0.25", linewidth=0.7)
     ax.set_xticks(x)
-    tick_labels = []
-    for _, label, sign in metrics:
-        direction = "higher" if sign > 0 else "lower"
-        tick_labels.append(f"{label}\n({direction} better)")
-    ax.set_xticklabels(tick_labels, fontsize=7)
+    ax.set_xticklabels([label for _, label, _ in metrics], fontsize=7, rotation=20, ha="right")
     ax.set_title(title, fontsize=9)
+    ax.set_ylabel("Signed delta vs. Hard CE", fontsize=8)
     ax.tick_params(axis="y", labelsize=7)
     ax.grid(axis="y", color="0.9", linewidth=0.6)
 
@@ -87,14 +84,16 @@ def main() -> None:
     phase_bins = pd.read_csv(args.phase_root / "metrics" / "petcgdnn_mismatch_phasefreqmultipath_snr_bin_metrics.csv")
     impulsive_bins = pd.read_csv(args.impulsive_root / "metrics" / "petcgdnn_impulsive_snr_bin_metrics.csv")
 
-    fig, axes = plt.subplots(2, 2, figsize=(7.1, 4.9), constrained_layout=True)
+    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.0))
     panel_delta(axes[0, 0], phase_delta, "Phase/frequency/multipath mismatch: paired deltas")
     panel_delta(axes[0, 1], impulsive_delta, "Impulsive-noise mismatch: paired deltas")
     panel_snr(axes[1, 0], phase_bins, "Phase/frequency/multipath mismatch")
     panel_snr(axes[1, 1], impulsive_bins, "Impulsive-noise mismatch")
     handles, labels = axes[1, 1].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=3, frameon=False, fontsize=8)
-    fig.subplots_adjust(bottom=0.14)
+    fig.text(0.5, 0.045, "For bars, higher is better for Acc./High acc.; lower is better for NLL/ECE/Brier/Band NLL.",
+             ha="center", va="center", fontsize=7)
+    fig.subplots_adjust(left=0.08, right=0.98, top=0.92, bottom=0.18, hspace=0.60, wspace=0.28)
 
     pdf = args.out_dir / "petcgdnn_mismatch_stress_tests.pdf"
     png = args.out_dir / "petcgdnn_mismatch_stress_tests.png"
