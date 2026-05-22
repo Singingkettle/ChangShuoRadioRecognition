@@ -1787,3 +1787,8 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Launched a conservative single-seed hard CE pilot for MCLDNN on RadioML2018.01A to test whether it is worth admitting as a second 2018A backbone.
 - Command wrapper: `/home/citybuster/Data/RCPS/work_dirs/logs/run_mcldnn_2018A_50ep_pilot.sh`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcldnn_2018A_50ep_seed2026_gpu0.log`.
 - Settings: seed 2026, batch size 256, max epochs 50, GPU0. This is a baseline feasibility pilot only; no RCPS variant will be launched unless the hard CE trajectory is competitive and stable.
+
+### 2026-05-22 11:12 CST - MCLDNN 2018A 50-epoch pilot epoch-9 check
+- Pilot remains healthy on GPU0 with no Traceback/OOM/Error.
+- Validation trajectory reached epoch9: epoch8 top-1 = 50.9549%, epoch9 top-1 = 52.1887%; validation loss at epoch9 = 1.4688.
+- Interpretation: MCLDNN is learning and remains a feasible second-backbone candidate, but it has not yet passed a baseline admission point. Continue to epoch20 before deciding whether to expand to multi-seed hard CE or stop this branch.
