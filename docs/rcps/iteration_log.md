@@ -1782,3 +1782,8 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Smoke with batch size 256 completed one epoch without shape/head/runtime errors; epoch time is about 8--9 minutes and validation top-1 after one epoch is 38.93%.
 - Batch-size sweep: 1024 fails with CUDA OOM; 512 is stable but has similar epoch wall time to 256 and uses about 10.5 GB, so it provides no meaningful throughput advantage.
 - Interpretation: MCLDNN is a feasible 2018A second-backbone candidate but full 3-seed baseline gating is expensive. It should enter at most a 50-epoch pilot first; do not launch RCPS variants until the hard CE pilot demonstrates competitive baseline behavior.
+
+### 2026-05-22 09:50 CST - MCLDNN RadioML2018.01A 50-epoch hard CE pilot launched
+- Launched a conservative single-seed hard CE pilot for MCLDNN on RadioML2018.01A to test whether it is worth admitting as a second 2018A backbone.
+- Command wrapper: `/home/citybuster/Data/RCPS/work_dirs/logs/run_mcldnn_2018A_50ep_pilot.sh`; log: `/home/citybuster/Data/RCPS/work_dirs/logs/mcldnn_2018A_50ep_seed2026_gpu0.log`.
+- Settings: seed 2026, batch size 256, max epochs 50, GPU0. This is a baseline feasibility pilot only; no RCPS variant will be launched unless the hard CE trajectory is competitive and stable.
