@@ -116,7 +116,7 @@ def balanced_subset(rows: Sequence[Dict], max_per_label_snr: int, seed: int) -> 
 
 class SpeechCommandsReliability(Dataset):
     def __init__(self, ann_path: Path, split: str, max_per_label_snr: int,
-                 seed: int, train: bool = True):
+                 seed: int, train: bool = True, return_clean_pair: bool = False):
         rows, meta = load_annotations(ann_path)
         self.rows = balanced_subset(rows, max_per_label_snr, seed)
         self.meta = meta
@@ -129,6 +129,7 @@ class SpeechCommandsReliability(Dataset):
         self.split = split
         self.seed = int(seed)
         self.train = bool(train)
+        self.return_clean_pair = bool(return_clean_pair)
 
     def __len__(self) -> int:
         return len(self.rows)
@@ -138,16 +139,19 @@ class SpeechCommandsReliability(Dataset):
         rng = random if self.train else random.Random(self.seed * 1000003 + idx)
         wav = cached_load_wav(str(self.raw_root / row['file_name']))
         snr = row['snr']
+        clean = fit_length(wav, rng if self.train else None)
         if str(snr) == 'clean':
-            mixed = fit_length(wav, rng if self.train else None)
+            mixed = clean
             snr_label = 'clean'
         else:
             bg_path = rng.choice(self.background_paths)
             noise = cached_load_wav(str(bg_path))
-            mixed = add_noise_at_snr(wav, noise, float(snr), rng)
+            mixed = add_noise_at_snr(clean, noise, float(snr), rng)
             snr_label = str(snr)
         label = self.class_to_idx[row['label_name']]
         reliability = float(row['reliability'])
+        if self.return_clean_pair:
+            return mixed.reshape(1, -1), clean.reshape(1, -1), int(label), reliability, snr_label
         return mixed.reshape(1, -1), int(label), reliability, snr_label
 
 
@@ -253,6 +257,22 @@ def build_model(name: str, num_classes: int) -> nn.Module:
 
 def soft_cross_entropy(logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
     return -(targets * F.log_softmax(logits, dim=1)).sum(dim=1).mean()
+
+
+def dpc_consistency_loss(noisy_logits: torch.Tensor,
+                         clean_logits: torch.Tensor,
+                         labels: torch.Tensor,
+                         reliability: torch.Tensor,
+                         args) -> torch.Tensor:
+    ce = F.cross_entropy(noisy_logits, labels)
+    temperature = max(float(args.consistency_temperature), 1e-6)
+    with torch.no_grad():
+        teacher = F.softmax(clean_logits / temperature, dim=1)
+    student_log = F.log_softmax(noisy_logits / temperature, dim=1)
+    per_sample = F.kl_div(student_log, teacher, reduction='none').sum(dim=1) * (temperature ** 2)
+    weights = torch.clamp(1.0 - reliability, min=0.0, max=1.0).pow(float(args.consistency_gamma))
+    consistency = (per_sample * weights).sum() / weights.sum().clamp_min(1.0)
+    return ce + float(args.consistency_weight) * consistency
 
 
 def compute_loss(method: str, logits: torch.Tensor, labels: torch.Tensor,
@@ -433,7 +453,7 @@ def build_loader(dataset: Dataset, args, shuffle: bool, seed: int) -> DataLoader
 
 def main():
     parser = argparse.ArgumentParser(description='Run Speech Commands RCPS cross-modal experiments.')
-    parser.add_argument('--method', choices=['hard-ce', 'static-ls', 'rcps-retention', 'rcps-confusion'], required=True)
+    parser.add_argument('--method', choices=['hard-ce', 'static-ls', 'rcps-retention', 'rcps-confusion', 'dpc-consistency'], required=True)
     parser.add_argument('--model', choices=['ds-cnn', 'logmel-resnet'], default='ds-cnn')
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--epochs', type=int, default=20)
@@ -448,6 +468,9 @@ def main():
     parser.add_argument('--confusion-base-source', default='')
     parser.add_argument('--confusion-temperature', type=float, default=1.0)
     parser.add_argument('--confusion-prior-blend', type=float, default=0.0)
+    parser.add_argument('--consistency-weight', type=float, default=0.2)
+    parser.add_argument('--consistency-temperature', type=float, default=1.0)
+    parser.add_argument('--consistency-gamma', type=float, default=1.0)
     parser.add_argument('--save-predictions', action='store_true')
     parser.add_argument('--train-max-per-label-snr', type=int, default=600)
     parser.add_argument('--val-max-per-label-snr', type=int, default=200)
@@ -459,8 +482,10 @@ def main():
     set_seed(args.seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     processed_root = Path(args.processed_root)
+    pair_clean = args.method == 'dpc-consistency'
     train_ds = SpeechCommandsReliability(processed_root / 'train.json', 'train',
-                                         args.train_max_per_label_snr, args.seed, train=True)
+                                         args.train_max_per_label_snr, args.seed, train=True,
+                                         return_clean_pair=pair_clean)
     val_ds = SpeechCommandsReliability(processed_root / 'validation.json', 'validation',
                                        args.val_max_per_label_snr, args.seed + 17, train=False)
     test_ds = SpeechCommandsReliability(processed_root / 'test.json', 'test',
@@ -495,14 +520,26 @@ def main():
     for epoch in range(1, args.epochs + 1):
         model.train()
         losses = []
-        for wav, y, r, _ in train_loader:
+        for batch in train_loader:
+            if pair_clean:
+                wav, clean_wav, y, r, _ = batch
+                clean_wav = clean_wav.to(device, non_blocking=True)
+            else:
+                wav, y, r, _ = batch
+                clean_wav = None
             wav = wav.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
             r = r.to(device, non_blocking=True).float()
             optimizer.zero_grad(set_to_none=True)
             x = feature_extractor(wav)
             logits = model(x)
-            loss = compute_loss(args.method, logits, y, r, num_classes, args)
+            if pair_clean:
+                clean_x = feature_extractor(clean_wav)
+                with torch.no_grad():
+                    clean_logits = model(clean_x)
+                loss = dpc_consistency_loss(logits, clean_logits, y, r, args)
+            else:
+                loss = compute_loss(args.method, logits, y, r, num_classes, args)
             loss.backward()
             optimizer.step()
             losses.append(float(loss.detach().cpu()))
