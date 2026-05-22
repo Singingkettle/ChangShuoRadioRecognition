@@ -55,6 +55,12 @@ class AMCDataset(BaseClassificationDataset):
             snr = raw_data_info['snr']
             snr_label = np.array(SNRs.index(snr), dtype=np.int64)
             data_info = dict(gt_label=gt_label, snr_label=snr_label, snr=snr, modulation=raw_data_info['modulation'])
+            for key, value in raw_data_info.items():
+                if key in {'file_name', 'modulation', 'snr'}:
+                    continue
+                if key in data_info:
+                    continue
+                data_info[key] = value
             data_path = os.path.join(self.data_root, 'iq', raw_data_info['file_name'])
             if self.cache:
                 x = np.load(data_path)
