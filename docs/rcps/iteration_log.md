@@ -1771,3 +1771,8 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - 20-epoch seed2026 matched comparison: hard CE accuracy/NLL/ECE/Brier = 82.6078 / 0.5252 / 0.0238 / 0.2434; fixed RCPS-retention eps0.05 = 82.6545 / 0.5324 / 0.0498 / 0.2432.
 - Paired deltas: accuracy +0.047 pp and Brier -0.00023, but NLL +0.00718 and ECE +0.02606. At -10 dB, RCPS-retention worsens accuracy by -0.509 pp and worsens NLL/ECE/Brier.
 - Interpretation: fixed uniform/retention smoothing is not an admissible audio main result. This diagnostic supports the manuscript claim that RCPS target broadening must be validation-constrained and posterior/base-aware; audio should stay diagnostic unless a posterior-base or sample-posterior audio variant passes validation gates.
+
+### 2026-05-22 07:35 CST - RadioML2018.01A PETCGDNN SNR-region evidence generated
+- Generated paired and aggregate SNR-bin summaries for `RadioML2018.01A / PETCGDNN / RCPS-Hybrid eps0.1` under `/home/citybuster/Data/RCPS/work_dirs/rcps_hybrid_2018A/summary/`.
+- Three-seed region deltas versus hard CE: low SNR accuracy/NLL/ECE/Brier = +0.390 / -0.0218 / -0.00146 / -0.00277; mid SNR = +1.277 / -0.0270 / -0.000995 / -0.0152; high SNR = +0.837 / -0.0197 / -0.00131 / -0.0117.
+- Interpretation: the 2018A improvement is not caused by sacrificing high-reliability recognition; high-SNR retention is satisfied in the region aggregate. The manuscript now reports these region values in the reliability-stratified AMC paragraph, while the detailed figure remains an auditable artifact rather than an additional main-text float.
