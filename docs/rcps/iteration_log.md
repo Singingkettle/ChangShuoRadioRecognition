@@ -1808,3 +1808,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Commit: `70705c8`.
 - Launched DS-CNN Speech Commands hard teacher rerun on GPU1 with prediction export, work root `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_confusion_20ep`.
 - Purpose: build a validation-only confusion/posterior base for a posterior-aware audio RCPS pilot. No audio positive claim will be made until this passes validation diagnostics.
+
+
+## 2026-05-22 13:50 CST - Speech Commands posterior/confusion-aware audio pilot completed
+
+- Completed Speech Commands / DS-CNN / seed2026 hard teacher and rcps-confusion pilot under /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_confusion_20ep.
+- Hard CE test overall: accuracy 73.5977, NLL 0.7220, ECE 0.0199, Brier 0.3586.
+- RCPS-Confusion test overall: accuracy 73.5017, NLL 0.7360, ECE 0.0183, Brier 0.3613.
+- Paired deltas (RCPS-Confusion minus Hard): accuracy -0.0961 pp, NLL +0.0140, ECE -0.0016, Brier +0.0027.
+- By SNR, RCPS-Confusion improves ECE in most bins and slightly improves low-SNR accuracy at -10 dB, but NLL worsens in every SNR bin and high-reliability accuracy/Brier degrade.
+- Decision: this audio posterior/confusion-aware pilot is a diagnostic result, not main positive evidence. It supports the paper stability gate: ECE-only gains are insufficient when NLL/Brier and high-reliability retention fail.
+- Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_confusion_20ep/summary/speechcommands_ds_cnn_rcps_confusion_vs_hard_seed2026.csv.

@@ -21,3 +21,8 @@ This document separates main positive evidence from diagnostic tradeoffs. Diagno
 - Static label smoothing is not a sufficient baseline substitute: it repeatedly worsens NLL/ECE/Brier in CIFAR-10-C, UCSD/RML22, and Speech Commands diagnostics.
 - Fixed uniform RCPS should not be presented as the final theory. The manuscript now frames finite-reliability smoothing as a low-cost approximation and DPC-RCPS as the main posterior-path method.
 - Next experimental priority: consolidate DPC main AMC and CIFAR-10-C figures/tables, then decide whether to run DPC/PosteriorBase audio only if validation diagnostics justify it.
+
+
+### Audio posterior/confusion-aware diagnostic (2026-05-22)
+
+Speech Commands / DS-CNN / seed2026 / rcps-confusion improved overall ECE from 0.0199 to 0.0183, but reduced accuracy from 73.5977 to 73.5017, increased NLL from 0.7220 to 0.7360, and increased Brier from 0.3586 to 0.3613. The result remains diagnostic only and should not be used as cross-modal positive evidence.
