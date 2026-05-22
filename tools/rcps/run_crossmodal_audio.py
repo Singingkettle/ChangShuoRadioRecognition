@@ -13,6 +13,7 @@ import argparse
 import csv
 import json
 import math
+import pickle
 import random
 import time
 from collections import defaultdict
@@ -270,6 +271,23 @@ def compute_loss(method: str, logits: torch.Tensor, labels: torch.Tensor,
                          gamma=args.gamma, retain_min=args.retain_min),
             base=dict(type='uniform'))
         return soft_cross_entropy(logits, targets)
+    if method == 'rcps-confusion':
+        if not args.confusion_base_source:
+            raise ValueError('rcps-confusion requires --confusion-base-source')
+        targets = build_rcps_targets(
+            labels,
+            reliability,
+            num_classes=num_classes,
+            reliability_map=dict(type='identity'),
+            epsilon=dict(type='retention_power', max=args.epsilon_max,
+                         gamma=args.gamma, retain_min=args.retain_min),
+            base=dict(
+                type='confusion',
+                source=args.confusion_base_source,
+                temperature=args.confusion_temperature,
+                prior_blend=args.confusion_prior_blend,
+                prior=dict(type='uniform')))
+        return soft_cross_entropy(logits, targets)
     raise ValueError(f'Unsupported method: {method}')
 
 
@@ -358,6 +376,30 @@ def write_metric_rows(path: Path, rows: List[Dict]) -> None:
         writer.writerows(rows)
 
 
+def write_prediction_pkl(path: Path,
+                         probs: np.ndarray,
+                         labels: np.ndarray,
+                         reliabilities: np.ndarray,
+                         snrs: np.ndarray) -> None:
+    """Write a paper.pkl-compatible artifact for posterior-base construction."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    numeric_snrs = []
+    for value in snrs:
+        if str(value) == 'clean':
+            numeric_snrs.append(30.0)
+        else:
+            numeric_snrs.append(float(value))
+    payload = {
+        'pps': probs.astype(np.float32),
+        'gts': labels.astype(np.int64),
+        'snrs': np.asarray(numeric_snrs, dtype=np.float32),
+        'snr_labels': np.asarray([str(v) for v in snrs]),
+        'reliability': reliabilities.astype(np.float32),
+    }
+    with path.open('wb') as f:
+        pickle.dump(payload, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 def append_metrics(rows: List[Dict], dataset: str, model_name: str, method: str, seed: int,
                    split: str, group: str, reliability_bin: str,
                    probs: np.ndarray, labels: np.ndarray, num_classes: int):
@@ -391,7 +433,7 @@ def build_loader(dataset: Dataset, args, shuffle: bool, seed: int) -> DataLoader
 
 def main():
     parser = argparse.ArgumentParser(description='Run Speech Commands RCPS cross-modal experiments.')
-    parser.add_argument('--method', choices=['hard-ce', 'static-ls', 'rcps-retention'], required=True)
+    parser.add_argument('--method', choices=['hard-ce', 'static-ls', 'rcps-retention', 'rcps-confusion'], required=True)
     parser.add_argument('--model', choices=['ds-cnn', 'logmel-resnet'], default='ds-cnn')
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--epochs', type=int, default=20)
@@ -403,6 +445,10 @@ def main():
     parser.add_argument('--epsilon-max', type=float, default=0.1)
     parser.add_argument('--gamma', type=float, default=1.0)
     parser.add_argument('--retain-min', type=float, default=0.85)
+    parser.add_argument('--confusion-base-source', default='')
+    parser.add_argument('--confusion-temperature', type=float, default=1.0)
+    parser.add_argument('--confusion-prior-blend', type=float, default=0.0)
+    parser.add_argument('--save-predictions', action='store_true')
     parser.add_argument('--train-max-per-label-snr', type=int, default=600)
     parser.add_argument('--val-max-per-label-snr', type=int, default=200)
     parser.add_argument('--test-max-per-label-snr', type=int, default=0)
@@ -484,7 +530,13 @@ def main():
 
     payload = torch.load(best_path, map_location=device)
     model.load_state_dict(payload['model'])
+    val_probs, val_labels, val_reliabilities, val_snrs = evaluate_loader(model, feature_extractor, val_loader, device)
     probs, labels, reliabilities, snrs = evaluate_loader(model, feature_extractor, test_loader, device)
+    if args.save_predictions:
+        write_prediction_pkl(work_dir / 'predictions' / 'validation.pkl',
+                             val_probs, val_labels, val_reliabilities, val_snrs)
+        write_prediction_pkl(work_dir / 'predictions' / 'test.pkl',
+                             probs, labels, reliabilities, snrs)
     metric_rows: List[Dict] = []
     append_metrics(metric_rows, 'speechcommands-noisy', args.model, args.method, args.seed,
                    'test', 'all', 'all', probs, labels, num_classes)
