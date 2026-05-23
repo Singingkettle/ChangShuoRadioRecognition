@@ -244,10 +244,10 @@ def maybe_plot(out_dir: Path, rows: List[Dict], critical_rows: List[Dict]) -> No
 
     log_overlap = np.log10(np.maximum(overlap, 1e-12))
     axes[2].plot(snr, log_overlap, marker="o", label=r"$\log_{10}(2r/d_{\min})$")
-    axes[2].axhline(0.0, color="0.35", lw=1.0, ls="--", label="crossing")
+    axes[2].axhline(0.0, color="0.35", lw=1.0, ls="--", label="unit overlap")
     axes[2].set_xlabel("SNR (dB)")
     axes[2].set_ylabel("Log overlap")
-    axes[2].set_title("Noise-tube crossing")
+    axes[2].set_title("Noise-tube overlap")
     axes[2].legend(frameon=False, fontsize=7)
 
     for ext in ("pdf", "png"):

@@ -302,6 +302,23 @@ def main() -> None:
             "noise_log_energy", "spectral_flatness", "speech_band_ratio",
             "low_band_ratio", "high_band_ratio", "vad_ratio", "zero_crossing_rate",
         ],
+        "teacher_conf": ["confidence"],
+        "snr_teacher_conf": ["snr_onehot", "confidence"],
+        "snr_audio_teacher_conf": [
+            "snr_onehot", "actual_snr", "clean_log_energy", "mixed_log_energy",
+            "noise_log_energy", "spectral_flatness", "speech_band_ratio",
+            "low_band_ratio", "high_band_ratio", "vad_ratio", "zero_crossing_rate",
+            "confidence",
+        ],
+        # Diagnostic only: entropy is a direct teacher-output statistic, so this
+        # feature set should not be interpreted as an independent physical
+        # reliability coordinate.
+        "snr_audio_teacher_entropy_conf": [
+            "snr_onehot", "actual_snr", "clean_log_energy", "mixed_log_energy",
+            "noise_log_energy", "spectral_flatness", "speech_band_ratio",
+            "low_band_ratio", "high_band_ratio", "vad_ratio", "zero_crossing_rate",
+            "entropy", "confidence",
+        ],
     }
     r2_rows: List[Dict] = []
     coefficients = {}
@@ -344,8 +361,12 @@ def main() -> None:
         "test_size": len(test_rows),
         "snr_onehot_entropy_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "entropy" and r["feature_set"] == "snr_onehot"),
         "snr_audio_entropy_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "entropy" and r["feature_set"] == "snr_onehot_audio"),
+        "teacher_conf_entropy_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "entropy" and r["feature_set"] == "teacher_conf"),
+        "snr_audio_teacher_conf_entropy_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "entropy" and r["feature_set"] == "snr_audio_teacher_conf"),
         "snr_onehot_correct_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "correct" and r["feature_set"] == "snr_onehot"),
         "snr_audio_correct_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "correct" and r["feature_set"] == "snr_onehot_audio"),
+        "teacher_conf_correct_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "correct" and r["feature_set"] == "teacher_conf"),
+        "snr_audio_teacher_conf_correct_test_r2": next(r["test_r2"] for r in r2_rows if r["outcome"] == "correct" and r["feature_set"] == "snr_audio_teacher_conf"),
     }
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
