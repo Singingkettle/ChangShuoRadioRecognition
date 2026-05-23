@@ -211,8 +211,6 @@ def maybe_plot(out_dir: Path, rows: List[Dict], critical_rows: List[Dict]) -> No
     acc = np.asarray([r.get("accuracy", np.nan) for r in rows], dtype=float)
     ent = np.asarray([r.get("mean_entropy", np.nan) for r in rows], dtype=float)
     fisher = np.asarray([r["fisher_ratio"] for r in rows], dtype=float)
-    margin = np.asarray([r["noise_tube_ratio"] for r in rows], dtype=float)
-    sil = np.asarray([r["silhouette_proxy"] for r in rows], dtype=float)
     overlap = np.asarray([r["paired_overlap_proxy"] for r in rows], dtype=float)
     paired_tube = np.asarray([r["paired_noise_tube_ratio"] for r in rows], dtype=float)
 
@@ -220,27 +218,35 @@ def maybe_plot(out_dir: Path, rows: List[Dict], critical_rows: List[Dict]) -> No
         lo, hi = np.nanmin(v), np.nanmax(v)
         return (v - lo) / max(hi - lo, 1e-12)
 
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.3), constrained_layout=True)
+    plt.rcParams.update({
+        "font.size": 8,
+        "axes.titlesize": 9,
+        "axes.labelsize": 8,
+        "xtick.labelsize": 7,
+        "ytick.labelsize": 7,
+        "legend.fontsize": 7,
+    })
+    fig, axes = plt.subplots(1, 3, figsize=(7.1, 2.15), constrained_layout=True)
     axes[0].plot(snr, acc, marker="o", label="Accuracy")
     axes[0].set_xlabel("SNR (dB)")
     axes[0].set_ylabel("Accuracy (%)")
     ax0b = axes[0].twinx()
     ax0b.plot(snr, ent, marker="s", color="#D55E00", label="Entropy")
     ax0b.set_ylabel("Entropy")
-    axes[0].set_title("Waterfall/posterior")
+    axes[0].set_title("Waterfall and entropy")
 
     axes[1].plot(snr, z(fisher), marker="o", label="Fisher")
     axes[1].plot(snr, z(paired_tube), marker="s", label="Paired tube")
-    axes[1].plot(snr, z(sil), marker="^", label="Silhouette")
     axes[1].set_xlabel("SNR (dB)")
     axes[1].set_ylabel("Normalized value")
     axes[1].set_title("Geometry order parameters")
     axes[1].legend(frameon=False, fontsize=7)
 
-    axes[2].plot(snr, overlap, marker="o", label="2 noise radius / clean dmin")
-    axes[2].axhline(1.0, color="0.35", lw=1.0, ls="--", label="tube crossing")
+    log_overlap = np.log10(np.maximum(overlap, 1e-12))
+    axes[2].plot(snr, log_overlap, marker="o", label=r"$\log_{10}(2r/d_{\min})$")
+    axes[2].axhline(0.0, color="0.35", lw=1.0, ls="--", label="crossing")
     axes[2].set_xlabel("SNR (dB)")
-    axes[2].set_ylabel("Overlap proxy")
+    axes[2].set_ylabel("Log overlap")
     axes[2].set_title("Noise-tube crossing")
     axes[2].legend(frameon=False, fontsize=7)
 
