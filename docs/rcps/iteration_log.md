@@ -1845,3 +1845,13 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - Teacher confidence explains 0.949±0.001 / 0.346±0.010.
 - Decision: audio is retained as a multidimensional-reliability boundary case. Do not claim Speech Commands as a positive RCPS/DPC result yet. The next audio direction, if pursued, is cross-fit teacher-confidence or learned phi-RCPS with validation gating.
 - Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_summary/logmel_resnet_phi_gate/summary/logmel_resnet_phi_gate_summary.csv.
+
+## 2026-05-24 12:15 CST - RadioML2018.01A CGDNet gate config repaired
+
+- During the TPAMI evidence-gap audit, the 2018A second-backbone gap was traced to a configuration error rather than an RCPS/DPC algorithm issue.
+- Previous `configs/rcps/_base_/models/cgdnet_iq-snr-deepsig-201801A.py` used `frame_length=128`, inherited from 2016-style inputs, while RadioML2018.01A uses 1024 complex samples per example.
+- This caused the CGDNet GRU reshape to fail with `RuntimeError: shape '[-1, 50, 472]' is invalid...`.
+- Fix: set `frame_length=1024` in the RCPS 2018A CGDNet base config and document why the value differs from 2016A.
+- Direct random-tensor forward smoke now passes: `forward_ok (4, 24)` for input shape `(4, 1, 2, 1024)`.
+- A full train-loop smoke was intentionally not used as proof because RadioML2018.01A dataloader/cache initialization can exceed a short timeout before the first batch.
+- Next admissible step: launch a formal `CGDNet + RadioML2018.01A + Hard CE` baseline gate with seeds 2026/2027/2028 only after confirming expected runtime; no RCPS comparison is allowed on this pair before that gate passes.
