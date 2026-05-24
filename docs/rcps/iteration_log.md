@@ -2059,3 +2059,10 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - CPU forward smoke passed for (N,1024,2), (N,2,1024), and (N,1,2,1024), all producing (N,24) logits.
 - This is hard-CE baseline gate only; no DensCNN Static LS / RCPS before hard-CE gate passes.
 
+### DensCNN fallback epoch 1 sanity check: 2026-05-25 07:14 CST
+
+- seed2026: val top1 33.7616%, loss 1.8407; best epoch1 saved.
+- seed2027: val top1 35.6392%, loss 1.8234; best epoch1 saved.
+- No error signatures; both runs entered epoch2.
+- Decision: DensCNN data/shape/loss path is sane; continue 20-epoch hard-CE prescreen; no RCPS before hard-CE gate passes.
+
