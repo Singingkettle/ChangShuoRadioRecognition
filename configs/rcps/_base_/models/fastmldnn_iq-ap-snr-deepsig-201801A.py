@@ -33,5 +33,9 @@ test_dataloader = dict(dataset=dict(data_root=data_root, pipeline=snr_pipeline))
 model = dict(
     type="SignalClassifier",
     backbone=dict(type="FastMLDNN", num_classes=24),
-    head=dict(type="ClsHead", loss=dict(type="CrossEntropyLoss", loss_weight=1.0)),
+    head=dict(
+        type="FastMLDNNHead",
+        loss=dict(type="CrossEntropyLoss", loss_weight=1.0),
+        beta=0,
+    ),
 )
