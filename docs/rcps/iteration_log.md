@@ -2050,3 +2050,12 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - Decision: ResNet-AMR is quarantined for 2018A main-table use; do not run ResNet-AMR RCPS paired comparisons; proceed to DenseNet/DensCNN hard-CE fallback gate.
 - ResNet-AMR training processes were stopped after preserving logs and checkpoints.
 
+### DensCNN fallback hard-CE gate launched: 2026-05-25 06:45 CST
+
+- Dataset/model: RadioML2018.01A / DensCNN / hard CE / 20-epoch fallback prescreen.
+- Config: configs/rcps/denscnn/denscnn_hard-ce_iq-snr-deepsig-201801A.py.
+- Work root: /home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A_denscnn_20ep.
+- seed2026: GPU0, pid 558587; seed2027: GPU1, pid 558583.
+- CPU forward smoke passed for (N,1024,2), (N,2,1024), and (N,1,2,1024), all producing (N,24) logits.
+- This is hard-CE baseline gate only; no DensCNN Static LS / RCPS before hard-CE gate passes.
+
