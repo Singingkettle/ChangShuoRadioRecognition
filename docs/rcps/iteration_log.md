@@ -1874,3 +1874,35 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Behavior: wait for seed2027/2028 training processes to finish, export test predictions with `num_workers=0`, run `analyze_reliability.py`, and aggregate seed2026/2027/2028 into:
   `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A_mcldnn_20ep/summary/deepsig201801A_mcldnn_hard-ce-20ep_3seed_summary.csv`.
 - This watcher is operational glue only; it does not change models, losses, seeds, or evaluation rules.
+## 2026-05-24 22:35 CST - Speech Commands phi-RCPS admitted
+
+- Context:
+  - Earlier scalar-SNR RCPS, posterior-confusion RCPS, and online DPC audio variants stayed diagnostic because they failed NLL/Brier or high-reliability retention gates.
+  - A log-mel ResNet hard-label teacher passed the audio baseline gate, and teacher confidence explained substantially more sample-level entropy/correctness variation than scalar SNR.
+- Code:
+  - `tools/rcps/export_audio_teacher_predictions.py` committed as `b8d5e4b`.
+  - `tools/rcps/run_crossmodal_audio_phi.py` committed as `709a246`.
+- Experiment:
+  - Dataset: Speech Commands noisy.
+  - Model: log-mel ResNet.
+  - Method: `phi-teacher`.
+  - Seeds: `2026, 2027, 2028`.
+  - Training: 20 epochs, `epsilon_max=0.05`, `gamma=1.0`, `retain_min=0.75`.
+  - Teacher posterior source: train split only, one artifact per seed.
+  - Test protocol: balanced, `test_max_per_label_snr=250`.
+- Artifacts:
+  - Metrics root: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_phi_20ep_eps005_ret075/metrics`.
+  - Summary: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_phi_20ep_eps005_ret075/summary_phi_vs_hard_3seed.csv`.
+  - Manifest: `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_phi_20ep_eps005_ret075/run_manifest_audio_phi.csv`.
+- Three-seed mean delta relative to matched hard CE:
+  - Accuracy: `+0.5368 pp`.
+  - NLL: `-0.0140`.
+  - Brier: `-0.0070`.
+  - ECE: `+0.0021`, slightly worse.
+  - Accuracy and NLL/Brier improve or stay non-negative in every SNR bin.
+  - High-SNR and clean retention pass.
+- Interpretation:
+  - Audio is no longer only a failure-mode section.
+  - Scalar SNR remains insufficient as a sample-level audio order parameter.
+  - The admitted positive result supports a learned/model-adaptive reliability projection: teacher confidence plus a small posterior correction and retention gate.
+  - The manuscript should keep scalar-SNR audio failures as diagnostics and report the phi-RCPS result as an admitted but teacher-dependent audio positive case.
