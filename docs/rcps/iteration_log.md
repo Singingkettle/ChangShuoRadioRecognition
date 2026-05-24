@@ -1855,3 +1855,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Direct random-tensor forward smoke now passes: `forward_ok (4, 24)` for input shape `(4, 1, 2, 1024)`.
 - A full train-loop smoke was intentionally not used as proof because RadioML2018.01A dataloader/cache initialization can exceed a short timeout before the first batch.
 - Next admissible step: launch a formal `CGDNet + RadioML2018.01A + Hard CE` baseline gate with seeds 2026/2027/2028 only after confirming expected runtime; no RCPS comparison is allowed on this pair before that gate passes.
+
+## 2026-05-24 12:35 CST - RadioML2018.01A MCLDNN second-backbone prescreen launched
+
+- Historical 2018A checkpoint audit was rejected: existing CNN4/DSCLDNN validation PKLs are near random (`~4.17%` on 24 classes), likely due to old checkpoint / class order / export mismatch, and must not enter the paper.
+- A practical second-backbone path is MCLDNN on RadioML2018.01A: seed2026 20-epoch test export completed with overall accuracy `54.2846%` and high-SNR bins around `85%`.
+- This is still a prescreen, not paper evidence, because it is a shorter 20-epoch budget and only one completed seed so far.
+- Launched detached tmux runs for seed2027 and seed2028:
+  - `rcps_mcldnn2018_s2027` on GPU0.
+  - `rcps_mcldnn2018_s2028` on GPU1.
+- Corrected a launch hygiene issue: an orphan duplicate seed2028 process from an earlier detach attempt was killed to prevent checkpoint contamination; only the tmux-managed seed2028 process remains.
+- Next action after both runs finish: export test predictions, run reliability-bin metrics, and decide whether MCLDNN 2018A is strong enough for supplementary evidence or whether the paper still needs CGDNet/FastMLDNN full baseline gate.
