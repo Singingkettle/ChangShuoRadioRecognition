@@ -46,7 +46,28 @@ class DensCNN(BaseBackbone):
                 nn.Linear(128, self.num_classes),
             )
 
+    def _format_input(self, x):
+        """Normalize common IQ layouts to ``N x 1 x 2 x L``."""
+        if x.dim() == 3:
+            if x.shape[1] == self.frame_length and x.shape[2] == 2:
+                return x.permute(0, 2, 1).unsqueeze(1).contiguous()
+            if x.shape[1] == 2 and x.shape[2] == self.frame_length:
+                return x.unsqueeze(1).contiguous()
+        if x.dim() == 4:
+            if x.shape[1] == 1 and x.shape[2] == 2:
+                return x
+            if x.shape[1] == 2 and x.shape[2] == self.frame_length:
+                return x.permute(0, 3, 1, 2).contiguous()
+            if x.shape[1] == self.frame_length and x.shape[2] == 2:
+                return x.permute(0, 3, 2, 1).contiguous()
+        raise ValueError(
+            'DensCNN expects one of N x 1 x 2 x L, N x L x 2, '
+            'N x 2 x L, N x 2 x L x 1, or N x L x 2 x 1; '
+            f'got shape {tuple(x.shape)}'
+        )
+
     def forward(self, x):
+        x = self._format_input(x)
         x1 = self.cnn1(x)
         x2 = self.cnn2(x1)
         x2 = torch.concatenate((x1, x2), dim=1)
