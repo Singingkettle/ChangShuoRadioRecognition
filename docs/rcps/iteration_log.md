@@ -1957,4 +1957,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Both seeds saved new best checkpoints at epoch 8.
 - Error scan remains empty.
 - Decision remains: continue hard CE parity gate; no RCPS paired comparison; no DenseNet/DensCNN fallback yet.
+## 2026-05-25 04:52 CST - ResNet-AMR 2018A long-budget epoch 9--10 sanity
+
+- Epoch 9 validation: seed2026 `48.8186%` / loss `1.5890`; seed2027 `46.8015%` / loss `1.6826`.
+- Epoch 10 validation: seed2026 `50.0819%` / loss `1.5737`; seed2027 `47.1655%` / loss `1.6675`.
+- Both seeds saved new best checkpoints at epoch 10.
+- Error scan remains empty.
+- Interpretation: long-budget training is correcting the short-budget prescreen weakness; keep running the hard CE parity gate. No RCPS and no fallback yet.
 
