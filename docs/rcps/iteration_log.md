@@ -1866,3 +1866,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - `rcps_mcldnn2018_s2028` on GPU1.
 - Corrected a launch hygiene issue: an orphan duplicate seed2028 process from an earlier detach attempt was killed to prevent checkpoint contamination; only the tmux-managed seed2028 process remains.
 - Next action after both runs finish: export test predictions, run reliability-bin metrics, and decide whether MCLDNN 2018A is strong enough for supplementary evidence or whether the paper still needs CGDNet/FastMLDNN full baseline gate.
+
+## 2026-05-24 12:40 CST - MCLDNN 2018A export watcher installed
+
+- Added runtime watcher `/home/citybuster/Data/RCPS/work_dirs/logs/watch_mcldnn_2018A_20ep_export.sh` outside the git repo.
+- Watcher tmux session: `rcps_mcldnn2018_export`.
+- Behavior: wait for seed2027/2028 training processes to finish, export test predictions with `num_workers=0`, run `analyze_reliability.py`, and aggregate seed2026/2027/2028 into:
+  `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A_mcldnn_20ep/summary/deepsig201801A_mcldnn_hard-ce-20ep_3seed_summary.csv`.
+- This watcher is operational glue only; it does not change models, losses, seeds, or evaluation rules.
