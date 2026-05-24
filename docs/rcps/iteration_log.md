@@ -1906,3 +1906,26 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - Scalar SNR remains insufficient as a sample-level audio order parameter.
   - The admitted positive result supports a learned/model-adaptive reliability projection: teacher confidence plus a small posterior correction and retention gate.
   - The manuscript should keep scalar-SNR audio failures as diagnostics and report the phi-RCPS result as an admitted but teacher-dependent audio positive case.
+
+## 2026-05-24 23:05 CST - RadioML2018.01A ResNet-AMR second-backbone gate opened
+
+- Motivation: the TPAMI evidence audit still has one weak point: RadioML2018.01A has PETCGDNN as an admitted main backbone, but needs a second independent backbone that is not CGDNet/FastMLDNN after their failed parity branches.
+- External reference: AMR-Benchmark includes a lightweight ResNet for RML2018.01A with Conv2D residual blocks, Adam lr 0.001, batch size 400, and early stopping.
+- Code change:
+  - Added `ResNetAMR` to `csrr/models/backbones/resnet_amr.py`.
+  - Registered it in `csrr/models/backbones/__init__.py`.
+  - Added ordinary and SNR-aware configs under `configs/resnet_amr/` and `configs/rcps/resnet_amr/`.
+  - The backbone uses ordinary `ClsHead`, so RCPS comparisons can remain loss/target-only after the hard CE gate passes.
+- QA:
+  - Config parsing passed for hard CE, static LS, and RCPS-Hybrid configs.
+  - Random-tensor forward passed for input layouts `N x L x 2`, `N x 2 x L`, `N x 1 x 2 x L`, `N x 2 x L x 1`, and `N x L x 2 x 1`.
+  - Smoke annotation set with 800 train/validation/test samples was generated at `/home/citybuster/Data/RCPS/processed/smoke_annotations/deepsig201801A_800`.
+  - Ann800 smoke train/validation/test/export/analyze passed and wrote `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A_smoke/metrics/deepsig201801A_resnet_amr_hard-ce-smoke_seed2026_test.csv`.
+- Debug notes:
+  - Initial smoke failed because the RCPS 2018A pipeline feeds `N x L x 2`, not `N x 1 x 2 x L`; the backbone now normalizes both layouts internally.
+  - A full-dataset smoke with `cache=True` spent several minutes caching all 2018A samples; ann800 smoke is now used for fast chain validation only.
+  - The first paired nohup launch started seed2026 but seed2027 inherited the wrong working directory; seed2027 was relaunched with an explicit `cd`.
+- Running now:
+  - `ResNetAMR + RadioML2018.01A + Hard CE + 20 epochs`, seed2026 on GPU0.
+  - `ResNetAMR + RadioML2018.01A + Hard CE + 20 epochs`, seed2027 on GPU1.
+- Gate rule unchanged: if 20-epoch hard CE is clearly below the MCLDNN diagnostic level or has unstable high-SNR plateau, ResNet-AMR is quarantined and the next candidate is DenseNet-AMR/DensCNN rather than forcing RCPS.

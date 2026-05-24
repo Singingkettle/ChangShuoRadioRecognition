@@ -14,10 +14,11 @@ from .mcformer import MCformer
 from .mcldnn import MCLDNN
 from .mldnn import MLDNNSingleBranch, MLDNN
 from .petcgdnn import PETCGDNN
+from .resnet_amr import ResNetAMR
 
 __all__ = [
     'CGDNet', 'CLDNNL', 'CLDNNW', 'CNN1DPF', 'CNN2', 'CNN4',
     'DAE', 'DensCNN', 'DSCLDNN', 'FastMLDNN', 'GRU2', 'HCGDNN',
     'LSTM2', 'MCformer', 'MCLDNN', 'MLDNNSingleBranch', 'MLDNN',
-    'PETCGDNN',
+    'PETCGDNN', 'ResNetAMR',
 ]
