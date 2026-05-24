@@ -1929,3 +1929,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - `ResNetAMR + RadioML2018.01A + Hard CE + 20 epochs`, seed2026 on GPU0.
   - `ResNetAMR + RadioML2018.01A + Hard CE + 20 epochs`, seed2027 on GPU1.
 - Gate rule unchanged: if 20-epoch hard CE is clearly below the MCLDNN diagnostic level or has unstable high-SNR plateau, ResNet-AMR is quarantined and the next candidate is DenseNet-AMR/DensCNN rather than forcing RCPS.
+## 2026-05-25 03:45 CST - ResNet-AMR 2018A long-budget gate manifest update
+
+- Added running manifest rows for `RadioML2018.01A / ResNetAMR / hard-ce-longbudget` seeds `2026` and `2027`.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_2018A_resnet_amr_longbudget`.
+- Early sanity through epoch 3: seed2026 val `41.2741%`, seed2027 val `37.4945%`.
+- No RCPS paired comparison is allowed until hard CE gate passes.
+- DenseNet/DensCNN fallback remains inactive until ResNet-AMR is formally quarantined.
+
