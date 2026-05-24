@@ -2066,3 +2066,10 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - No error signatures; both runs entered epoch2.
 - Decision: DensCNN data/shape/loss path is sane; continue 20-epoch hard-CE prescreen; no RCPS before hard-CE gate passes.
 
+### DensCNN fallback epoch 2 sanity check: 2026-05-25 07:30 CST
+
+- seed2026: val top1 39.2895%, loss 1.7806; best epoch2 saved.
+- seed2027: val top1 38.4306%, loss 1.7784; best epoch2 saved.
+- No error signatures; both runs entered epoch3.
+- Decision: DensCNN remains viable through epoch5/10/20; no RCPS before hard-CE gate passes.
+
