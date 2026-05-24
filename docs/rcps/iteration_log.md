@@ -1936,4 +1936,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Early sanity through epoch 3: seed2026 val `41.2741%`, seed2027 val `37.4945%`.
 - No RCPS paired comparison is allowed until hard CE gate passes.
 - DenseNet/DensCNN fallback remains inactive until ResNet-AMR is formally quarantined.
+## 2026-05-25 03:46 CST - ResNet-AMR 2018A long-budget epoch 4 sanity
+
+- `RadioML2018.01A / ResNetAMR / hard-ce-longbudget` continues normally.
+- Epoch 4 validation: seed2026 `44.5039%`, seed2027 `41.1745%`.
+- Both seeds saved `best_accuracy_top1_epoch_4.pth`.
+- Error scan is empty.
+- Decision: continue hard CE parity gate; no RCPS paired comparison; no DenseNet/DensCNN fallback yet.
 
