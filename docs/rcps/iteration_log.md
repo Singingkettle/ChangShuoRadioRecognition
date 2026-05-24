@@ -1832,3 +1832,16 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Low-SNR and clean bins both degrade in accuracy/NLL/Brier. Therefore same-model clean-view consistency is not admitted as positive audio evidence.
 - Decision: do not expand Speech Commands DPC-consistency. The result supports the theoretical boundary that DPC requires a reliable and calibrated teacher or validation-approved posterior projection; online same-backbone self-teaching can amplify bias.
 - Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_dpc_consistency_summary/speechcommands_ds_cnn_dpc_consistency_vs_hard_seed2026.csv.
+
+## 2026-05-24 11:30 CST - Speech Commands logmel-resnet audio gate completed
+
+- Completed a stronger Speech Commands / logmel-resnet audio diagnostic.
+- Hard CE baseline over seeds 2026/2027/2028 is stable: accuracy 87.704±0.255, NLL 0.3714±0.0073, ECE 0.0058±0.0024, Brier 0.1729±0.0024.
+- Low-weight online DPC consistency (weight 0.01) does not pass the gate: accuracy delta -0.149±0.291 pp, NLL delta +0.0044, ECE delta +0.0009, Brier delta +0.0025.
+- Single-seed RCPS-retention with epsilon 0.05 improves accuracy and Brier but worsens NLL/ECE, so it remains diagnostic.
+- Post-hoc phi gate using hard CE predictions confirms that scalar SNR is not a sufficient sample-level order parameter for audio:
+  - SNR bins explain entropy/correctness R2 = 0.257±0.007 / 0.067±0.003.
+  - SNR plus hand-crafted audio features explain 0.276±0.007 / 0.071±0.004.
+  - Teacher confidence explains 0.949±0.001 / 0.346±0.010.
+- Decision: audio is retained as a multidimensional-reliability boundary case. Do not claim Speech Commands as a positive RCPS/DPC result yet. The next audio direction, if pursued, is cross-fit teacher-confidence or learned phi-RCPS with validation gating.
+- Summary CSV: /home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_speechcommands_summary/logmel_resnet_phi_gate/summary/logmel_resnet_phi_gate_summary.csv.
