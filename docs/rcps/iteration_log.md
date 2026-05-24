@@ -2022,3 +2022,13 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - seed 2027: accuracy `49.4679%`, loss `1.4981`; best checkpoint remains epoch 14.
 - Error scan: empty.
 - Decision: both seeds are showing accuracy fluctuations while validation loss continues to improve. This is not a runtime failure or immediate collapse. Continue hard-CE parity and wait for the epoch-20 moving-slope check and eventual best-checkpoint test. No RCPS and no DenseNet/DensCNN fallback yet.
+
+
+### 2026-05-25 06:18 CST - ResNet-AMR 2018A long-budget epoch 18 sanity
+
+- Stage: `baseline_gate_2018A_resnet_amr_longbudget`, hard CE only.
+- Epoch 18 validation:
+  - seed 2026: accuracy `52.2914%`, loss `1.4051`; best checkpoint remains epoch 16.
+  - seed 2027: accuracy `49.1243%`, loss `1.4880`; best checkpoint remains epoch 14.
+- Error scan: empty.
+- Decision: top-1 accuracy is entering a plateau/fluctuation region while validation loss continues to improve. Continue to the epoch-20 moving-slope check before any go/no-go decision. No RCPS and no DenseNet/DensCNN fallback yet.
