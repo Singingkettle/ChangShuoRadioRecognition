@@ -86,7 +86,15 @@ def main() -> None:
             row = next(r for r in summary_rows if r["setting"] == setting and r["metric"] == metric)
             values[i, j] = row["pearson_with_accuracy"]
 
-    fig, ax = plt.subplots(figsize=(8.8, 3.0))
+    plt.rcParams.update({
+        "font.size": 8,
+        "axes.titlesize": 9,
+        "axes.labelsize": 8,
+        "xtick.labelsize": 7,
+        "ytick.labelsize": 7,
+        "legend.fontsize": 7,
+    })
+    fig, ax = plt.subplots(figsize=(7.2, 2.35))
     x = np.arange(len(settings))
     width = 0.24
     colors = ["#0072B2", "#009E73", "#D55E00"]
@@ -96,9 +104,9 @@ def main() -> None:
     ax.set_ylim(-1.05, 1.05)
     ax.set_ylabel("Pearson correlation with accuracy")
     ax.set_xticks(x)
-    ax.set_xticklabels(settings, rotation=18, ha="right")
+    ax.set_xticklabels(settings, rotation=16, ha="right")
     ax.legend(frameon=False, ncol=3, loc="lower left")
-    ax.set_title("Real AMC feature geometry aligns with reliability transitions")
+    ax.set_title("Real AMC Feature Geometry")
     ax.grid(axis="y", alpha=0.25)
     fig.tight_layout()
     fig.savefig(out_dir / "real_amc_geometry_summary.pdf", bbox_inches="tight")
