@@ -1950,4 +1950,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Both seeds continue to refresh best checkpoints.
 - seed2027 recovered from the slow epoch-5 increment, so no diagnostic intervention is triggered.
 - Decision remains: continue hard CE gate; no RCPS paired comparison; no DenseNet/DensCNN fallback yet.
+## 2026-05-25 04:30 CST - ResNet-AMR 2018A long-budget epoch 7--8 sanity
+
+- Epoch 7 validation: seed2026 `46.7044%` with loss `1.6263`; seed2027 `43.9369%` with loss `1.7215`.
+- Epoch 8 validation: seed2026 `48.4182%` with loss `1.6063`; seed2027 `44.6712%` with loss `1.7024`.
+- Both seeds saved new best checkpoints at epoch 8.
+- Error scan remains empty.
+- Decision remains: continue hard CE parity gate; no RCPS paired comparison; no DenseNet/DensCNN fallback yet.
 
