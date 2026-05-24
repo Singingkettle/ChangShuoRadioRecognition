@@ -1971,4 +1971,11 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Both seeds saved new best checkpoints at epoch 12.
 - Error scan remains empty.
 - Decision: keep hard CE gate running; ResNet-AMR is not quarantined; no RCPS until test/SNR-bin gate and seed plan are resolved.
+## 2026-05-25 05:36 CST - ResNet-AMR 2018A long-budget epoch 13--14 sanity
+
+- Epoch 13 validation: seed2026 `51.5885%` / loss `1.4683`; seed2027 `49.2461%` / loss `1.5672`.
+- Epoch 14 validation: seed2026 `52.0778%` / loss `1.4518`; seed2027 `49.8390%` / loss `1.5458`.
+- Both seeds saved new best checkpoints at epoch 14.
+- Error scan remains empty.
+- Interpretation: long-budget parity is materially stronger than the 20-epoch prescreen. Continue hard CE gate; no RCPS until test/SNR-bin and third seed decisions are resolved.
 
