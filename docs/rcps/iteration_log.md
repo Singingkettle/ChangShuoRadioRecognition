@@ -1979,3 +1979,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
 - Error scan remains empty.
 - Interpretation: long-budget parity is materially stronger than the 20-epoch prescreen. Continue hard CE gate; no RCPS until test/SNR-bin and third seed decisions are resolved.
 
+
+
+### 2026-05-25 05:47 CST - ResNet-AMR 2018A long-budget epoch 15 sanity
+
+- Branch/commit during training: `feature/rcps-experiments` / training launched from `73c9e7f`; logging commit was `d631bdd`.
+- Stage: `baseline_gate_2018A_resnet_amr_longbudget`, hard CE only.
+- Epoch 15 validation:
+  - seed 2026: accuracy `52.3008%`, loss `1.4369`, saved `best_accuracy_top1_epoch_15.pth`.
+  - seed 2027: accuracy `49.0091%`, loss `1.5268`; best checkpoint remains epoch 14.
+- Error scan: no `Traceback`, `CUDA out of memory`, `Too many open files`, `CalledProcessError`, `FileNotFoundError`, or `TypeError`.
+- Decision: seed 2027 has an accuracy fluctuation but loss is still improving; continue hard CE parity. Do not start RCPS, and do not switch to DenseNet fallback.
