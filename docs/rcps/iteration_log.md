@@ -2032,3 +2032,12 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - seed 2027: accuracy `49.1243%`, loss `1.4880`; best checkpoint remains epoch 14.
 - Error scan: empty.
 - Decision: top-1 accuracy is entering a plateau/fluctuation region while validation loss continues to improve. Continue to the epoch-20 moving-slope check before any go/no-go decision. No RCPS and no DenseNet/DensCNN fallback yet.
+
+### ResNet-AMR long-budget epoch 19 sanity check: 2026-05-25 06:30 CST
+
+- Dataset/model: RadioML2018.01A / ResNet-AMR / hard CE / long-budget gate.
+- seed2026 epoch19: val top1 52.5559%, loss 1.3973; best checkpoint refreshed at epoch19.
+- seed2027 epoch19: val top1 49.3637%, loss 1.4816; best remains epoch14 at 49.8390%.
+- Last-5-epoch slopes: seed2026 acc +0.0638 pp/epoch, loss -0.0099/epoch; seed2027 acc +0.0887 pp/epoch, loss -0.0113/epoch.
+- Decision: continue to epoch20 go/no-go; do not start RCPS; do not switch to DenseNet/DensCNN fallback yet.
+
