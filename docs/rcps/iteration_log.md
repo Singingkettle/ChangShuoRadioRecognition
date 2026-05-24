@@ -1990,3 +1990,14 @@ Decision: no RCPS comparison is launched on parity-failed models. The next goal 
   - seed 2027: accuracy `49.0091%`, loss `1.5268`; best checkpoint remains epoch 14.
 - Error scan: no `Traceback`, `CUDA out of memory`, `Too many open files`, `CalledProcessError`, `FileNotFoundError`, or `TypeError`.
 - Decision: seed 2027 has an accuracy fluctuation but loss is still improving; continue hard CE parity. Do not start RCPS, and do not switch to DenseNet fallback.
+
+
+### 2026-05-25 05:55 CST - ResNet-AMR 2018A long-budget go/no-go rule
+
+This is a pre-specified admission rule for the RadioML2018.01A second-backbone gate, added while the long-budget hard-CE run is still in progress.
+
+- Continue seed 2026/2027 until early stopping or a clear plateau.
+- Advance to seed 2028 and paired RCPS only if best-checkpoint test mean is close to the MCLDNN diagnostic anchor, provisionally at least about `54.5%`, with normal high-SNR plateau (about `83%+` at the top SNR bins), no large NLL/Brier posterior-quality regression, and no seed collapse.
+- Quarantine ResNet-AMR if the long-budget test mean remains more than about `2.5 pp` below the MCLDNN diagnostic anchor, or if the high-SNR plateau/export/analyze pipeline is abnormal.
+- If quarantined, switch to the pre-registered DenseNet/DensCNN fallback, which must itself pass hard-CE gate before any RCPS comparison.
+- No RCPS comparison is allowed before this hard-CE gate is resolved.
