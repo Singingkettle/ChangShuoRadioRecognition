@@ -2041,3 +2041,12 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - Last-5-epoch slopes: seed2026 acc +0.0638 pp/epoch, loss -0.0099/epoch; seed2027 acc +0.0887 pp/epoch, loss -0.0113/epoch.
 - Decision: continue to epoch20 go/no-go; do not start RCPS; do not switch to DenseNet/DensCNN fallback yet.
 
+### ResNet-AMR long-budget epoch20 gate decision: 2026-05-25 06:42 CST
+
+- Dataset/model: RadioML2018.01A / ResNet-AMR / hard CE / long-budget gate.
+- seed2026 epoch20: val top1 52.4893%, loss 1.3905; best epoch19 52.5559%.
+- seed2027 epoch20: val top1 49.9479%, loss 1.4734; best epoch20 49.9479%.
+- Two-seed best mean: 51.2519%, about 3.25 pp below the pre-registered ~54.5% admission line.
+- Decision: ResNet-AMR is quarantined for 2018A main-table use; do not run ResNet-AMR RCPS paired comparisons; proceed to DenseNet/DensCNN hard-CE fallback gate.
+- ResNet-AMR training processes were stopped after preserving logs and checkpoints.
+
