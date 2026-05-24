@@ -2001,3 +2001,14 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - Quarantine ResNet-AMR if the long-budget test mean remains more than about `2.5 pp` below the MCLDNN diagnostic anchor, or if the high-SNR plateau/export/analyze pipeline is abnormal.
 - If quarantined, switch to the pre-registered DenseNet/DensCNN fallback, which must itself pass hard-CE gate before any RCPS comparison.
 - No RCPS comparison is allowed before this hard-CE gate is resolved.
+
+
+### 2026-05-25 05:56 CST - ResNet-AMR 2018A long-budget epoch 16 sanity
+
+- Branch/commit during training: `feature/rcps-experiments`; training launched from `73c9e7f`; current logging commit before this entry was `21895df`.
+- Stage: `baseline_gate_2018A_resnet_amr_longbudget`, hard CE only.
+- Epoch 16 validation:
+  - seed 2026: accuracy `52.3976%`, loss `1.4255`, saved `best_accuracy_top1_epoch_16.pth`.
+  - seed 2027: accuracy `49.3833%`, loss `1.5108`; best checkpoint remains epoch 14.
+- Error scan: empty.
+- Decision: continue long-budget hard-CE parity. Seed 2027 recovered from the epoch-15 accuracy dip and is not a collapse. Do not start RCPS and do not switch to DenseNet/DensCNN fallback.
