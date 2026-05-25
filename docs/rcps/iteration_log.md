@@ -2235,3 +2235,16 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - Work root: `/home/citybuster/Data/RCPS/work_dirs/pilot_critical_posterior_hisar_20ep`.
 - Logs: `pilot_critical_posterior_hisar_seed2026.log` and `pilot_critical_posterior_hisar_seed2027.log`.
 - Admission rule remains unchanged: three-seed NLL/Brier majority improvement with high-reliability retention; otherwise diagnostic only.
+
+
+### Hisar critical-posterior three-seed gate completed: 2026-05-26 05:40
+
+`HisarMod2019.1 / PETCGDNN / RCPS-Critical-Posterior` seeds 2026/2027/2028 finished train, prediction export, and reliability analysis under `/home/citybuster/Data/RCPS/work_dirs/pilot_critical_posterior_hisar_20ep`.
+
+Three-seed summary:
+
+- Hard CE Acc/NLL/ECE/Brier: `55.9605±0.7358 / 1.0805±0.0204 / 0.0091±0.0017 / 0.4867±0.0075`.
+- RCPS-Critical-Posterior: `56.2609±0.5987 / 1.0742±0.0194 / 0.0096±0.0023 / 0.4832±0.0058`.
+- Paired deltas: Acc `+0.3004±0.7367 pp`, NLL `-0.0063±0.0203`, ECE `+0.0005±0.0041`, Brier `-0.0034±0.0075`.
+
+Gate decision: not admitted to the main table. The mean trend is slightly positive, but NLL/Brier improvement is not present in the majority of seeds; seed2028 carries the gain while seeds 2026/2027 are slightly worse. Record as `promising but not admitted` non-DeepSig diagnostic.
