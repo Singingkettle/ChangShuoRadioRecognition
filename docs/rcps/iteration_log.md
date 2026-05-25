@@ -2257,3 +2257,16 @@ Purpose: test whether the `Speech Commands / Logmel-ResNet / phi-RCPS` evidence 
 Teacher artifact QA passed before training: each train posterior has 46200 samples, shape `(46200, 11)`, contiguous sample_idx, and normalized probabilities.
 
 Launched seed2026 and seed2027 under `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_phi_crossfit_20ep_eps005_ret075`; seed2028 will start after one GPU is free. Admission rule: NLL/Brier majority-seed improvement against hard CE, no material accuracy loss; ECE alone is insufficient.
+
+
+### Audio cross-fit phi-RCPS gate completed: 2026-05-26 06:20
+
+`Speech Commands / Logmel-ResNet / cross-fit phi-RCPS` completed for seeds 2026/2027/2028. Teacher mapping: student 2026 <- teacher 2027, student 2027 <- teacher 2028, student 2028 <- teacher 2026.
+
+Three-seed overall test:
+
+- Hard CE Acc/NLL/ECE/Brier: `87.7039±0.2545 / 0.3714±0.0073 / 0.0058±0.0024 / 0.1729±0.0024`.
+- Cross-fit phi-RCPS: `87.9723±0.1696 / 0.3629±0.0060 / 0.0075±0.0023 / 0.1690±0.0017`.
+- Paired deltas: Acc `+0.2684±0.1926 pp`, NLL `-0.0085±0.0017`, ECE `+0.0017±0.0009`, Brier `-0.0039±0.0014`.
+
+Gate decision: admitted as audio learned-reliability evidence with ECE tradeoff. This strengthens the audio result against the same-seed teacher criticism, but it is not scalar SNR universality.
