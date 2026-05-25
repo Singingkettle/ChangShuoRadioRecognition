@@ -2270,3 +2270,10 @@ Three-seed overall test:
 - Paired deltas: Acc `+0.2684±0.1926 pp`, NLL `-0.0085±0.0017`, ECE `+0.0017±0.0009`, Brier `-0.0039±0.0014`.
 
 Gate decision: admitted as audio learned-reliability evidence with ECE tradeoff. This strengthens the audio result against the same-seed teacher criticism, but it is not scalar SNR universality.
+
+
+### Hisar / MCformer smoke passed: 2026-05-26 06:48
+
+`HisarMod2019.1 / MCformer / Hard CE` seed2026 1-epoch smoke completed under `/home/citybuster/Data/RCPS/work_dirs/smoke_hisar_mcformer_1ep`. The run completed train, validation export, test export, and reliability-bin analysis without traceback/OOM/file-handle errors. Validation accuracy after one epoch was `33.1029%`; test accuracy was `33.16%`.
+
+Decision: configuration and metadata path are valid, but this is not a baseline gate. MCformer on Hisar is a possible non-DeepSig second-backbone candidate; a 10--20 epoch single-seed pilot should precede any three-seed hard gate because one epoch is substantially heavier than PETCGDNN.
