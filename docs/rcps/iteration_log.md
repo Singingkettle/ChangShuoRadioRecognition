@@ -2248,3 +2248,12 @@ Three-seed summary:
 - Paired deltas: Acc `+0.3004±0.7367 pp`, NLL `-0.0063±0.0203`, ECE `+0.0005±0.0041`, Brier `-0.0034±0.0075`.
 
 Gate decision: not admitted to the main table. The mean trend is slightly positive, but NLL/Brier improvement is not present in the majority of seeds; seed2028 carries the gain while seeds 2026/2027 are slightly worse. Record as `promising but not admitted` non-DeepSig diagnostic.
+
+
+### Audio cross-fit phi-RCPS launched: 2026-05-26 05:54
+
+Purpose: test whether the `Speech Commands / Logmel-ResNet / phi-RCPS` evidence depends on same-seed teacher self-confirmation. Cross-fit teacher mapping: student seed2026 uses teacher checkpoint seed2027, seed2027 uses teacher checkpoint seed2028, and seed2028 uses teacher checkpoint seed2026.
+
+Teacher artifact QA passed before training: each train posterior has 46200 samples, shape `(46200, 11)`, contiguous sample_idx, and normalized probabilities.
+
+Launched seed2026 and seed2027 under `/home/citybuster/Data/RCPS/work_dirs/crossmodal_audio_phi_crossfit_20ep_eps005_ret075`; seed2028 will start after one GPU is free. Admission rule: NLL/Brier majority-seed improvement against hard CE, no material accuracy loss; ECE alone is insufficient.
