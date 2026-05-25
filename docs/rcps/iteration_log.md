@@ -2122,3 +2122,17 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - Two-seed best mean: 49.8384%.
 - Decision: DensCNN does not meet the ~54.5% 2018A second-backbone admission line and is weaker than ResNet-AMR long-budget. Quarantine DensCNN; do not run seed2028 or any DensCNN Static LS / RCPS paired comparison. Keep 2018A as PETCGDNN large-scale extension, not dual-backbone main evidence.
 
+
+
+### Next-stage AMC supplement configs and smoke QA: 2026-05-25 23:31 CST
+
+- Added RCPS-ready configs for HisarMod2019.1 with PETCGDNN and MCformer, plus PETCGDNN on RadioML2016.10B.
+- Fixed the original MCformer Hisar config path typo (`datasets/datasets/hisar` -> `datasets/hisar`).
+- New configs use `LoadIQFromFile` with `cache=False` for smoke/gate stability, avoiding full Hisar array caching.
+- Static config parse passed for all new hard CE, Static LS, and RCPS-Hybrid configs.
+- Forward smoke passed: Hisar PETCGDNN `(N,1024,2)->(N,26)`, Hisar MCformer `(N,2,1024)->(N,26)`, 10B PETCGDNN `(N,128,2)->(N,10)`.
+- 1-epoch small-sample train/export/analyze smoke passed:
+  - HisarMod2019.1 / PETCGDNN / hard CE / seed2026: validation CSV at `/home/citybuster/Data/RCPS/work_dirs/smoke_next_stage/metrics/hisar2019_petcgdnn_hard-ce_seed2026_validation.csv`.
+  - HisarMod2019.1 / MCformer / hard CE / seed2026: validation CSV at `/home/citybuster/Data/RCPS/work_dirs/smoke_next_stage/metrics/hisar2019_mcformer_hard-ce_seed2026_validation.csv`.
+  - RadioML2016.10B / PETCGDNN / hard CE / seed2026: validation CSV at `/home/citybuster/Data/RCPS/work_dirs/smoke_next_stage/metrics/deepsig201610B_petcgdnn_hard-ce_seed2026_validation.csv`.
+- Decision: start formal hard-CE baseline gates for Hisar PETCGDNN and 10B PETCGDNN first. Hisar MCformer remains a second candidate after PETCGDNN gate starts cleanly. No RCPS paired runs before hard-CE gates pass.
