@@ -2147,3 +2147,15 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - HisarMod2019.1 / PETCGDNN / seed2026 on GPU0, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_next_stage_hisar_petcgdnn_20ep_cache`.
   - RadioML2016.10B / PETCGDNN / seed2026 on GPU1, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_next_stage_10B_petcgdnn_20ep_cache`.
 - Both runs entered epoch 1 with normal training logs and no `Traceback`, `Too many open files`, or CUDA OOM. No Static LS / RCPS paired comparison before the hard-CE gates pass.
+
+
+### Next-stage PETCGDNN hard-CE gate seed2026 complete: 2026-05-26 00:13 CST
+
+- RadioML2016.10B / PETCGDNN / hard CE / seed2026 completed 20 epochs, exported validation/test predictions, and produced reliability-bin CSVs.
+  - Validation overall accuracy: 62.2133%, NLL: 0.9433, ECE: 0.0235, Brier: 0.4186.
+  - Test overall accuracy: 62.2181%, NLL: 0.9419, ECE: 0.0232, Brier: 0.4182.
+- HisarMod2019.1 / PETCGDNN / hard CE / seed2026 completed 20 epochs, exported validation/test predictions, and produced reliability-bin CSVs.
+  - Validation overall accuracy: 56.6346%, NLL: 1.0624, ECE: 0.0181, Brier: 0.4799.
+  - Test overall accuracy: 56.7865%, NLL: 1.0575, ECE: 0.0140, Brier: 0.4785.
+- Post-processing used `num_workers=0` and completed without the earlier file-handle failure.
+- seed2027 runs have started for both gates. No Static LS / RCPS paired comparisons until all three hard-CE seeds finish and pass gate review.
