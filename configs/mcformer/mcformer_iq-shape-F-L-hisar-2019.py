@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/datasets/hisar/iq-shape-F-L-hisar2019.py',
+    '../_base_/datasets/hisar/iq-shape-F-L-hisar2019.py',
     '../_base_/schedules/amc.py',
     '../_base_/runtimes/amc.py'
 ]

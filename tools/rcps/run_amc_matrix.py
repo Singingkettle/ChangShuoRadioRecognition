@@ -59,6 +59,12 @@ CONFIGS = {
     ('petcgdnn', 'rcps-confusion'): 'configs/rcps/petcgdnn/petcgdnn_rcps-confusion_iq-snr-deepsig-201610A.py',
     ('petcgdnn', 'rcps-entropy'): 'configs/rcps/petcgdnn/petcgdnn_rcps-entropy_iq-snr-deepsig-201610A.py',
     ('petcgdnn', 'rcps-posterior'): 'configs/rcps/petcgdnn/petcgdnn_rcps-posterior_iq-snr-deepsig-201610A.py',
+    ('petcgdnn_10b', 'hard-ce'): 'configs/rcps/petcgdnn/petcgdnn_hard-ce_iq-snr-deepsig-201610B.py',
+    ('petcgdnn_10b', 'static-ls'): 'configs/rcps/petcgdnn/petcgdnn_static-ls_iq-snr-deepsig-201610B.py',
+    ('petcgdnn_10b', 'rcps-hybrid'): 'configs/rcps/petcgdnn/petcgdnn_rcps-hybrid-eps01_iq-snr-deepsig-201610B.py',
+    ('petcgdnn_hisar', 'hard-ce'): 'configs/rcps/petcgdnn/petcgdnn_hard-ce_iq-snr-hisar2019.py',
+    ('petcgdnn_hisar', 'static-ls'): 'configs/rcps/petcgdnn/petcgdnn_static-ls_iq-snr-hisar2019.py',
+    ('petcgdnn_hisar', 'rcps-hybrid'): 'configs/rcps/petcgdnn/petcgdnn_rcps-hybrid-eps01_iq-snr-hisar2019.py',
     ('petcgdnn_kerasinit', 'hard-ce'): 'configs/rcps/parity/petcgdnn_hard-ce_kerasinit_iq-snr-deepsig-201610A.py',
     ('petcgdnn_kerasinit', 'static-ls'): 'configs/rcps/parity/petcgdnn_static-ls_kerasinit_iq-snr-deepsig-201610A.py',
     ('petcgdnn_kerasinit', 'rcps-retention'): 'configs/rcps/parity/petcgdnn_rcps-retention_kerasinit_iq-snr-deepsig-201610A.py',
@@ -71,6 +77,9 @@ CONFIGS = {
     ('mcformer', 'rcps-confusion'): 'configs/rcps/mcformer/mcformer_rcps-confusion_iq-snr-deepsig-201610A.py',
     ('mcformer', 'rcps-entropy'): 'configs/rcps/mcformer/mcformer_rcps-entropy_iq-snr-deepsig-201610A.py',
     ('mcformer', 'rcps-posterior'): 'configs/rcps/mcformer/mcformer_rcps-posterior_iq-snr-deepsig-201610A.py',
+    ('mcformer_hisar', 'hard-ce'): 'configs/rcps/mcformer/mcformer_hard-ce_iq-snr-hisar2019.py',
+    ('mcformer_hisar', 'static-ls'): 'configs/rcps/mcformer/mcformer_static-ls_iq-snr-hisar2019.py',
+    ('mcformer_hisar', 'rcps-hybrid'): 'configs/rcps/mcformer/mcformer_rcps-hybrid-eps01_iq-snr-hisar2019.py',
 }
 
 
