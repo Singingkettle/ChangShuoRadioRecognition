@@ -2159,3 +2159,16 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - Test overall accuracy: 56.7865%, NLL: 1.0575, ECE: 0.0140, Brier: 0.4785.
 - Post-processing used `num_workers=0` and completed without the earlier file-handle failure.
 - seed2027 runs have started for both gates. No Static LS / RCPS paired comparisons until all three hard-CE seeds finish and pass gate review.
+
+
+### Next-stage PETCGDNN hard-CE gate seed2027 complete: 2026-05-26 00:45 CST
+
+- RadioML2016.10B / PETCGDNN / hard CE / seed2027 completed and exported validation/test CSVs.
+  - Validation overall accuracy: 62.5100%, NLL: 0.9366, ECE: 0.0102, Brier: 0.4141.
+  - Test overall accuracy: 62.5683%, NLL: 0.9353, ECE: 0.0098, Brier: 0.4138.
+  - Two-seed stability so far: seed2026 test 62.2181%, seed2027 test 62.5683%; this is a strong candidate for RadioML2016.10B second-backbone admission, pending seed2028.
+- HisarMod2019.1 / PETCGDNN / hard CE / seed2027 completed and exported validation/test CSVs.
+  - Validation overall accuracy: 55.7673%, NLL: 1.0917, ECE: 0.0104, Brier: 0.4894.
+  - Test overall accuracy: 55.7196%, NLL: 1.0875, ECE: 0.0081, Brier: 0.4884.
+  - This is slightly below seed2026 but still stable enough to continue seed2028 before deciding whether Hisar is admitted or diagnostic.
+- seed2028 runs have started for both gates. No RCPS paired comparisons before seed2028 completes and gate review is logged.
