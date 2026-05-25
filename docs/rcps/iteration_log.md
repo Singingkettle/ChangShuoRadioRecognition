@@ -2277,3 +2277,8 @@ Gate decision: admitted as audio learned-reliability evidence with ECE tradeoff.
 `HisarMod2019.1 / MCformer / Hard CE` seed2026 1-epoch smoke completed under `/home/citybuster/Data/RCPS/work_dirs/smoke_hisar_mcformer_1ep`. The run completed train, validation export, test export, and reliability-bin analysis without traceback/OOM/file-handle errors. Validation accuracy after one epoch was `33.1029%`; test accuracy was `33.16%`.
 
 Decision: configuration and metadata path are valid, but this is not a baseline gate. MCformer on Hisar is a possible non-DeepSig second-backbone candidate; a 10--20 epoch single-seed pilot should precede any three-seed hard gate because one epoch is substantially heavier than PETCGDNN.
+
+
+### Hisar / MCformer 10-epoch hard pilot launched: 2026-05-26 06:49
+
+After the 1-epoch smoke passed, launched a single-seed 10-epoch hard-label pilot for `HisarMod2019.1 / MCformer` under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcformer_hard_10ep`. This is not a main result; it is a cost-controlled check before deciding whether to spend a three-seed long-budget baseline gate.
