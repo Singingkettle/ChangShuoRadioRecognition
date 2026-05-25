@@ -2185,3 +2185,15 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - RCPS-Hybrid with epsilon max 0.1 and gamma 1.0.
   - Seeds 2026/2027/2028, 20 epochs, validation/test prediction export and reliability-bin analysis.
 - HisarMod2019.1 / PETCGDNN / hard CE seed2028 continues on GPU0; no Hisar paired run before hard-CE gate review.
+
+
+### HisarMod2019.1 PETCGDNN hard-CE gate review and paired-comparison launch: 2026-05-26 01:15 CST
+
+- HisarMod2019.1 / PETCGDNN / hard CE completed three seeds.
+  - Test accuracy: seed2026 56.7865%, seed2027 55.7196%, seed2028 55.3754%.
+  - Three-seed test mean/std: accuracy 55.9605±0.7358%, NLL 1.0805±0.0204, ECE 0.0091±0.0017, Brier 0.4867±0.0075.
+- Gate decision: pass as non-DeepSig AMC extension candidate, pending paired target comparison. This remains extension evidence unless RCPS paired metrics pass the NLL/Brier and retention gates.
+- Launched paired comparison on GPU0 under `/home/citybuster/Data/RCPS/work_dirs/paired_next_stage_hisar_petcgdnn_20ep`:
+  - Static LS with smoothing 0.1.
+  - RCPS-Hybrid with epsilon max 0.1 and gamma 1.0.
+  - Seeds 2026/2027/2028, 20 epochs, validation/test prediction export and reliability-bin analysis.
