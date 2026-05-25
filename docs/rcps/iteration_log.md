@@ -2115,3 +2115,10 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - The run remains stable but is likely below the desired 2018A second-backbone admission line; continue to epoch20 for formal gate.
 - Decision: no RCPS before hard-CE gate passes.
 
+### DensCNN fallback epoch20 gate decision: 2026-05-25 13:03 CST
+
+- seed2026: best epoch16 val top1 49.9291%, loss 1.4956; epoch20 val top1 49.1685%, loss 1.4643.
+- seed2027: best epoch18 val top1 49.7477%, loss 1.4773; epoch20 val top1 49.5494%, loss 1.4624.
+- Two-seed best mean: 49.8384%.
+- Decision: DensCNN does not meet the ~54.5% 2018A second-backbone admission line and is weaker than ResNet-AMR long-budget. Quarantine DensCNN; do not run seed2028 or any DensCNN Static LS / RCPS paired comparison. Keep 2018A as PETCGDNN large-scale extension, not dual-backbone main evidence.
+
