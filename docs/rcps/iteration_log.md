@@ -2197,3 +2197,20 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - Static LS with smoothing 0.1.
   - RCPS-Hybrid with epsilon max 0.1 and gamma 1.0.
   - Seeds 2026/2027/2028, 20 epochs, validation/test prediction export and reliability-bin analysis.
+
+
+### Next-stage PETCGDNN paired comparison gate decisions: 2026-05-26 04:16 CST
+
+- RadioML2016.10B / PETCGDNN paired comparison completed.
+  - Hard CE test mean/std: Acc 61.6422±1.3125, NLL 0.9538±0.0265, ECE 0.0102±0.0021, Brier 0.4250±0.0158.
+  - Static LS 0.1 test mean/std: Acc 62.1478±0.2859, NLL 1.0017±0.0088, ECE 0.0498±0.0042, Brier 0.4244±0.0052.
+  - RCPS-Hybrid eps0.1 test mean/std: Acc 44.8975±30.2222, NLL 1.4029±0.7792, ECE 0.0139±0.0097, Brier 0.5771±0.2796.
+  - Gate decision: reject RCPS-Hybrid for main/extension tables. The method improved over Static LS on the first two seeds but seed2028 collapsed to 10.0000% accuracy and NLL 2.3026. This pair remains a hard-label baseline anchor and target-gate stability diagnostic.
+
+- HisarMod2019.1 / PETCGDNN paired comparison completed.
+  - Hard CE test mean/std: Acc 55.9605±0.7358, NLL 1.0805±0.0204, ECE 0.0091±0.0017, Brier 0.4867±0.0075.
+  - Static LS 0.1 test mean/std: Acc 55.7217±0.3486, NLL 1.1661±0.0123, ECE 0.0526±0.0041, Brier 0.4945±0.0039.
+  - RCPS-Hybrid eps0.1 test mean/std: Acc 55.6467±0.3331, NLL 1.1262±0.0107, ECE 0.0229±0.0061, Brier 0.4925±0.0032.
+  - Gate decision: reject RCPS-Hybrid for main/extension tables. Static LS is a clear negative control; RCPS-Hybrid is safer than Static LS but still worse than Hard CE in Acc/NLL/ECE/Brier. Hisar remains a non-DeepSig hard-label anchor and a target-gate diagnostic.
+
+- Interpretation for the manuscript: these results strengthen the admission protocol rather than the positive table. They should be described as evidence that fixed smoothing and simple Hybrid targets are insufficient outside admitted settings. Follow-up should use Critical-RCPS or PosteriorBase-RCPS with validation target gates, not a wider fixed-epsilon Hybrid sweep.
