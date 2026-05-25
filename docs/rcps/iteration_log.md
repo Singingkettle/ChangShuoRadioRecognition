@@ -2087,3 +2087,10 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
 - No error signatures. DensCNN keeps improving and has smaller seed gap than ResNet-AMR.
 - Decision: continue 20-epoch hard-CE prescreen; no RCPS before hard-CE gate passes.
 
+### DensCNN fallback epoch 9 sanity check: 2026-05-25 09:42 CST
+
+- seed2026: epoch6 44.0768/1.6726; epoch7 45.0516/1.6551; epoch8 45.5700/1.6398; epoch9 45.5900/1.6272.
+- seed2027: epoch6 44.7072/1.6640; epoch7 44.6398/1.6477; epoch8 45.5967/1.6324; epoch9 46.0555/1.6211.
+- No error signatures. The curve is stable and seed gap is small, but the model is still weak relative to desired 2018A second-backbone gate.
+- Decision: continue to 20 epochs before formal gate; no RCPS before hard-CE gate passes.
+
