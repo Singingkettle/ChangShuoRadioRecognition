@@ -26,6 +26,10 @@ class LoadIQFromFile(BaseTransform):
          Returns:
              dict: The dict contains loaded iq frame and meta information.
          """
+        if 'iq' in results:
+            results.setdefault('iq_length', max(results['iq'].shape))
+            return results
+
         file_path = results['iq_path']
 
         try:
