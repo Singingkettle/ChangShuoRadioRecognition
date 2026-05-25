@@ -2136,3 +2136,14 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - HisarMod2019.1 / MCformer / hard CE / seed2026: validation CSV at `/home/citybuster/Data/RCPS/work_dirs/smoke_next_stage/metrics/hisar2019_mcformer_hard-ce_seed2026_validation.csv`.
   - RadioML2016.10B / PETCGDNN / hard CE / seed2026: validation CSV at `/home/citybuster/Data/RCPS/work_dirs/smoke_next_stage/metrics/deepsig201610B_petcgdnn_hard-ce_seed2026_validation.csv`.
 - Decision: start formal hard-CE baseline gates for Hisar PETCGDNN and 10B PETCGDNN first. Hisar MCformer remains a second candidate after PETCGDNN gate starts cleanly. No RCPS paired runs before hard-CE gates pass.
+
+
+### Next-stage hard-CE gate cache recovery: 2026-05-25 23:43 CST
+
+- The first formal Hisar PETCGDNN and RadioML2016.10B PETCGDNN gates were initially too slow with per-sample non-cached `.npy` loading.
+- Patched `LoadIQFromFile` to safely skip loading when `AMCDataset(cache=True)` has already placed `iq` in the sample dict, and switched the new Hisar/10B RCPS base configs back to cached loading.
+- Commit: `0b238ca` (`Make RCPS IQ loading compatible with cached datasets`), pushed to `origin/feature/rcps-experiments`.
+- Relaunched 20-epoch hard-CE baseline gates:
+  - HisarMod2019.1 / PETCGDNN / seed2026 on GPU0, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_next_stage_hisar_petcgdnn_20ep_cache`.
+  - RadioML2016.10B / PETCGDNN / seed2026 on GPU1, work root `/home/citybuster/Data/RCPS/work_dirs/baseline_gate_next_stage_10B_petcgdnn_20ep_cache`.
+- Both runs entered epoch 1 with normal training logs and no `Traceback`, `Too many open files`, or CUDA OOM. No Static LS / RCPS paired comparison before the hard-CE gates pass.
