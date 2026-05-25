@@ -2214,3 +2214,17 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - Gate decision: reject RCPS-Hybrid for main/extension tables. Static LS is a clear negative control; RCPS-Hybrid is safer than Static LS but still worse than Hard CE in Acc/NLL/ECE/Brier. Hisar remains a non-DeepSig hard-label anchor and a target-gate diagnostic.
 
 - Interpretation for the manuscript: these results strengthen the admission protocol rather than the positive table. They should be described as evidence that fixed smoothing and simple Hybrid targets are insufficient outside admitted settings. Follow-up should use Critical-RCPS or PosteriorBase-RCPS with validation target gates, not a wider fixed-epsilon Hybrid sweep.
+
+
+### Critical-posterior PETCGDNN pilot decisions: 2026-05-26 05:05 CST
+
+- Built reliability-conditioned posterior-table targets from hard-CE validation predictions and ran seed2028 pilots for RadioML2016.10B / PETCGDNN and HisarMod2019.1 / PETCGDNN.
+- RadioML2016.10B / PETCGDNN / RCPS-Critical-Posterior seed2028 failed the target gate.
+  - Test Acc/NLL/ECE/Brier: 10.0000 / 2.3026 / 0.0028 / 0.9000.
+  - Paired vs Hard CE seed2028: Acc -50.1402 pp, NLL +1.3184, ECE -0.0097, Brier +0.4569.
+  - Decision: reject and do not expand; record as soft-target collapse diagnostic for this model-dataset pair.
+- HisarMod2019.1 / PETCGDNN / RCPS-Critical-Posterior seed2028 passed the single-seed pilot.
+  - Test Acc/NLL/ECE/Brier: 56.5262 / 1.0671 / 0.0069 / 0.4810.
+  - Paired vs Hard CE seed2028: Acc +1.1508 pp, NLL -0.0294, ECE -0.0041, Brier -0.0121.
+  - Decision: expand only this Hisar critical-posterior setting to seeds 2026/2027. It remains pending three-seed admission and must not be written as a completed positive result yet.
+- Manuscript interpretation: 10B/PETCGDNN strengthens the quarantine/target-gate narrative; Hisar critical-posterior is the current best non-DeepSig AMC extension candidate.
