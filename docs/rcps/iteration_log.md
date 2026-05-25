@@ -2228,3 +2228,10 @@ This is a pre-specified admission rule for the RadioML2018.01A second-backbone g
   - Paired vs Hard CE seed2028: Acc +1.1508 pp, NLL -0.0294, ECE -0.0041, Brier -0.0121.
   - Decision: expand only this Hisar critical-posterior setting to seeds 2026/2027. It remains pending three-seed admission and must not be written as a completed positive result yet.
 - Manuscript interpretation: 10B/PETCGDNN strengthens the quarantine/target-gate narrative; Hisar critical-posterior is the current best non-DeepSig AMC extension candidate.
+
+### Hisar critical-posterior three-seed expansion launch: 2026-05-26 05:08 CST
+
+- Launched HisarMod2019.1 / PETCGDNN / RCPS-Critical-Posterior seeds 2026 and 2027 after seed2028 passed the single-seed pilot.
+- Work root: `/home/citybuster/Data/RCPS/work_dirs/pilot_critical_posterior_hisar_20ep`.
+- Logs: `pilot_critical_posterior_hisar_seed2026.log` and `pilot_critical_posterior_hisar_seed2027.log`.
+- Admission rule remains unchanged: three-seed NLL/Brier majority improvement with high-reliability retention; otherwise diagnostic only.
