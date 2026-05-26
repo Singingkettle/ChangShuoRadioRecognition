@@ -2307,3 +2307,20 @@ Results: validation accuracy `36.2548%`; test Acc/NLL/ECE/Brier `36.1054 / 1.824
 ### Hisar / MCLDNN corrected 10-epoch hard pilot launched: 2026-05-26 09:52
 
 After the corrected 1-epoch MCLDNN Hisar smoke passed, launched a single-seed 10-epoch hard-label pilot under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcldnn_corrected_10ep`. This is a cost-controlled baseline-gate pilot, not a main result. Admission decision will compare its validation/test trajectory against the Hisar PETCGDNN hard-label anchor around 56% and the rejected MCformer pilot at 48.69%.
+
+
+### Hisar / MCLDNN corrected 20-epoch baseline gate completed: 2026-05-26 12:50
+
+`HisarMod2019.1 / MCLDNN / Hard CE` corrected frame_length=1024 configuration completed the 20-epoch three-seed hard-label gate under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcldnn_corrected_20ep_fresh`.
+
+Seed-level test metrics:
+
+- seed2026 Acc/NLL/ECE/Brier `62.9669 / 1.0879 / 0.0469 / 0.4399`; high-SNR mean over 14/16/18 dB `88.4923`.
+- seed2027 Acc/NLL/ECE/Brier `65.9342 / 0.9935 / 0.0322 / 0.4036`; high-SNR mean `94.1179`.
+- seed2028 Acc/NLL/ECE/Brier `59.1877 / 1.1187 / 0.0197 / 0.4653`; high-SNR mean `80.7923`.
+
+Three-seed summary: Acc/NLL/ECE/Brier `62.6963±3.3814 / 1.0667±0.0653 / 0.0330±0.0136 / 0.4362±0.0310`; high-SNR mean `87.8009±6.6897`.
+
+Gate decision: hard-label baseline gate passes as a non-DeepSig second backbone, but seed variance is non-negligible and must be reported. This result corrects the earlier legacy 2x128 MCLDNN parity failure and shows the backbone was underestimated by the 10-epoch pilot.
+
+Next action: add `static-ls`, `rcps-hybrid`, and `rcps-critical-posterior` MCLDNN-Hisar configs. Build a MCLDNN-specific reliability-conditioned posterior table from validation predictions only; no test information is used. Paired RCPS/LS comparison may start only after config QA.
