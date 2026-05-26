@@ -33,6 +33,7 @@ CONFIGS = {
     ('mcldnn', 'rcps-uniform'): 'configs/rcps/mcldnn/mcldnn_rcps-uniform_iq-snr-deepsig-201610A.py',
     ('mcldnn', 'rcps-retention'): 'configs/rcps/mcldnn/mcldnn_rcps-retention_iq-snr-deepsig-201610A.py',
     ('mcldnn', 'rcps-confusion'): 'configs/rcps/mcldnn/mcldnn_rcps-confusion_iq-snr-deepsig-201610A.py',
+    ('mcldnn_hisar', 'hard-ce'): 'configs/rcps/mcldnn/mcldnn_hard-ce_iq-snr-hisar2019.py',
     ('mldnn', 'hard-ce'): 'configs/rcps/mldnn/mldnn_hard-ce_iq-ap-snr-deepsig-201610A.py',
     ('mldnn', 'static-ls'): 'configs/rcps/mldnn/mldnn_static-ls_iq-ap-snr-deepsig-201610A.py',
     ('mldnn', 'rcps-uniform'): 'configs/rcps/mldnn/mldnn_rcps-uniform_iq-ap-snr-deepsig-201610A.py',

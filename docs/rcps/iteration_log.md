@@ -2297,3 +2297,9 @@ Gate decision: rejected as a weak second-backbone baseline for Hisar. The traini
 ### Hisar / MCLDNN smoke failed: 2026-05-26 09:38
 
 HisarMod2019.1 / MCLDNN / Hard CE seed2026 1-epoch smoke failed before training with `ValueError: cannot reshape array of size 2048 into shape (1,2,128)`. This is a config-parity/input-length issue: the current Hisar samples are 2x1024 while the legacy MCLDNN Hisar config uses 2x128 reshape. Do not count this as model or RCPS evidence. A corrected frame_length=1024 SNR-aware config is required before any baseline gate.
+
+### Hisar / MCLDNN corrected smoke passed: 2026-05-26 09:48
+
+Added a corrected SNR-aware MCLDNN Hisar config using `frame_length=1024` and `Reshape [1,2,1024]`, replacing the legacy 2x128 input assumption. The corrected 1-epoch hard-label smoke completed train, validation prediction export, test prediction export, reliability analysis, and efficiency export under `/home/citybuster/Data/RCPS/work_dirs/smoke_hisar_mcldnn_corrected_1ep`.
+
+Results: validation accuracy `36.2548%`; test Acc/NLL/ECE/Brier `36.1054 / 1.8246 / 0.0109 / 0.6791`. This is not a baseline gate, but it is a valid chain and a stronger 1-epoch start than the MCformer Hisar smoke. Decision: commit the corrected config and run a single-seed 10-epoch hard-label pilot before considering any three-seed gate.
