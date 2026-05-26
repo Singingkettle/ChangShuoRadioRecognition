@@ -2303,3 +2303,7 @@ HisarMod2019.1 / MCLDNN / Hard CE seed2026 1-epoch smoke failed before training 
 Added a corrected SNR-aware MCLDNN Hisar config using `frame_length=1024` and `Reshape [1,2,1024]`, replacing the legacy 2x128 input assumption. The corrected 1-epoch hard-label smoke completed train, validation prediction export, test prediction export, reliability analysis, and efficiency export under `/home/citybuster/Data/RCPS/work_dirs/smoke_hisar_mcldnn_corrected_1ep`.
 
 Results: validation accuracy `36.2548%`; test Acc/NLL/ECE/Brier `36.1054 / 1.8246 / 0.0109 / 0.6791`. This is not a baseline gate, but it is a valid chain and a stronger 1-epoch start than the MCformer Hisar smoke. Decision: commit the corrected config and run a single-seed 10-epoch hard-label pilot before considering any three-seed gate.
+
+### Hisar / MCLDNN corrected 10-epoch hard pilot launched: 2026-05-26 09:52
+
+After the corrected 1-epoch MCLDNN Hisar smoke passed, launched a single-seed 10-epoch hard-label pilot under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcldnn_corrected_10ep`. This is a cost-controlled baseline-gate pilot, not a main result. Admission decision will compare its validation/test trajectory against the Hisar PETCGDNN hard-label anchor around 56% and the rejected MCformer pilot at 48.69%.
