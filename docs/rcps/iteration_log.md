@@ -2293,3 +2293,7 @@ Validation trajectory: epoch1 `32.9654%`, epoch2 `38.3567%`, epoch3 `40.6154%`, 
 Overall test metrics from `hisar2019_mcformer_hisar_hard-ce_hard_seed2026_test.csv`: Acc/NLL/ECE/Brier `48.6900 / 1.3225 / 0.0069 / 0.5510`.
 
 Gate decision: rejected as a weak second-backbone baseline for Hisar. The training/export/analyze chain is healthy, but the 10-epoch hard-label accuracy remains far below the Hisar PETCGDNN hard-label anchor around `56%`. Do not launch three-seed hard gate or RCPS paired comparison for this backbone unless a new independently stabilized recipe is introduced.
+
+### Hisar / MCLDNN smoke failed: 2026-05-26 09:38
+
+HisarMod2019.1 / MCLDNN / Hard CE seed2026 1-epoch smoke failed before training with `ValueError: cannot reshape array of size 2048 into shape (1,2,128)`. This is a config-parity/input-length issue: the current Hisar samples are 2x1024 while the legacy MCLDNN Hisar config uses 2x128 reshape. Do not count this as model or RCPS evidence. A corrected frame_length=1024 SNR-aware config is required before any baseline gate.
