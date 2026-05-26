@@ -2282,3 +2282,14 @@ Decision: configuration and metadata path are valid, but this is not a baseline 
 ### Hisar / MCformer 10-epoch hard pilot launched: 2026-05-26 06:49
 
 After the 1-epoch smoke passed, launched a single-seed 10-epoch hard-label pilot for `HisarMod2019.1 / MCformer` under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcformer_hard_10ep`. This is not a main result; it is a cost-controlled check before deciding whether to spend a three-seed long-budget baseline gate.
+
+
+### Hisar / MCformer 10-epoch hard pilot completed: 2026-05-26 09:25
+
+`HisarMod2019.1 / MCformer / Hard CE` seed2026 10-epoch pilot completed under `/home/citybuster/Data/RCPS/work_dirs/pilot_hisar_mcformer_hard_10ep` with validation and test prediction export plus reliability-bin analysis.
+
+Validation trajectory: epoch1 `32.9654%`, epoch2 `38.3567%`, epoch3 `40.6154%`, epoch4 `42.9192%`, epoch5 `45.1760%`, epoch6 `46.0404%`, epoch7 `46.7240%`, epoch8 `47.1269%`, epoch9 `46.8962%`, epoch10 `48.6481%`.
+
+Overall test metrics from `hisar2019_mcformer_hisar_hard-ce_hard_seed2026_test.csv`: Acc/NLL/ECE/Brier `48.6900 / 1.3225 / 0.0069 / 0.5510`.
+
+Gate decision: rejected as a weak second-backbone baseline for Hisar. The training/export/analyze chain is healthy, but the 10-epoch hard-label accuracy remains far below the Hisar PETCGDNN hard-label anchor around `56%`. Do not launch three-seed hard gate or RCPS paired comparison for this backbone unless a new independently stabilized recipe is introduced.
