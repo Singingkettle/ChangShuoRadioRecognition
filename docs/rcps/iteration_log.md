@@ -2375,3 +2375,15 @@ Gate details:
 - High-SNR retention passes in 3/3 seeds, high-SNR accuracy delta -0.0085±0.8068 pp.
 
 Decision: conditionally admitted as non-DeepSig, second-backbone evidence for transition-band posterior correction. In the manuscript, report it as transition-band posterior quality and accuracy evidence with high-reliability retention; do not claim universal reliability-bin calibration improvement. Keep Static LS / weak Hybrid seed2026 failures as diagnostic evidence that blind smoothing is insufficient.
+
+### RadioML2016.10B / PETCGDNN matched target-gate rerun confirms quarantine: 2026-05-26 20:40
+
+A matched 20-epoch PETCGDNN RadioML2016.10B paired run was repeated under /home/citybuster/Data/RCPS/work_dirs/paired_10B_petcgdnn_20ep using the already passed hard-label baseline cache. The hard-label cache remains a usable baseline: Acc/NLL/ECE/Brier = 61.6422±1.3125 / 0.9538±0.0265 / 0.0102±0.0021 / 0.4250±0.0158.
+
+Target-gate results:
+
+- Static LS 0.1: delta Acc/NLL/ECE/Brier = -0.6148 pp / +0.0679 / +0.0403 / +0.0124. Not admitted.
+- RCPS-Hybrid eps0.1/gamma2: seed2028 collapsed to 10% random prediction; three-seed delta Acc/NLL/Brier = -16.7559 pp / +0.4435 / +0.1514. Not admitted.
+- RCPS-Critical-Posterior: seed2028 also collapsed to 10%; three-seed delta Acc/NLL/Brier = -16.8983 pp / +0.4450 / +0.1543. Not admitted.
+
+Decision: this branch is a target-stability diagnostic/quarantine. Do not cherry-pick seed2026/2027. The result supports the two-stage evidence protocol: a hard-label baseline gate can pass while a target gate fails.
