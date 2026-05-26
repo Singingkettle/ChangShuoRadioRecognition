@@ -2324,3 +2324,54 @@ Three-seed summary: Acc/NLL/ECE/Brier `62.6963±3.3814 / 1.0667±0.0653 / 0.0330
 Gate decision: hard-label baseline gate passes as a non-DeepSig second backbone, but seed variance is non-negligible and must be reported. This result corrects the earlier legacy 2x128 MCLDNN parity failure and shows the backbone was underestimated by the 10-epoch pilot.
 
 Next action: add `static-ls`, `rcps-hybrid`, and `rcps-critical-posterior` MCLDNN-Hisar configs. Build a MCLDNN-specific reliability-conditioned posterior table from validation predictions only; no test information is used. Paired RCPS/LS comparison may start only after config QA.
+
+### Hisar / MCLDNN Static LS and weak Hybrid target gate failed: 2026-05-26 14:26
+
+HisarMod2019.1 / MCLDNN / 20 epochs / seed2026 paired comparison completed for Static LS 0.1 and RCPS-Hybrid eps0.1/gamma2 under /home/citybuster/Data/RCPS/work_dirs/paired_hisar_mcldnn_20ep.
+
+Hard CE seed2026 test Acc/NLL/ECE/Brier: 62.9669 / 1.0879 / 0.0469 / 0.4399.
+
+Static LS seed2026: 58.9458 / 1.2280 / 0.0280 / 0.4839; deltas vs hard CE: Acc -4.0212 pp, NLL +0.1401, Brier +0.0441; high-SNR Acc -5.4179 pp; transition-band Acc/NLL/Brier -5.2369 pp / +0.1520 / +0.0484.
+
+RCPS-Hybrid seed2026: 59.8050 / 1.1839 / 0.0240 / 0.4728; deltas vs hard CE: Acc -3.1619 pp, NLL +0.0960, Brier +0.0329; high-SNR retention passed with Acc +0.9410 pp, but transition-band Acc/NLL/Brier degraded by -3.5138 pp / +0.1209 / +0.0432.
+
+Gate decision: neither Static LS nor weak RCPS-Hybrid is admitted. They improve ECE but degrade accuracy/NLL/Brier, matching the pre-registered rule that ECE-only improvements are insufficient. Stopped remaining seed2027/2028 queues and retained seed2026 as diagnostic evidence. Launched MCLDNN + Hisar + RCPS-Critical-Posterior seed2026 pilot at /home/citybuster/Data/RCPS/work_dirs/paired_hisar_mcldnn_critical_20ep to test posterior-table / critical-band target selection.
+
+### Hisar / MCLDNN RCPS-Critical-Posterior seed2026 target gate passed: 2026-05-26 15:34
+
+HisarMod2019.1 / MCLDNN / RCPS-Critical-Posterior / 20 epochs / seed2026 completed under /home/citybuster/Data/RCPS/work_dirs/paired_hisar_mcldnn_critical_20ep. The posterior table was built from MCLDNN hard CE validation predictions only; no test information was used.
+
+Overall test comparison:
+
+- Hard CE: Acc/NLL/ECE/Brier 62.9669 / 1.0879 / 0.0469 / 0.4399.
+- RCPS-Critical-Posterior: 64.7812 / 1.0004 / 0.0302 / 0.4180.
+- Paired delta: Acc +1.8142 pp, NLL -0.0875, ECE -0.0167, Brier -0.0218.
+
+Reliability-bin checks:
+
+- Transition band (0/2/4/6/8 dB): Acc +1.3877 pp, NLL -0.0941, Brier -0.0254, ECE -0.0289.
+- Low-SNR (-20 to -12 dB): Acc +2.5138 pp, NLL -0.0890, Brier -0.0189.
+- High-SNR (14/16/18 dB): Acc -0.3077 pp, satisfying the <=1 pp retention rule; NLL/Brier are slightly worse and require 3-seed confirmation.
+
+Decision: seed2026 passes target gate. Launched seed2027 and seed2028 in parallel. If the 3-seed result preserves majority NLL/Brier/accuracy improvements and high-SNR retention, this pair can become non-DeepSig second-backbone positive evidence. If not, keep it as a diagnostic showing that posterior/critical target selection has signal but needs stronger validation constraints.
+
+### Hisar / MCLDNN RCPS-Critical-Posterior 3-seed gate completed: 2026-05-26 16:48
+
+HisarMod2019.1 / MCLDNN / RCPS-Critical-Posterior completed for seeds 2026/2027/2028. Summary saved to /home/citybuster/Data/RCPS/work_dirs/paired_hisar_mcldnn_critical_20ep/summary_hisar_mcldnn_critical_vs_hard_3seed.csv.
+
+Three-seed overall:
+
+- Hard CE Acc/NLL/ECE/Brier: 62.6963±3.3814 / 1.0667±0.0653 / 0.0330±0.0136 / 0.4362±0.0310.
+- RCPS-Critical-Posterior: 63.5362±3.4964 / 1.0432±0.0793 / 0.0330±0.0073 / 0.4296±0.0319.
+- Paired delta: Acc +0.8399±0.8451 pp, NLL -0.0235±0.0559, ECE +0.0001±0.0145, Brier -0.0067±0.0131.
+
+Gate details:
+
+- Overall accuracy improves in 3/3 seeds.
+- Overall NLL/Brier improve in only 1/3 seeds, so this is not a universal all-bin calibration win.
+- Transition-band NLL improves in 3/3 seeds.
+- Transition-band Brier improves in 3/3 seeds.
+- Transition-band paired deltas: Acc +1.1364±0.3127 pp, NLL -0.0517±0.0414, Brier -0.0154±0.0090.
+- High-SNR retention passes in 3/3 seeds, high-SNR accuracy delta -0.0085±0.8068 pp.
+
+Decision: conditionally admitted as non-DeepSig, second-backbone evidence for transition-band posterior correction. In the manuscript, report it as transition-band posterior quality and accuracy evidence with high-reliability retention; do not claim universal reliability-bin calibration improvement. Keep Static LS / weak Hybrid seed2026 failures as diagnostic evidence that blind smoothing is insufficient.
