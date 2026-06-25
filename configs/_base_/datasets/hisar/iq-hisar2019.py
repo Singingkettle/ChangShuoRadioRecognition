@@ -2,7 +2,7 @@
 data_root = 'data/ModulationClassification/Hisar/HisarMod2019.1'
 dataset_type = 'AMCDataset'
 
-pipeline = [dict(type='Reshape', shapes=dict(iq=[1, 2, 128])), dict(type='PackInputs', input_key='iq')]
+pipeline = [dict(type='Reshape', shapes=dict(iq=[1, 2, 1024])), dict(type='PackInputs', input_key='iq')]
 
 train_dataloader = dict(
     batch_size=400,

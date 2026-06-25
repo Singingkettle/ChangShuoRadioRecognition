@@ -4,11 +4,8 @@ dataset_type = 'AMCDataset'
 
 pipeline = [
     dict(
-        type='IQToAP',
-    ),
-    dict(
         type='Transpose',
-        orders=dict(ap=[1, 0])
+        orders=dict(iq=[1, 0])
     ),
     dict(
         type='PackInputs',
