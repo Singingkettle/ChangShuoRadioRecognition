@@ -36,6 +36,17 @@ class ICAMCNet(BaseBackbone):
                  dropout=0.4,
                  noise_std=1.0,
                  init_cfg=None):
+        # The AMR-Benchmark Keras reference initialises every Conv2D/Dense
+        # with `glorot_uniform`. Without an explicit init the PyTorch default
+        # (Kaiming, fan_in based) makes the Flatten->Linear(8192, 128) output
+        # too small; the GaussianNoise(std=1) layer then swamps the signal and
+        # the network never escapes random-chance loss (ln(num_classes)).
+        # Default to Xavier-uniform on Conv2d and Linear to match Keras.
+        if init_cfg is None:
+            init_cfg = [
+                dict(type='Xavier', layer='Conv2d', distribution='uniform'),
+                dict(type='Xavier', layer='Linear', distribution='uniform'),
+            ]
         super(ICAMCNet, self).__init__(init_cfg=init_cfg)
         self.frame_length = frame_length
         self.num_classes = num_classes

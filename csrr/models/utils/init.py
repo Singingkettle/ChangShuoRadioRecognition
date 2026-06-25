@@ -35,8 +35,17 @@ def rnn_init(module: nn.Module, gain: float = 1.0) -> None:
             nn.init.zeros_(param)
 
 
+@WEIGHT_INITIALIZERS.register_module(name='RNN')
 @WEIGHT_INITIALIZERS.register_module(name='LSTM')
 class LSTMInit(BaseInit):
+    """Recurrent weight initializer.
+
+    ``rnn_init`` is generic over RNN cell types (it dispatches on the
+    ``weight_ih``/``weight_hh``/``bias_*`` parameter names), so the same class
+    is registered under both ``'LSTM'`` and ``'RNN'``. Several CGDNet configs
+    request ``dict(type='RNN', layer='GRU', ...)`` to apply the Keras-style
+    Xavier(input) + orthogonal(recurrent) initialisation to their GRU.
+    """
     def __init__(self, gain: float, layer: Union[str, List, None] = None):
         super().__init__(layer=layer)
         self.gain = gain

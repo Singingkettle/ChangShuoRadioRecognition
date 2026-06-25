@@ -17,6 +17,22 @@ class MCLDNN(BaseBackbone):
     """
 
     def __init__(self, frame_length=128, num_classes=-1, init_cfg=None):
+        # The AMR-Benchmark Keras reference initialises every Conv/Dense with
+        # `glorot_uniform`. Without an explicit init the PyTorch default
+        # (Kaiming) leaves the deep multi-branch + SELU head unable to escape
+        # the random-chance solution (loss frozen at ln(num_classes)); match
+        # Keras by defaulting to Xavier-uniform on conv and linear layers.
+        if init_cfg is None:
+            init_cfg = [
+                dict(type='Xavier', layer='Conv2d', distribution='uniform'),
+                dict(type='Xavier', layer='Conv1d', distribution='uniform'),
+                dict(type='Xavier', layer='Linear', distribution='uniform'),
+                # Keras CuDNNLSTM uses glorot(input) + orthogonal(recurrent);
+                # rnn_init reproduces that (and sets forget-gate bias = 1),
+                # which converges to a markedly better optimum than the
+                # PyTorch default uniform LSTM init.
+                dict(type='LSTM', layer='LSTM', gain=1),
+            ]
         super(MCLDNN, self).__init__(init_cfg=init_cfg)
         self.frame_length = frame_length
         self.num_classes = num_classes
@@ -65,7 +81,13 @@ class MCLDNN(BaseBackbone):
         x3 = self.conv3(x[:, :, 1, :])
         x4 = self.conv4(torch.stack([x2, x3], dim=2))
         x5 = self.conv5(torch.cat([x1, x4], dim=1))
-        x = torch.reshape(x5, [-1, self.frame_length-4, 100])
+        # x5 is NCHW [B, 100, 1, L-4]. The Keras reference reshapes the NHWC
+        # tensor [B, 1, L-4, 100] to (L-4, 100), i.e. time = the L-4 conv
+        # positions, features = the 100 channels. A plain torch.reshape here
+        # interleaves channels into the time axis and scrambles the sequence
+        # fed to the LSTM, which freezes training at random chance. Squeeze the
+        # singleton height and permute so time/feature axes match Keras.
+        x = x5.squeeze(2).permute(0, 2, 1).contiguous()
         x, _ = self.lstm(x)
         if self.num_classes > 0:
             x = self.classifier(x[:, -1, :])

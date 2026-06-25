@@ -22,6 +22,16 @@ class CLDNNL(BaseBackbone):
     """
 
     def __init__(self, frame_length=128, num_classes=-1, init_cfg=None):
+        # Match the AMR-Benchmark Keras CLDNN2 reference (`glorot_uniform`).
+        # The deep 256-channel conv stack with Dropout(0.5) after every layer
+        # vanishes under PyTorch's default init and freezes the network at
+        # random chance (loss == ln(num_classes)); Xavier-uniform restores a
+        # healthy gradient signal.
+        if init_cfg is None:
+            init_cfg = [
+                dict(type='Xavier', layer='Conv2d', distribution='uniform'),
+                dict(type='Xavier', layer='Linear', distribution='uniform'),
+            ]
         super(CLDNNL, self).__init__(init_cfg=init_cfg)
         self.frame_length = frame_length
         self.num_classes = num_classes

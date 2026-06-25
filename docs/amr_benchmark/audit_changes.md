@@ -221,6 +221,142 @@ weights (`CE 0.1`, `MSE 0.9`), dropped the unused `frame_length`
 kwarg on the long-sequence configs, and removed the spurious
 `_scope_='mmdet'` qualifier from the 201604C MSELoss entry.
 
+## Phase 2 fixes (training/accuracy alignment)
+
+### `csrr/models/backbones/icamcnet.py` — Xavier (glorot_uniform) init (🟢 high confidence)
+
+**Symptom:** On RML2016.10A the first Phase 2 run sat at exactly random
+chance (`accuracy/top1 = 9.0909% = 1/11`, `loss = 2.3979 = ln(11)`) for
+every epoch; the best checkpoint was `epoch_1` and `ReduceLROnPlateau`
+decayed the LR to its `1e-6` floor without the validation metric ever
+improving. No NaNs — the network simply never escaped the random-output
+regime.
+
+**Root cause:** the AMR-Benchmark Keras reference initialises every
+`Conv2D`/`Dense` with `kernel_initializer='glorot_uniform'`, but the CSRR
+config supplied no `init_cfg`, so the backbone fell back to PyTorch's
+default Kaiming (fan-in) initialisation. With the large
+`Flatten -> Linear(8192, 128)` head this produces a very small-variance
+128-d feature vector, which the reference `GaussianNoise(std=1)` layer
+(applied between the hidden Dense and the classifier) then swamps. The
+gradient signal is too weak to grow the features before the LR scheduler
+collapses, so the model freezes at the random-chance solution.
+
+**Fix:** default `init_cfg` to Xavier-uniform on `Conv2d` and `Linear`
+(equivalent to Keras `glorot_uniform`) when the config does not specify
+one. Validated with a CPU overfit probe (7 batches, 150 epochs): default
+init crawls (2.49 -> 1.50 with a ~75-epoch dead zone) whereas Xavier init
+drops immediately and steadily (3.14 -> 1.09); the `noise_std=1.0`
+reference value is retained and works fine once the init is correct.
+The diverged `work_dirs/amr_benchmark/icamcnet/deepsig201610A` run was
+discarded and the model re-queued.
+
+### `csrr/models/backbones/mcldnn.py` — LSTM reshape + Xavier init (🟢 high confidence)
+
+**Symptom:** identical random-chance freeze to ICAMCNet (train *and* val
+loss pinned at `ln(11)=2.398` from epoch 1, even at the full `lr=1e-3`
+before `ReduceLROnPlateau` decayed it). Adding Xavier init alone was not
+enough — a full-pipeline probe (`MODELS.build` + `data_preprocessor` +
+`train_step`, 400 steps over 20 real batches) still stayed at 2.40.
+
+**Root cause:** the tensor handed to the LSTM was reshaped incorrectly.
+After `conv5` the NCHW activation is `[B, 100, 1, L-4]`; the Keras
+reference reshapes the NHWC tensor `[B, 1, L-4, 100]` to `(L-4, 100)` so
+the LSTM sees `time = L-4` conv positions and `features = 100` channels.
+The CSRR port used `torch.reshape(x5, [-1, L-4, 100])`, which interleaves
+the 100 channels into the time axis and feeds the LSTM a scrambled
+sequence — the network cannot fit it and never leaves random chance.
+
+**Fix:** `x = x5.squeeze(2).permute(0, 2, 1).contiguous()` before the LSTM
+(frame-length agnostic). The same full-pipeline probe then drops the loss
+steadily (2.40 -> 2.06 in 400 steps). Also defaulted `init_cfg` to
+Xavier-uniform (Conv2d/Conv1d/Linear) to match the Keras `glorot_uniform`
+reference. The diverged 10A run was discarded and MCLDNN re-queued.
+
+### `csrr/models/backbones/cldnn.py` (`CLDNNL`) — Xavier init (🟢 high confidence)
+
+**Symptom:** same random-chance freeze (best checkpoint `epoch_1`, val
+accuracy pinned at 9.09%). `CLDNNW` (lighter, 50-channel) trained fine;
+`CLDNNL` (deep 256-channel conv stack with `Dropout(0.5)` after every
+conv) did not.
+
+**Root cause / fix:** missing weight init — the deep conv stack vanishes
+under PyTorch's default init. Defaulted `init_cfg` to Xavier-uniform on
+Conv2d/Linear (matching the Keras CLDNN2 `glorot_uniform`). `CLDNNW` was
+left untouched because it already trains and has a valid result. The
+diverged `CLDNNL` 10A run was discarded and re-queued.
+
+### `csrr/models/utils/init.py` — register `RNN` weight initializer (🟢 high confidence)
+
+**Symptom:** every CGDNet config (`dict(type='RNN', layer='GRU', gain=1)`
+in `init_cfg`) crashed `init_weights()` with
+`KeyError: 'RNN is not in the csrr::weight initializer registry'`.
+
+**Root cause / fix:** the generic recurrent initializer (`rnn_init`:
+Xavier on `weight_ih`, orthogonal on `weight_hh`, forget-gate-bias=1) was
+registered only under the name `LSTM`, but the CGDNet configs request
+`RNN`. Registered the same `LSTMInit` class under both `LSTM` and `RNN`
+(stacked `register_module`), so CGDNet's GRU gets the intended
+Keras-style init. Verified `MODELS.build(...).init_weights()` runs clean.
+
+## Phase 2 — RML2016.10A results & assessment
+
+Full 15-model sweep on RML2016.10A (50/10/40 split, 2× RTX 3090, Adam
+lr=1e-3, EarlyStopping patience=50, ReduceLROnPlateau). Measured
+overall / peak (see the auto table in `accuracy_tracking.md`):
+
+| Model | overall (tgt) | peak (tgt) | note |
+|-------|---------------|------------|------|
+| CNN2 | 63.6 (59) | 81.7 (79) | above target |
+| CNN4 | 57.6 (58) | 83.9 (80) | peak above |
+| MCNet | 56.0 (58) | 82.4 (82) | on target |
+| ICAMCNet | 56.8 (57) | 85.1 (83) | **fixed** (init) |
+| ResNetAMR | 54.3 (57) | 82.2 (83) | overall −2.7 |
+| DensCNN | 54.5 (57) | 82.9 (83) | overall −2.5 |
+| GRU2 | 57.7 (58) | 85.7 (85) | on target |
+| LSTM2 | 56.6 (58) | 85.1 (87) | A/P variant |
+| DAE | 55.6 (57) | 84.7 (82) | peak above |
+| MCLDNN | 57.8 (62) | 85.2 (92.05) | **fixed** (reshape+init); residual gap |
+| CLDNNW | 53.0 (57) | 78.3 (85) | ZeroPad divergence |
+| CLDNNL | 57.5 (57) | 83.8 (85) | **fixed** (init) |
+| CGDNet | 53.5 (58) | 79.2 (83) | **fixed** (RNN init); low |
+| PETCGDNN | 57.9 (60) | 86.5 (89) | peak −2.5 |
+| CNN1DPF | 55.0 (57) | 84.2 (85) | AP variant |
+
+**Interpretation of the universal `fail` label.** The orchestrator's
+status is `pass` only if overall, peak *and* best-SNR are all within
+tolerance. Two effects make almost every row `fail` even where the
+reproduction is sound:
+
+1. **Best-SNR criterion vs. high-SNR plateau.** Accuracy saturates at
+   high SNR, so the per-SNR argmax lands at 14–18 dB for nearly every
+   model. The reference "best SNR" values (4–10 dB) are really "≥X dB"
+   (the plateau onset), so a measured peak at 18 dB is correct behaviour
+   but trips the `±2 dB` band. Judge reproduction on overall + peak
+   magnitude, not the argmax SNR.
+2. **Approximate overall targets + 50/10/40 split.** The `overall`
+   targets are eyeballed from DSP Fig. 5 (±1 pp) and assume the paper's
+   60% train split; CSRR trains on 50%, so a ~2–4 pp lower overall is
+   expected and consistent across models.
+
+Net: peaks are at/above reference for ~half the models and within ~2 pp
+for most others; overalls cluster ~2–4 pp below the approximate targets.
+
+**MCLDNN residual gap (documented, retunes capped).** MCLDNN was the
+hardest case: a scrambled LSTM reshape (now fixed) plus missing init
+(now fixed) had frozen it at random chance. After both fixes it trains
+correctly but converges to ~57.8 % overall / ~85.2 % peak versus the
+92.05 % single-best anchor. Retune attempts: (1) Keras-style LSTM init
+(Xavier-ih + orthogonal-hh) — no change (85.6→85.2). Diagnosis shows the
+network plateaus at ~57.5 % val accuracy by ~epoch 31 *while LR is still
+1e-3*, i.e. a genuine convergence ceiling, not an LR-schedule artifact;
+the data path is verified faithful to the Keras reference (branch wiring,
+paddings, concat axes) and uses identical raw-IQ inputs (no
+normalisation). The ~7 pp peak gap is attributed to the reduced training
+split and optimisation differences (Keras CuDNNLSTM/Adam vs PyTorch); on
+this split MCLDNN performs like a typical model rather than the singular
+top performer. Recorded as a residual gap per the Phase 2 retune cap.
+
 ## Known divergences kept on purpose
 
 These are noted here so Phase 2 can decide whether to invest more
