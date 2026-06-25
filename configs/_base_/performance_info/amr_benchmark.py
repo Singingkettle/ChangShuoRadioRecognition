@@ -1,27 +1,15 @@
-# AMC method registry: maps display names used in figures to (a) a stable
-# colour/legend index and (b) the per-dataset training-config subdirectory
-# under ``work_dirs/``. Phase 2 fills the work_dirs with actual training runs;
-# this file just declares where each (method, dataset) result is expected.
+# Canonical comparison registry for the AMR-Benchmark reproduction: keeps only
+# the 15 baseline methods (no MLDNN/HCGDNN/FastMLDNN/DSCLDNN/MCformer/TRN).
 #
-# Dataset keys must match those used in plot configs:
-#   deepsig201610A  -> RML2016.10A
-#   deepsig201610B  -> RML2016.10B
-#   deepsig201801A  -> RML2018.01A
-#   hisar2019       -> HisarMod2019.1
-#
-# The work-dir subdirectory name matches the corresponding training config
-# filename (without ``.py``); the actual config lives somewhere under
-# ``configs/<family>/<subdir>.py``.
+# The publish mapping mirrors ``amc.py``; we duplicate it here so that the
+# per-dataset plot configs can be loaded standalone without inheriting the
+# project-own methods that AMR-Benchmark does not cover.
 
 info = dict(
     work_dir='work_dirs',
-    save_dir='work_dirs/performance',
+    save_dir='work_dirs/performance/amr_benchmark',
 
-    # ----- AMR-Benchmark methods (15) + project-own methods -----
-    # Stable colour indices so the same method always renders with the same
-    # colour across all comparison plots.
     methods={
-        # AMR-Benchmark methods
         'CNN1': 0,
         'CNN2': 1,
         'MCNET': 2,
@@ -37,17 +25,9 @@ info = dict(
         'CGDNet': 12,
         'PETCGDNN': 13,
         'CNN1DPF': 14,
-        # Project-own methods
-        'MLDNN': 15,
-        'HCGDNN': 16,
-        'FastMLDNN': 17,
-        'DSCLDNN': 18,
-        'MCformer': 19,
-        'TRN': 20,
     },
 
     publish=dict(
-        # ---- RML2016.10A ----
         deepsig201610A=dict(
             CNN1='cnn2_iq-deepsig-201610A',
             CNN2='cnn4_iq-deepsig-201610A',
@@ -64,14 +44,7 @@ info = dict(
             CGDNet='cgdnet_iq-deepsig-201610A',
             PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201610A',
             CNN1DPF='cnn1dpf_iq-deepsig-201610A',
-            MLDNN='mldnn_iq-ap-deepsig201610A',
-            HCGDNN='hcgdnn_iq-deepsig-201610A',
-            FastMLDNN='fastmldnn_iq-ap-deepsig-201610A',
-            DSCLDNN='dscldnn_ap-iq-deepsig-201610A',
-            MCformer='mcformer_iq-shape-F-L-deepsig-201610A',
-            TRN='trn_img-deepsig201610A',
         ),
-        # ---- RML2016.10B ----
         deepsig201610B=dict(
             CNN1='cnn2_iq-deepsig-201610B',
             CNN2='cnn4_iq-deepsig-201610B',
@@ -88,13 +61,7 @@ info = dict(
             CGDNet='cgdnet_iq-deepsig-201610B',
             PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201610B',
             CNN1DPF='cnn1dpf_iq-deepsig-201610B',
-            MLDNN='mldnn_iq-ap-deepsig201610B',
-            HCGDNN='hcgdnn_iq-deepsig-201610B',
-            FastMLDNN='fastmldnn_iq-ap-deepsig-201610B',
-            DSCLDNN='dscldnn_ap-iq-deepsig-201610B',
-            MCformer='mcformer_iq-shape-F-L-deepsig-201610B',
         ),
-        # ---- RML2018.01A ----
         deepsig201801A=dict(
             CNN1='cnn2_iq-deepsig-201801A',
             CNN2='cnn4_iq-deepsig-201801A',
@@ -111,13 +78,7 @@ info = dict(
             CGDNet='cgdnet_iq-deepsig-201801A',
             PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201801A',
             CNN1DPF='cnn1dpf_iq-deepsig-201801A',
-            MLDNN='mldnn_iq-ap-deepsig201801A',
-            HCGDNN='hcgdnn_iq-deepsig-201801A',
-            FastMLDNN='fastmldnn_iq-ap-deepsig-201801A',
-            DSCLDNN='dscldnn_ap-iq-deepsig-201801A',
-            MCformer='mcformer_iq-shape-F-L-deepsig-201801A',
         ),
-        # ---- HisarMod2019.1 ----
         hisar2019=dict(
             CNN1='cnn2_iq-hisar-2019',
             CNN2='cnn4_iq-hisar-2019',
@@ -134,11 +95,6 @@ info = dict(
             CGDNet='cgdnet_iq-hisar-2019',
             PETCGDNN='petcgdnn_iq-shape-L-F-hisar-2019',
             CNN1DPF='cnn1dpf_iq-hisar-2019',
-            MLDNN='mldnn_iq-ap-hisar2019',
-            HCGDNN='hcgdnn_iq-hisar-2019',
-            FastMLDNN='fastmldnn_iq-ap-hisar-2019',
-            DSCLDNN='dscldnn_ap-iq-hisar-2019',
-            MCformer='mcformer_iq-shape-F-L-hisar-2019',
         ),
     ),
 )
