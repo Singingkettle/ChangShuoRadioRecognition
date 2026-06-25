@@ -16,13 +16,26 @@ class SNRVsAccuracy(BaseDraw):
 
     def __call__(self, performances, save_dir):
         for dataset_name in self.dataset:
+            if dataset_name not in performances:
+                continue
+            dataset_perfs = performances[dataset_name]
             for set_name in self.dataset[dataset_name]:
                 method_names = self.dataset[dataset_name][set_name]
+
+                # Filter out methods that have no paper.pkl available.
+                method_names = [
+                    m for m in method_names
+                    if (m if isinstance(m, str) else m[0]) in dataset_perfs
+                ]
+                if not method_names:
+                    print(f'[SNRVsAccuracy] No data for {dataset_name}/'
+                          f'{set_name}; skipping.')
+                    continue
 
                 common_snrs = None
                 for method_name in method_names:
                     name = method_name if isinstance(method_name, str) else method_name[0]
-                    snr_set = set(performances[dataset_name][name].snr_set)
+                    snr_set = set(dataset_perfs[name].snr_set)
                     common_snrs = snr_set if common_snrs is None else common_snrs & snr_set
                 common_snrs = sorted(common_snrs)
 
@@ -30,10 +43,10 @@ class SNRVsAccuracy(BaseDraw):
                 accs = []
                 for method_name in method_names:
                     if isinstance(method_name, str):
-                        performance = performances[dataset_name][method_name]
+                        performance = dataset_perfs[method_name]
                         method = dict(score=0, point=[], name=method_name)
                     else:
-                        performance = performances[dataset_name][method_name[0]]
+                        performance = dataset_perfs[method_name[0]]
                         method = dict(score=0, point=[], name=method_name[1])
                         self.legend[method_name[1]] = self.legend[method_name[0]]
                     accuracy = performance.ACC

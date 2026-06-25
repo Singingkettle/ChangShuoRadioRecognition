@@ -28,26 +28,76 @@ import torch
 from ..builder import TABLES
 
 
-def _collect_reshape_shapes(pipeline) -> Dict[str, List[int]]:
-    """Walk a pipeline list and accumulate all ``Reshape`` shape mappings."""
-    shapes: Dict[str, List[int]] = {}
-    if pipeline is None:
-        return shapes
+def _infer_frame_length(cfg) -> int:
+    """Best-effort frame length inference from ``cfg.data_root``."""
+    data_root = ''
+    if hasattr(cfg, 'get'):
+        data_root = cfg.get('data_root', '') or ''
+    if not data_root:
+        for loader_key in ('train_dataloader', 'val_dataloader',
+                           'test_dataloader'):
+            loader = cfg.get(loader_key) if hasattr(cfg, 'get') else None
+            if not loader:
+                continue
+            ds = loader.get('dataset', {}) if isinstance(loader, dict) else {}
+            data_root = (ds.get('data_root', '') if isinstance(ds, dict)
+                         else '') or data_root
+            if data_root:
+                break
+    data_root = str(data_root).lower()
+    if '2018' in data_root or 'hisar' in data_root:
+        return 1024
+    return 128
+
+
+def _apply_pipeline_to_shapes(pipeline, base_shapes: Dict[str, List[int]]):
+    """Apply ``Reshape`` and ``Transpose`` steps to ``base_shapes`` in place.
+
+    Other transforms are ignored. Recurses into ``task_handlers`` /
+    ``transforms`` / ``pipeline`` nesting.
+    """
+    if not pipeline:
+        return base_shapes
     for step in pipeline:
         if not isinstance(step, dict):
             continue
-        if step.get('type') == 'Reshape':
-            step_shapes = step.get('shapes', {}) or {}
-            for key, shape in step_shapes.items():
-                shapes[key] = list(shape)
-        # Recurse into nested task_handlers (PackMultiTaskInputs etc.)
+        step_type = step.get('type')
+        if step_type == 'Reshape':
+            for key, shape in (step.get('shapes', {}) or {}).items():
+                base_shapes[key] = list(shape)
+        elif step_type == 'Transpose':
+            for key, order in (step.get('orders', {}) or {}).items():
+                if key in base_shapes:
+                    current = base_shapes[key]
+                    base_shapes[key] = [current[i] for i in order]
+        elif step_type == 'IQToAP':
+            # IQ -> AP transformation keeps the [2, L] layout but renames key.
+            if 'iq' in base_shapes:
+                base_shapes.setdefault('ap', list(base_shapes['iq']))
+        # Recurse into nested keys
         for nested_key in ('task_handlers', 'transforms', 'pipeline'):
             nested = step.get(nested_key)
             if isinstance(nested, dict):
-                shapes.update(_collect_reshape_shapes(list(nested.values())))
+                _apply_pipeline_to_shapes(list(nested.values()), base_shapes)
             elif isinstance(nested, list):
-                shapes.update(_collect_reshape_shapes(nested))
-    return shapes
+                _apply_pipeline_to_shapes(nested, base_shapes)
+    return base_shapes
+
+
+def _pack_input_keys(pipeline) -> List[str]:
+    """Return the ordered list of input keys consumed by the final pack step."""
+    if not pipeline:
+        return []
+    for step in reversed(pipeline):
+        if not isinstance(step, dict):
+            continue
+        if step.get('type') in ('PackInputs', 'PackMultiTaskInputs'):
+            keys = step.get('input_key')
+            if isinstance(keys, list):
+                return list(keys)
+            if isinstance(keys, str):
+                return [keys]
+    return []
 
 
 def _build_dummy_inputs(cfg, device: torch.device):
@@ -60,7 +110,8 @@ def _build_dummy_inputs(cfg, device: torch.device):
     # Prefer test pipeline (closer to inference); fall back to train pipeline.
     pipeline_candidates = []
     for key in ('test_pipeline', 'pipeline', 'train_pipeline'):
-        pipeline_candidates.append(cfg.get(key) if hasattr(cfg, 'get') else None)
+        if hasattr(cfg, 'get'):
+            pipeline_candidates.append(cfg.get(key))
     for loader_key in ('test_dataloader', 'val_dataloader', 'train_dataloader'):
         loader = cfg.get(loader_key) if hasattr(cfg, 'get') else None
         if loader is None:
@@ -69,29 +120,42 @@ def _build_dummy_inputs(cfg, device: torch.device):
         if isinstance(ds, dict):
             pipeline_candidates.append(ds.get('pipeline'))
 
-    shapes: Dict[str, List[int]] = {}
-    for p in pipeline_candidates:
-        if p:
-            collected = _collect_reshape_shapes(list(p))
-            for k, v in collected.items():
-                shapes.setdefault(k, v)
+    frame_length = _infer_frame_length(cfg)
+    # Base raw-IQ shape coming out of the dataset before any transform.
+    base_shapes: Dict[str, List[int]] = {
+        'iq': [2, frame_length],
+        'ap': [2, frame_length],
+    }
 
-    if not shapes:
-        raise RuntimeError(
-            'Could not determine input shapes from config (no Reshape '
-            'transform found in any pipeline).')
+    pack_keys: List[str] = []
+    # Only the first non-empty pipeline candidate is used (applying the same
+    # Reshape/Transpose multiple times would cancel itself out).
+    for p in pipeline_candidates:
+        if not p:
+            continue
+        _apply_pipeline_to_shapes(list(p), base_shapes)
+        pack_keys = _pack_input_keys(list(p))
+        break
+
+    if not pack_keys:
+        # Pick the most likely default
+        pack_keys = ['iq'] if 'iq' in base_shapes else list(base_shapes.keys())
 
     tensors = {
-        k: torch.randn((1, *shape), dtype=torch.float32, device=device)
-        for k, shape in shapes.items()
+        k: torch.randn((1, *base_shapes[k]), dtype=torch.float32, device=device)
+        for k in pack_keys if k in base_shapes
     }
+
+    if not tensors:
+        raise RuntimeError(
+            'Could not determine input shapes from config '
+            '(no Reshape / Transpose found and pack key not in base_shapes).')
 
     if len(tensors) == 1:
         only_key, only_tensor = next(iter(tensors.items()))
         repr_str = f'{only_key}={tuple(only_tensor.shape)}'
         return only_tensor, repr_str
 
-    # Multiple keys -> the SignalDataPreprocessor produces a dict input.
     repr_str = ', '.join(
         f'{k}={tuple(v.shape)}' for k, v in tensors.items())
     return tensors, repr_str

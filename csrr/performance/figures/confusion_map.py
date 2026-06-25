@@ -11,8 +11,15 @@ class ConfusionMap(BaseDraw):
 
     def __call__(self, performances, save_dir):
         for dataset_name in self.dataset:
+            if dataset_name not in performances:
+                continue
+            dataset_perfs = performances[dataset_name]
             for method_name in self.dataset[dataset_name]:
-                performance = performances[dataset_name][method_name]
+                if method_name not in dataset_perfs:
+                    print(f'[ConfusionMap] {method_name} missing for '
+                          f'{dataset_name}; skipping.')
+                    continue
+                performance = dataset_perfs[method_name]
                 confusion_matrix = performance.confusion_matrix
                 for snr in confusion_matrix:
                     conf = confusion_matrix[snr][:-1, :-1]

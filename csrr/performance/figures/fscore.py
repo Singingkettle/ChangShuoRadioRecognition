@@ -37,15 +37,21 @@ class ClassVsF1ScoreWithSNR(BaseDraw):
 
     def __call__(self, performances, save_dir):
         for dataset_name in self.dataset:
+            if dataset_name not in performances:
+                continue
+            dataset_perfs = performances[dataset_name]
             for set_name in self.dataset[dataset_name]:
                 methods = dict()
                 f1s = dict()
                 classes = []
                 for method_name in self.dataset[dataset_name][set_name]:
+                    name = method_name if isinstance(method_name, str) else method_name[0]
+                    if name not in dataset_perfs:
+                        continue
                     if isinstance(method_name, str):
-                        performance = performances[dataset_name][method_name]
+                        performance = dataset_perfs[method_name]
                     else:
-                        performance = performances[dataset_name][method_name[0]]
+                        performance = dataset_perfs[method_name[0]]
                         self.legend[method_name[1]] = self.legend[method_name[0]]
                     f1_score = performance.F1
                     for group_name in f1_score:
