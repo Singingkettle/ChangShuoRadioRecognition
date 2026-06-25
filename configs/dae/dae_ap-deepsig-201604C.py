@@ -14,6 +14,6 @@ model = dict(
     head=dict(
         type='DAEHead',
         loss_cls=dict(type='CrossEntropyLoss', loss_weight=0.1),
-        loss_mse=dict(type='MSELoss', loss_weight=0.9, reduction='mean', _scope_='mmdet')
+        loss_mse=dict(type='MSELoss', loss_weight=0.9, reduction='mean'),
     )
 )

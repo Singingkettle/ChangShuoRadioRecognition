@@ -12,7 +12,8 @@ model = dict(
         num_classes=11,
     ),
     head=dict(
-        type='ClsHead',
-        loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
+        type='DAEHead',
+        loss_cls=dict(type='CrossEntropyLoss', loss_weight=0.1),
+        loss_mse=dict(type='MSELoss', loss_weight=0.9, reduction='mean'),
     )
 )
