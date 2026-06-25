@@ -9,6 +9,7 @@ model = dict(
     type='SignalClassifier',
     backbone=dict(
         type='CLDNNW',
+        frame_length=1024,
         num_classes=24,
     ),
     head=dict(

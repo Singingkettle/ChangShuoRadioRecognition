@@ -9,7 +9,7 @@ model = dict(
     type='SignalClassifier',
     backbone=dict(
         type='CGDNet',
-        frame_length=128,
+        frame_length=1024,
         num_classes=26,
         init_cfg=[
             dict(type='Kaiming', layer='Linear', mode='fan_in'),
