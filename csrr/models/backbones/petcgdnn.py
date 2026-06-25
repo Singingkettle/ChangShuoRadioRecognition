@@ -18,10 +18,16 @@ class PET(nn.Module):
         sin_x = torch.sin(p1_x)
         cos_x = torch.cos(p1_x)
 
+        # Standard 2D rotation matrix applied to the (I, Q) plane.
+        # Matches the AMR-Benchmark PET-CGDNN Keras reference:
+        #   I' = I * cos(theta) + Q * sin(theta)
+        #   Q' = Q * cos(theta) - I * sin(theta)
+        # The previous implementation flipped the sign of Q' which broke
+        # the rotational equivariance of the parameter estimation layer.
         x11 = x[:, :, 0] * cos_x
         x12 = x[:, :, 1] * sin_x
-        x21 = x[:, :, 0] * sin_x
-        x22 = x[:, :, 1] * cos_x
+        x21 = x[:, :, 1] * cos_x
+        x22 = x[:, :, 0] * sin_x
 
         y1 = x11 + x12
         y2 = x21 - x22
