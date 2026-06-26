@@ -249,7 +249,12 @@ class Flops:
 
         cfg_path = os.path.join(work_dir, cfg_subdir, f'{cfg_subdir}.py')
         if not os.path.isfile(cfg_path):
-            cfg_path = self._search_config(cfg_subdir)
+            # Nested layout (work_dir/<model>/<dataset>/): the training run
+            # dumps the resolved config into the run dir under its original
+            # basename, so glob for it rather than assuming subdir == basename.
+            import glob
+            dumped = sorted(glob.glob(os.path.join(work_dir, cfg_subdir, '*.py')))
+            cfg_path = dumped[0] if dumped else self._search_config(cfg_subdir)
 
         if cfg_path is None or not os.path.isfile(cfg_path):
             print(f'[Flops] Skipping {method_name}: config not found '

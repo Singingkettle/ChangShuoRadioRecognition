@@ -1,100 +1,46 @@
 # Canonical comparison registry for the AMR-Benchmark reproduction: keeps only
 # the 15 baseline methods (no MLDNN/HCGDNN/FastMLDNN/DSCLDNN/MCformer/TRN).
 #
-# The publish mapping mirrors ``amc.py``; we duplicate it here so that the
-# per-dataset plot configs can be loaded standalone without inheriting the
-# project-own methods that AMR-Benchmark does not cover.
+# Path convention (IMPORTANT): the Phase 2 orchestrator
+# (``tools/amr_benchmark/run_migration.py``) writes every run to the NESTED
+# layout ``work_dirs/amr_benchmark/<model>/<dataset>/res/paper.pkl`` (model =
+# the matrix key / backbone dir, dataset = short label). The performance
+# framework builds the pickle path as ``<work_dir>/<publish_subdir>/res/
+# paper.pkl``, so we set ``work_dir='work_dirs/amr_benchmark'`` and make every
+# publish entry the ``<model>/<dataset>`` subdir. (The previous flat
+# ``<config_name>`` convention resolved to non-existent
+# ``work_dirs/<config_name>/res/paper.pkl`` and silently produced empty
+# figures.)
+
+# Display name -> orchestrator model key (== matrix key == work_dir subdir).
+_MODEL_KEYS = dict(
+    CNN1='cnn2',
+    CNN2='cnn4',
+    MCNET='mcnet',
+    ICAMCNet='icamcnet',
+    ResNet='resnetamr',
+    DenseNet='denscnn',
+    GRU='gru2',
+    LSTM='lstm2',
+    DAE='dae',
+    MCLDNN='mcldnn',
+    CLDNNW='cldnnw',
+    CLDNN2='cldnnl',
+    CGDNet='cgdnet',
+    PETCGDNN='petcgdnn',
+    CNN1DPF='cnn1dpf',
+)
+
+_DATASETS = ['deepsig201610A', 'deepsig201610B', 'deepsig201801A', 'hisar2019']
 
 info = dict(
-    work_dir='work_dirs',
+    work_dir='work_dirs/amr_benchmark',
     save_dir='work_dirs/performance/amr_benchmark',
-
-    methods={
-        'CNN1': 0,
-        'CNN2': 1,
-        'MCNET': 2,
-        'ICAMCNet': 3,
-        'ResNet': 4,
-        'DenseNet': 5,
-        'GRU': 6,
-        'LSTM': 7,
-        'DAE': 8,
-        'MCLDNN': 9,
-        'CLDNNW': 10,
-        'CLDNN2': 11,
-        'CGDNet': 12,
-        'PETCGDNN': 13,
-        'CNN1DPF': 14,
+    methods={name: idx for idx, name in enumerate(_MODEL_KEYS)},
+    publish={
+        ds: {disp: f'{key}/{ds}' for disp, key in _MODEL_KEYS.items()}
+        for ds in _DATASETS
     },
-
-    publish=dict(
-        deepsig201610A=dict(
-            CNN1='cnn2_iq-deepsig-201610A',
-            CNN2='cnn4_iq-deepsig-201610A',
-            MCNET='mcnet_iq-deepsig-201610A',
-            ICAMCNet='icamcnet_iq-deepsig-201610A',
-            ResNet='resnet_iq-deepsig-201610A',
-            DenseNet='denscnn_iq-deepsig-201610A',
-            GRU='gru2_iq-shape-L-F-deepsig-201610A',
-            LSTM='lstm2_ap-shape-L-F-deepsig-201610A',
-            DAE='dae_ap-deepsig-201610A',
-            MCLDNN='mcldnn_iq-deepsig-201610A',
-            CLDNNW='cldnnw_iq-deepsig-201610A',
-            CLDNN2='cldnnl_iq-deepsig-201610A',
-            CGDNet='cgdnet_iq-deepsig-201610A',
-            PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201610A',
-            CNN1DPF='cnn1dpf_iq-deepsig-201610A',
-        ),
-        deepsig201610B=dict(
-            CNN1='cnn2_iq-deepsig-201610B',
-            CNN2='cnn4_iq-deepsig-201610B',
-            MCNET='mcnet_iq-deepsig-201610B',
-            ICAMCNet='icamcnet_iq-deepsig-201610B',
-            ResNet='resnet_iq-deepsig-201610B',
-            DenseNet='denscnn_iq-deepsig-201610B',
-            GRU='gru2_iq-shape-L-F-deepsig-201610B',
-            LSTM='lstm2_ap-shape-L-F-deepsig-201610B',
-            DAE='dae_ap-deepsig-201610B',
-            MCLDNN='mcldnn_iq-deepsig-201610B',
-            CLDNNW='cldnnw_iq-deepsig-201610B',
-            CLDNN2='cldnnl_iq-deepsig-201610B',
-            CGDNet='cgdnet_iq-deepsig-201610B',
-            PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201610B',
-            CNN1DPF='cnn1dpf_iq-deepsig-201610B',
-        ),
-        deepsig201801A=dict(
-            CNN1='cnn2_iq-deepsig-201801A',
-            CNN2='cnn4_iq-deepsig-201801A',
-            MCNET='mcnet_iq-deepsig-201801A',
-            ICAMCNet='icamcnet_iq-deepsig-201801A',
-            ResNet='resnet_iq-deepsig-201801A',
-            DenseNet='denscnn_iq-deepsig-201801A',
-            GRU='gru2_iq-shape-L-F-deepsig-201801A',
-            LSTM='lstm2_ap-shape-L-F-deepsig-201801A',
-            DAE='dae_ap-deepsig-201801A',
-            MCLDNN='mcldnn_iq-deepsig-201801A',
-            CLDNNW='cldnnw_iq-deepsig-201801A',
-            CLDNN2='cldnnl_iq-deepsig-201801A',
-            CGDNet='cgdnet_iq-deepsig-201801A',
-            PETCGDNN='petcgdnn_iq-shape-L-F-deepsig-201801A',
-            CNN1DPF='cnn1dpf_iq-deepsig-201801A',
-        ),
-        hisar2019=dict(
-            CNN1='cnn2_iq-hisar-2019',
-            CNN2='cnn4_iq-hisar-2019',
-            MCNET='mcnet_iq-hisar-2019',
-            ICAMCNet='icamcnet_iq-hisar-2019',
-            ResNet='resnet_iq-hisar-2019',
-            DenseNet='denscnn_iq-hisar-2019',
-            GRU='gru2_iq-shape-L-F-hisar-2019',
-            LSTM='lstm2_ap-shape-L-F-hisar-2019',
-            DAE='dae_ap-hisar-2019',
-            MCLDNN='mcldnn_iq-hisar-2019',
-            CLDNNW='cldnnw_iq-hisar-2019',
-            CLDNN2='cldnnl_iq-hisar-2019',
-            CGDNet='cgdnet_iq-hisar-2019',
-            PETCGDNN='petcgdnn_iq-shape-L-F-hisar-2019',
-            CNN1DPF='cnn1dpf_iq-hisar-2019',
-        ),
-    ),
 )
+
+del _MODEL_KEYS, _DATASETS
