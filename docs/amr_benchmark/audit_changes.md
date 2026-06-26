@@ -427,6 +427,47 @@ feeds well-scaled features to the LSTM, so normalization is counter-productive).
 EarlyStopping (patience 50) is left enabled: with normalization the best epoch
 lands well inside the patience window, so it no longer truncates convergence.
 
+## Phase 2 — RML2018.01A & HisarMod pre-flight smoke test (🟢 high confidence)
+
+Before the multi-day driver reached the two large/unfamiliar datasets,
+a CPU-only build+instantiate check was run on representative configs to
+catch any breakage early (no GPU consumed; tiny 12-sample temp
+annotation so no full-corpus `np.load`). The reusable harness lives at
+`tools/amr_benchmark/_smoke_test.py` and, per config: parses with
+`mmengine.Config`, `MODELS.build(cfg.model)`, builds the train dataset,
+pulls `dataset[0]` through the pipeline, collates a 4-sample batch
+through the model's `data_preprocessor`, and runs a single CPU forward
+in both `loss` (train mode) and `predict` (eval mode).
+
+Configs exercised — both new bases on both datasets and both head dims:
+
+| Config | base | input shape | classes/head | loss@init | result |
+|--------|------|-------------|--------------|-----------|--------|
+| `mcldnn/...201801A` | `iq-l2norm` | (1,2,1024) | 24/24 | 3.18 ≈ ln24 | PASS |
+| `gru2/...shape-L-F...201801A` | `iq-shape-L-F` | (1024,2) | 24/24 | 3.13 | PASS |
+| `cnn2/...201801A` | `iq` | (1,2,1024) | 24/24 | 3.21 | PASS |
+| `lstm2/...ap-shape-L-F...201801A` | `ap-shape-L-F` | (1024,2) | 24/24 | 3.23 | PASS |
+| `dae/...ap...201801A` | `ap` | (1024,2) | 24/24 | CE+MSE | PASS |
+| `cldnnw/...201801A` | `iq-l2norm` | (1,2,1024) | 24/24 | 3.16 | PASS |
+| `cnn1dpf/...201801A` | `iq` | (1,2,1024) | 24/24 | 3.24 | PASS |
+| `petcgdnn/...shape-L-F...hisar` | `iq-shape-L-F` | (1024,2) | 26/26 | 3.27 ≈ ln26 | PASS |
+| `cgdnet/...hisar` | `iq-l2norm` | (1,2,1024) | 26/26 | 3.28 | PASS |
+| `mcldnn/...hisar` | `iq-l2norm` | (1,2,1024) | 26/26 | 3.33 | PASS |
+| `cnn2/...hisar` | `iq` | (1,2,1024) | 26/26 | 3.15 | PASS |
+| `lstm2/...ap-shape-L-F...hisar` | `ap-shape-L-F` | (1024,2) | 26/26 | 3.23 | PASS |
+| `dae/...ap...hisar` | `ap` | (1024,2) | 26/26 | CE+MSE | PASS |
+
+**Outcome: no real config/model bugs.** All 24-class (2018.01A) and
+26-class (HisarMod) heads match their dataset class counts; the L2-norm
+and shape-L-F bases produce the expected `(1,2,1024)` / `(1024,2)`
+tensors; initial losses equal `ln(num_classes)` (sane random init). The
+only initial smoke FAIL was a *harness* artifact, not a model bug: DAE's
+backbone only returns its `(xc, x, xd)` reconstruction triple when
+`self.training` is True (`csrr/models/backbones/dae.py` L42), so running
+the loss path in `eval()` collapsed it; the harness was corrected to run
+the loss path in `train()` mode (matching the real training loop) and
+DAE then passes with the intended `0.1·CE + 0.9·MSE` decomposition.
+
 ## Known divergences kept on purpose
 
 These are noted here so Phase 2 can decide whether to invest more
