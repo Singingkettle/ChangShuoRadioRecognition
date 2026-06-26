@@ -157,6 +157,40 @@ MATRIX: dict[str, dict[str, dict[str, Any]]] = {
         "hisar2019":      _entry("configs/cnn1dpf/cnn1dpf_iq-hisar-2019.py",       None, None, 10,
                                   notes="No AMR-Benchmark reference for HisarMod"),
     },
+    # ----- Project-own methods (MLDNN / HCGDNN / FastMLDNN) -----
+    # Targets are the original-paper numbers (see accuracy_targets.md "Project-own
+    # methods" section), reported only on RML2016.10A; other datasets are
+    # measured-only (target None). One-sided pass rule: measured >= target - tol.
+    "mldnn": {
+        "deepsig201610A": _entry("configs/mldnn/mldnn_iq-ap-deepsig201610A.py", 62.0, 92.0, 16,
+                                  notes="IoT-J 2021; fig-read overall, approx; 50/10/40 vs paper protocol"),
+        "deepsig201610B": _entry("configs/mldnn/mldnn_iq-ap-deepsig201610B.py", None, None, None,
+                                  notes="measured-only (no extracted paper number)"),
+        "deepsig201801A": _entry("configs/mldnn/mldnn_iq-ap-deepsig201801A.py", None, None, None,
+                                  notes="measured-only (not reported by paper)"),
+        "hisar2019":      _entry("configs/mldnn/mldnn_iq-ap-hisar2019.py",      None, None, None,
+                                  notes="measured-only (not reported by paper)"),
+    },
+    "hcgdnn": {
+        "deepsig201610A": _entry("configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py", 64.9, 93.0, 16,
+                                  notes="TWC 2022; overall from AMSCN comparison (0.649)"),
+        "deepsig201610B": _entry("configs/hcgdnn/hcgdnn_iq-deepsig-201610B.py", None, None, None,
+                                  notes="measured-only; fused (HCGDNNWeightsAccuracy) test"),
+        "deepsig201801A": _entry("configs/hcgdnn/hcgdnn_iq-deepsig-201801A.py", None, None, None,
+                                  notes="measured-only; fused test"),
+        "hisar2019":      _entry("configs/hcgdnn/hcgdnn_iq-hisar-2019.py",      None, None, None,
+                                  notes="measured-only; fused test"),
+    },
+    "fastmldnn": {
+        "deepsig201610A": _entry("configs/fastmldnn/fastmldnn_iq-ap-deepsig-201610A.py", 63.24, 92.0, 16,
+                                  notes="TCCN 2023; ULNN repro 63.01; FastMLDNNHead beta=0"),
+        "deepsig201610B": _entry("configs/fastmldnn/fastmldnn_iq-ap-deepsig-201610B.py", None, None, None,
+                                  notes="measured-only"),
+        "deepsig201801A": _entry("configs/fastmldnn/fastmldnn_iq-ap-deepsig-201801A.py", None, None, None,
+                                  notes="measured-only"),
+        "hisar2019":      _entry("configs/fastmldnn/fastmldnn_iq-ap-hisar-2019.py",      None, None, None,
+                                  notes="measured-only"),
+    },
 }
 
 

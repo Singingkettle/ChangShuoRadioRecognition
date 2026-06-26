@@ -1,7 +1,7 @@
 _base_ = [
-    '../_base_/datasets/deepsig/iq-deepsig201610B.py',
-    '../_base_/schedules/amc.py',
-    '../_base_/runtimes/amc.py'
+    './iq-deepsig201610B.py',
+    './runtimes.py',
+    './schedules.py'
 ]
 
 # model settings
@@ -12,7 +12,7 @@ model = dict(
         num_classes=10,
     ),
     head=dict(
-        type='ClsHead',
+        type='HCGDNNHead',
         loss=dict(
             cnn=dict(type='CrossEntropyLoss', loss_weight=1),
             gru1=dict(type='CrossEntropyLoss', loss_weight=1),

@@ -79,6 +79,12 @@ def main():
     if torch.cuda.is_available():
         model = model.cuda()
 
+    # Match tools/train.py: default to ``default_collate`` so multi-input
+    # models (e.g. MLDNN/FastMLDNN, whose pipeline packs an ``{iq, ap}`` dict)
+    # get their per-key tensors stacked into batched tensors. ``pseudo_collate``
+    # (mmengine's default) would leave a list-of-dicts that the data
+    # preprocessor cannot stack. Single-input configs are unaffected.
+    cfg.test_dataloader.setdefault('collate_fn', dict(type='default_collate'))
     dataloader = Runner.build_dataloader(cfg.test_dataloader)
     dataset = dataloader.dataset
     classes = list(dataset.CLASSES)

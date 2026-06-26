@@ -264,3 +264,73 @@ Source: `RML201610a/1DCNN-PF/rmlmodels/DCNNPF.py` + `main.py`.
 
 These four cells are the strongest anchor points; any reproduction
 that lands within ±1.5 pp of them is considered a pass.
+
+## Project-own methods (MLDNN / HCGDNN / FastMLDNN)
+
+These three networks are CSRR's *own* contributions (Chang et al.),
+not part of the 15-model AMR-Benchmark suite. Their reference numbers
+come from the **original papers** rather than the DSP 2022 survey:
+
+| Method | Paper / DOI | Primary dataset(s) reported |
+|--------|-------------|------------------------------|
+| MLDNN | "Multitask-Learning-Based Deep Neural Network for AMC," IEEE IoT-J 2021/2022, 9(3):2192-2206, doc 9462447 | RML2016.10A (+10B) |
+| HCGDNN | "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for AMC," IEEE TWC 2022, 21:8713-8728, doi 10.1109/TWC.2022.3168884, doc 9764618 | RML2016.10A |
+| FastMLDNN | "A Fast Multi-Loss Learning Deep Neural Network for AMC," IEEE TCCN 2023, 9(6):1503-1518, doi 10.1109/TCCN.2023.3309010, doc 10239249 | RML2016.10A |
+
+> **Protocol caveat.** All three papers were originally evaluated on
+> RML2016.10A with the authors' own train/test protocol (MLDNN and
+> FastMLDNN historically trained on a merged `train+validation` split
+> and re-used `test` for validation). This workstream re-trains them
+> under the **project-standard 50/10/40 split** (`train.json` /
+> `validation.json` / `test.json`), so small absolute differences from
+> the published numbers are expected. Per the one-sided rule a run is a
+> **pass** when `measured >= target - tol` (matching or exceeding the
+> paper passes); the same ±1.5 pp overall / ±1.0 pp peak / ±2 dB bands
+> apply. Datasets a paper never reported are marked **n/a (no paper
+> number)** — those are trained and reported as *measured-only*.
+
+### Source notes for the RML2016.10A anchors
+
+- **FastMLDNN — overall 63.24% @ RML2016.10A** is the headline number
+  from the FastMLDNN paper (159k params), independently reproduced at
+  **63.01%** by the ULNN paper (Sci. Rep. 2024) and quoted as 63.24% by
+  the 2025 MDPI DP-DRSN survey and arXiv:2507.04586. The ULNN
+  reproduction reports FastMLDNN high-SNR ([0,18] dB) average **91.24%**
+  and low-SNR ([-20,-2] dB) average **34.78%**; the per-SNR peak lands
+  at the high-SNR plateau (≈16–18 dB), so we adopt **peak ≈ 92.0% @ 16 dB**.
+- **HCGDNN — overall 64.9% @ RML2016.10A** is taken from the AMSCN paper
+  comparison table (HCGDNN AMC = 0.649; Sensors 2023, PMC10007238); the
+  HCGDNN abstract/ADS record advertise high-SNR accuracy **≈93%**, so we
+  adopt **peak ≈ 93.0% @ 16 dB**. HCGDNN uses the I/Q cue only with a
+  learned non-linear fusion over its CNN / BiGRU1 / BiGRU2 heads.
+- **MLDNN — RML2016.10A**: the original MLDNN paper fuses I/Q + A/P via a
+  SAFN gate and a multi-task (modulation + SNR) head. A precise overall
+  number could not be extracted from an open copy (IEEE paywalled); it is
+  FastMLDNN's stated baseline (FastMLDNN is ≈9× cheaper for *comparable*
+  accuracy), and figure-read high-SNR accuracy is ≈92%. We therefore set
+  a **figure-read** target of overall **≈62.0%**, **peak ≈ 92.0% @ 16 dB**
+  and flag it as approximate. If the measured 50/10/40 result lands below
+  this band it is reported as a documented gap, not a hard failure.
+
+### Per-(method × dataset) targets used by the orchestrator
+
+`None` ⇒ no paper number for that (method, dataset); the orchestrator
+records it as *measured-only* (it still trains and reports accuracy).
+
+| Method | Dataset | Target overall | Target peak | Peak SNR | Notes |
+|--------|---------|----------------|-------------|----------|-------|
+| MLDNN | RML2016.10A | ~62.0 (fig-read) | ~92.0 | 16 dB | IoT-J paper, approx; 50/10/40 vs paper protocol |
+| MLDNN | RML2016.10B | n/a | n/a | — | paper number not extracted; measured-only |
+| MLDNN | RML2018.01A | n/a | n/a | — | not reported by paper; measured-only |
+| MLDNN | HisarMod | n/a | n/a | — | not reported by paper; measured-only |
+| HCGDNN | RML2016.10A | 64.9 | ~93.0 | 16 dB | TWC paper (AMSCN-sourced overall) |
+| HCGDNN | RML2016.10B | n/a | n/a | — | measured-only |
+| HCGDNN | RML2018.01A | n/a | n/a | — | measured-only |
+| HCGDNN | HisarMod | n/a | n/a | — | measured-only |
+| FastMLDNN | RML2016.10A | 63.24 | ~92.0 | 16 dB | TCCN paper; ULNN repro 63.01 |
+| FastMLDNN | RML2016.10B | n/a | n/a | — | measured-only |
+| FastMLDNN | RML2018.01A | n/a | n/a | — | measured-only |
+| FastMLDNN | HisarMod | n/a | n/a | — | measured-only |
+
+Detailed measured-vs-target results, gap analysis and the live tracking
+table are maintained in `own_methods_results.md`.

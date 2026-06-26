@@ -52,7 +52,13 @@ class HCGDNNHead(BaseModule):
         weights[-1] = 1 - sum(weights[0:-1])
         head_index = 0
         for head_name in loss:
-            self.register_buffer(head_name, torch.tensor(weights[head_index]).float(), persistent=False)
+            # ``persistent=True`` so the fusion weights learned on the
+            # validation set by ``HCGDNNHook`` are saved into the best
+            # checkpoint. ``tools/test.py`` loads that checkpoint without a
+            # validation pass, so the fused (paper.pkl) output would otherwise
+            # fall back to the init weights (gru2=1, others=0) instead of the
+            # learned fusion.
+            self.register_buffer(head_name, torch.tensor(weights[head_index]).float(), persistent=True)
             head_index += 1
 
     def set_weights(self, weights: Dict[str, float]) -> None:

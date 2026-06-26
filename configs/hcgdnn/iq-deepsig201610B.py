@@ -31,8 +31,7 @@ val_dataloader = dict(
 )
 
 val_evaluator = [
-    dict(type='Accuracy', topk=(1,)),
-    dict(type='Loss', task='classification')
+    dict(type='HCGDNNWeightsAccuracy', topk=(1,)),
 ]
 
 test_dataloader = dict(

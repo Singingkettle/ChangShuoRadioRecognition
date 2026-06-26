@@ -12,7 +12,8 @@ model = dict(
         num_classes=26,
     ),
     head=dict(
-        type='ClsHead',
+        type='FastMLDNNHead',
         loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
+        beta=0,
     )
 )

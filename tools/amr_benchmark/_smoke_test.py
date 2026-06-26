@@ -65,13 +65,20 @@ def smoke(cfg_path: str) -> bool:
     sample = dataset[0]
     inputs = sample["inputs"]
     data_sample = sample["data_samples"]
-    print(f"[ok] sample[0] inputs shape={tuple(inputs.shape)} dtype={inputs.dtype} "
-          f"label={int(data_sample.gt_label)}")
+    # Multi-input models (MLDNN/FastMLDNN) pack a dict of tensors (iq+ap)
+    # rather than a single tensor.
+    if isinstance(inputs, dict):
+        shape_str = {k: tuple(v.shape) for k, v in inputs.items()}
+    else:
+        shape_str = tuple(inputs.shape)
+    print(f"[ok] sample[0] inputs shape={shape_str}")
 
     # ---- 3. collate a tiny batch via the dataloader collate_fn ----
     from mmengine.dataset import default_collate, pseudo_collate
     from torch.utils.data import DataLoader
-    collate = cfg.train_dataloader.get("collate_fn", dict(type="pseudo_collate"))
+    # tools/train.py forces default_collate for all dataloaders, so match it
+    # here (required for multi-input {iq,ap} models like MLDNN/FastMLDNN).
+    collate = cfg.train_dataloader.get("collate_fn", dict(type="default_collate"))
     collate_type = collate.get("type", "pseudo_collate")
     collate_fn = default_collate if collate_type == "default_collate" else pseudo_collate
     batch = collate_fn([dataset[i] for i in range(min(4, len(dataset)))])
@@ -88,11 +95,24 @@ def smoke(cfg_path: str) -> bool:
         model.train()
         losses = model(data["inputs"], data["data_samples"], mode="loss")
         print(f"[ok] loss forward: { {k: float(v) for k,v in losses.items()} }")
+
+    # ---- 4b. predict path on the TEST pipeline ----
+    # Train and test pipelines can differ (e.g. MLDNN's train pipeline packs a
+    # MultiTaskDataSample for the SNR auxiliary task, while inference uses a
+    # plain DataSample). Exercise predict with the real test pipeline so the
+    # paper.pkl path is validated, not the train-mode data samples.
+    test_ds_cfg = dict(cfg.test_dataloader["dataset"])
+    test_ds_cfg["ann_file"] = tf.name
+    test_ds_cfg["data_root"] = data_root
+    test_dataset = DATASETS.build(test_ds_cfg)
+    test_batch = collate_fn([test_dataset[i] for i in range(min(4, len(test_dataset)))])
+    test_data = dp(test_batch, training=False)
+    with torch.no_grad():
         model.eval()
-        preds = model(data["inputs"], data["data_samples"], mode="predict")
+        preds = model(test_data["inputs"], test_data["data_samples"], mode="predict")
         scores = preds[0].pred_score
-        print(f"[ok] predict forward: batch={len(preds)} num_classes={scores.numel()} "
-              f"argmax={int(scores.argmax())}")
+        print(f"[ok] predict forward (test pipeline): batch={len(preds)} "
+              f"num_classes={scores.numel()} argmax={int(scores.argmax())}")
 
     # sanity: head dim must match dataset classes
     num_classes = scores.numel()

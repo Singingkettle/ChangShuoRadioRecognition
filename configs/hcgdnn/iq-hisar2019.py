@@ -2,7 +2,7 @@
 data_root = 'data/ModulationClassification/Hisar/HisarMod2019.1'
 dataset_type = 'AMCDataset'
 
-pipeline = [dict(type='Reshape', shapes=dict(iq=[2, 1, 128])), dict(type='PackInputs', input_key='iq')]
+pipeline = [dict(type='Reshape', shapes=dict(iq=[2, 1, 1024])), dict(type='PackInputs', input_key='iq')]
 
 train_dataloader = dict(
     batch_size=400,
@@ -31,8 +31,7 @@ val_dataloader = dict(
 )
 
 val_evaluator = [
-    dict(type='Accuracy', topk=(1,)),
-    dict(type='Loss', task='classification')
+    dict(type='HCGDNNWeightsAccuracy', topk=(1,)),
 ]
 
 test_dataloader = dict(
