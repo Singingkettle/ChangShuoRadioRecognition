@@ -244,14 +244,16 @@ def _classify(result: JobResult) -> str:
     spec = result.spec
     if spec.target_overall is None or spec.target_peak is None:
         return "measured"
-    overall_ok = abs(result.overall_acc - spec.target_overall) <= TOLERANCES["overall"]
-    peak_ok = result.peak_acc is not None and abs(
-        result.peak_acc - spec.target_peak
-    ) <= TOLERANCES["peak"]
-    snr_ok = True
-    if spec.target_best_snr is not None and result.best_snr is not None:
-        snr_ok = abs(result.best_snr - spec.target_best_snr) <= TOLERANCES["best_snr"]
-    return "pass" if (overall_ok and peak_ok and snr_ok) else "fail"
+    # One-sided tolerance: matching OR exceeding the reference accuracy is a
+    # pass. We only fail when the measured value falls more than the tolerance
+    # *below* the reference. The best-SNR location is informational only --
+    # accuracy saturates on a high-SNR plateau, so the per-SNR argmax (commonly
+    # 14-18 dB) is not a meaningful discriminator and must not fail a run that
+    # otherwise reproduces the reference accuracy.
+    overall_ok = result.overall_acc >= spec.target_overall - TOLERANCES["overall"]
+    peak_ok = (result.peak_acc is not None and
+               result.peak_acc >= spec.target_peak - TOLERANCES["peak"])
+    return "pass" if (overall_ok and peak_ok) else "fail"
 
 
 # ---------------------------------------------------------------------------

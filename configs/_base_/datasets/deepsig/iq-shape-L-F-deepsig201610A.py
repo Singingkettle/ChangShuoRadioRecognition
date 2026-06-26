@@ -2,7 +2,14 @@
 data_root = 'data/ModulationClassification/DeepSig/RadioML.2016.10A'
 dataset_type = 'AMCDataset'
 
+# Per-sample L2 (unit-energy) normalization (see iq-deepsig201610A.py for the
+# root-cause rationale): RML2016.10A ships each example at a tiny fixed scale
+# (Frobenius ~0.1), which caps the temporal/RNN models well below the reference.
 pipeline = [
+    dict(
+        type='SelfNormalize',
+        norms=dict(iq={})
+    ),
     dict(
         type='Transpose',
         orders=dict(iq=[1, 0])

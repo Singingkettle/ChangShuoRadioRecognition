@@ -2,7 +2,13 @@
 data_root = 'data/ModulationClassification/Hisar/HisarMod2019.1'
 dataset_type = 'AMCDataset'
 
+# Per-sample L2 (unit-energy) normalization (see iq-l2norm-deepsig201610A.py):
+# only the recurrent models (gru2, petcgdnn) consume this L-by-F base.
 pipeline = [
+    dict(
+        type='SelfNormalize',
+        norms=dict(iq={})
+    ),
     dict(
         type='Transpose',
         orders=dict(iq=[1, 0])

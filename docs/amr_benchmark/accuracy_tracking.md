@@ -98,23 +98,23 @@ Do not hand-edit the rows; edit the targets in
 instead.
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-06-25 21:29:54 UTC_
+_Last orchestrator run: 2026-06-26 00:51:24 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| CNN2 | RML2016.10A | `configs/cnn2/cnn2_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn2/deepsig201610A` | 59.00 | 63.60 | 79.00 | 81.70 | 6 dB | 10 dB | `fail` | 2026-06-25T21:07:34Z |
-| CNN4 | RML2016.10A | `configs/cnn4/cnn4_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn4/deepsig201610A` | 58.00 | 57.57 | 80.00 | 83.89 | 4 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| MCNET | RML2016.10A | `configs/mcnet/mcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/mcnet/deepsig201610A` | 58.00 | 55.98 | 82.00 | 82.41 | 6 dB | 12 dB | `fail` | 2026-06-25T21:07:34Z |
-| ICAMCNET | RML2016.10A | `configs/icamcnet/icamcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/icamcnet/deepsig201610A` | 57.00 | 56.79 | 83.00 | 85.07 | 6 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| RESNETAMR | RML2016.10A | `configs/resnetamr/resnetamr_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610A` | 57.00 | 54.33 | 83.00 | 82.20 | 6 dB | 10 dB | `fail` | 2026-06-25T21:07:34Z |
-| DENSCNN | RML2016.10A | `configs/denscnn/denscnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/denscnn/deepsig201610A` | 57.00 | 54.48 | 83.00 | 82.86 | 6 dB | 10 dB | `fail` | 2026-06-25T21:07:34Z |
-| GRU2 | RML2016.10A | `configs/gru2/gru2_iq-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/gru2/deepsig201610A` | 58.00 | 57.74 | 85.00 | 85.70 | 4 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| LSTM2 | RML2016.10A | `configs/lstm2/lstm2_ap-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/lstm2/deepsig201610A` | 58.00 | 56.57 | 87.00 | 85.11 | 4 dB | 12 dB | `fail` | 2026-06-25T21:07:34Z |
-| DAE | RML2016.10A | `configs/dae/dae_ap-deepsig-201610A.py` | `work_dirs/amr_benchmark/dae/deepsig201610A` | 57.00 | 55.60 | 82.00 | 84.68 | 6 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| MCLDNN | RML2016.10A | `configs/mcldnn/mcldnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/mcldnn/deepsig201610A` | 62.00 | 57.81 | 92.05 | 85.23 | 10 dB | 18 dB | `fail` | 2026-06-25T21:29:54Z |
-| CLDNNW | RML2016.10A | `configs/cldnnw/cldnnw_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201610A` | 57.00 | 53.00 | 85.00 | 78.25 | 6 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| CLDNNL | RML2016.10A | `configs/cldnnl/cldnnl_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201610A` | 57.00 | 57.53 | 85.00 | 83.80 | 4 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| CGDNET | RML2016.10A | `configs/cgdnet/cgdnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cgdnet/deepsig201610A` | 58.00 | 53.46 | 83.00 | 79.18 | 6 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
-| PETCGDNN | RML2016.10A | `configs/petcgdnn/petcgdnn_iq-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/petcgdnn/deepsig201610A` | 60.00 | 57.90 | 89.00 | 86.45 | 6 dB | 14 dB | `fail` | 2026-06-25T21:07:34Z |
-| CNN1DPF | RML2016.10A | `configs/cnn1dpf/cnn1dpf_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn1dpf/deepsig201610A` | 57.00 | 54.97 | 85.00 | 84.16 | 6 dB | 18 dB | `fail` | 2026-06-25T21:07:34Z |
+| CNN2 | RML2016.10A | `configs/cnn2/cnn2_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn2/deepsig201610A` | 59.00 | 63.18 | 79.00 | 81.43 | 6 dB | 10 dB | `pass` | 2026-06-26T00:51:24Z |
+| CNN4 | RML2016.10A | `configs/cnn4/cnn4_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn4/deepsig201610A` | 58.00 | 57.57 | 80.00 | 83.89 | 4 dB | 18 dB | `pass` | 2026-06-26T00:51:24Z |
+| MCNET | RML2016.10A | `configs/mcnet/mcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/mcnet/deepsig201610A` | 58.00 | 55.98 | 82.00 | 82.41 | 6 dB | 12 dB | `fail` | 2026-06-26T00:51:24Z |
+| ICAMCNET | RML2016.10A | `configs/icamcnet/icamcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/icamcnet/deepsig201610A` | 57.00 | 56.79 | 83.00 | 85.07 | 6 dB | 18 dB | `pass` | 2026-06-26T00:51:24Z |
+| RESNETAMR | RML2016.10A | `configs/resnetamr/resnetamr_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610A` | 57.00 | 54.33 | 83.00 | 82.20 | 6 dB | 10 dB | `fail` | 2026-06-26T00:51:24Z |
+| DENSCNN | RML2016.10A | `configs/denscnn/denscnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/denscnn/deepsig201610A` | 57.00 | 54.48 | 83.00 | 82.86 | 6 dB | 10 dB | `fail` | 2026-06-26T00:51:24Z |
+| GRU2 | RML2016.10A | `configs/gru2/gru2_iq-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/gru2/deepsig201610A` | 58.00 | 57.84 | 85.00 | 85.95 | 4 dB | 18 dB | `pass` | 2026-06-26T00:51:24Z |
+| LSTM2 | RML2016.10A | `configs/lstm2/lstm2_ap-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/lstm2/deepsig201610A` | 58.00 | 56.57 | 87.00 | 85.11 | 4 dB | 12 dB | `fail` | 2026-06-26T00:51:24Z |
+| DAE | RML2016.10A | `configs/dae/dae_ap-deepsig-201610A.py` | `work_dirs/amr_benchmark/dae/deepsig201610A` | 57.00 | 55.60 | 82.00 | 84.68 | 6 dB | 18 dB | `pass` | 2026-06-26T00:51:24Z |
+| MCLDNN | RML2016.10A | `configs/mcldnn/mcldnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/mcldnn/deepsig201610A` | 62.00 | 61.75 | 92.05 | 92.45 | 10 dB | 12 dB | `pass` | 2026-06-26T00:51:24Z |
+| CLDNNW | RML2016.10A | `configs/cldnnw/cldnnw_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201610A` | 57.00 | 53.78 | 85.00 | 79.48 | 6 dB | 18 dB | `fail` | 2026-06-26T00:51:24Z |
+| CLDNNL | RML2016.10A | `configs/cldnnl/cldnnl_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201610A` | 57.00 | 56.02 | 85.00 | 83.14 | 4 dB | 14 dB | `fail` | 2026-06-26T00:51:24Z |
+| CGDNET | RML2016.10A | `configs/cgdnet/cgdnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cgdnet/deepsig201610A` | 58.00 | 55.55 | 83.00 | 82.50 | 6 dB | 18 dB | `fail` | 2026-06-26T00:51:24Z |
+| PETCGDNN | RML2016.10A | `configs/petcgdnn/petcgdnn_iq-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/petcgdnn/deepsig201610A` | 60.00 | 60.26 | 89.00 | 90.43 | 6 dB | 14 dB | `pass` | 2026-06-26T00:51:24Z |
+| CNN1DPF | RML2016.10A | `configs/cnn1dpf/cnn1dpf_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cnn1dpf/deepsig201610A` | 57.00 | 54.97 | 85.00 | 84.16 | 6 dB | 18 dB | `fail` | 2026-06-26T00:51:24Z |
 <!-- AMR_BENCHMARK_AUTO_TABLE_END -->

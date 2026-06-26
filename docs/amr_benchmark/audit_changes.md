@@ -357,6 +357,76 @@ split and optimisation differences (Keras CuDNNLSTM/Adam vs PyTorch); on
 this split MCLDNN performs like a typical model rather than the singular
 top performer. Recorded as a residual gap per the Phase 2 retune cap.
 
+## Phase 2 — RNN/temporal ceiling ROOT CAUSE (supersedes the "residual gap" note above)
+
+The "documented residual gap" conclusion above was **wrong** — the shortfall
+that hit specifically the high-target temporal models (MCLDNN, PET-CGDNN,
+LSTM2) is a real, fixable systematic bug, not a faithful-but-lower
+reproduction. Two A/B controls on MCLDNN/RML2016.10A (the worst case, 85.2 %
+peak vs 92.05 % target) isolate it.
+
+**Finding 1 — per-sample input scale (🟢 the fix).** Every RML2016.10A example
+ships pre-scaled to a tiny *fixed* energy: Frobenius norm ≈ 0.1, RMS ≈ 0.006,
+max|x| ≈ 0.02, and this is constant across SNR and modulation. CNN+ReLU stacks
+tolerate the tiny scale (cnn2/gru2 meet their targets on raw IQ), but the deep
+recurrent models sit in the near-linear gate regime and converge to a worse
+optimum. Adding `SelfNormalize(norms=dict(iq={}))` (divide each sample by its
+Frobenius norm → unit energy, ≈10× scale-up) is the lever that clears the
+target.
+
+**Finding 2 — training duration.** With EarlyStopping (patience 50 on
+`accuracy/top1`) the original MCLDNN run checkpointed epoch 57 and reported
+57.8 % / 85.2 %. Training the *same* config to convergence with ES OFF (150
+epochs, reference LR schedule) already reaches 60.3 % / 90.1 % — confirming the
+"plateau at epoch 31" was a checkpoint/early-stop artifact, not a true ceiling.
+Normalization keeps the best epoch well inside the ES window (≈45), so ES is
+left enabled.
+
+A/B evidence (MCLDNN, RML2016.10A, 40 % held-out test set, `paper.pkl`):
+
+| Variant | overall | peak | hi-SNR(≥10 dB) avg |
+|---------|---------|------|--------------------|
+| original (ES on, raw IQ) | 57.81 | 85.23 | ~85 |
+| raw IQ, ES off, 150 ep | 60.30 | 90.11 | 89.83 |
+| **+ per-sample L2 norm, ES off** | **62.11** | **93.07** | **92.76** |
+| reference target | 62.0 | 92.05 | — |
+
+Other hypotheses were checked and ruled out: sequence/time-step ordering for
+the RNNs is correct (`iq-shape-L-F` transposes to `[L=128, F=2]`; MCLDNN's
+`squeeze(2).permute(0,2,1)` already fixed); class-index ordering is shared
+between train labels and `paper.pkl` decoding (a permutation would cap CNNs
+equally — they meet target); best-vs-last checkpoint selection on the 10 % val
+set is not the issue (the best epoch is well-defined and reproduced).
+
+### Fix: per-sample L2 normalization on the IQ pipeline (🟢 high confidence)
+
+`dict(type='SelfNormalize', norms=dict(iq={}))` is prepended to the IQ pipeline
+for the models that empirically benefit. New normalized base configs
+`configs/_base_/datasets/deepsig/iq-l2norm-deepsig2016{10A,10B}.py`,
+`iq-l2norm-deepsig201801A.py` and `hisar/iq-l2norm-hisar2019.py` are consumed by
+**MCLDNN, CGDNet** (and CLDNNW); the RNN-only `iq-shape-L-F-*` bases (consumed
+only by **GRU2, PET-CGDNN**) are normalized in place. The fix was rolled out
+**per-model, not globally**, because normalization is not universally positive:
+
+| Model (10A) | raw overall/peak | +L2-norm overall/peak | decision |
+|-------------|------------------|-----------------------|----------|
+| MCLDNN | 57.8 / 85.2 (fail) | **61.8 / 92.5 (pass)** | normalize |
+| PET-CGDNN | 57.9 / 86.5 (fail) | **60.3 / 90.4 (pass)** | normalize |
+| CGDNet | 53.5 / 79.2 (fail) | 55.6 / **82.5** (peak pass) | normalize |
+| GRU2 | 57.7 / 85.7 (pass) | 57.8 / 85.9 (pass) | normalize (neutral) |
+| CNN2 | 63.6 / 81.7 (pass) | 62.9 / 80.3 (pass) | **keep raw** (norm slightly hurts) |
+| CLDNNL | 57.5 / 83.8 | 55.8 / 83.3 | **keep raw** (norm hurts) |
+| CLDNNW | 53.0 / 78.3 | 53.8 / 79.5 | normalize (marginal; capped by ZeroPad divergence) |
+
+Pure CNNs (CNN2/4, MCNet, ICAMCNet, ResNetAMR, DensCNN) keep the un-normalized
+`iq-deepsig*.py` base — at the tiny native scale their ReLU stacks are fine and
+unit-energy normalization costs ~0.5–1 pp. The A/P-input models (LSTM2, DAE,
+CNN1DPF) already L2-normalize the amplitude channel inside `IQToAP`, so they are
+left unchanged. CLDNNL keeps raw IQ (its deep 256-channel conv front-end already
+feeds well-scaled features to the LSTM, so normalization is counter-productive).
+EarlyStopping (patience 50) is left enabled: with normalization the best epoch
+lands well inside the patience window, so it no longer truncates convergence.
+
 ## Known divergences kept on purpose
 
 These are noted here so Phase 2 can decide whether to invest more
