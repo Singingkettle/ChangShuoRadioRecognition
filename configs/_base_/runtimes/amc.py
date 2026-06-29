@@ -14,7 +14,13 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook'),
 )
 
-custom_hooks = [dict(type='EarlyStoppingHook', monitor='accuracy/top1', min_delta=0, patience=50, rule='greater')]
+# Early stopping on the validation top-1 accuracy (0-100 scale). ``min_delta``
+# is in percentage points: with the previous ``min_delta=0`` any sub-0.01pp
+# wiggle counted as an "improvement" and reset the patience window, so on the
+# large RML2018.01A dataset early stopping never fired and training drifted
+# toward ``max_epochs``. Requiring a >=0.1pp gain with a 15-epoch patience makes
+# early stopping effective again so jobs converge and stop in hours.
+custom_hooks = [dict(type='EarlyStoppingHook', monitor='accuracy/top1', min_delta=0.1, patience=15, rule='greater')]
 
 env_cfg = dict(
     # disable cudnn benchmark

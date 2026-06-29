@@ -507,3 +507,101 @@ time on them if accuracy falls outside the tolerance band.
   (parallel worker) and have not been touched in this branch.
 - Training and accuracy verification happen in Phase 2; this branch
   only sets up the orchestrator and target tables.
+
+## 2026-06-29 — RML2018.01A training never terminates (~106-day ETA)
+
+🟢 **Symptom.** During the Phase 2 sweep every RML2018.01A job stalled.
+`work_dirs/amr_benchmark/denscnn/deepsig201801A/.../*.log` showed the run
+at Epoch 94 of a 10000-epoch budget, mmengine ETA **~106 days**, loss
+plateaued ~1.4, and the learning rate stuck at `5.0000e-04` for 80+
+epochs. `mcldnn@2018` (Epoch 28, ETA ~46 d) and `dae@2018` (Epoch 87,
+ETA ~12 d) showed the same pattern. Because the sweep runs ≤2 jobs in
+parallel and each 2018 job effectively never ended, the
+2018 → HisarMod → finalize chain was blocked (only 5/15 of 2018 had
+produced `res/paper.pkl`).
+
+**Root cause (two compounding bugs, both in the shared `_base_` config).**
+
+1. `configs/_base_/schedules/amc.py` — `train_cfg` set
+   `max_epochs=10000` (line 16, the misleading `# train 5 epochs`
+   comment notwithstanding). RML2018.01A has ~3195 train iters/epoch at
+   ~0.287 s/iter ≈ 15 min/epoch, so 10000 epochs ≈ 106 days — exactly
+   the reported ETA. RML2016.10A/10B share this file but have ~275
+   iters/epoch (~11 s/epoch), so their *wall-clock* ETA looked like
+   "~1 day" and they converged in time via early stopping.
+2. `configs/_base_/runtimes/amc.py` — the `EarlyStoppingHook` used
+   `min_delta=0`, `patience=50` on `accuracy/top1`. With `min_delta=0`
+   *any* sub-0.01 pp wiggle counted as an "improvement" and reset the
+   patience window. On the 24-class RML2018.01A set the validation
+   accuracy keeps inching up for a long time, so early stopping never
+   fired and training drifted toward `max_epochs`. The
+   `ReduceOnPlateauParamScheduler` (monitor `loss/classification`) had
+   the same problem from the other side: val loss kept improving
+   marginally, so the LR was almost never decayed — hence the LR frozen
+   at `5.0000e-04`. (The small RML2016 sets *did* eventually trip both
+   mechanisms: e.g. `denscnn/deepsig201610A` decayed all the way to
+   `1.0000e-06` and early-stopped at epoch 207, best @ 157.)
+
+Evidence the models do not actually need thousands of epochs: the five
+RML2018.01A models that *did* finish reached their best validation epoch
+at 77 (`cnn4`), 91 (`cnn2`), 109 (`icamcnet`), 117 (`resnetamr`), and
+193 (`mcnet`).
+
+**Fix (shared `_base_`, inherited by all 15 AMR-Benchmark models across
+all four datasets incl. HisarMod — no per-model hacks).**
+
+`configs/_base_/schedules/amc.py`:
+
+| field | old | new |
+| --- | --- | --- |
+| `train_cfg.max_epochs` | `10000` | `150` |
+| `param_scheduler` | `ReduceOnPlateauParamScheduler` (lr, monitor `loss/classification`, factor 0.5, patience 5) | `CosineAnnealingLR(by_epoch=True, T_max=150, eta_min=1e-6)` |
+
+`configs/_base_/runtimes/amc.py` — `EarlyStoppingHook`:
+
+| field | old | new |
+| --- | --- | --- |
+| `min_delta` | `0` | `0.1` (percentage points) |
+| `patience` | `50` | `15` |
+
+Rationale: `CosineAnnealingLR` makes the LR anneal *visibly every epoch*
+toward `1e-6`, removing the plateau-stuck-LR failure mode entirely.
+`max_epochs=150` comfortably covers the observed 77–193-epoch
+convergence window while bounding the worst case to hours instead of
+months. The stricter early-stopping criterion (≥0.1 pp gain over a
+15-epoch window) terminates jobs once validation accuracy genuinely
+plateaus.
+
+**Why this does not regress RML2016.10A/10B.** All 10A/10B results are
+already frozen as `res/paper.pkl` and the orchestrator
+(`tools/amr_benchmark/run_migration.py`) skips any job whose checkpoint
+/ `paper.pkl` already exists, so completed runs are never recomputed.
+For any re-run, the small 2016 sets converge far inside the 150-epoch
+cap (10A `denscnn` best was @ 157 only because `min_delta=0` let it
+inch up; with `min_delta=0.1` it plateau-stops earlier near the same
+accuracy, within the ±1.5 pp tolerance).
+
+**Process actions.** Killed the four stalled RML2018.01A `train.py`
+jobs running under the old schedule — `denscnn` (orig PID 1246880),
+`dae` (PID 1848076), `mcldnn` (PID 1849375), and `lstm2` (orphaned
+workers) — plus their forked dataloader workers (88 PIDs total). Left
+the durable drivers and orchestrator untouched (`_sweep_driver.sh`
+696546, `run_migration.py` 995031, `_finalize_driver.sh` 1149690).
+Removed the four partial work_dirs
+(`work_dirs/amr_benchmark/{denscnn,mcldnn,dae,lstm2}/deepsig201801A`),
+none of which contained `res/paper.pkl`, so the orchestrator retrains
+them from scratch under the fixed schedule rather than reusing a
+half-trained `best_*.pth`. On the freed GPUs the live orchestrator
+immediately launched the next pending 2018 jobs (`cldnnw@2018`,
+`cldnnl@2018`) under the new config, confirming the re-run path. The
+killed four are re-attempted in the sweep's HisarMod phase and the
+finalize driver's idempotent full sweep.
+
+**Note for own-method schedules.** `configs/{lstm2,mldnn,hcgdnn,
+fastmldnn}/schedules.py` and `configs/trn/schedule.py` carry the same
+latent pattern (`max_epochs` 10000/3200/400 and `MultiStepLR`
+milestones `[800, 1200]` that never fire within a sane budget). They
+are *not* used by the 15-model main sweep (those configs pull
+`_base_/schedules/amc.py`), so they are out of scope for this blocker,
+but the own-method 2018/HisarMod runs in the finalize driver will need
+an analogous fix before they can converge in reasonable time.
