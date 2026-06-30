@@ -14,6 +14,13 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook'),
 )
 
+# Early stopping on the validation top-1 accuracy (0-100 scale). This file had
+# no ``custom_hooks`` at all, so combined with the old MultiStepLR/3200-epoch
+# schedule training never stopped. Requiring a >=0.1pp gain over a 15-epoch
+# window terminates the run once accuracy plateaus (matches the baseline recipe
+# in _base_/runtimes/amc.py).
+custom_hooks = [dict(type='EarlyStoppingHook', monitor='accuracy/top1', min_delta=0.1, patience=15, rule='greater')]
+
 env_cfg = dict(
     # disable cudnn benchmark
     cudnn_benchmark=False,

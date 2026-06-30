@@ -14,8 +14,13 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook'),
 )
 
+# Early stopping on the fused validation top-1 accuracy (0-100 scale). The old
+# ``min_delta=0, patience=100`` let any sub-0.01pp wiggle reset the window, so
+# early stopping effectively never fired and training drifted to epoch 200+.
+# Requiring a >=0.1pp gain over a 15-epoch window makes it fire once accuracy
+# genuinely plateaus (matches the baseline recipe in _base_/runtimes/amc.py).
 custom_hooks = [
-    dict(type='EarlyStoppingHook', monitor='accuracy/top1', min_delta=0, patience=100, rule='greater'),
+    dict(type='EarlyStoppingHook', monitor='accuracy/top1', min_delta=0.1, patience=15, rule='greater'),
     dict(type='HCGDNNHook',)
 ]
 

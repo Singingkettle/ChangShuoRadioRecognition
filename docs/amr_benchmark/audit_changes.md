@@ -605,3 +605,71 @@ are *not* used by the 15-model main sweep (those configs pull
 `_base_/schedules/amc.py`), so they are out of scope for this blocker,
 but the own-method 2018/HisarMod runs in the finalize driver will need
 an analogous fix before they can converge in reasonable time.
+
+## 2026-06-30 — Own-methods (MLDNN / HCGDNN / FastMLDNN) schedules never terminate (3–5 day ETAs)
+
+🟢 **Symptom.** As the finalize driver reached the own-method
+(MLDNN/HCGDNN/FastMLDNN) jobs on the large datasets (RML2018.01A,
+HisarMod), each job drifted toward multi-day ETAs and monopolized both
+RTX 3090s, starving the cheaper missing baselines of GPU time. Unlike
+the 15 main-sweep models, these three pull their *own*
+`configs/<method>/schedules.py` + `runtimes.py` rather than the shared
+`_base_` files, so they never received the 2026-06-29 `_base_` fix and
+still carried the latent never-terminating pattern flagged in that
+entry's "Note for own-method schedules".
+
+**Root cause (per method).**
+
+1. **MLDNN** — `configs/mldnn/schedules.py` declared **no
+   `param_scheduler` at all**, so the LR was frozen at `4.0000e-04` for
+   the entire run, and `max_epochs=400` let RML2018.01A (~2000 train
+   iters/epoch) drift for multiple days.
+2. **HCGDNN** — `configs/hcgdnn/schedules.py` used
+   `ReduceOnPlateauParamScheduler` (monitor `accuracy/top1`, patience
+   30) with `max_epochs=10000`. Because the fused validation accuracy
+   keeps inching up by tiny amounts, the plateau scheduler almost never
+   stepped, so the LR sat frozen at `4.4000e-04` while training ran to
+   epoch 200+ (observed ~5-day ETA). Its `EarlyStoppingHook` also used
+   `min_delta=0, patience=100`, so early stopping effectively never
+   fired.
+3. **FastMLDNN** — `configs/fastmldnn/schedules.py` used
+   `MultiStepLR(milestones=[800, 1200])` with `max_epochs=3200`; the
+   first LR drop would not occur until epoch 800, far beyond any sane
+   convergence point, so the LR never decayed and training never
+   stopped. Its `runtimes.py` had **no `custom_hooks`** at all (no early
+   stopping).
+
+**Fix (per-method, mirrors the 2026-06-29 `_base_` recipe; preserves
+each method's original optimizer LR — MLDNN `4e-4`, HCGDNN/FastMLDNN
+`4.4e-4`).**
+
+| File | old | new |
+| --- | --- | --- |
+| `configs/mldnn/schedules.py` | no `param_scheduler`, `max_epochs=400` | `CosineAnnealingLR(by_epoch=True, T_max=150, eta_min=1e-6)`, `max_epochs=150` |
+| `configs/hcgdnn/schedules.py` | `ReduceOnPlateauParamScheduler`, `max_epochs=10000` | `CosineAnnealingLR(by_epoch=True, T_max=150, eta_min=1e-6)`, `max_epochs=150` |
+| `configs/hcgdnn/runtimes.py` `EarlyStoppingHook` | `min_delta=0, patience=100` | `min_delta=0.1, patience=15` |
+| `configs/fastmldnn/schedules.py` | `MultiStepLR(milestones=[800,1200])`, `max_epochs=3200` | `CosineAnnealingLR(by_epoch=True, T_max=150, eta_min=1e-6)`, `max_epochs=150` |
+| `configs/fastmldnn/runtimes.py` `custom_hooks` | (none) | `[EarlyStoppingHook(monitor='accuracy/top1', min_delta=0.1, patience=15, rule='greater')]` |
+
+MLDNN inherits its `EarlyStoppingHook` (and the `CheckpointHook` with
+`save_best='accuracy/top1'`) from `_base_/runtimes/amc.py`; HCGDNN and
+FastMLDNN now carry the same `EarlyStoppingHook` locally and also
+inherit `save_best='accuracy/top1'` from `_base_`. **Paper accuracy is
+preserved, not degraded:** the `CheckpointHook` saves the best-val
+checkpoint and the orchestrator tests that checkpoint, so the bounded
+schedule only caps wall-clock time — it never tests a half-trained
+or post-plateau model. `CosineAnnealingLR` makes the LR anneal visibly
+every epoch toward `1e-6`, removing the plateau-stuck-LR failure mode,
+and the stricter early stopping (≥0.1 pp gain over a 15-epoch window)
+terminates each job once validation accuracy genuinely plateaus,
+bounding the worst case to hours instead of days.
+
+**Scope.** Only the five own-method files above were changed. No
+baseline configs and no shared `_base_` files (`_base_/schedules/amc.py`,
+`_base_/runtimes/amc.py`) were touched. Live verification on the
+running jobs confirmed the fix is active: `fastmldnn@deepsig201801A`
+(epoch 6, `lr 9.97e-04` cosine-decaying, ETA ~1 day, `EarlyStoppingHook`
+in the hook list) and `hcgdnn@deepsig201801A` (epoch 18, `lr 4.26e-04`
+decaying from `4.4e-04`, `EarlyStoppingHook` present). With the
+own-method ETAs dropped from multi-day to hours, the cheaper missing
+baselines can again receive GPU time as these jobs complete.
