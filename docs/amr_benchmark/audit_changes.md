@@ -673,3 +673,98 @@ in the hook list) and `hcgdnn@deepsig201801A` (epoch 18, `lr 4.26e-04`
 decaying from `4.4e-04`, `EarlyStoppingHook` present). With the
 own-method ETAs dropped from multi-day to hours, the cheaper missing
 baselines can again receive GPU time as these jobs complete.
+
+## 2026-07-01 — FastMLDNN diverges (dead-ReLU collapse) on RML2018.01A
+
+🟢 **Symptom.** `fastmldnn@deepsig201801A` produced a garbage result:
+the orchestrator tested from `best_accuracy_top1_epoch_1.pth` and
+measured overall **8.02%**, peak **11.09%** (~random for 24 classes).
+The best checkpoint being epoch 1 means validation accuracy never
+improved after epoch 1. By contrast `fastmldnn@deepsig201610B` is fine
+(overall 57.81%, peak 87.75% from `best_epoch_64`), so the failure is
+specific to 2018.01A.
+
+**Root cause — divergence, not a data/label bug.** Both configs inherit
+the same shared `_base_/schedules/amc.py` (Adam **`lr=1e-3`**),
+`_base_/runtimes/amc.py`, and the same model (`num_classes` correctly 24
+on 2018, 10 on 10B; AP pipeline identical). The only dataset difference
+is signal length: **2018.01A frames are 1024 samples vs 128 on
+10A/10B**. The `FastMLDNN` backbone
+(`csrr/models/backbones/fastmldnn.py`) aggregates its transformer output
+with `merge='sum'` — `torch.sum(x, dim=1)` over the post-CNN sequence.
+Three `kernel_size=3, stride=1` convs reduce length by 6, so the summed
+sequence is **~1018 steps on 2018 vs ~122 on 10A/10B (~8.3x)**; the
+summed feature magnitude (hence logits and gradients) is ~8x larger on
+2018. The training log proves the collapse:
+
+| epoch | train loss (end) | val acc | val loss |
+| --- | --- | --- | --- |
+| 1 | 2.7976 | 8.03% | 59.72 |
+| 2 | **3.1781** | 4.17% (=1/24) | 31.45 |
+| 3–16 | **3.1781 (frozen)** | 4.17% | 22→17 |
+
+`3.1781 = ln(24)` *exactly*: after the epoch-1 step the final classifier
+ReLUs went dead (the last `nn.Linear` has `bias=False`, so an all-zero
+post-ReLU input yields uniform logits → constant `ln(24)` loss and
+exactly 1/24 accuracy), and the zero gradient through dead ReLUs meant
+the network never recovered. `EarlyStoppingHook` (patience 15) then
+stopped it and the epoch-1 weights were tested. This is classic
+LR-too-high divergence, amplified on 2018 by the ~8x sum-merge scaling.
+10A/10B are unaffected (short signals → ~8x smaller summed activations)
+and converge fine at the shared `lr=1e-3`.
+
+**Fix (dataset-specific; `configs/fastmldnn/fastmldnn_iq-ap-deepsig-201801A.py` only).**
+
+| field | old (inherited `_base_`) | new (2018.01A override) |
+| --- | --- | --- |
+| `optim_wrapper.optimizer.lr` | `1e-3` | `2e-4` (toward FastMLDNN's paper `4.4e-4`, scaled down for the 8x sum magnitude) |
+| `optim_wrapper.clip_grad` | (none) | `dict(max_norm=5.0, norm_type=2)` — hard guard against the explosive step |
+| `param_scheduler` | single `CosineAnnealingLR(T_max=150)` | `[LinearLR(start_factor=0.01, begin=0, end=5), CosineAnnealingLR(T_max=145, begin=5, end=150, eta_min=1e-6)]` — 5-epoch warmup so early high-variance steps cannot kill the ReLUs, then cosine |
+
+`max_epochs=150`, `EarlyStoppingHook(min_delta=0.1, patience=15)` and
+`CheckpointHook(save_best='accuracy/top1')` are unchanged (inherited).
+**10A/10B configs are deliberately untouched** (they don't share this
+file and converge fine), so this cannot regress the completed/good
+10A/10B results.
+
+**Validation (manual single-GPU run on the fixed config, GPU1, cache on).**
+The fix is confirmed: the warmup LR starts microscopic (`~3e-6`, ramping)
+and the initial training loss is **207** (directly confirming the giant
+summed logits on 2018) but then descends smoothly under gradient
+clipping — `207 → 7.3 → 3.0` within epoch 1, ending epoch 1 at **2.78**,
+and crucially epoch 2 **continues down to ~2.58 (then 2.45 in epoch 3)
+instead of locking at `ln(24)`**. Validation accuracy *climbs* and the
+best checkpoint advances past epoch 1:
+
+| epoch | train loss | val acc | best ckpt |
+| --- | --- | --- | --- |
+| 1 | 2.78 | 8.71% | epoch 1 |
+| 2 | 2.58 | **13.51%** | **epoch 2** |
+| 3 | 2.45 | (climbing; LR still in warmup ~9e-5) | — |
+
+No NaN, no collapse, loss monotonically decreasing, val accuracy rising
+while the LR is still only warming up (it reaches the full `2e-4` at
+epoch 5, after which convergence accelerates). The stale garbage result
+(`res/paper.pkl`, `best_accuracy_top1_epoch_1.pth`, `epoch_16.pth`,
+`last_checkpoint`) was removed from
+`work_dirs/amr_benchmark/fastmldnn/deepsig201801A/` (logs kept) so the
+idempotent sweep re-trains fastmldnn@2018 under the fixed config; the
+manual validation run was then killed (it lived in a throwaway
+`_validate_2018` work-dir and never touched the sweep's directory).
+
+**Related-method risk assessment (no changes made).**
+- **mldnn@deepsig201801A** (queued, not yet re-run): **low risk** for
+  this defect. MLDNN uses `lr=4e-4` (not `1e-3`) and aggregates bounded
+  GRU states (`tanh` outputs), and a prior 2018.01A run trained 41
+  epochs without any `ln(24)` collapse (loss stable ~5.3 with healthy
+  per-branch terms). Its historical problem was sluggish convergence +
+  the never-terminating schedule (addressed separately on 2026-06-30),
+  not divergence. Worth watching when the sweep retrains it, but it does
+  not share FastMLDNN's dead-ReLU failure, so MLDNN is left unchanged.
+- **hcgdnn@deepsig201801A** (running): **healthy** — val acc ~58%
+  (plateauing), epoch 63, `lr` cosine-annealing (`2.8e-4`), loss
+  decreasing. Left untouched.
+
+**Scope.** Only `configs/fastmldnn/fastmldnn_iq-ap-deepsig-201801A.py`
+was changed. No shared `_base_` files, no backbone/head code, no other
+method or dataset configs, and no 10A/10B results were touched.
