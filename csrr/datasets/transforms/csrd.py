@@ -15,7 +15,17 @@ class LoadCSRDFrame(BaseTransform):
     """Load a CSRD ``.mat`` entry.
 
     The file stores ``signal_data`` of shape ``(num_signals, 2, L)`` — the
-    per-signal passband I/Q components. The received frame is their sum.
+    per-signal passband I/Q components — and, for noisy configurations
+    (awgn-*/real/real_awgn-*), ``wideband_data`` of shape ``(1, 2, L)``:
+    the received frame with the frame's single AWGN realization applied
+    once at the wideband level.
+
+    ``wideband_data`` is preferred as the received frame whenever present.
+    Summing ``signal_data`` is only correct for noise-free entries; with
+    older exports whose per-signal components each embedded the (same)
+    wideband noise vector, summing stacked that noise ``num_signals``
+    times, silently degrading the effective SNR far below the label
+    (see docs/csrd_jointdet/dataset_generation.md).
 
     **Added keys**: ``iq`` (float32, shape (2, L)); optionally
     ``signal_components`` (float32, shape (num_signals, 2, L)).
@@ -30,11 +40,15 @@ class LoadCSRDFrame(BaseTransform):
         self.keep_components = keep_components
 
     def transform(self, results: dict) -> dict:
-        components = loadmat(results['iq_path'])['signal_data']
-        components = np.asarray(components, dtype=np.float32)
+        mat = loadmat(results['iq_path'])
+        components = np.asarray(mat['signal_data'], dtype=np.float32)
         if components.ndim == 2:  # single-signal entry stored squeezed
             components = components[None, ...]
-        results['iq'] = components.sum(axis=0)
+        if 'wideband_data' in mat:
+            results['iq'] = np.asarray(
+                mat['wideband_data'], dtype=np.float32)[0]
+        else:
+            results['iq'] = components.sum(axis=0)
         if self.keep_components:
             results['signal_components'] = components
         return results
