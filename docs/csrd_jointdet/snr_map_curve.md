@@ -56,7 +56,8 @@ CUDA_VISIBLE_DEVICES=1 python tools/test_det.py \
 ```
 
 When `snrwise=True`, `tools/test_det.py` writes the curve artifacts under the
-active work directory by default:
+active work directory by default. The detector config writes mAP and AR per
+SNR; the joint config writes class-aware mAP per SNR.
 
 ```bash
 work_dirs/jdm/jdm-det_fft-csrd/snr_curve.json

@@ -63,7 +63,8 @@ test_evaluator = dict(
     type='SignalDetectionMetric',
     classwise=True,
     snrwise=True,
-    snr_plot_title='JDM joint: class-aware mAP/AR vs per-signal SNR')
+    snrwise_metrics=('mAP', ),
+    snr_plot_title='JDM joint: class-aware mAP vs per-signal SNR')
 
 # inference-only: no train loop
 train_dataloader = None

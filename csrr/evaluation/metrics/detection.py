@@ -126,6 +126,8 @@ class SignalDetectionMetric(BaseMetric):
         snr_plot_out (str | None): optional image/PDF output path for the SNR
             mAP curve.
         snr_plot_title (str | None): optional plot title.
+        snrwise_metrics (Sequence[str]): SNR-curve metrics to compute. Allowed
+            names are ``mAP``, ``AP50``, ``AP75`` and ``AR``.
     """
     default_prefix: Optional[str] = 'detection'
 
@@ -139,6 +141,8 @@ class SignalDetectionMetric(BaseMetric):
                  snr_curve_out: Optional[str] = None,
                  snr_plot_out: Optional[str] = None,
                  snr_plot_title: Optional[str] = None,
+                 snrwise_metrics: Sequence[str] = ('mAP', 'AP50', 'AP75',
+                                                   'AR'),
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -152,6 +156,12 @@ class SignalDetectionMetric(BaseMetric):
         self.snr_curve_out = snr_curve_out
         self.snr_plot_out = snr_plot_out
         self.snr_plot_title = snr_plot_title
+        allowed_snr_metrics = {'mAP', 'AP50', 'AP75', 'AR'}
+        self.snrwise_metrics = tuple(snrwise_metrics)
+        unknown = set(self.snrwise_metrics) - allowed_snr_metrics
+        if unknown:
+            raise ValueError(
+                f'Unsupported SNR-wise metrics: {sorted(unknown)}')
 
     @staticmethod
     def _to_numpy(value) -> np.ndarray:
@@ -350,19 +360,24 @@ class SignalDetectionMetric(BaseMetric):
         curve = []
         for snr in snr_values:
             groups, _ = self._build_groups(results, snr, class_ids)
-            values = dict(
-                mAP=self._mean_over_groups(groups, self._ap_at_with_ignore,
-                                           self.iou_thrs),
-                AP50=self._mean_over_groups(groups, self._ap_at_with_ignore,
-                                            (0.5,)),
-                AP75=self._mean_over_groups(groups, self._ap_at_with_ignore,
-                                            (0.75,)),
-                AR=self._mean_over_groups(groups, self._ar_at_with_ignore,
-                                          self.iou_thrs, None),
-            )
+            values = {}
+            if 'mAP' in self.snrwise_metrics:
+                values['mAP'] = self._mean_over_groups(
+                    groups, self._ap_at_with_ignore, self.iou_thrs)
+            if 'AP50' in self.snrwise_metrics:
+                values['AP50'] = self._mean_over_groups(
+                    groups, self._ap_at_with_ignore, (0.5,))
+            if 'AP75' in self.snrwise_metrics:
+                values['AP75'] = self._mean_over_groups(
+                    groups, self._ap_at_with_ignore, (0.75,))
+            if 'AR' in self.snrwise_metrics:
+                values['AR'] = self._mean_over_groups(
+                    groups, self._ar_at_with_ignore, self.iou_thrs, None)
             label = self._format_snr_for_key(snr)
-            scalar_metrics[f'mAP_snr_{label}'] = values['mAP']
-            scalar_metrics[f'AR_snr_{label}'] = values['AR']
+            if 'mAP' in values:
+                scalar_metrics[f'mAP_snr_{label}'] = values['mAP']
+            if 'AR' in values:
+                scalar_metrics[f'AR_snr_{label}'] = values['AR']
             curve.append({
                 'snr': self._to_json_scalar(snr),
                 'num_gt': self._count_gt_at_snr(results, snr),
@@ -479,6 +494,7 @@ class SignalDetectionMetric(BaseMetric):
             metric='SignalDetectionMetric',
             classwise=self.classwise,
             snr_key=self.snr_key,
+            snrwise_metrics=list(self.snrwise_metrics),
             iou_thrs=[float(thr) for thr in self.iou_thrs],
             points=curve)
 
@@ -508,13 +524,17 @@ class SignalDetectionMetric(BaseMetric):
         if any(self._parse_snr_number(x) is None for x in xs):
             xs = [str(x) for x in xs]
         map_values = [np.nan if point['mAP'] is None else point['mAP']
-                      for point in curve]
+                      for point in curve] if 'mAP' in self.snrwise_metrics \
+            else None
         ar_values = [np.nan if point['AR'] is None else point['AR']
-                     for point in curve]
+                     for point in curve] if 'AR' in self.snrwise_metrics \
+            else None
 
         fig, ax = plt.subplots(figsize=(6.4, 4.2))
-        ax.plot(xs, map_values, marker='o', label='mAP@[.50:.95]')
-        ax.plot(xs, ar_values, marker='s', label='AR@[.50:.95]')
+        if map_values is not None:
+            ax.plot(xs, map_values, marker='o', label='mAP@[.50:.95]')
+        if ar_values is not None:
+            ax.plot(xs, ar_values, marker='s', label='AR@[.50:.95]')
         ax.set_xlabel('Per-signal SNR (dB)')
         ax.set_ylabel('Metric')
         ax.set_ylim(0.0, 1.0)

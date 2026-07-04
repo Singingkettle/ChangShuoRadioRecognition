@@ -51,4 +51,5 @@ test_cfg = dict()
 test_evaluator = dict(
     type='SignalDetectionMetric',
     snrwise=True,
+    snrwise_metrics=('mAP', 'AR'),
     snr_plot_title='JDM detector: mAP/AR vs per-signal SNR')
