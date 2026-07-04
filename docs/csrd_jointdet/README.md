@@ -10,6 +10,8 @@ Clean re-implementation of
 on the current mmengine-based `csrr` stack. Background research and the
 inventory of the historical (pre-mmengine) implementation live in
 [`paper_and_history_notes.md`](paper_and_history_notes.md).
+Current detector/joint optimization notes, diagnostics, and experiment configs
+are tracked in [`optimization_notes.md`](optimization_notes.md).
 
 ## Method in one paragraph
 
