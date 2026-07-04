@@ -42,9 +42,24 @@ def main():
 
     cfg.load_from = args.checkpoint
     cfg.test_dataloader.setdefault('collate_fn', dict(type='default_collate'))
+    _set_default_snr_outputs(cfg.test_evaluator, cfg.work_dir)
 
     runner = Runner.from_cfg(cfg)
     runner.test()
+
+
+def _set_default_snr_outputs(evaluator, work_dir: str) -> None:
+    """Place SNR curve artifacts in the active work dir by default."""
+    if isinstance(evaluator, (list, tuple)):
+        for item in evaluator:
+            _set_default_snr_outputs(item, work_dir)
+        return
+    if not isinstance(evaluator, dict) or not evaluator.get('snrwise', False):
+        return
+    evaluator.setdefault('snr_curve_out',
+                         osp.join(work_dir, 'snr_curve.json'))
+    evaluator.setdefault('snr_plot_out',
+                         osp.join(work_dir, 'snr_curve.pdf'))
 
 
 if __name__ == '__main__':

@@ -59,7 +59,11 @@ test_dataloader = dict(dataset=dict(pipeline=joint_pipeline))
 
 # class-aware evaluation over modulation labels = joint JDM metric
 val_evaluator = dict(type='SignalDetectionMetric', classwise=True)
-test_evaluator = dict(type='SignalDetectionMetric', classwise=True)
+test_evaluator = dict(
+    type='SignalDetectionMetric',
+    classwise=True,
+    snrwise=True,
+    snr_plot_title='JDM joint: class-aware mAP/AR vs per-signal SNR')
 
 # inference-only: no train loop
 train_dataloader = None

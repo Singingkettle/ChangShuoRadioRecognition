@@ -37,7 +37,7 @@ separately and chained at inference.
 | Sec. V-A JDM pipeline ("proposal" hand-off) | `csrr/models/detectors/jdm.py::JDMFramework` |
 | Sec. IV CRML23 dataset | `csrr/datasets/csrd.py` (`CSRDDetectionDataset`, `CSRDModulationDataset`) over `data/ChangShuo/v*` |
 | FFT input representation | `csrr/datasets/transforms/csrd.py::IQToSpectrum` (+ `LoadCSRDFrame`) |
-| Sec. VI-A metrics (mAP/AP50/AP75, size-binned AP, AR@k) | `csrr/evaluation/metrics/detection.py::SignalDetectionMetric` |
+| Sec. VI-A metrics (mAP/AP50/AP75, size-binned AP, AR@k, per-box SNR curves) | `csrr/evaluation/metrics/detection.py::SignalDetectionMetric` |
 | Sec. VI training protocol | `configs/jdm/*.py` (optimizers/epochs/batch sizes per paper) |
 
 Model wrapper for the stand-alone detector: 
@@ -46,8 +46,9 @@ Model wrapper for the stand-alone detector:
 
 ## Data
 
-Expected at `data/ChangShuo/v1 … v124` (CSRD / ChangShuoRadioData `twc`
-profile output; present on this machine). Each version = one channel
+Expected at `/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026/v1 …
+v124` (CSRD / ChangShuoRadioData `twc` profile output; present on this
+machine). Each version = one channel
 configuration × 1000 entries: `anno/*.json` + `sequence_data/iq/*.mat`
 (`signal_data`: per-signal passband I/Q `(num_signals, 2, 1200)`, frame = sum).
 No split files are used; the datasets split every version 50/10/40
@@ -77,6 +78,11 @@ python tools/merge_jdm_checkpoints.py \
     work_dirs/jdm_joint.pth
 python tools/test_det.py configs/jdm/jdm-joint_iq-csrd.py work_dirs/jdm_joint.pth
 ```
+
+`tools/test_det.py` emits detector-only and joint mAP-vs-SNR curves when the
+JDM test evaluator is configured with `snrwise=True`. The SNR grouping is by
+each GT box's own annotation SNR, not by frame; see
+[`snr_map_curve.md`](snr_map_curve.md) for the definition and artifact paths.
 
 To restrict training/evaluation to specific channel conditions (e.g. only the
 AWGN versions, mirroring the paper's per-condition figures), override

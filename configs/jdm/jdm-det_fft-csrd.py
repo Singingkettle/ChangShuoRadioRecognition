@@ -46,3 +46,9 @@ param_scheduler = dict(
 train_cfg = dict(by_epoch=True, max_epochs=30, val_interval=1)
 val_cfg = dict()
 test_cfg = dict()
+
+# Test-time SNR curves group GT objects by each signal's own annotation SNR.
+test_evaluator = dict(
+    type='SignalDetectionMetric',
+    snrwise=True,
+    snr_plot_title='JDM detector: mAP/AR vs per-signal SNR')
