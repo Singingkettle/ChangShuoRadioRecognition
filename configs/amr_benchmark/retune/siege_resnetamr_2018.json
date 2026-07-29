@@ -1,0 +1,28 @@
+{
+  "description": "Siege manifest — ResNetAMR @ RML2018.01A (marginal overall fail −0.26 pp)",
+  "paper_target_overall": 57.0,
+  "paper_target_peak": 91.0,
+  "campaign_success_overall": 57.0,
+  "campaign_success_peak": 91.0,
+  "gap_pp": 0.26,
+  "experiments": [
+    {
+      "id": "W4_resnetamr_2018_es30",
+      "priority": 0,
+      "model": "resnetamr",
+      "dataset": "deepsig201801A",
+      "variant": "es_patience30",
+      "config": "configs/amr_benchmark/retune/wave4_resnetamr_deepsig201801A_es_patience30.py",
+      "notes": "Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall"
+    },
+    {
+      "id": "W4_resnetamr_2018_warmup",
+      "priority": 0,
+      "model": "resnetamr",
+      "dataset": "deepsig201801A",
+      "variant": "lr2e4_warmup",
+      "config": "configs/amr_benchmark/retune/wave4_resnetamr_deepsig201801A_lr2e4_warmup.py",
+      "notes": "lr=2e-4 + 5-epoch linear warmup + grad clip"
+    }
+  ]
+}

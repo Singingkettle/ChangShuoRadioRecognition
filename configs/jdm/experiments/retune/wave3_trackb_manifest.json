@@ -1,0 +1,45 @@
+{
+  "description": "JDM retune wave 3 Track B — hyperparam grid around 5-ep winning recipe (anchors 96/120/146, bw×20)",
+  "experiments": [
+    {
+      "id": "det_wave3b_5ep_lr5e4",
+      "module": "detector",
+      "variant": "det_wave3b_5ep_lr5e4",
+      "config": "configs/jdm/experiments/retune/det_wave3b_5ep_lr5e4.py",
+      "priority": 0,
+      "notes": "Track B: fresh 5 ep, lr 5e-4, cosine T_max=5, ES off, bw×20, anchors 96/120/146"
+    },
+    {
+      "id": "det_wave3b_5ep_lr1e3",
+      "module": "detector",
+      "variant": "det_wave3b_5ep_lr1e3",
+      "config": "configs/jdm/experiments/retune/det_wave3b_5ep_lr1e3.py",
+      "priority": 0,
+      "notes": "Track B: fresh 5 ep, lr 1e-3 (base winning recipe), ES off"
+    },
+    {
+      "id": "det_wave3b_8ep_lr1e3",
+      "module": "detector",
+      "variant": "det_wave3b_8ep_lr1e3",
+      "config": "configs/jdm/experiments/retune/det_wave3b_8ep_lr1e3.py",
+      "priority": 0,
+      "notes": "Track B: fresh 8 ep, lr 1e-3, cosine T_max=8, ES off"
+    },
+    {
+      "id": "det_wave3b_5ep_lr2e3",
+      "module": "detector",
+      "variant": "det_wave3b_5ep_lr2e3",
+      "config": "configs/jdm/experiments/retune/det_wave3b_5ep_lr2e3.py",
+      "priority": 1,
+      "notes": "Track B: fresh 5 ep, lr 2e-3, ES off"
+    },
+    {
+      "id": "det_wave3b_5ep_lr1e3_es3",
+      "module": "detector",
+      "variant": "det_wave3b_5ep_lr1e3_es3",
+      "config": "configs/jdm/experiments/retune/det_wave3b_5ep_lr1e3_es3.py",
+      "priority": 1,
+      "notes": "Track B: fresh 5 ep, lr 1e-3, ES patience 3"
+    }
+  ]
+}

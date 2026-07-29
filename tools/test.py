@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import os.path as osp
 import pickle
@@ -8,6 +9,7 @@ import torch
 from mmengine.config import Config, DictAction
 from mmengine.registry import init_default_scope
 from mmengine.runner import Runner, load_checkpoint
+
 
 
 def parse_args():
@@ -153,7 +155,12 @@ def main():
         pickle.dump(res, f)
 
     acc = np.mean(np.argmax(pps, axis=1) == gts) * 100
+    metrics = {'accuracy/top1': float(acc)}
+    metrics_path = osp.join(work_dir, 'amc_test_metrics.json')
+    with open(metrics_path, 'w') as f:
+        json.dump(metrics, f, indent=2)
     print(f'\nResults saved to {save_path}')
+    print(f'  metrics: {metrics_path}')
     print(f'  samples: {pps.shape[0]}, classes: {pps.shape[1]}')
     if 'feas' in res:
         print(f'  features: {res["feas"].shape}, centers: '

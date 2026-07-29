@@ -1,0 +1,54 @@
+{
+  "description": "Wave-8 Tier-A \u2014 FastMLDNN @ 10A near-miss after W7 best 60.89/92.14 (\u22120.13pp peak+; still \u22122.35pp vs paper 63.24)",
+  "updated_at": "2026-07-20T10:51:00Z",
+  "campaign_mode": "paper_exact",
+  "paper_target_overall": 63.24,
+  "paper_target_peak": 92.0,
+  "experiments": [
+    {
+      "id": "W8_fastmldnn_10a_paper_fixedlr_l2_wd5e5_esoff600",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_fixedlr_l2_wd5e5_esoff600",
+      "config": "configs/amr_benchmark/retune/wave8_fastmldnn_deepsig201610A_paper_fixedlr_l2_wd5e5_esoff600.py",
+      "notes": "Combine W7 wd5e5 + 600ep"
+    },
+    {
+      "id": "W8_fastmldnn_10a_paper_fixedlr_l2_beta03_esoff500",
+      "priority": 1,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_fixedlr_l2_beta03_esoff500",
+      "config": "configs/amr_benchmark/retune/wave8_fastmldnn_deepsig201610A_paper_fixedlr_l2_beta03_esoff500.py",
+      "notes": "Softer multi-loss beta=0.3"
+    },
+    {
+      "id": "W8_fastmldnn_10a_paper_fixedlr_l2_gradclip_esoff500",
+      "priority": 2,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_fixedlr_l2_gradclip_esoff500",
+      "config": "configs/amr_benchmark/retune/wave8_fastmldnn_deepsig201610A_paper_fixedlr_l2_gradclip_esoff500.py",
+      "notes": "Grad clip on W6 stack"
+    },
+    {
+      "id": "W8_fastmldnn_10a_paper_fixedlr_adamw_esoff500",
+      "priority": 3,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_fixedlr_adamw_esoff500",
+      "config": "configs/amr_benchmark/retune/wave8_fastmldnn_deepsig201610A_paper_fixedlr_adamw_esoff500.py",
+      "notes": "AdamW decoupled WD"
+    },
+    {
+      "id": "W8_fastmldnn_10a_paper_cosine_l2_esoff500",
+      "priority": 4,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_cosine_l2_esoff500",
+      "config": "configs/amr_benchmark/retune/wave8_fastmldnn_deepsig201610A_paper_cosine_l2_esoff500.py",
+      "notes": "Cosine schedule contrast"
+    }
+  ]
+}

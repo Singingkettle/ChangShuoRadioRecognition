@@ -36,27 +36,24 @@ inputs and to exercise the real test pipeline for the predict path.
 
 ## Measured-vs-paper results
 
-> _Status: training pending — coordinating with the running AMR-Benchmark
-> sweep (GPUs busy). The durable sweep driver's RML2018.01A / HisarMod
-> phases enumerate these three methods automatically (they are in
-> `tools/amr_benchmark/matrix.py`); RML2016.10A/10B are produced during
-> the same phased sweep. Numbers will be filled in here as `paper.pkl`
-> files land under `work_dirs/amr_benchmark/<model>/<dataset>/res/`._
+> Updated from `accuracy_tracking.md` (2026-07-14). Campaign mode for these
+> three is **paper_exact**; **50/10/40 is paper-native** (not a TF concession).
+> Deep dive: [`own_methods_paper_alignment.md`](./own_methods_paper_alignment.md).
 
 | Method | Dataset | Target overall | Meas overall | Target peak | Meas peak | Peak SNR (meas) | Status | Notes |
 |--------|---------|----------------|--------------|-------------|-----------|-----------------|--------|-------|
-| MLDNN | RML2016.10A | ~62.0 (fig) | — | ~92.0 | — | — | pending | approx target; 50/10/40 vs paper protocol |
-| MLDNN | RML2016.10B | n/a | — | n/a | — | — | pending | measured-only |
-| MLDNN | RML2018.01A | n/a | — | n/a | — | — | pending | measured-only |
-| MLDNN | HisarMod | n/a | — | n/a | — | — | pending | measured-only |
-| HCGDNN | RML2016.10A | 64.9 | — | ~93.0 | — | — | pending | fused (HCGDNNWeightsAccuracy) |
-| HCGDNN | RML2016.10B | n/a | — | n/a | — | — | pending | measured-only |
-| HCGDNN | RML2018.01A | n/a | — | n/a | — | — | pending | measured-only |
-| HCGDNN | HisarMod | n/a | — | n/a | — | — | pending | measured-only |
-| FastMLDNN | RML2016.10A | 63.24 | — | ~92.0 | — | — | pending | FastMLDNNHead beta=0 |
-| FastMLDNN | RML2016.10B | n/a | — | n/a | — | — | pending | measured-only |
-| FastMLDNN | RML2018.01A | n/a | — | n/a | — | — | pending | measured-only |
-| FastMLDNN | HisarMod | n/a | — | n/a | — | — | pending | measured-only |
+| MLDNN | RML2016.10A | 62.0 | **62.31** | 92.0 | **92.73** | 12 dB | **pass** (paper-exact) | Hold |
+| MLDNN | RML2016.10B | n/a | 65.06 | n/a | 93.62 | 18 dB | measured | |
+| MLDNN | RML2018.01A | n/a | 57.94 | n/a | 90.77 | 22 dB | measured | |
+| MLDNN | HisarMod | n/a | 60.06 | n/a | 73.63 | 16 dB | measured | |
+| HCGDNN | RML2016.10A | 64.9 | **63.04** | 93.0 | **93.11** | 18 dB | **fail** paper-exact | Peak OK; overall −1.86 |
+| HCGDNN | RML2016.10B | n/a | 65.04 | n/a | 93.71 | 18 dB | measured | |
+| HCGDNN | RML2018.01A | n/a | 58.72 | n/a | 93.52 | 24 dB | measured | |
+| HCGDNN | HisarMod | n/a | 57.39 | n/a | 70.16 | 18 dB | measured | |
+| FastMLDNN | RML2016.10A | 63.24 | **61.02** | 92.0 | **91.52** | 18 dB | **fail** paper-exact | Synced `esoff300`; paper siege next |
+| FastMLDNN | RML2016.10B | n/a | 57.81 | n/a | 87.75 | 18 dB | measured | |
+| FastMLDNN | RML2018.01A | n/a | 48.05 | n/a | 77.45 | 20 dB | measured | |
+| FastMLDNN | HisarMod | n/a | 5.98 | n/a | 7.90 | −8 dB | measured | Broken; defer |
 
 ## Re-tuning log
 
@@ -68,12 +65,9 @@ signal scale — the candidate fix if their high-SNR accuracy falls short._
 
 ## Protocol differences vs each paper
 
-- **Split.** All three papers report on RML2016.10A with their own
-  protocol; MLDNN/FastMLDNN historically merged train+validation and
-  re-used the test set for validation. This workstream uses the strict
-  50/10/40 split, so a small (~1–3 pp) absolute drop vs the published
-  numbers is expected and is reported as a documented gap, not a failure,
-  when within reason.
-- **Datasets.** RML2016.10B, RML2018.01A and HisarMod were not given
-  explicit accuracy numbers we could extract from the three papers; they
-  are trained and reported measured-only.
+- **Split (policy 2026-07-14).** Project standard **50/10/40 is treated as
+  paper-native** for MLDNN / FastMLDNN / HCGDNN. Residual gaps must be closed
+  via paper architecture freeze + training recipe (see alignment doc), not
+  waived as “TF 6:2:2 vs CSRR.”
+- **Datasets.** RML2016.10B, RML2018.01A and HisarMod have no extractable
+  paper targets; measured-only.

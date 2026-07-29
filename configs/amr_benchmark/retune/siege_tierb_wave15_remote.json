@@ -1,0 +1,142 @@
+{
+  "description": "Wave-15 Tier-B (H100): AMR-Benchmark original Keras recipe (Adam 1e-3 + ReduceLROnPlateau f0.5 p5 + ES p50) on all failing 10A/10B pairs, ordered by gap.",
+  "updated_at": "2026-07-27T09:50:00Z",
+  "campaign_mode": "approximate",
+  "experiments": [
+    {
+      "id": "W15_cnn2_deepsig201610B",
+      "priority": 0,
+      "model": "cnn2",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cnn2_deepsig201610B_amrb_plateau.py",
+      "notes": "56.25/64.00 gap -7.75"
+    },
+    {
+      "id": "W15_cldnnl_deepsig201610B",
+      "priority": 1,
+      "model": "cldnnl",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cldnnl_deepsig201610B_amrb_plateau.py",
+      "notes": "56.57/62 gap -5.43"
+    },
+    {
+      "id": "W15_cldnnw_deepsig201610B",
+      "priority": 2,
+      "model": "cldnnw",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cldnnw_deepsig201610B_amrb_plateau.py",
+      "notes": "57.21/62 gap -4.79"
+    },
+    {
+      "id": "W15_cnn1dpf_deepsig201610B",
+      "priority": 3,
+      "model": "cnn1dpf",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cnn1dpf_deepsig201610B_amrb_plateau.py",
+      "notes": "58.42/62 gap -3.58"
+    },
+    {
+      "id": "W15_cldnnw_deepsig201610A",
+      "priority": 4,
+      "model": "cldnnw",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cldnnw_deepsig201610A_amrb_plateau.py",
+      "notes": "53.78/57 gap -3.22 (+peak)"
+    },
+    {
+      "id": "W15_resnetamr_deepsig201610A",
+      "priority": 5,
+      "model": "resnetamr",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_resnetamr_deepsig201610A_amrb_plateau.py",
+      "notes": "54.33/57 gap -2.67"
+    },
+    {
+      "id": "W15_denscnn_deepsig201610A",
+      "priority": 6,
+      "model": "denscnn",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_denscnn_deepsig201610A_amrb_plateau.py",
+      "notes": "54.48/57 gap -2.52"
+    },
+    {
+      "id": "W15_mcnet_deepsig201610B",
+      "priority": 7,
+      "model": "mcnet",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_mcnet_deepsig201610B_amrb_plateau.py",
+      "notes": "59.49/62 gap -2.51"
+    },
+    {
+      "id": "W15_cgdnet_deepsig201610A",
+      "priority": 8,
+      "model": "cgdnet",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cgdnet_deepsig201610A_amrb_plateau.py",
+      "notes": "55.55/58 gap -2.45"
+    },
+    {
+      "id": "W15_denscnn_deepsig201610B",
+      "priority": 9,
+      "model": "denscnn",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_denscnn_deepsig201610B_amrb_plateau.py",
+      "notes": "59.72/62 gap -2.28"
+    },
+    {
+      "id": "W15_cnn1dpf_deepsig201610A",
+      "priority": 10,
+      "model": "cnn1dpf",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cnn1dpf_deepsig201610A_amrb_plateau.py",
+      "notes": "54.97/57 gap -2.03"
+    },
+    {
+      "id": "W15_mcnet_deepsig201610A",
+      "priority": 11,
+      "model": "mcnet",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_mcnet_deepsig201610A_amrb_plateau.py",
+      "notes": "55.98/58 gap -2.02"
+    },
+    {
+      "id": "W15_resnetamr_deepsig201610B",
+      "priority": 12,
+      "model": "resnetamr",
+      "dataset": "deepsig201610B",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_resnetamr_deepsig201610B_amrb_plateau.py",
+      "notes": "60.37/62 gap -1.63"
+    },
+    {
+      "id": "W15_lstm2_deepsig201610A",
+      "priority": 13,
+      "model": "lstm2",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_lstm2_deepsig201610A_amrb_plateau.py",
+      "notes": "56.57/58 gap -1.43"
+    },
+    {
+      "id": "W15_cldnnl_deepsig201610A",
+      "priority": 14,
+      "model": "cldnnl",
+      "dataset": "deepsig201610A",
+      "variant": "amrb_plateau_w15",
+      "config": "configs/amr_benchmark/retune/wave15_cldnnl_deepsig201610A_amrb_plateau.py",
+      "notes": "56.02/57 gap -0.98 (+peak)"
+    }
+  ]
+}

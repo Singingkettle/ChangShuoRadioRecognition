@@ -92,6 +92,85 @@ class IQToSpectrum(BaseTransform):
 
 
 @TRANSFORMS.register_module()
+class LoadDetProposal(BaseTransform):
+    """Attach a detector proposal interval for AMC domain adaptation.
+
+    Looks up ``(file_name, signal_index)`` or hard-negative
+    ``(file_name, hard_neg_index)`` in a JSON cache produced by
+    ``tools/precompute_amc_proposals.py`` and writes ``proposal_box``
+    ``(left, right)`` in FFT-bin units for :class:`CSRDSignalToBaseband`.
+
+    Args:
+        proposal_cache (str): path to the JSON cache file.
+    """
+
+    def __init__(self, proposal_cache: str):
+        import json
+        with open(proposal_cache, encoding='utf-8') as f:
+            self._cache = json.load(f)
+
+    def transform(self, results: dict) -> dict:
+        key = results['file_name']
+        frame_entry = self._cache.get(key)
+        if frame_entry is None:
+            raise KeyError(
+                f'No detector proposal cache entry for {key!r}.')
+        if results.get('is_hard_negative', False):
+            unmatched = frame_entry.get('_unmatched', [])
+            neg_idx = results['hard_neg_index']
+            if neg_idx >= len(unmatched):
+                raise KeyError(
+                    f'Hard-negative index {neg_idx} out of range for '
+                    f'{key!r} (have {len(unmatched)} unmatched proposals).')
+            entry = unmatched[neg_idx]
+        else:
+            sig_idx = str(results['signal_index'])
+            entry = frame_entry.get(sig_idx)
+            if entry is None:
+                raise KeyError(
+                    f'No detector proposal for {key!r} signal_index={sig_idx} '
+                    f'in proposal cache.')
+        results['proposal_box'] = np.asarray(entry, dtype=np.float32)
+        return results
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(proposal_cache=...)'
+
+
+@TRANSFORMS.register_module()
+class PrepareGtScore(BaseTransform):
+    """Convert labels to soft targets for AMC hard-negative mining.
+
+    Positive samples (``is_hard_negative=False``) receive a one-hot
+    ``gt_score``; hard negatives receive a uniform distribution so the
+    classifier learns to stay uncertain on leakage-dominated crops.
+
+    Args:
+        num_classes (int): number of modulation classes.
+    """
+
+    def __init__(self, num_classes: int):
+        self.num_classes = num_classes
+
+    def transform(self, results: dict) -> dict:
+        if results.get('is_hard_negative', False):
+            score = np.full(
+                self.num_classes, 1.0 / self.num_classes, dtype=np.float32)
+            results['gt_score'] = score
+            # Placeholder label for the data preprocessor; loss uses gt_score.
+            results['gt_label'] = np.array(0, dtype=np.int64)
+        else:
+            label = int(np.asarray(results['gt_label']).reshape(-1)[0])
+            score = np.zeros(self.num_classes, dtype=np.float32)
+            score[label] = 1.0
+            results['gt_score'] = score
+        return results
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(num_classes={self.num_classes})'
+
+
+@TRANSFORMS.register_module()
 class CSRDSignalToBaseband(BaseTransform):
     """Extract the single-signal baseband crop of one annotated signal.
 
@@ -102,7 +181,8 @@ class CSRDSignalToBaseband(BaseTransform):
 
     **Required keys**: ``iq`` (and ``signal_components`` when
     ``source='component'``), ``signal_index``, ``center_frequency``,
-    ``bandwidth``, ``sample_rate``.
+    ``bandwidth``, ``sample_rate`` — unless ``proposal_box`` is already
+    present (FFT-bin ``(left, right)`` from a detector proposal cache).
     **Modified keys**: ``iq`` — replaced by the (2, L) baseband crop.
 
     Args:
@@ -125,10 +205,14 @@ class CSRDSignalToBaseband(BaseTransform):
         num_bins = frame.shape[-1]
         spectrum = np.fft.fftshift(np.fft.fft(frame))
 
-        sample_rate = results['sample_rate']
-        cf, bw = results['center_frequency'], results['bandwidth']
-        left = int(round(((cf - bw / 2) / sample_rate + 0.5) * num_bins))
-        right = int(round(((cf + bw / 2) / sample_rate + 0.5) * num_bins))
+        if 'proposal_box' in results:
+            left = int(round(float(results['proposal_box'][0])))
+            right = int(round(float(results['proposal_box'][1])))
+        else:
+            sample_rate = results['sample_rate']
+            cf, bw = results['center_frequency'], results['bandwidth']
+            left = int(round(((cf - bw / 2) / sample_rate + 0.5) * num_bins))
+            right = int(round(((cf + bw / 2) / sample_rate + 0.5) * num_bins))
         left = min(max(left, 0), num_bins - 1)
         right = min(max(right, left + 1), num_bins)
 

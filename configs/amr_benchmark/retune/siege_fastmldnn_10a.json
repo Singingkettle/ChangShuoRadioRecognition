@@ -1,0 +1,76 @@
+{
+  "description": "Siege manifest — FastMLDNN @ RML2016.10A (Wave-2 winners + Wave-3 micro-tune)",
+  "reference": "docs/amr_benchmark/retune_campaign.md#per-model-siege-mode",
+  "paper_target_overall": 63.24,
+  "paper_target_peak": 92.0,
+  "campaign_success_overall": 63.24,
+  "campaign_success_peak": 92.0,
+  "wave2_best_overall": 60.12,
+  "wave3_best_overall": 60.70,
+  "gap_vs_paper_overall_pp": -2.54,
+  "experiments": [
+    {
+      "id": "W2_fastmldnn_10a_beta05_xavier_esoff150",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_esoff150",
+      "config": "configs/amr_benchmark/retune/wave2_fastmldnn_deepsig201610A_beta05_xavier_esoff150.py",
+      "notes": "Wave-2 P0: beta=0.5 + Xavier + ES off"
+    },
+    {
+      "id": "W2_fastmldnn_10a_beta05_xavier_l2_esoff",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_l2_esoff",
+      "config": "configs/amr_benchmark/retune/wave2_fastmldnn_deepsig201610A_beta05_xavier_l2_esoff.py",
+      "notes": "Wave-2 P0+P1: + IQ L2 SelfNormalize"
+    },
+    {
+      "id": "W2_fastmldnn_10a_beta05_xavier_dp007_esoff",
+      "priority": 1,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_dp007_esoff",
+      "config": "configs/amr_benchmark/retune/wave2_fastmldnn_deepsig201610A_beta05_xavier_dp007_esoff.py",
+      "notes": "Wave-2 P0+P1: + dp=0.07"
+    },
+    {
+      "id": "W2_fastmldnn_10a_beta05_xavier_l2_dp007_esoff",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_l2_dp007_esoff",
+      "config": "configs/amr_benchmark/retune/wave2_fastmldnn_deepsig201610A_beta05_xavier_l2_dp007_esoff.py",
+      "notes": "Wave-2 best: 60.12% overall / 89.48% peak (−1.62 / −1.52 pp)"
+    },
+    {
+      "id": "W3_fastmldnn_10a_esoff200",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_l2_dp007_esoff200",
+      "config": "configs/amr_benchmark/retune/wave3_fastmldnn_deepsig201610A_beta05_xavier_l2_dp007_esoff200.py",
+      "notes": "Wave-3: Wave-2 stack + max_epochs=200, ES off"
+    },
+    {
+      "id": "W3_fastmldnn_10a_stepLR",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_l2_dp007_esoff_stepLR",
+      "config": "configs/amr_benchmark/retune/wave3_fastmldnn_deepsig201610A_beta05_xavier_l2_dp007_esoff_stepLR.py",
+      "notes": "Wave-3: Wave-2 stack + StepLR ×0.1 @ ep 100, 150"
+    },
+    {
+      "id": "W3_fastmldnn_10a_lr5e4",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "beta05_xavier_l2_dp007_esoff_lr5e4",
+      "config": "configs/amr_benchmark/retune/wave3_fastmldnn_deepsig201610A_beta05_xavier_l2_dp007_esoff_lr5e4.py",
+      "notes": "Wave-3: Wave-2 stack + lr=5e-4"
+    }
+  ]
+}

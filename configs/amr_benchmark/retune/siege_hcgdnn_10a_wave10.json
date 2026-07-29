@@ -1,0 +1,18 @@
+{
+  "description": "Wave-10 Tier-A HCGDNN careful FT only (arch freeze)",
+  "updated_at": "2026-07-23T13:04:19Z",
+  "campaign_mode": "paper_exact",
+  "paper_target_overall": 64.9,
+  "paper_target_peak": 93.0,
+  "experiments": [
+    {
+      "id": "W10_hcgdnn_10A_ft120_lr5e5_from_w9best",
+      "priority": 0,
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_multistep_l2_ft120_lr5e5_from_w9best_w10",
+      "config": "configs/amr_benchmark/retune/wave10_hcgdnn_deepsig201610A_paper_multistep_l2_ft120_lr5e5_from_w9best_w10.py",
+      "notes": "Gentle FT 120ep lr5e-5 from W9 HCG 63.30@ep968"
+    }
+  ]
+}

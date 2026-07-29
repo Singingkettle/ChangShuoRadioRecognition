@@ -1,0 +1,29 @@
+{
+  "description": "JDM retune wave 1 — full 30-epoch detector runs (2026-07-06)",
+  "experiments": [
+    {
+      "id": "det_30ep_096146_bw20",
+      "module": "detector",
+      "variant": "det_30ep_anchor096146_bw20",
+      "config": "configs/jdm/experiments/retune/det_30ep_anchor096146_bw20.py",
+      "priority": 0,
+      "notes": "P0: empirical anchors, paper 30-ep budget, bw loss x20"
+    },
+    {
+      "id": "det_30ep_110130150_bw20",
+      "module": "detector",
+      "variant": "det_30ep_anchor110130150_bw20",
+      "config": "configs/jdm/experiments/retune/det_30ep_anchor110130150_bw20.py",
+      "priority": 0,
+      "notes": "P0: paper AP-bin anchors 110/130/150, bw loss x20"
+    },
+    {
+      "id": "amc_detprops_30ep",
+      "module": "amc",
+      "variant": "amc_detprops_30ep",
+      "config": "configs/jdm/experiments/retune/amc_detprops_30ep.py",
+      "priority": 1,
+      "notes": "P1: extend proposal-crop AMC to 30 epochs"
+    }
+  ]
+}

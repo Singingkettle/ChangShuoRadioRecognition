@@ -17,6 +17,7 @@ _base_ = [
 
 model = dict(
     type='JDMFramework',
+    fuse_scores=True,  # det_score × max(cls_conf); +6.15 pp joint mAP (see optimization_notes)
     detector=dict(
         type='SignalDetector',
         backbone=dict(
@@ -29,7 +30,7 @@ model = dict(
             in_channels=256,
             frame_length=1200,
             stride=8,
-            anchor_widths=(100.0, 120.0, 140.0),
+            anchor_widths=(96.0, 120.0, 146.0),
             test_cfg=dict(score_thr=0.05, nms_iou_thr=0.45, max_per_frame=20),
         ),
     ),

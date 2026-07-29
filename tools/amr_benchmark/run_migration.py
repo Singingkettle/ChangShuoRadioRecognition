@@ -267,6 +267,7 @@ def _run_job(spec: JobSpec, gpu: int, args: argparse.Namespace) -> JobResult:
     spec.work_dir.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu)
+    env["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
     paper_pkl = spec.work_dir / "res" / "paper.pkl"
     needs_train = not args.skip_train
@@ -349,6 +350,7 @@ _DATASET_LABELS = {
     "deepsig201801A": "RML2018.01A",
     "hisar2019": "HisarMod",
 }
+_LABEL_TO_DATASET = {v: k for k, v in _DATASET_LABELS.items()}
 
 
 def _fmt_pp(value: float | None) -> str:
@@ -384,7 +386,32 @@ def _render_row(result: JobResult) -> str:
     )
 
 
-def _render_table(results: list[JobResult]) -> str:
+def _parse_existing_auto_row_lines(text: str) -> dict[tuple[str, str], str]:
+    """Parse existing auto-table body rows keyed by (model, dataset).
+
+    Used so partial updates (promote / filtered migration) merge into the
+    full matrix instead of truncating it to the new result set.
+    """
+    if AUTO_BEGIN in text and AUTO_END in text:
+        text = text.split(AUTO_BEGIN, 1)[1].split(AUTO_END, 1)[0]
+    rows: dict[tuple[str, str], str] = {}
+    for line in text.splitlines():
+        if not line.startswith("|") or line.startswith("|---"):
+            continue
+        parts = [p.strip() for p in line.split("|")]
+        if len(parts) < 13 or parts[1] == "Model":
+            continue
+        model = parts[1].strip().lower()
+        dataset = _LABEL_TO_DATASET.get(parts[2].strip(), parts[2].strip())
+        rows[(model, dataset)] = line
+    return rows
+
+
+def _render_table(
+    results: list[JobResult],
+    *,
+    existing_rows: dict[tuple[str, str], str] | None = None,
+) -> str:
     header = (
         "| Model | Dataset | Config | Work dir "
         "| Overall (target %) | Overall (meas %) "
@@ -394,21 +421,49 @@ def _render_table(results: list[JobResult]) -> str:
     )
     sep = "|" + "---|" * 12
     lines = [header, sep]
-    by_model: dict[str, list[JobResult]] = {}
-    for res in results:
-        by_model.setdefault(res.spec.model, []).append(res)
+    by_key: dict[tuple[str, str], JobResult] = {
+        (res.spec.model, res.spec.dataset): res for res in results
+    }
+    existing_rows = existing_rows or {}
+    # Prefer MATRIX order; keep any non-matrix legacy rows at the end.
+    emitted: set[tuple[str, str]] = set()
     for model in MATRIX.keys():
-        for res in by_model.get(model, []):
+        for dataset in MATRIX[model].keys():
+            key = (model, dataset)
+            if key in by_key:
+                lines.append(_render_row(by_key[key]))
+                emitted.add(key)
+            elif key in existing_rows:
+                lines.append(existing_rows[key])
+                emitted.add(key)
+    for key, row in existing_rows.items():
+        if key not in emitted:
+            lines.append(row)
+    for key, res in by_key.items():
+        if key not in emitted:
             lines.append(_render_row(res))
     return "\n".join(lines)
 
 
-def _update_tracking_md(results: list[JobResult], dry_run: bool) -> None:
+def _update_tracking_md(
+    results: list[JobResult],
+    dry_run: bool,
+    *,
+    replace_all: bool = False,
+) -> None:
+    """Rewrite the auto table.
+
+    By default **merges** ``results`` into any existing auto-table rows so a
+    single promote / filtered re-parse cannot wipe the full matrix. Pass
+    ``replace_all=True`` only for a deliberate full-matrix rebuild.
+    """
     if not TRACKING_PATH.is_file():
         _LOG.warning("Tracking file %s missing; not updating", TRACKING_PATH)
         return
     text = TRACKING_PATH.read_text()
-    new_table = _render_table(results)
+    existing = {} if replace_all else _parse_existing_auto_row_lines(text)
+    new_table = _render_table(results, existing_rows=existing)
+    merged_count = len(_parse_existing_auto_row_lines(new_table))
     block = (
         f"{AUTO_BEGIN}\n"
         f"_Last orchestrator run: "
@@ -427,7 +482,13 @@ def _update_tracking_md(results: list[JobResult], dry_run: bool) -> None:
         print(block)
         return
     TRACKING_PATH.write_text(new_text)
-    _LOG.info("Wrote %d rows to %s", len(results), TRACKING_PATH)
+    _LOG.info(
+        "Wrote %d tracking row(s) to %s (incoming=%d, merge=%s)",
+        merged_count,
+        TRACKING_PATH,
+        len(results),
+        not replace_all,
+    )
 
 
 # ---------------------------------------------------------------------------

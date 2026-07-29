@@ -1,0 +1,37 @@
+{
+  "description": "JDM retune wave 2 — P0 detector retry with early-stop + cosine (2026-07-06)",
+  "experiments": [
+    {
+      "id": "det_wave2_es_pat5_lr5e4_bw20_tm15",
+      "module": "detector",
+      "variant": "det_wave2_es_pat5_lr5e4_bw20_tm15",
+      "config": "configs/jdm/experiments/retune/det_wave2_es_pat5_lr5e4_bw20_tm15.py",
+      "priority": 0,
+      "notes": "P0 retry: lr 5e-4, cosine T_max=15, ES patience 5, bw×20, max 15 ep"
+    },
+    {
+      "id": "det_wave2_es_pat3_lr5e4_bw20_tm10",
+      "module": "detector",
+      "variant": "det_wave2_es_pat3_lr5e4_bw20_tm10",
+      "config": "configs/jdm/experiments/retune/det_wave2_es_pat3_lr5e4_bw20_tm10.py",
+      "priority": 0,
+      "notes": "P0 retry: lr 5e-4, cosine T_max=10, ES patience 3, bw×20, max 15 ep"
+    },
+    {
+      "id": "det_wave2_es_pat5_lr5e4_bw2_tm15",
+      "module": "detector",
+      "variant": "det_wave2_es_pat5_lr5e4_bw2_tm15",
+      "config": "configs/jdm/experiments/retune/det_wave2_es_pat5_lr5e4_bw2_tm15.py",
+      "priority": 0,
+      "notes": "P0 retry: lr 5e-4, cosine T_max=15, ES patience 5, paper bw×2, max 15 ep"
+    },
+    {
+      "id": "det_wave2_es_pat5_lr5e4_bw20_tm10",
+      "module": "detector",
+      "variant": "det_wave2_es_pat5_lr5e4_bw20_tm10",
+      "config": "configs/jdm/experiments/retune/det_wave2_es_pat5_lr5e4_bw20_tm10.py",
+      "priority": 0,
+      "notes": "P0 retry: lr 5e-4, cosine T_max=10, ES patience 5, bw×20, max 15 ep"
+    }
+  ]
+}

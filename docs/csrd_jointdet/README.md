@@ -33,7 +33,7 @@ separately and chained at inference.
 | Sec. V-B detection CNN (Fig. 4) | `csrr/models/backbones/jdm.py::JDMDetectionBackbone` |
 | Sec. V-B YOLO-style head, anchors, confidence | `csrr/models/heads/jdm_det_head.py::JDMDetectionHead` |
 | Eq. (6) IoU (1-D degenerate) + NMS | `csrr/models/utils/interval_ops.py` |
-| detection losses (BCE conf / BCE center / MSE log-bw ×2) | `JDMDetectionHead.loss` (+ `csrr/models/losses`) |
+| detection losses (BCE conf / BCE center / MSE log-bw ×20) | `JDMDetectionHead.loss` (+ `csrr/models/losses`) |
 | Sec. V-C classification CNN (Fig. 5, "Sum layer") | `csrr/models/backbones/jdm.py::JDMClassificationBackbone` |
 | Sec. V-C proposal filtering (carrier removal + LPF) | `csrr/datasets/transforms/csrd.py::CSRDSignalToBaseband` (train) / `csrr/models/detectors/jdm.py::JDMFramework._to_baseband` (inference) |
 | Sec. V-A JDM pipeline ("proposal" hand-off) | `csrr/models/detectors/jdm.py::JDMFramework` |
@@ -42,7 +42,7 @@ separately and chained at inference.
 | Sec. VI-A metrics (mAP/AP50/AP75, size-binned AP, AR@k, per-box SNR curves) | `csrr/evaluation/metrics/detection.py::SignalDetectionMetric` |
 | Sec. VI training protocol | `configs/jdm/*.py` (optimizers/epochs/batch sizes per paper) |
 
-Model wrapper for the stand-alone detector: 
+Model wrapper for the stand-alone detector:
 `csrr/models/detectors/signal_detector.py::SignalDetector` (mmengine
 `BaseModel` with the same loss/predict contract as `SignalClassifier`).
 
@@ -81,6 +81,13 @@ python tools/merge_jdm_checkpoints.py \
 python tools/test_det.py configs/jdm/jdm-joint_iq-csrd.py work_dirs/jdm_joint.pth
 ```
 
+The default joint config enables **score fusion** (`fuse_scores=True`: final
+box score = detection confidence × max classification confidence). With the
+optimized detector + 20-epoch proposal-crop AMC, this yields class-aware joint
+mAP **0.5868** on the test split (see
+[`optimization_notes.md`](optimization_notes.md)). To disable fusion for
+ablation, override with `--cfg-options model.fuse_scores=False`.
+
 `tools/test_det.py` emits detector-only and joint mAP-vs-SNR curves when the
 JDM test evaluator is configured with `snrwise=True`. The SNR grouping is by
 each GT box's own annotation SNR, not by frame; see
@@ -96,9 +103,12 @@ AWGN versions, mirroring the paper's per-condition figures), override
   an exact stride-8 grid of 150 cells for L = 1200. The paper/historical code
   used valid padding, which produced a feature grid inconsistent with the
   anchor stride (see the history notes).
-- **Anchors**: 3 per cell (paper) with widths 100/120/140 bins, chosen from
-  the dataset's bandwidth clusters; the historical code used 2 anchors
-  (120/90).
+- **Anchors and bandwidth loss**: 3 anchors per cell (paper), promoted to the
+  empirical regenerated-data widths 96/120/146 bins with log-bandwidth MSE
+  weight 20 after the detector optimization run in
+  [`optimization_notes.md`](optimization_notes.md). The historical code used 2
+  anchors (120/90), and the earlier mmengine baseline used 100/120/140 with
+  weight 2.
 - **Low-pass filter**: ideal (FFT-mask) filtering instead of a FIR filter —
   same brick-wall behaviour, simpler and identical between training crops and
   inference proposals.

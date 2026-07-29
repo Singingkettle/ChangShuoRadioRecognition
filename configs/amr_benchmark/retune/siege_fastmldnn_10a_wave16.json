@@ -1,0 +1,45 @@
+{
+  "description": "Wave-16 FastMLDNN: seed sweep + round-2 FT of the TRUE pipeline stage-2 (61.29 NEW BEST recipe; wave-14 hand configs failed at 53.9 due to L2 pipeline mismatch).",
+  "updated_at": "2026-07-28T00:25:00Z",
+  "campaign_mode": "paper_exact",
+  "paper_target_overall": 63.24,
+  "paper_target_peak": 92.0,
+  "experiments": [
+    {
+      "id": "W16_fastmldnn_stage2_pipeline_seed1",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "stage2_pipeline_seed1_w16",
+      "config": "configs/amr_benchmark/retune/wave16_fastmldnn_deepsig201610A_stage2_pipeline_seed1.py",
+      "notes": "Pipeline-matched stage-2 from stage-1 ep758, seed=1"
+    },
+    {
+      "id": "W16_fastmldnn_stage2_pipeline_seed2",
+      "priority": 1,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "stage2_pipeline_seed2_w16",
+      "config": "configs/amr_benchmark/retune/wave16_fastmldnn_deepsig201610A_stage2_pipeline_seed2.py",
+      "notes": "Pipeline-matched stage-2 from stage-1 ep758, seed=2"
+    },
+    {
+      "id": "W16_fastmldnn_stage2_pipeline_seed3",
+      "priority": 2,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "stage2_pipeline_seed3_w16",
+      "config": "configs/amr_benchmark/retune/wave16_fastmldnn_deepsig201610A_stage2_pipeline_seed3.py",
+      "notes": "Pipeline-matched stage-2 from stage-1 ep758, seed=3"
+    },
+    {
+      "id": "W16_fastmldnn_stage2_pipeline_r2_seed9",
+      "priority": 3,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "stage2_pipeline_r2_seed9_w16",
+      "config": "configs/amr_benchmark/retune/wave16_fastmldnn_deepsig201610A_stage2_pipeline_r2_seed9.py",
+      "notes": "Round-2 FT from the 61.29 new best"
+    }
+  ]
+}

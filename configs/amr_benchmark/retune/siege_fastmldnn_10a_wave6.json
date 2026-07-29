@@ -1,0 +1,18 @@
+{
+  "description": "Wave-6 Tier-A — FastMLDNN @ 10A near-miss after paper_fixedlr 60.67/91.59 (−0.35pp overall)",
+  "updated_at": "2026-07-18T15:15:00Z",
+  "campaign_mode": "paper_exact",
+  "paper_target_overall": 63.24,
+  "paper_target_peak": 92.0,
+  "experiments": [
+    {
+      "id": "W6_fastmldnn_10a_paper_fixedlr_l2_esoff500",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "paper_fixedlr_l2_esoff500",
+      "config": "configs/amr_benchmark/retune/wave6_fastmldnn_deepsig201610A_paper_fixedlr_l2_esoff500.py",
+      "notes": "paper fixed LR + L2 + 500ep; close the −0.35pp overall gap"
+    }
+  ]
+}

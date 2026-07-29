@@ -1,0 +1,59 @@
+{
+  "description": "Wave-4 marginal retune — fresh hyperparam variants for top marginal fails (architecture freeze)",
+  "experiments": [
+    {
+      "id": "W4_resnetamr_10b_es30",
+      "priority": 0,
+      "model": "resnetamr",
+      "dataset": "deepsig201610B",
+      "variant": "es_patience30",
+      "config": "configs/amr_benchmark/retune/wave4_resnetamr_deepsig201610B_es_patience30.py",
+      "notes": "Relaxed ES (min_delta 0.05, patience 30) for −0.13 pp overall"
+    },
+    {
+      "id": "W4_resnetamr_10b_warmup",
+      "priority": 0,
+      "model": "resnetamr",
+      "dataset": "deepsig201610B",
+      "variant": "lr2e4_warmup",
+      "config": "configs/amr_benchmark/retune/wave4_resnetamr_deepsig201610B_lr2e4_warmup.py",
+      "notes": "lr=2e-4 + 5-epoch linear warmup + grad clip"
+    },
+    {
+      "id": "W4_icamcnet_hisar_warmup",
+      "priority": 1,
+      "model": "icamcnet",
+      "dataset": "hisar2019",
+      "variant": "lr2e4_warmup",
+      "config": "configs/amr_benchmark/retune/wave4_icamcnet_hisar2019_lr2e4_warmup.py",
+      "notes": "lr=2e-4 + warmup (es30 failed); peak −1.44 pp"
+    },
+    {
+      "id": "W4_hcgdnn_10a_es30",
+      "priority": 2,
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "variant": "es_patience30",
+      "config": "configs/amr_benchmark/retune/wave1_hcgdnn_deepsig201610A_es_patience30.py",
+      "notes": "ES patience 30 (es25/lr1e3 failed); overall −0.86 pp"
+    },
+    {
+      "id": "W4_hcgdnn_10a_lr5e4",
+      "priority": 2,
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "variant": "lr5e4",
+      "config": "configs/amr_benchmark/retune/wave4_hcgdnn_deepsig201610A_lr5e4.py",
+      "notes": "Lower LR 5e-4 (distinct from failed lr1e3/es25)"
+    },
+    {
+      "id": "W4_lstm2_10a_es35",
+      "priority": 3,
+      "model": "lstm2",
+      "dataset": "deepsig201610A",
+      "variant": "es_patience35",
+      "config": "configs/amr_benchmark/retune/wave4_lstm2_deepsig201610A_es_patience35.py",
+      "notes": "ES patience 35 (es30/lr5e4/iq failed); peak −0.89 pp"
+    }
+  ]
+}

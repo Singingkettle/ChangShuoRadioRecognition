@@ -1,0 +1,72 @@
+{
+  "description": "Per-model siege queue \u2014 Tier A own methods first (paper_exact); Tier B approximate-only",
+  "strategy": "per-model-siege",
+  "updated_at": "2026-07-15T06:47:07Z",
+  "entries": [
+    {
+      "id": "siege_fastmldnn_10a_paper",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_paper.json",
+      "status": "exhausted",
+      "gap_pp": 2.22,
+      "failing_metric": "overall+peak",
+      "prior_best_overall": 61.02,
+      "prior_best_peak": 91.52,
+      "notes": "Paper-recipe MultiStep+\u03b2 (configs/fastmldnn/paper/). Prior r3 best 61.02/91.52; Tier A paper_exact. Split 5:1:4 paper-native.; GPU0-only paper siege PID 2722111 log siege_fastmldnn_paper.log; paper siege 3/3 variants finished 2026-07-14; still fail vs 63.24 \u2014 HCGDNN paper next (2026-07-15T02:32:48Z)"
+    },
+    {
+      "id": "siege_fastmldnn_10a",
+      "priority": 1,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a.json",
+      "status": "exhausted",
+      "gap_pp": 2.22,
+      "failing_metric": "overall+peak",
+      "best_variant": "beta05_xavier_l2_dp007_esoff300",
+      "best_overall": 61.02,
+      "best_peak": 91.52,
+      "notes": "Siege r3 exhausted \u2014 best 61.02/91.52; superseded by siege_fastmldnn_10a_paper"
+    },
+    {
+      "id": "siege_hcgdnn_10a_paper",
+      "priority": 0,
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_hcgdnn_10a_paper.json",
+      "status": "exhausted",
+      "gap_pp": 1.86,
+      "failing_metric": "overall",
+      "notes": "Tier A paper MultiStep after FastML paper siege exhausted. Prior lr1e3/es25 hurt; baseline 63.04/93.11 vs 64.9/93. Relaunch GPU0 preempting ResNetAMR 2026-07-15T02:32:48Z.; confirmed running GPU0 siege PID 3204759 2026-07-15T02:35:45Z"
+    },
+    {
+      "id": "siege_lstm2_10a",
+      "priority": 10,
+      "model": "lstm2",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_lstm2_10a.json",
+      "status": "exhausted",
+      "gap_pp": 0.89,
+      "failing_metric": "peak",
+      "notes": "Tier B approximate \u2014 deprioritized"
+    },
+    {
+      "id": "siege_icamcnet_hisar",
+      "priority": 11,
+      "model": "icamcnet",
+      "dataset": "hisar2019",
+      "manifest": "configs/amr_benchmark/retune/siege_icamcnet_hisar.json",
+      "status": "exhausted",
+      "gap_pp": 1.44,
+      "failing_metric": "peak",
+      "waiver": "waived_peak_near_miss",
+      "best_overall": 82.27,
+      "best_peak": 98.56,
+      "best_variant": "es_patience30",
+      "notes": "Tier B waived; do not relaunch ES loops",
+      "exhausted_at": "2026-07-14T01:21:28Z"
+    }
+  ]
+}

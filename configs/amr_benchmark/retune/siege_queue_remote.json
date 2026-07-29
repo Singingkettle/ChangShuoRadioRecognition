@@ -1,0 +1,141 @@
+{
+  "description": "REMOTE 4xH100 Tier-A AMR Wave-14. Owned by gpu_pool_keepalive.sh + manual orchestrators on idle GPUs.",
+  "host": "remote-h100",
+  "strategy": "per-model-siege",
+  "campaign_mode": "paper_exact",
+  "updated_at": "2026-07-27T09:50:00Z",
+  "notes": "Scoreboard: FastMLDNN best 61.05 (w12 stage2 seed1; paper 63.24) — w13 seed sweep 60.98-61.03 = warm-start basin exhausted; stage1 peaked ep758 (cut at 2728) -> w14 runs the true two-stage pipeline from it. HCGDNN best 63.39 (w13 plateau FT seed1; paper 64.9) — FT-from-best ratchet works (63.31->63.314->63.39), w14 = round-2 FT from 63.39.",
+  "entries": [
+    {
+      "id": "remote_fastmldnn_10a_wave11",
+      "priority": 0,
+      "host": "remote-h100",
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_wave11.json",
+      "status": "exhausted",
+      "notes": "FT150: 58.2 / 60.44 — below 61.02"
+    },
+    {
+      "id": "remote_hcgdnn_10a_wave11",
+      "priority": 1,
+      "host": "remote-h100",
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_hcgdnn_10a_wave11.json",
+      "status": "exhausted",
+      "notes": "FT150 runs did not beat 63.31"
+    },
+    {
+      "id": "remote_fastmldnn_10a_wave12_author",
+      "priority": 2,
+      "host": "remote-h100",
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_wave12.json",
+      "status": "exhausted",
+      "notes": "stage2-from-best seed0 61.01 / seed1 61.05 (best); b80 56.74; stage1 peaked ep758, cut at ep2728"
+    },
+    {
+      "id": "remote_hcgdnn_10a_wave12_author",
+      "priority": 3,
+      "host": "remote-h100",
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_hcgdnn_10a_wave12.json",
+      "status": "exhausted",
+      "notes": "plateau FT 63.314; scratch 62.83/62.54"
+    },
+    {
+      "id": "remote_fastmldnn_10a_wave13_seeds",
+      "priority": 4,
+      "host": "remote-h100",
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_wave13.json",
+      "status": "exhausted",
+      "notes": "seeds 2/3/4 + r2: 60.98-61.03 — none beat 61.05"
+    },
+    {
+      "id": "remote_hcgdnn_10a_wave13_seeds",
+      "priority": 5,
+      "host": "remote-h100",
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_hcgdnn_10a_wave13.json",
+      "status": "exhausted",
+      "notes": "seed1 63.39 NEW BEST, seed2 63.297 (local seeds 3/4: 63.28/63.30)"
+    },
+    {
+      "id": "remote_hcgdnn_10a_wave14_ft_r2",
+      "priority": 6,
+      "host": "remote-h100",
+      "model": "hcgdnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_hcgdnn_10a_wave14.json",
+      "status": "exhausted",
+      "notes": "r2 seeds 5/6/7 (+local 8): 63.351-63.385 — ratchet saturated below 63.39 best"
+    },
+    {
+      "id": "remote_fastmldnn_10a_wave14_stage2_pipeline",
+      "priority": 7,
+      "host": "remote-h100",
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_wave14.json",
+      "status": "exhausted",
+      "notes": "hand configs hit L2-pipeline mismatch (53.9); steward-chained stage2B got 61.29 NEW BEST"
+    },
+    {
+      "id": "remote_tierb_10ab_wave15",
+      "priority": 8,
+      "host": "remote-h100",
+      "model": "tierb-mixed",
+      "dataset": "deepsig201610AB",
+      "manifest": "configs/amr_benchmark/retune/siege_tierb_wave15_remote.json",
+      "status": "passed",
+      "notes": "CLDNNL-10B PASSED (63.56/91.96, target 62/89); 8 others failed; 6 skipped by until-pass -> wave15b",
+      "passing_variant": "amrb_plateau_w15"
+    },
+    {
+      "id": "remote_tierb_wave15b_remainder",
+      "priority": 9,
+      "host": "remote-h100",
+      "model": "tierb-mixed",
+      "dataset": "deepsig201610AB",
+      "manifest": "configs/amr_benchmark/retune/siege_tierb_wave15b_remainder.json",
+      "status": "pending",
+      "notes": "6 pairs skipped by until-pass"
+    },
+    {
+      "id": "remote_fastmldnn_10a_wave16_pipeline",
+      "priority": 10,
+      "host": "remote-h100",
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_fastmldnn_10a_wave16.json",
+      "status": "pending",
+      "notes": "Seed sweep + r2 of the 61.29 pipeline stage-2"
+    },
+    {
+      "id": "remote_tierb_wave17_hisar",
+      "priority": 11,
+      "host": "remote-h100",
+      "model": "tierb-mixed",
+      "dataset": "hisar2019",
+      "manifest": "configs/amr_benchmark/retune/siege_tierb_wave17_hisar.json",
+      "status": "pending",
+      "notes": "Keras recipe on all 9 failing Hisar pairs"
+    },
+    {
+      "id": "remote_tiera_wave16b_filler",
+      "priority": 12,
+      "host": "remote-h100",
+      "model": "tiera-mixed",
+      "dataset": "deepsig201610A",
+      "manifest": "configs/amr_benchmark/retune/siege_tiera_wave16b.json",
+      "status": "pending",
+      "notes": "FastMLDNN seeds 5-6 + HCGDNN half-LR polish"
+    }
+  ]
+}

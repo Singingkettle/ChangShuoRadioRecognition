@@ -1,0 +1,24 @@
+{
+  "description": "Wave-5 AMR — remaining Tier-B fails after siege_queue_full phantom-pending reconcile (2026-07-18)",
+  "updated_at": "2026-07-18T07:50:00Z",
+  "experiments": [
+    {
+      "id": "W5_cnn4_2018_es30",
+      "priority": 0,
+      "model": "cnn4",
+      "dataset": "deepsig201801A",
+      "variant": "es_patience30",
+      "config": "configs/amr_benchmark/retune/wave5_cnn4_deepsig201801A_es_patience30.py",
+      "notes": "Remaining tracking fail; ES patience 30"
+    },
+    {
+      "id": "W5_cnn4_2018_warmup",
+      "priority": 0,
+      "model": "cnn4",
+      "dataset": "deepsig201801A",
+      "variant": "lr2e4_warmup",
+      "config": "configs/amr_benchmark/retune/wave5_cnn4_deepsig201801A_lr2e4_warmup.py",
+      "notes": "Remaining tracking fail; lr=2e-4 warmup"
+    }
+  ]
+}

@@ -7,6 +7,14 @@ each model we note what already matched, what was fixed in this
 branch (`feature/amr-benchmark-migration`), and what remains as an
 intentional CSRR design choice that Phase 2 should be aware of.
 
+**Retune policy:** All hyperparameter retunes must obey the
+[architecture freeze policy](../amr_benchmark/retune_campaign.md#architecture-freeze-policy).
+Fixes recorded below (Xavier init, per-sample L2 `SelfNormalize`, MCLDNN LSTM
+reshape, CNN4 `(2,8)` kernels, DAE `DAEHead` wiring) restored **parity with the
+Keras reference** — they are **not** architecture changes and must not be reversed
+or extended during retune (e.g. do not remove CLDNNW ZeroPad or alter conv
+channel counts to chase accuracy).
+
 Confidence legend: 🟢 high — code/dimension/loss verified by smoke
 test or paper Table 4 parity; 🟡 medium — fix is logically sound
 but requires Phase 2 training to confirm accuracy impact; 🔴 low —
@@ -768,3 +776,85 @@ manual validation run was then killed (it lived in a throwaway
 **Scope.** Only `configs/fastmldnn/fastmldnn_iq-ap-deepsig-201801A.py`
 was changed. No shared `_base_` files, no backbone/head code, no other
 method or dataset configs, and no 10A/10B results were touched.
+
+---
+
+## 2026-07-04 — Recovery of the two OOM-killed 2018.01A jobs (mldnn, fastmldnn); no config changes
+
+**Symptom.** The last two missing matrix entries both went
+`status=error` overnight in `work_dirs/amr_benchmark/sweep_hisar.log`:
+`fastmldnn/deepsig201801A` at 09:30 and `mldnn/deepsig201801A` at 09:40.
+
+**Root cause (both): host-RAM exhaustion, not a model/config defect.**
+Both jobs hold the full RML2018.01A dataset in RAM (~34–35 GB RSS each,
+20 persistent DataLoader workers). When `fastmldnn@hisar2019` began its
+own large dataset load at ~09:28–09:30 on top of the two resident 2018
+jobs, the box (156 GiB) thrashed into swap (per-iteration times spiked
+from 0.42 s to 239 s in both training logs from 08:12 onward) and the
+kernel OOM killer fired twice (dmesg):
+
+- 09:28:44 — killed pid 3357535 (35.5 GB anon RSS): the **fastmldnn@2018
+  main train process**, mid-epoch 1 → `train.py` rc≠0 → orchestrator
+  `status=error` at 09:30.
+- 09:35:13 — killed pid 3152834 (17 GB anon RSS): a **mldnn@2018
+  DataLoader worker** → `RuntimeError: DataLoader worker … killed by
+  signal: Killed` in epoch 64 → `status=error` at 09:40.
+
+**Explicitly ruled out.** fastmldnn@2018 did **not** re-diverge: the
+work-dir dumped config confirms the fc8c10c fix was applied (`lr=2e-4`,
+`clip_grad max_norm=5.0`, 5-epoch `LinearLR` warmup → cosine), and the
+07:59–08:35 log shows a textbook-healthy start (warmup lr 3e-6→3.7e-5,
+loss 207 → 2.79 monotonically, grad_norm 1502 → ~8.7, no `ln(24)` lock).
+mldnn@2018 likewise trained healthily for 63 epochs under the current
+schedule (fresh run started 07-03 14:47, lr 4e-4 cosine T_max=150).
+
+**Orphan cleanup.** One leftover `train.py`-cmdline process (pid
+3361493, PPID 1, 34.7 GB RSS, zero GPU memory) was an orphaned
+DataLoader worker of the OOM-killed fastmldnn@2018 main process. Killed
+(SIGTERM); host RAM went 55 GiB → 21 GiB used. The running
+fastmldnn@hisar2019 job (pid 3367530, GPU 1) and both sweep/finalize
+drivers were not touched.
+
+**Recovery (no config changes needed).** Driver:
+`tools/amr_benchmark/_recover_2018.sh` — durable (setsid+nohup),
+idempotent, locked, GPU 0 only, logging to
+`work_dirs/amr_benchmark/recover_2018.log`.
+
+- **mldnn@2018 → test-only.** Val history shows an effective plateau:
+  best 58.06% @ epoch 62 (of max 150), only +0.09 pp improvement over
+  the final 6 epochs, crash at epoch 64. Re-testing the existing
+  `best_accuracy_top1_epoch_62.pth` (same recovery as dae@2018) produces
+  `res/paper.pkl` now instead of spending ~19 h of GPU 0 on a resume
+  worth ~+0.5 pp; 58% is inside the expected 55–63% sibling band.
+  Command (as the orchestrator would run):
+  `tools/test.py configs/mldnn/mldnn_iq-ap-deepsig201801A.py <best_epoch_62> --work-dir work_dirs/amr_benchmark/mldnn/deepsig201801A`.
+- **fastmldnn@2018 → clean retrain + test.** It died in epoch 1 with no
+  checkpoint, so there is nothing to resume; the fc8c10c config is
+  correct and healthy, so it was retrained as-is on GPU 0
+  (`CUDA_VISIBLE_DEVICES=0`), chained with the manual test step so
+  `res/paper.pkl` is produced even though the run lives outside the
+  orchestrator.
+
+**Coordination with `_finalize_driver.sh`.** mldnn@2018 will have both a
+best checkpoint and `res/paper.pkl` before the finalize sweep starts, so
+it is skipped outright. For fastmldnn@2018 the retrain's first
+`best_*.pth` (≈30 min in) makes the finalize sweep skip training; at
+most it re-runs a cheap `test.py` against the then-current best
+checkpoint, and the recovery driver's own final test overwrites
+`res/paper.pkl` with the fully-trained result afterwards. No
+double-training can occur.
+ean retrain + test.** It died in epoch 1 with no
+  checkpoint, so there is nothing to resume; the fc8c10c config is
+  correct and healthy, so it was retrained as-is on GPU 0
+  (`CUDA_VISIBLE_DEVICES=0`), chained with the manual test step so
+  `res/paper.pkl` is produced even though the run lives outside the
+  orchestrator.
+
+**Coordination with `_finalize_driver.sh`.** mldnn@2018 will have both a
+best checkpoint and `res/paper.pkl` before the finalize sweep starts, so
+it is skipped outright. For fastmldnn@2018 the retrain's first
+`best_*.pth` (≈30 min in) makes the finalize sweep skip training; at
+most it re-runs a cheap `test.py` against the then-current best
+checkpoint, and the recovery driver's own final test overwrites
+`res/paper.pkl` with the fully-trained result afterwards. No
+double-training can occur.

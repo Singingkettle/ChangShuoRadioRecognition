@@ -1,0 +1,88 @@
+{
+  "description": "Wave-17 Tier-B (HisarMod): Keras original recipe on all 9 failing Hisar pairs.",
+  "updated_at": "2026-07-28T01:15:00Z",
+  "campaign_mode": "approximate",
+  "experiments": [
+    {
+      "id": "W17_mcnet_hisar",
+      "priority": 0,
+      "model": "mcnet",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_mcnet_hisar2019_amrb_plateau.py",
+      "notes": "56.03/70 gap -13.97"
+    },
+    {
+      "id": "W17_petcgdnn_hisar",
+      "priority": 1,
+      "model": "petcgdnn",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_petcgdnn_hisar2019_amrb_plateau.py",
+      "notes": "64.68/75 gap -10.32"
+    },
+    {
+      "id": "W17_resnetamr_hisar",
+      "priority": 2,
+      "model": "resnetamr",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_resnetamr_hisar2019_amrb_plateau.py",
+      "notes": "72.49/80 gap -7.51"
+    },
+    {
+      "id": "W17_cldnnw_hisar",
+      "priority": 3,
+      "model": "cldnnw",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_cldnnw_hisar2019_amrb_plateau.py",
+      "notes": "68.84/75 gap -6.16"
+    },
+    {
+      "id": "W17_lstm2_hisar",
+      "priority": 4,
+      "model": "lstm2",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_lstm2_hisar2019_amrb_plateau.py",
+      "notes": "66.81/73 gap -6.19"
+    },
+    {
+      "id": "W17_cldnnl_hisar",
+      "priority": 5,
+      "model": "cldnnl",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_cldnnl_hisar2019_amrb_plateau.py",
+      "notes": "69.51/75 gap -5.49"
+    },
+    {
+      "id": "W17_gru2_hisar",
+      "priority": 6,
+      "model": "gru2",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_gru2_hisar2019_amrb_plateau.py",
+      "notes": "68.51/73 gap -4.49"
+    },
+    {
+      "id": "W17_mcldnn_hisar",
+      "priority": 7,
+      "model": "mcldnn",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_mcldnn_hisar2019_amrb_plateau.py",
+      "notes": "70.66/75 gap -4.34"
+    },
+    {
+      "id": "W17_dae_hisar",
+      "priority": 8,
+      "model": "dae",
+      "dataset": "hisar2019",
+      "variant": "amrb_plateau_w17",
+      "config": "configs/amr_benchmark/retune/wave17_dae_hisar2019_amrb_plateau.py",
+      "notes": "peak 61.39/70 (overall passes)"
+    }
+  ]
+}

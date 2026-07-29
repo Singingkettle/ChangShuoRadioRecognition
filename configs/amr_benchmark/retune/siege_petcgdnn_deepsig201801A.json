@@ -1,0 +1,24 @@
+{
+  "description": "Auto siege \u2014 petcgdnn @ deepsig201801A (marginal paper-exact)",
+  "updated_at": "2026-07-16T04:52:41Z",
+  "experiments": [
+    {
+      "id": "W4_petcgdnn_deepsig201801A_es30",
+      "priority": 0,
+      "model": "petcgdnn",
+      "dataset": "deepsig201801A",
+      "variant": "es_patience30",
+      "config": "configs/amr_benchmark/retune/wave4_petcgdnn_deepsig201801A_es_patience30.py",
+      "notes": "Auto ES patience 30"
+    },
+    {
+      "id": "W4_petcgdnn_deepsig201801A_warmup",
+      "priority": 0,
+      "model": "petcgdnn",
+      "dataset": "deepsig201801A",
+      "variant": "lr2e4_warmup",
+      "config": "configs/amr_benchmark/retune/wave4_petcgdnn_deepsig201801A_lr2e4_warmup.py",
+      "notes": "Auto lr=2e-4 warmup"
+    }
+  ]
+}

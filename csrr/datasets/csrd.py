@@ -168,6 +168,100 @@ class CSRDDetectionDataset(_CSRDBase):
 
 
 @DATASETS.register_module()
+class CSRDModulationDetPropDataset(_CSRDBase):
+    """Signal-level AMC dataset with detector proposals and hard negatives.
+
+    Extends :class:`CSRDModulationDataset` with proposal-cache lookups and
+    optional unmatched detector proposals per frame for hard-negative mining.
+
+    Args:
+        proposal_cache (str): JSON cache from ``precompute_amc_proposals.py``.
+        include_hard_negatives (bool): append unmatched proposal crops on the
+            train split. Defaults to False.
+        max_hard_neg_per_frame (int): cap hard negatives added per frame.
+    """
+
+    def __init__(self,
+                 data_root: str,
+                 split: str = 'train',
+                 versions: Union[str, Sequence[str], None] = None,
+                 split_ratios: Sequence[float] = DEFAULT_SPLIT_RATIOS,
+                 split_seed: int = 0,
+                 frame_length: int = 1200,
+                 metainfo: Optional[dict] = None,
+                 indices: Optional[Union[int, Sequence[int]]] = None,
+                 serialize_data: bool = True,
+                 pipeline: List[Union[dict, Callable]] = [],
+                 test_mode: bool = False,
+                 lazy_init: bool = False,
+                 max_refetch: int = 1000,
+                 proposal_cache: str = '',
+                 include_hard_negatives: bool = False,
+                 max_hard_neg_per_frame: int = 3) -> None:
+        import json
+        with open(proposal_cache, encoding='utf-8') as f:
+            self._proposal_cache = json.load(f)
+        self.include_hard_negatives = include_hard_negatives
+        self.max_hard_neg_per_frame = max_hard_neg_per_frame
+        super().__init__(
+            data_root=data_root,
+            split=split,
+            versions=versions,
+            split_ratios=split_ratios,
+            split_seed=split_seed,
+            frame_length=frame_length,
+            metainfo=metainfo,
+            indices=indices,
+            serialize_data=serialize_data,
+            pipeline=pipeline,
+            test_mode=test_mode,
+            lazy_init=lazy_init,
+            max_refetch=max_refetch)
+
+    def load_data_list(self) -> List[dict]:
+        class_to_idx = None
+        data_list = []
+        for anno in self._scan_entries():
+            if class_to_idx is None:
+                class_to_idx = {
+                    name: i for i, name in enumerate(self.CLASSES)}
+            sample_rate = anno['sample_rate'][0] if anno['sample_rate'] \
+                else 150000
+            file_name = anno['file_name']
+            for sig_idx, modulation in enumerate(anno['modulation']):
+                data_list.append(
+                    dict(
+                        iq_path=anno['iq_path'],
+                        file_name=file_name,
+                        version=anno['version'],
+                        sample_rate=sample_rate,
+                        frame_length=self.frame_length,
+                        signal_index=sig_idx,
+                        is_hard_negative=False,
+                        center_frequency=anno['center_frequency'][sig_idx],
+                        bandwidth=anno['bandwidth'][sig_idx],
+                        snr=anno['snr'][sig_idx],
+                        channel=anno['channel'][sig_idx],
+                        gt_label=np.array(
+                            class_to_idx[modulation], dtype=np.int64)))
+            if self.include_hard_negatives:
+                unmatched = self._proposal_cache.get(
+                    file_name, {}).get('_unmatched', [])
+                for neg_idx in range(
+                        min(len(unmatched), self.max_hard_neg_per_frame)):
+                    data_list.append(
+                        dict(
+                            iq_path=anno['iq_path'],
+                            file_name=file_name,
+                            version=anno['version'],
+                            sample_rate=sample_rate,
+                            frame_length=self.frame_length,
+                            is_hard_negative=True,
+                            hard_neg_index=neg_idx))
+        return data_list
+
+
+@DATASETS.register_module()
 class CSRDModulationDataset(_CSRDBase):
     """Signal-level dataset for the JDM classification module.
 

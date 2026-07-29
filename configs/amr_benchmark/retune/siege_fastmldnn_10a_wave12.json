@@ -1,0 +1,27 @@
+{
+  "description": "Wave-12 Tier-A FastMLDNN AUTHOR-EXACT recipe (recovered from origin/main, the paper's official release). Two levers never tried in waves 1-11: (1) author stage-1 MultiStep[800,1200] 3200ep no-ES; (2) author stage-2 constant lr 1.054e-4 + dp0.07 + beta0.5 long fine-tune, applied to our best 61.02 ckpt.",
+  "updated_at": "2026-07-27T03:40:00Z",
+  "campaign_mode": "paper_exact",
+  "paper_target_overall": 63.24,
+  "paper_target_peak": 92.0,
+  "experiments": [
+    {
+      "id": "W12_fastmldnn_author_stage1_ms3200",
+      "priority": 0,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "author_stage1_ms3200_w12",
+      "config": "configs/amr_benchmark/retune/wave12_fastmldnn_deepsig201610A_author_stage1_ms3200.py",
+      "notes": "Author published stage-1: beta0 dp0.5 MultiStep[800,1200] 3200ep no-ES no-L2; best-val ckpt feeds author stage-2"
+    },
+    {
+      "id": "W12_fastmldnn_author_stage2_from_esoff300best",
+      "priority": 1,
+      "model": "fastmldnn",
+      "dataset": "deepsig201610A",
+      "variant": "author_stage2_from_esoff300best_w12",
+      "config": "configs/amr_benchmark/retune/wave12_fastmldnn_deepsig201610A_author_stage2_from_esoff300best.py",
+      "notes": "Author stage-2 recipe (const lr 1.054e-4, dp0.07, beta0.5, ES pat100) warm-started from historical best 61.02"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "description": "JDM P1 AMC after Wave 3B — proposal-crop 30ep with Track B detector proposals",
+  "experiments": [
+    {
+      "id": "amc_wave3b_detprops_30ep",
+      "module": "amc",
+      "variant": "amc_wave3b_detprops_30ep",
+      "config": "configs/jdm/experiments/retune/amc_wave3b_detprops_30ep.py",
+      "priority": 1,
+      "notes": "P1: Track B det proposals + continue from 20-ep AMC best, 30 ep cosine"
+    }
+  ]
+}

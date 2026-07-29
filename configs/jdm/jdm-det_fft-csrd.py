@@ -19,13 +19,14 @@ model = dict(
         in_channels=256,
         frame_length=1200,
         stride=8,
-        anchor_widths=(100.0, 120.0, 140.0),
+        # Empirical CSRD bandwidth clusters from the regenerated data.
+        anchor_widths=(96.0, 120.0, 146.0),
         ignore_iou_thr=0.5,
         loss_conf=dict(type='CrossEntropyLoss', use_sigmoid=True,
                        loss_weight=1.0),
         loss_cf=dict(type='CrossEntropyLoss', use_sigmoid=True,
                      loss_weight=1.0),
-        loss_bw=dict(type='MSELoss', loss_weight=2.0),
+        loss_bw=dict(type='MSELoss', loss_weight=20.0),
         test_cfg=dict(score_thr=0.05, nms_iou_thr=0.45, max_per_frame=20),
     ),
 )
