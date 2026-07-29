@@ -177,3 +177,70 @@ class SNRLabel(BaseTransform):
 
         return results
 
+
+@TRANSFORMS.register_module()
+class RadioAugment(BaseTransform):
+    """Label-preserving I/Q augmentation for modulation classification.
+
+    Operates on the ``(2, L)`` baseband crop (``iq[0]`` = real, ``iq[1]`` =
+    imag) produced by :class:`CSRDSignalToBaseband`. All three operations are
+    modulation-invariant, so the modulation label is unchanged — they only
+    enlarge the training distribution over nuisance parameters the receiver
+    should be invariant to:
+
+    - **phase rotation**: multiply by ``exp(j*theta)``; a random constant
+      carrier phase, always present in real receivers.
+    - **time shift**: circular roll along the sample axis; an unknown symbol
+      timing offset.
+    - **frequency offset**: multiply by ``exp(j*2*pi*f*n/L)`` for a small
+      normalized ``f``; residual carrier-frequency offset after downconversion.
+
+    These are standard, unpublished-but-benign training details (they do not
+    change the architecture, the reported metrics, or the paper narrative).
+    Applied only at training time; disable in val/test pipelines.
+
+    Args:
+        key (str): result key to augment. Defaults to ``'iq'``.
+        phase (bool): enable random phase rotation. Defaults to True.
+        time_shift (int): max absolute circular roll in samples (0 disables).
+            Defaults to 0.
+        freq_offset (float): max absolute normalized frequency offset (cycles
+            over the whole window; 0 disables). Defaults to 0.0.
+        prob (float): probability of applying the (whole) augmentation to a
+            given sample. Defaults to 1.0.
+    """
+
+    def __init__(self, key: str = 'iq', phase: bool = True,
+                 time_shift: int = 0, freq_offset: float = 0.0,
+                 prob: float = 1.0) -> None:
+        self.key = key
+        self.phase = phase
+        self.time_shift = int(time_shift)
+        self.freq_offset = float(freq_offset)
+        self.prob = float(prob)
+
+    def transform(self, results: dict) -> dict:
+        if np.random.rand() > self.prob:
+            return results
+        iq = results[self.key]
+        c = iq[0].astype(np.float64) + 1j * iq[1].astype(np.float64)
+        n = c.shape[-1]
+
+        if self.phase:
+            c = c * np.exp(1j * np.random.uniform(0.0, 2.0 * np.pi))
+        if self.freq_offset > 0:
+            f = np.random.uniform(-self.freq_offset, self.freq_offset)
+            c = c * np.exp(1j * 2.0 * np.pi * f * np.arange(n) / n)
+        if self.time_shift > 0:
+            shift = int(np.random.randint(-self.time_shift,
+                                          self.time_shift + 1))
+            c = np.roll(c, shift)
+
+        results[self.key] = np.stack([c.real, c.imag]).astype(np.float32)
+        return results
+
+    def __repr__(self) -> str:
+        return (f'{self.__class__.__name__}(key={self.key!r}, '
+                f'phase={self.phase}, time_shift={self.time_shift}, '
+                f'freq_offset={self.freq_offset}, prob={self.prob})')
+

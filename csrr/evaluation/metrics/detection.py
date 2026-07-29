@@ -143,6 +143,7 @@ class SignalDetectionMetric(BaseMetric):
                  snr_plot_title: Optional[str] = None,
                  snrwise_metrics: Sequence[str] = ('mAP', 'AP50', 'AP75',
                                                    'AR'),
+                 per_iou_ap: bool = False,
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -151,6 +152,11 @@ class SignalDetectionMetric(BaseMetric):
             else size_ranges
         self.max_detections = tuple(max_detections)
         self.classwise = classwise
+        # When True, also emit AP at each individual IoU threshold
+        # (AP_iou_0.50 .. AP_iou_0.95). Diagnostic only; localizes where the
+        # mAP gap to the paper radar sits (paper Fig. 8 ideal mAP 0.91 vs our
+        # 0.80 is concentrated in the high-IoU / box-tightness regime).
+        self.per_iou_ap = per_iou_ap
         self.snrwise = snrwise
         self.snr_key = snr_key
         self.snr_curve_out = snr_curve_out
@@ -231,6 +237,11 @@ class SignalDetectionMetric(BaseMetric):
         for k in self.max_detections:
             metrics[f'AR@{k}'] = self._mean_over_groups(
                 groups, self._ar_at, self.iou_thrs, k)
+
+        if self.per_iou_ap:
+            for iou_thr in self.iou_thrs:
+                metrics[f'AP_iou_{iou_thr:.2f}'] = self._mean_over_groups(
+                    groups, self._ap_at, (iou_thr,))
 
         if self.snrwise:
             snr_metrics, snr_curve = self._compute_snrwise(

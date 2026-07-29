@@ -11,7 +11,8 @@ def cross_entropy(pred,
                   weight=None,
                   reduction='mean',
                   avg_factor=None,
-                  class_weight=None):
+                  class_weight=None,
+                  label_smoothing=0.0):
     """Calculate the CrossEntropy loss.
 
     Args:
@@ -24,12 +25,15 @@ def cross_entropy(pred,
             the loss. Defaults to None.
         class_weight (torch.Tensor, optional): The weight for each class with
             shape (C), C is the number of classes. Default None.
+        label_smoothing (float): Label-smoothing epsilon passed straight to
+            ``F.cross_entropy``. Defaults to 0.0 (exact hard-target CE).
 
     Returns:
         torch.Tensor: The calculated loss
     """
     # element-wise losses
-    loss = F.cross_entropy(pred, label, weight=class_weight, reduction='none')
+    loss = F.cross_entropy(pred, label, weight=class_weight, reduction='none',
+                           label_smoothing=label_smoothing)
 
     # apply weights and do the reduction
     if weight is not None:
@@ -155,7 +159,8 @@ class CrossEntropyLoss(nn.Module):
                  reduction='mean',
                  loss_weight=1.0,
                  class_weight=None,
-                 pos_weight=None):
+                 pos_weight=None,
+                 label_smoothing=0.0):
         super(CrossEntropyLoss, self).__init__()
         self.use_sigmoid = use_sigmoid
         self.use_soft = use_soft
@@ -167,6 +172,10 @@ class CrossEntropyLoss(nn.Module):
         self.loss_weight = loss_weight
         self.class_weight = class_weight
         self.pos_weight = pos_weight
+        # Only the hard-target softmax CE path supports label smoothing.
+        self.label_smoothing = label_smoothing
+        assert not (label_smoothing > 0 and (use_sigmoid or use_soft)), \
+            'label_smoothing only applies to the standard softmax CE path'
 
         if self.use_sigmoid:
             self.cls_criterion = binary_cross_entropy
@@ -197,6 +206,10 @@ class CrossEntropyLoss(nn.Module):
             kwargs.update({'pos_weight': pos_weight})
         else:
             pos_weight = None
+
+        if not self.use_sigmoid and not self.use_soft \
+                and self.label_smoothing > 0:
+            kwargs.setdefault('label_smoothing', self.label_smoothing)
 
         loss_cls = self.loss_weight * self.cls_criterion(
             cls_score,

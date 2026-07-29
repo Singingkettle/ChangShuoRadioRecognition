@@ -42,6 +42,9 @@ class JDMFramework(BaseModel):
                  detector: dict,
                  classifier: dict,
                  data_preprocessor: Optional[dict] = None,
+                 fuse_scores: bool = False,
+                 fuse_alpha: float = 1.0,
+                 cls_temperature: float = 1.0,
                  init_cfg: Optional[dict] = None):
         data_preprocessor = data_preprocessor or {}
         if isinstance(data_preprocessor, dict):
@@ -51,6 +54,16 @@ class JDMFramework(BaseModel):
                          data_preprocessor=data_preprocessor)
         self.detector = MODELS.build(detector)
         self.classifier = MODELS.build(classifier)
+        self.fuse_scores = fuse_scores
+        # Score-fusion calibration (inference-time, narrative-neutral). The
+        # paper describes joint score = det_score * cls_score; these knobs let
+        # us calibrate the classifier confidence before fusing without
+        # retraining or changing the architecture:
+        #   fused = det_score * cls_score ** fuse_alpha
+        # with cls_score read off a temperature-scaled softmax. alpha=1,
+        # temperature=1 recovers the exact paper fusion (default).
+        self.fuse_alpha = fuse_alpha
+        self.cls_temperature = cls_temperature
 
     def forward(self,
                 inputs: torch.Tensor,
@@ -89,16 +102,19 @@ class JDMFramework(BaseModel):
             logits = self.classifier(batch, mode='tensor')
             if isinstance(logits, (tuple, list)):
                 logits = logits[-1]
-            scores = torch.softmax(logits, dim=1)
+            scores = torch.softmax(logits / self.cls_temperature, dim=1)
             labels = scores.argmax(dim=1)
         for i, sample in enumerate(data_samples):
             start = sum(num_dets[:i])
             stop = start + num_dets[i]
             if num_dets[i] > 0:
+                cls_scores = scores[start:stop].max(dim=1).values
                 sample.set_field(labels[start:stop], 'pred_box_labels')
-                sample.set_field(
-                    scores[start:stop].max(dim=1).values,
-                    'pred_box_label_scores')
+                sample.set_field(cls_scores, 'pred_box_label_scores')
+                if self.fuse_scores:
+                    fused = sample.pred_box_scores * cls_scores ** \
+                        self.fuse_alpha
+                    sample.set_field(fused, 'pred_box_scores')
             else:
                 device = sample.pred_boxes.device
                 sample.set_field(

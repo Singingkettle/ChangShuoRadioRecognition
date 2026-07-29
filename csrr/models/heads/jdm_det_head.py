@@ -35,7 +35,7 @@ from mmengine.model import BaseModule
 
 from csrr.structures import DataSample
 from ..builder import HEADS, build_loss
-from ..utils import interval_iou, interval_nms
+from ..utils import interval_iou, interval_nms, interval_nms_vote
 
 
 @HEADS.register_module()
@@ -53,8 +53,8 @@ class JDMDetectionHead(BaseModule):
         ignore_iou_thr (float): IoU above which a non-positive anchor is
             excluded from the negative confidence loss.
         loss_conf / loss_cf / loss_bw (dict): loss configs for confidence,
-            center offset and log-bandwidth (paper/historical recipe:
-            BCE / BCE / MSE with weight 2).
+            center offset and log-bandwidth (current CSRD recipe:
+            BCE / BCE / MSE with bandwidth weight 20).
         test_cfg (dict): ``score_thr``, ``nms_iou_thr`` and ``max_per_frame``
             used by :meth:`predict`.
     """
@@ -63,7 +63,7 @@ class JDMDetectionHead(BaseModule):
                  in_channels: int = 256,
                  frame_length: int = 1200,
                  stride: int = 8,
-                 anchor_widths=(100.0, 120.0, 140.0),
+                 anchor_widths=(96.0, 120.0, 146.0),
                  ignore_iou_thr: float = 0.5,
                  loss_conf: Optional[dict] = None,
                  loss_cf: Optional[dict] = None,
@@ -85,7 +85,7 @@ class JDMDetectionHead(BaseModule):
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)
         loss_cf = loss_cf or dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)
-        loss_bw = loss_bw or dict(type='MSELoss', loss_weight=2.0)
+        loss_bw = loss_bw or dict(type='MSELoss', loss_weight=20.0)
         self.loss_conf = build_loss(loss_conf)
         self.loss_cf = build_loss(loss_cf)
         self.loss_bw = build_loss(loss_bw)
@@ -203,6 +203,11 @@ class JDMDetectionHead(BaseModule):
         score_thr = self.test_cfg['score_thr']
         nms_iou_thr = self.test_cfg['nms_iou_thr']
         max_per_frame = self.test_cfg['max_per_frame']
+        # Optional inference-time box voting to tighten localization / lift
+        # high-IoU AP (off by default -> exact paper behaviour).
+        box_voting = self.test_cfg.get('box_voting', False)
+        vote_iou_thr = self.test_cfg.get('vote_iou_thr', 0.6)
+        vote_score_pow = self.test_cfg.get('vote_score_pow', 1.0)
 
         if data_samples is None:
             data_samples = [DataSample() for _ in range(pred.size(0))]
@@ -211,11 +216,20 @@ class JDMDetectionHead(BaseModule):
             keep = scores[i] > score_thr
             sample_boxes, sample_scores = boxes[i][keep], scores[i][keep]
             if sample_boxes.numel() > 0:
-                inds = interval_nms(sample_boxes, sample_scores,
-                                    iou_threshold=nms_iou_thr,
-                                    max_num=max_per_frame)
-                sample_boxes, sample_scores = sample_boxes[inds], \
-                    sample_scores[inds]
+                if box_voting:
+                    inds, voted = interval_nms_vote(
+                        sample_boxes, sample_scores,
+                        iou_threshold=nms_iou_thr, max_num=max_per_frame,
+                        vote_iou_thr=vote_iou_thr,
+                        vote_score_pow=vote_score_pow)
+                    sample_scores = sample_scores[inds]
+                    sample_boxes = voted
+                else:
+                    inds = interval_nms(sample_boxes, sample_scores,
+                                        iou_threshold=nms_iou_thr,
+                                        max_num=max_per_frame)
+                    sample_boxes, sample_scores = sample_boxes[inds], \
+                        sample_scores[inds]
             sample.set_field(sample_boxes, 'pred_boxes')
             sample.set_field(sample_scores, 'pred_box_scores')
         return data_samples
