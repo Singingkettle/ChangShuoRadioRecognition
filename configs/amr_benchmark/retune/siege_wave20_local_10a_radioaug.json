@@ -1,0 +1,61 @@
+{
+  "description": "Wave-20 Tier-B local GPU1: RadioAugment + Keras plateau recipe for near-miss RML2016.10A pairs",
+  "updated_at": "2026-07-29T07:10:00Z",
+  "campaign_mode": "tiered",
+  "experiments": [
+    {
+      "id": "W20_cldnnl_10A_radioaug_plateau",
+      "priority": 0,
+      "model": "cldnnl",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_cldnnl_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 56.02 / target 57; phase+shift augment on plain IQ"
+    },
+    {
+      "id": "W20_mcnet_10A_radioaug_plateau",
+      "priority": 1,
+      "model": "mcnet",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_mcnet_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 55.98 / target 58"
+    },
+    {
+      "id": "W20_cgdnet_10A_radioaug_plateau",
+      "priority": 2,
+      "model": "cgdnet",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_cgdnet_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 55.55 / target 58; augment before SelfNormalize"
+    },
+    {
+      "id": "W20_denscnn_10A_radioaug_plateau",
+      "priority": 3,
+      "model": "denscnn",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_denscnn_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 54.48 / target 57"
+    },
+    {
+      "id": "W20_resnetamr_10A_radioaug_plateau",
+      "priority": 4,
+      "model": "resnetamr",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_resnetamr_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 54.33 / target 57"
+    },
+    {
+      "id": "W20_cldnnw_10A_radioaug_plateau",
+      "priority": 5,
+      "model": "cldnnw",
+      "dataset": "deepsig201610A",
+      "variant": "radioaug_plateau_w20",
+      "config": "configs/amr_benchmark/retune/wave20_cldnnw_deepsig201610A_radioaug_plateau.py",
+      "notes": "best 53.78 / target 57; augment before SelfNormalize"
+    }
+  ]
+}

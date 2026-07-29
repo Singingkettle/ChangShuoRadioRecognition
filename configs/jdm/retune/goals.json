@@ -72,15 +72,15 @@
         "ideal": {
           "map_min": 0.85,
           "protocol": "v1",
-          "source_globs": ["eval_ideal_v1_joint_voted*", "eval_ideal_v1_joint_testonly*"],
-          "operating_point": "eval_ideal_v1_joint_voted (box_voting vt0.75); testonly is exact-paper reference.",
+          "source_globs": ["eval_w21_joint_ideal_voted*", "eval_ideal_v1_joint_voted*", "eval_ideal_v1_joint_testonly*"],
+          "operating_point": "eval_w21_joint_ideal_voted: det120 + AMC-w21 merged ckpt, box_voting vt0.75 -> mAP 0.7667 (2026-07-29, best). Older det120+amcW17 fusion: 0.7624. testonly is exact-paper reference.",
           "notes": "Fig. 13(a) ideal: merged joint ckpt on v1 test-only."
         },
         "simulate": {
           "map_min": 0.67,
           "protocol": "real_awgn",
           "source_globs": ["eval_simulate_real_awgn_joint_voted*", "eval_simulate_real_awgn_joint_testonly*"],
-          "operating_point": "eval_simulate_real_awgn_joint_voted (box_voting vt0.75); testonly is exact-paper reference.",
+          "operating_point": "eval_simulate_real_awgn_joint_voted (box_voting vt0.75) with det120+amcW17 fusion: 0.5195 (best). NOTE: det120+amcW21 merged ckpt scores LOWER here (0.4485, eval_w21_joint_sim_voted) despite higher AMC top1 -> keep the W17 fusion as the simulate operating point.",
           "notes": "Fig. 13(a) simulate: merged joint ckpt on Real+Real_awgn test-only."
         }
       },
@@ -101,8 +101,12 @@
       "gtbox_awgn_top1_pct": 93.2,
       "gtbox_simulate_top1_pct": 75.04,
       "fig10_pointwise_status": "MET/EXCEEDED — tools/jdm_fig10_audit.py (2026-07-29): GT-box AMC beats paper Fig.10 simulate on every modulation/SNR (e.g. 64QAM ours 0.75-0.79 vs paper 0.05-0.43; 8PSK 0.96-1.0 vs 0.30-0.63).",
-      "proposal_crop_top1_pct": 83.26,
-      "notes": "AMC module is NOT the bottleneck: GT-box AMC EXCEEDS paper Fig.10 point-by-point (AWGN 93.2%, simulate 75.0%). The ~83% proposal-crop number is a joint-inference artifact of detector box-localization noise, addressed by tighter detector boxes (box voting / wave-21), not by a better classifier. Audit artifacts: work_dirs/jdm/retune/fig10_audit/."
+ "proposal_crop_top1_pct": 84.63,
+ "proposal_crop_history": {
+  "w17_strongdet": 83.26,
+  "w21_voted_props": 84.63
+ },
+ "notes": "AMC module is NOT the bottleneck: GT-box AMC EXCEEDS paper Fig.10 point-by-point (AWGN 93.2%, simulate 75.0%). The proposal-crop number is a joint-inference artifact of detector box-localization noise, addressed by tighter detector boxes (box voting / wave-21), not by a better classifier. W21 (retrained on box-voted det120 proposals) lifted proposal-crop 83.26 -> 84.63. Audit artifacts: work_dirs/jdm/retune/fig10_audit/."
     }
   },
   "paper_notes": [

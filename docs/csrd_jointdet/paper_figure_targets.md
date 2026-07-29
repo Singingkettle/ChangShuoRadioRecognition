@@ -278,6 +278,25 @@ proxy is therefore satisfied on AWGN (93.2%) and the Fig.10 point-by-point
 criterion is met; remaining joint gains come from tighter detector boxes
 (box voting, wave-21 tighter-box detector), not from a better classifier.
 
+## 2026-07-29 W21: AMC retrained on box-voted det120 proposals
+
+Retraining the AMC head on proposals precomputed from the best 120-epoch
+detector **with box voting** (`amc_detprops_120voted_w21.py`) lifted
+proposal-crop test top-1 from 83.26% → **84.63%** (val best 85.16%) —
+confirming the A1/A2 conclusion that tighter boxes, not a better classifier,
+move the joint metrics.
+
+Merged joint checkpoint (`jdm_joint_det120_amcw21.pth`), box voting vt0.75:
+
+| protocol | joint mAP (W17 AMC) | joint mAP (W21 AMC) | operating point |
+|---|---|---|---|
+| ideal (v1) | 0.7624 | **0.7667** | W21 merged ckpt (new best) |
+| simulate (real_awgn) | **0.5195** | 0.4485 | keep W17 fusion |
+
+The W21 classifier helps on clean v1 crops but is *more* sensitive to noisy
+real_awgn crops (it was trained on voted/tighter proposals, i.e. a cleaner crop
+distribution). Per-protocol operating points recorded in `goals.json`.
+
 ## Recommended eval protocol for “逐点一致”
 
 1. **Det Fig. 8 simul:** `eval_simulate_real_awgn_det_testonly.py` (`v104`+`v105–v124`).
