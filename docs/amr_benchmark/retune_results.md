@@ -15650,3 +15650,9 @@ See [`retune_campaign.md`](./retune_campaign.md) for the intervention catalog an
 | When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-07-29 07:41:36 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.84 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-07-29 08:05:08
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-29 08:05:08 | cldnnl/deepsig201610A | `radioaug_plateau_w20` | 61.23 | 90.91 | `pass` | `True` | Δoverall +5.21pp; Δpeak +7.77pp | best 56.02 / target 57; phase+shift augment on plain IQ | `work_dirs/amr_benchmark_retune/cldnnl/deepsig201610A/radioaug_plateau_w20` |

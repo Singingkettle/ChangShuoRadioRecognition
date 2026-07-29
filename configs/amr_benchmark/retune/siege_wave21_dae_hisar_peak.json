@@ -1,0 +1,15 @@
+{
+ "description": "Wave-21 Hisar peak push: dae",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W21_dae_hisar_plateau_peak",
+   "priority": 1,
+   "model": "dae",
+   "dataset": "hisar2019",
+   "variant": "plateau_peak_w21",
+   "config": "configs/amr_benchmark/retune/wave21_dae_hisar2019_plateau_peak.py",
+   "notes": "peak-SNR criterion push"
+  }
+ ]
+}

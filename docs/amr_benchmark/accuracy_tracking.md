@@ -3,7 +3,7 @@
 ## Auto-generated results
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-07-18 07:48:50 UTC_
+_Last orchestrator run: 2026-07-29 08:05:09 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -51,7 +51,7 @@ _Last orchestrator run: 2026-07-18 07:48:50 UTC_
 | CLDNNW | RML2016.10B | `configs/cldnnw/cldnnw_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201610B` | 62.00 | 57.21 | 89.00 | 82.58 | 4 dB | 18 dB | `fail` | 2026-07-16T04:22:44Z |
 | CLDNNW | RML2018.01A | `configs/cldnnw/cldnnw_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201801A` | 55.00 | 37.19 | 88.00 | 53.33 | 18 dB | 28 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNW | HisarMod | `configs/cldnnw/cldnnw_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cldnnw/hisar2019` | 75.00 | 68.84 | 98.00 | 95.43 | 10 dB | 14 dB | `fail` | 2026-07-16T04:22:45Z |
-| CLDNNL | RML2016.10A | `configs/cldnnl/cldnnl_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201610A` | 57.00 | 56.02 | 85.00 | 83.14 | 4 dB | 14 dB | `fail` | 2026-07-16T04:22:45Z |
+| CLDNNL | RML2016.10A | `configs/amr_benchmark/retune/wave20_cldnnl_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/cldnnl/deepsig201610A/radioaug_plateau_w20` | 57.00 | 61.23 | 85.00 | 90.91 | 4 dB | 8 dB | `pass` | 2026-07-29T08:05:08Z |
 | CLDNNL | RML2016.10B | `configs/cldnnl/cldnnl_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201610B` | 62.00 | 56.57 | 89.00 | 82.03 | 2 dB | 18 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNL | RML2018.01A | `configs/cldnnl/cldnnl_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201801A` | 57.00 | 46.67 | 92.00 | 81.40 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNL | HisarMod | `configs/cldnnl/cldnnl_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cldnnl/hisar2019` | 75.00 | 69.51 | 98.00 | 89.56 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:45Z |
