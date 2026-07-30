@@ -17621,3 +17621,9 @@ See [`retune_campaign.md`](./retune_campaign.md) for the intervention catalog an
 | When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-07-30 07:27:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-07-30 07:54:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-30 07:54:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
