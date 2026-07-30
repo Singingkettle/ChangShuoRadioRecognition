@@ -345,6 +345,56 @@ def wave12_followups(actions: list[str]) -> None:
                 log(f"W12 pulled remote metrics -> {rel}")
 
 
+# --- Collapse detection ---------------------------------------------------------
+
+# A run is "collapsed" when it has trained well past warm-up yet validation
+# accuracy is still at chance level (e.g. the w24 lstm2-Hisar run that sat at
+# 9.6% for 150 epochs while occupying a GPU). Alert loudly: occupied-but-
+# useless GPUs are invisible to pure busy/idle checks.
+COLLAPSE_MIN_EPOCH = 15
+COLLAPSE_TOP1_PCT = 12.0
+
+_COLLAPSE_SNIPPET = (
+    "cd {repo} && find work_dirs/amr_benchmark_retune work_dirs/jdm/retune "
+    "-name '*.log' -mmin -40 2>/dev/null | while read -r f; do "
+    "tail -c 400000 \"$f\" | grep -oE 'Epoch\\(val\\) *\\[[0-9]+\\].*accuracy/top1: [0-9.]+' "
+    "| tail -n 1 | sed \"s|^|$f\\||\"; done"
+)
+
+
+def _parse_collapse_lines(host: str, out: str) -> list[dict]:
+    import re
+
+    bad = []
+    for ln in out.splitlines():
+        if "|" not in ln:
+            continue
+        path, rest = ln.split("|", 1)
+        m = re.search(r"Epoch\(val\) *\[(\d+)\].*accuracy/top1: ([0-9.]+)", rest)
+        if not m:
+            continue
+        epoch, top1 = int(m.group(1)), float(m.group(2))
+        if epoch >= COLLAPSE_MIN_EPOCH and top1 < COLLAPSE_TOP1_PCT:
+            bad.append(dict(host=host, log=path, epoch=epoch, top1=top1))
+    return bad
+
+
+def collapse_check(actions: list[str]) -> list[dict]:
+    """Scan actively-written training logs on both boxes for collapsed runs."""
+    bad = []
+    _, out = sh(_COLLAPSE_SNIPPET.format(repo=REPO), timeout=60)
+    bad += _parse_collapse_lines("local", out)
+    _, out = ssh(_COLLAPSE_SNIPPET.format(repo=REMOTE_REPO), timeout=60)
+    bad += _parse_collapse_lines("remote", out)
+    for b in bad:
+        log(
+            f"*** COLLAPSED RUN [{b['host']}] {b['log']}: epoch {b['epoch']} "
+            f"val top1 {b['top1']:.2f}% (chance-level; GPU busy but wasted) ***"
+        )
+        actions.append(f"collapse_alert:{b['host']}:{b['log']}")
+    return bad
+
+
 def detect_plateau(history: list[dict], current: dict) -> bool:
     metric_keys = [
         "detector_map_ideal", "detector_ap75_ideal", "joint_map_ideal",
@@ -418,6 +468,12 @@ def main() -> int:
     except Exception as e:  # never let follow-ups break the core steward loop
         log(f"W12 followups error: {e}")
 
+    try:
+        collapsed = collapse_check(actions)
+    except Exception as e:
+        log(f"collapse check error: {e}")
+        collapsed = []
+
     plateau = detect_plateau(history, current)
     if plateau:
         log("PLATEAU detected (no JDM metric moved for %dh while busy) — escalating strategy" % PLATEAU_HOURS)
@@ -427,7 +483,9 @@ def main() -> int:
 
     # Verdict
     verdict = "OK"
-    if (r_idle >= 1 and (pool.get("amr_pending", 0) or pool.get("jdm_has_work"))):
+    if collapsed:
+        verdict = f"COLLAPSED_RUNS({len(collapsed)})"
+    elif (r_idle >= 1 and (pool.get("amr_pending", 0) or pool.get("jdm_has_work"))):
         verdict = "REMOTE_IDLE_WITH_WORK (nudged)"
     elif r_total and remote_busy == 0:
         verdict = "REMOTE_ALL_IDLE"
@@ -443,6 +501,7 @@ def main() -> int:
         local=dict(busy=local_busy, total=l_total, idle=l_idle),
         jdm_metrics=metrics,
         plateau=plateau,
+        collapsed_runs=collapsed,
     )
     save_json(STATUS, status)
     with HIST.open("a") as fh:
