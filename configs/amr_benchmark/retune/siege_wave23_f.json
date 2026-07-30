@@ -1,0 +1,24 @@
+{
+ "description": "Wave-23 lane F (H100 GPU2): strong-aug near-miss pushes",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W23_cgdnet_deepsig201610A_radioaug_strong_w23",
+   "priority": 0,
+   "model": "cgdnet",
+   "dataset": "deepsig201610A",
+   "variant": "radioaug_strong_w23",
+   "config": "configs/amr_benchmark/retune/wave23_cgdnet_deepsig201610A_radioaug_strong.py",
+   "notes": "56.96/58"
+  },
+  {
+   "id": "W23_resnetamr_deepsig201610A_radioaug_strong_w23",
+   "priority": 1,
+   "model": "resnetamr",
+   "dataset": "deepsig201610A",
+   "variant": "radioaug_strong_w23",
+   "config": "configs/amr_benchmark/retune/wave23_resnetamr_deepsig201610A_radioaug_strong.py",
+   "notes": "55.95/57"
+  }
+ ]
+}

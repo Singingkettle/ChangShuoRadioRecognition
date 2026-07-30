@@ -3,7 +3,7 @@
 ## Auto-generated results
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-07-29 15:23:22 UTC_
+_Last orchestrator run: 2026-07-30 02:10:09 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -27,7 +27,7 @@ _Last orchestrator run: 2026-07-29 15:23:22 UTC_
 | RESNETAMR | RML2016.10B | `configs/resnetamr/resnetamr_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610B` | 62.00 | 60.37 | 87.00 | 90.88 | 4 dB | 16 dB | `fail` | 2026-07-16T04:22:43Z |
 | RESNETAMR | RML2018.01A | `configs/resnetamr/resnetamr_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201801A` | 57.00 | 55.24 | 91.00 | 91.27 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:43Z |
 | RESNETAMR | HisarMod | `configs/resnetamr/resnetamr_iq-hisar-2019.py` | `work_dirs/amr_benchmark/resnetamr/hisar2019` | 80.00 | 72.49 | 100.00 | 98.00 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:43Z |
-| DENSCNN | RML2016.10A | `configs/denscnn/denscnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/denscnn/deepsig201610A` | 57.00 | 54.48 | 83.00 | 82.86 | 6 dB | 10 dB | `fail` | 2026-07-16T04:22:43Z |
+| DENSCNN | RML2016.10A | `configs/amr_benchmark/retune/wave22_denscnn_deepsig201610A_radioaug_selfnorm.py` | `work_dirs/amr_benchmark_retune/denscnn/deepsig201610A/radioaug_selfnorm_w22` | 57.00 | 58.92 | 83.00 | 90.30 | 6 dB | 18 dB | `pass` | 2026-07-30T02:10:09Z |
 | DENSCNN | RML2016.10B | `configs/denscnn/denscnn_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/denscnn/deepsig201610B` | 62.00 | 59.72 | 87.00 | 89.53 | 4 dB | 18 dB | `fail` | 2026-07-16T04:22:43Z |
 | DENSCNN | RML2018.01A | `configs/denscnn/denscnn_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/denscnn/deepsig201801A` | 58.00 | 53.99 | 92.00 | 89.45 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:43Z |
 | DENSCNN | HisarMod | `configs/denscnn/denscnn_iq-hisar-2019.py` | `work_dirs/amr_benchmark/denscnn/hisar2019` | 80.00 | 83.85 | 100.00 | 100.00 | 10 dB | 6 dB | `pass` | 2026-07-16T04:22:43Z |

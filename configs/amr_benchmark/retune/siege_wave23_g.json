@@ -1,0 +1,24 @@
+{
+ "description": "Wave-23 lane G (H100 GPU0): denscnn-10B selfnorm + cnn4-201801A",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W23_denscnn_deepsig201610B_radioaug_selfnorm_w23",
+   "priority": 0,
+   "model": "denscnn",
+   "dataset": "deepsig201610B",
+   "variant": "radioaug_selfnorm_w23",
+   "config": "configs/amr_benchmark/retune/wave23_denscnn_deepsig201610B_radioaug_selfnorm.py",
+   "notes": "59.72/62"
+  },
+  {
+   "id": "W23_cnn4_deepsig201801A_radioaug_w23",
+   "priority": 1,
+   "model": "cnn4",
+   "dataset": "deepsig201801A",
+   "variant": "radioaug_w23",
+   "config": "configs/amr_benchmark/retune/wave23_cnn4_deepsig201801A_radioaug.py",
+   "notes": "54.55/55 closest 201801A pair"
+  }
+ ]
+}

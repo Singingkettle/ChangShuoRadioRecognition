@@ -212,11 +212,17 @@ class RadioAugment(BaseTransform):
 
     def __init__(self, key: str = 'iq', phase: bool = True,
                  time_shift: int = 0, freq_offset: float = 0.0,
+                 awgn_snr_db: tuple = None, awgn_prob: float = 0.5,
                  prob: float = 1.0) -> None:
         self.key = key
         self.phase = phase
         self.time_shift = int(time_shift)
         self.freq_offset = float(freq_offset)
+        # (lo, hi) SNR range in dB for additive white Gaussian noise relative
+        # to the crop's own power; None disables. Label-preserving: AWGN is
+        # exactly the channel impairment the classifier must be invariant to.
+        self.awgn_snr_db = tuple(awgn_snr_db) if awgn_snr_db else None
+        self.awgn_prob = float(awgn_prob)
         self.prob = float(prob)
 
     def transform(self, results: dict) -> dict:
@@ -235,6 +241,14 @@ class RadioAugment(BaseTransform):
             shift = int(np.random.randint(-self.time_shift,
                                           self.time_shift + 1))
             c = np.roll(c, shift)
+        if self.awgn_snr_db is not None and np.random.rand() < self.awgn_prob:
+            snr_db = np.random.uniform(*self.awgn_snr_db)
+            sig_power = float(np.mean(np.abs(c) ** 2))
+            if sig_power > 0:
+                noise_power = sig_power / (10.0 ** (snr_db / 10.0))
+                sigma = np.sqrt(noise_power / 2.0)
+                c = c + (np.random.normal(0.0, sigma, n)
+                         + 1j * np.random.normal(0.0, sigma, n))
 
         results[self.key] = np.stack([c.real, c.imag]).astype(np.float32)
         return results
@@ -242,5 +256,6 @@ class RadioAugment(BaseTransform):
     def __repr__(self) -> str:
         return (f'{self.__class__.__name__}(key={self.key!r}, '
                 f'phase={self.phase}, time_shift={self.time_shift}, '
-                f'freq_offset={self.freq_offset}, prob={self.prob})')
+                f'freq_offset={self.freq_offset}, '
+                f'awgn_snr_db={self.awgn_snr_db}, prob={self.prob})')
 
