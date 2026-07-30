@@ -297,6 +297,24 @@ The W21 classifier helps on clean v1 crops but is *more* sensitive to noisy
 real_awgn crops (it was trained on voted/tighter proposals, i.e. a cleaner crop
 distribution). Per-protocol operating points recorded in `goals.json`.
 
+## 2026-07-30 detector-tightening attempts: three negative results
+
+All three attempts to push past the det120 champion (ideal voted 0.8238)
+degraded it — det120 + box voting remains the detector operating point:
+
+| attempt | ideal voted mAP | simulate voted mAP | verdict |
+|---|---|---|---|
+| det120 (champion) | **0.8238** | **0.7701** | keep |
+| bw40 FT (bandwidth loss ×2) | 0.7936 | 0.7184 | negative (best at ep2, then decays) |
+| EMA from-scratch (w21) | 0.6935 | — | negative (never reached det120 level) |
+| SWA 16-ep constant-LR tail (w22) | 0.7568 (avg) / 0.7572 (best snapshot) | 0.7133 | negative |
+
+Interpretation: det120's peak is a sharp optimum; every perturbation
+(loss reweighting, weight smoothing, snapshot averaging) moves off it.
+Next rung: det_full_200ep (longer cosine from scratch, running) and the
+classifier-side robustness attack for the simulate joint gap
+(amc_detprops_120voted_radioaug_w23, running).
+
 ## Recommended eval protocol for “逐点一致”
 
 1. **Det Fig. 8 simul:** `eval_simulate_real_awgn_det_testonly.py` (`v104`+`v105–v124`).

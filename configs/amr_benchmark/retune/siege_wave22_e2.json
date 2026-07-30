@@ -1,0 +1,15 @@
+{
+ "description": "Wave-22 lane E2 (H100 GPU0): cldnnl-10B with winning recipe",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W22_cldnnl_deepsig201610B_radioaug_selfnorm_w22",
+   "priority": 0,
+   "model": "cldnnl",
+   "dataset": "deepsig201610B",
+   "variant": "radioaug_selfnorm_w22",
+   "config": "configs/amr_benchmark/retune/wave22_cldnnl_deepsig201610B_radioaug_selfnorm.py",
+   "notes": "56.57/62; 10A recipe passed at 61.23"
+  }
+ ]
+}

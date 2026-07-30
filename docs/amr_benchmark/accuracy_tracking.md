@@ -3,7 +3,7 @@
 ## Auto-generated results
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-07-29 08:05:09 UTC_
+_Last orchestrator run: 2026-07-29 15:23:22 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -15,15 +15,15 @@ _Last orchestrator run: 2026-07-29 08:05:09 UTC_
 | CNN4 | RML2016.10B | `configs/amr_benchmark/retune/wave4_cnn4_deepsig201610B_lr2e4_warmup.py` | `work_dirs/amr_benchmark_retune/cnn4/deepsig201610B/lr2e4_warmup` | 63.00 | 61.83 | 84.00 | 89.61 | 2 dB | 16 dB | `pass` | 2026-07-18T07:48:50Z |
 | CNN4 | RML2018.01A | `configs/cnn4/cnn4_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cnn4/deepsig201801A` | 55.00 | 54.55 | 91.00 | 84.57 | 18 dB | 30 dB | `fail` | 2026-07-16T04:22:42Z |
 | CNN4 | HisarMod | `configs/cnn4/cnn4_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cnn4/hisar2019` | 70.00 | 75.08 | 98.00 | 99.81 | 10 dB | 18 dB | `pass` | 2026-07-16T04:22:42Z |
-| MCNET | RML2016.10A | `configs/mcnet/mcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/mcnet/deepsig201610A` | 58.00 | 55.98 | 82.00 | 82.41 | 6 dB | 12 dB | `fail` | 2026-07-16T04:22:42Z |
-| MCNET | RML2016.10B | `configs/mcnet/mcnet_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/mcnet/deepsig201610B` | 62.00 | 59.49 | 87.00 | 86.54 | 4 dB | 18 dB | `fail` | 2026-07-16T04:22:42Z |
+| MCNET | RML2016.10A | `configs/amr_benchmark/retune/wave20_mcnet_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/radioaug_plateau_w20` | 58.00 | 57.04 | 82.00 | 84.59 | 6 dB | 18 dB | `pass` | 2026-07-29T08:14:46Z |
+| MCNET | RML2016.10B | `configs/amr_benchmark/retune/wave20_mcnet_deepsig201610B_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610B/radioaug_plateau_w20` | 62.00 | 62.41 | 87.00 | 91.41 | 4 dB | 12 dB | `pass` | 2026-07-29T13:01:30Z |
 | MCNET | RML2018.01A | `configs/mcnet/mcnet_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/mcnet/deepsig201801A` | 55.00 | 58.43 | 92.00 | 92.78 | 18 dB | 26 dB | `pass` | 2026-07-16T04:22:42Z |
 | MCNET | HisarMod | `configs/mcnet/mcnet_iq-hisar-2019.py` | `work_dirs/amr_benchmark/mcnet/hisar2019` | 70.00 | 56.03 | 97.00 | 79.00 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:42Z |
 | ICAMCNET | RML2016.10A | `configs/icamcnet/icamcnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/icamcnet/deepsig201610A` | 57.00 | 56.79 | 83.00 | 85.07 | 6 dB | 18 dB | `pass` | 2026-07-16T04:22:42Z |
 | ICAMCNET | RML2016.10B | `configs/icamcnet/icamcnet_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/icamcnet/deepsig201610B` | 62.00 | 61.66 | 87.00 | 91.67 | 4 dB | 14 dB | `pass` | 2026-07-16T04:22:42Z |
 | ICAMCNET | RML2018.01A | `configs/icamcnet/icamcnet_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/icamcnet/deepsig201801A` | 58.00 | 59.49 | 92.00 | 95.13 | 18 dB | 20 dB | `pass` | 2026-07-16T04:22:43Z |
 | ICAMCNET | HisarMod | `configs/icamcnet/icamcnet_iq-hisar-2019.py` | `work_dirs/amr_benchmark/icamcnet/hisar2019` | 80.00 | 82.01 | 100.00 | 98.56 | 10 dB | 16 dB | `fail` | 2026-07-16T04:22:43Z |
-| RESNETAMR | RML2016.10A | `configs/resnetamr/resnetamr_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610A` | 57.00 | 54.33 | 83.00 | 82.20 | 6 dB | 10 dB | `fail` | 2026-07-16T04:22:43Z |
+| RESNETAMR | RML2016.10A | `configs/amr_benchmark/retune/wave20_resnetamr_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201610A/radioaug_plateau_w20` | 57.00 | 55.95 | 83.00 | 84.14 | 6 dB | 18 dB | `pass` | 2026-07-29T09:27:55Z |
 | RESNETAMR | RML2016.10B | `configs/resnetamr/resnetamr_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610B` | 62.00 | 60.37 | 87.00 | 90.88 | 4 dB | 16 dB | `fail` | 2026-07-16T04:22:43Z |
 | RESNETAMR | RML2018.01A | `configs/resnetamr/resnetamr_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201801A` | 57.00 | 55.24 | 91.00 | 91.27 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:43Z |
 | RESNETAMR | HisarMod | `configs/resnetamr/resnetamr_iq-hisar-2019.py` | `work_dirs/amr_benchmark/resnetamr/hisar2019` | 80.00 | 72.49 | 100.00 | 98.00 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:43Z |
@@ -55,7 +55,7 @@ _Last orchestrator run: 2026-07-29 08:05:09 UTC_
 | CLDNNL | RML2016.10B | `configs/cldnnl/cldnnl_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201610B` | 62.00 | 56.57 | 89.00 | 82.03 | 2 dB | 18 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNL | RML2018.01A | `configs/cldnnl/cldnnl_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cldnnl/deepsig201801A` | 57.00 | 46.67 | 92.00 | 81.40 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNL | HisarMod | `configs/cldnnl/cldnnl_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cldnnl/hisar2019` | 75.00 | 69.51 | 98.00 | 89.56 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:45Z |
-| CGDNET | RML2016.10A | `configs/cgdnet/cgdnet_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cgdnet/deepsig201610A` | 58.00 | 55.55 | 83.00 | 82.50 | 6 dB | 18 dB | `fail` | 2026-07-16T04:22:45Z |
+| CGDNET | RML2016.10A | `configs/amr_benchmark/retune/wave20_cgdnet_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/cgdnet/deepsig201610A/radioaug_plateau_w20` | 58.00 | 56.96 | 83.00 | 83.66 | 6 dB | 14 dB | `pass` | 2026-07-29T07:56:33Z |
 | CGDNET | RML2016.10B | `configs/cgdnet/cgdnet_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/cgdnet/deepsig201610B` | 62.00 | 61.15 | 88.00 | 89.49 | 4 dB | 14 dB | `pass` | 2026-07-16T04:22:45Z |
 | CGDNET | RML2018.01A | `configs/cgdnet/cgdnet_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cgdnet/deepsig201801A` | 57.00 | 35.87 | 92.00 | 51.67 | 18 dB | 18 dB | `fail` | 2026-07-16T04:22:46Z |
 | CGDNET | HisarMod | `configs/cgdnet/cgdnet_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cgdnet/hisar2019` | (CSRR-only) | 71.25 | (CSRR-only) | 95.69 | 10 dB | 14 dB | `measured` | 2026-07-16T04:22:46Z |
