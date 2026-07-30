@@ -1,0 +1,24 @@
+{
+ "description": "Wave-23 local GPU1: AP-input pairs via IQ-space augment",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W23_lstm2_10A_radioaug",
+   "priority": 0,
+   "model": "lstm2",
+   "dataset": "deepsig201610A",
+   "variant": "radioaug_plateau_w23",
+   "config": "configs/amr_benchmark/retune/wave23_lstm2_deepsig201610A_radioaug_plateau.py",
+   "notes": "56.57/58"
+  },
+  {
+   "id": "W23_cnn1dpf_10A_radioaug",
+   "priority": 1,
+   "model": "cnn1dpf",
+   "dataset": "deepsig201610A",
+   "variant": "radioaug_plateau_w23",
+   "config": "configs/amr_benchmark/retune/wave23_cnn1dpf_deepsig201610A_radioaug_plateau.py",
+   "notes": "54.97/57"
+  }
+ ]
+}
