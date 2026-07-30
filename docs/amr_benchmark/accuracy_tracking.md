@@ -3,7 +3,7 @@
 ## Auto-generated results
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-07-30 02:10:09 UTC_
+_Last orchestrator run: 2026-07-30 08:43:57 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -35,7 +35,7 @@ _Last orchestrator run: 2026-07-30 02:10:09 UTC_
 | GRU2 | RML2016.10B | `configs/gru2/gru2_iq-shape-L-F-deepsig-201610B.py` | `work_dirs/amr_benchmark/gru2/deepsig201610B` | 63.00 | 64.53 | 91.00 | 93.50 | 2 dB | 14 dB | `pass` | 2026-07-16T04:22:43Z |
 | GRU2 | RML2018.01A | `configs/amr_benchmark/retune/wave4_gru2_deepsig201801A_lr2e4_warmup.py` | `work_dirs/amr_benchmark_retune/gru2/deepsig201801A/lr2e4_warmup` | 59.00 | 61.95 | 95.00 | 96.37 | 18 dB | 28 dB | `pass` | 2026-07-17T06:15:30Z |
 | GRU2 | HisarMod | `configs/gru2/gru2_iq-shape-L-F-hisar-2019.py` | `work_dirs/amr_benchmark/gru2/hisar2019` | 73.00 | 68.51 | 98.00 | 96.32 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:43Z |
-| LSTM2 | RML2016.10A | `configs/lstm2/lstm2_ap-shape-L-F-deepsig-201610A.py` | `work_dirs/amr_benchmark/lstm2/deepsig201610A` | 58.00 | 56.57 | 87.00 | 85.11 | 4 dB | 12 dB | `fail` | 2026-07-16T04:22:44Z |
+| LSTM2 | RML2016.10A | `configs/amr_benchmark/retune/wave23_lstm2_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/radioaug_plateau_w23` | 58.00 | 63.53 | 87.00 | 93.73 | 4 dB | 12 dB | `pass` | 2026-07-30T08:08:37Z |
 | LSTM2 | RML2016.10B | `configs/lstm2/lstm2_ap-shape-L-F-deepsig-201610B.py` | `work_dirs/amr_benchmark/lstm2/deepsig201610B` | 64.00 | 63.94 | 94.00 | 93.66 | 18 dB | 14 dB | `pass` | 2026-07-16T04:22:44Z |
 | LSTM2 | RML2018.01A | `configs/lstm2/lstm2_ap-shape-L-F-deepsig-201801A.py` | `work_dirs/amr_benchmark/lstm2/deepsig201801A` | 60.00 | 62.30 | 98.00 | 97.02 | 22 dB | 28 dB | `pass` | 2026-07-16T04:22:44Z |
 | LSTM2 | HisarMod | `configs/lstm2/lstm2_ap-shape-L-F-hisar-2019.py` | `work_dirs/amr_benchmark/lstm2/hisar2019` | 73.00 | 66.81 | 98.00 | 90.04 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:44Z |

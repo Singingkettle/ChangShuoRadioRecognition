@@ -1,0 +1,24 @@
+{
+ "description": "Wave-25 local GPU1: cldnnw mild+awgn, cnn2-10B",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W25_cldnnw_10A_mildawgn",
+   "priority": 0,
+   "model": "cldnnw",
+   "dataset": "deepsig201610A",
+   "variant": "mild_awgn_w25",
+   "config": "configs/amr_benchmark/retune/wave25_cldnnw_deepsig201610A_mild_awgn.py",
+   "notes": "54.73 mild new best"
+  },
+  {
+   "id": "W25_cnn2_10B_radioaug",
+   "priority": 1,
+   "model": "cnn2",
+   "dataset": "deepsig201610B",
+   "variant": "radioaug_plateau_w25",
+   "config": "configs/amr_benchmark/retune/wave25_cnn2_deepsig201610B_radioaug_plateau.py",
+   "notes": "56.25/64"
+  }
+ ]
+}
