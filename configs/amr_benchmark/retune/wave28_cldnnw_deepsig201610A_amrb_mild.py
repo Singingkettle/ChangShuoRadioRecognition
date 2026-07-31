@@ -7,6 +7,8 @@ pairs; combine it with the winning amrb schedule to fix both axes.
 _base_ = ['./wave15_cldnnw_deepsig201610A_amrb_plateau.py']
 train_pipeline = [
     dict(type='RadioAugment', key='iq', phase=True, time_shift=0, prob=0.5),
+    # w24-mild's stabilizer: recurrent nets collapse on raw phase-rotated IQ.
+    dict(type='SelfNormalize', norms=dict(iq={})),
     dict(type='Reshape', shapes=dict(iq=[1, 2, 128])),
     dict(type='PackInputs', input_key='iq'),
 ]
