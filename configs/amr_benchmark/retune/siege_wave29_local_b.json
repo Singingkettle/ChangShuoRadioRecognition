@@ -1,0 +1,15 @@
+{
+ "description": "W29b local GPU0: cnn2-10B amrb",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W29_cnn2_10B_amrb",
+   "priority": 0,
+   "model": "cnn2",
+   "dataset": "deepsig201610B",
+   "variant": "amrb_plateau_w29",
+   "config": "configs/amr_benchmark/retune/wave29_cnn2_deepsig201610B_amrb_plateau.py",
+   "notes": "56.25/62.5"
+  }
+ ]
+}

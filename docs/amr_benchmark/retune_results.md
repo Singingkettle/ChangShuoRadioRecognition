@@ -18327,3 +18327,9 @@ See [`retune_campaign.md`](./retune_campaign.md) for the intervention catalog an
 | When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-07-31 07:42:17 | cldnnw/deepsig201610A | `amrb_mild_w28` | 54.89 | 81.68 | `fail` | `False` | Δoverall -0.35pp; Δpeak -0.27pp | 55.24/81.95 needs 55.5/84 | `work_dirs/amr_benchmark_retune/cldnnw/deepsig201610A/amrb_mild_w28` |
+
+## Run 2026-07-31 10:19:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-31 10:19:41 | cnn1dpf/deepsig201610A | `mild_selfnorm_w29` | 14.33 | 21.73 | `fail` | `False` | Δoverall -40.64pp; Δpeak -62.43pp | 54.97/55.5 | `work_dirs/amr_benchmark_retune/cnn1dpf/deepsig201610A/mild_selfnorm_w29` |
