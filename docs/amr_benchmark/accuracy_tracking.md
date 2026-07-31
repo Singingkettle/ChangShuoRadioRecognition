@@ -3,7 +3,7 @@
 ## Auto-generated results
 
 <!-- AMR_BENCHMARK_AUTO_TABLE_BEGIN -->
-_Last orchestrator run: 2026-07-30 08:43:57 UTC_
+_Last orchestrator run: 2026-07-31 03:11:35 UTC_
 
 | Model | Dataset | Config | Work dir | Overall (target %) | Overall (meas %) | Peak (target %) | Peak (meas %) | Best SNR (target) | Best SNR (meas) | Status | Updated |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -25,7 +25,7 @@ _Last orchestrator run: 2026-07-30 08:43:57 UTC_
 | ICAMCNET | HisarMod | `configs/amr_benchmark/retune/wave21_icamcnet_hisar2019_plateau_peak.py` | `work_dirs/amr_benchmark_retune/icamcnet/hisar2019/plateau_peak_w21` | 80.00 | 83.41 | 100.00 | 98.58 | 10 dB | 16 dB | `fail` | 2026-07-31T01:00:00Z |
 | RESNETAMR | RML2016.10A | `configs/amr_benchmark/retune/wave20_resnetamr_deepsig201610A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201610A/radioaug_plateau_w20` | 57.00 | 55.95 | 83.00 | 84.14 | 6 dB | 18 dB | `pass` | 2026-07-29T09:27:55Z |
 | RESNETAMR | RML2016.10B | `configs/resnetamr/resnetamr_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201610B` | 62.00 | 60.37 | 87.00 | 90.88 | 4 dB | 16 dB | `fail` | 2026-07-16T04:22:43Z |
-| RESNETAMR | RML2018.01A | `configs/resnetamr/resnetamr_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/resnetamr/deepsig201801A` | 57.00 | 55.24 | 91.00 | 91.27 | 18 dB | 20 dB | `fail` | 2026-07-16T04:22:43Z |
+| RESNETAMR | RML2018.01A | `configs/amr_benchmark/retune/wave25_resnetamr_deepsig201801A_radioaug_plateau.py` | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/radioaug_plateau_w25` | 57.00 | 57.10 | 91.00 | 93.53 | 18 dB | 20 dB | `pass` | 2026-07-31T03:11:34Z |
 | RESNETAMR | HisarMod | `configs/resnetamr/resnetamr_iq-hisar-2019.py` | `work_dirs/amr_benchmark/resnetamr/hisar2019` | 80.00 | 72.49 | 100.00 | 98.00 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:43Z |
 | DENSCNN | RML2016.10A | `configs/amr_benchmark/retune/wave22_denscnn_deepsig201610A_radioaug_selfnorm.py` | `work_dirs/amr_benchmark_retune/denscnn/deepsig201610A/radioaug_selfnorm_w22` | 57.00 | 58.92 | 83.00 | 90.30 | 6 dB | 18 dB | `pass` | 2026-07-30T02:10:09Z |
 | DENSCNN | RML2016.10B | `configs/amr_benchmark/retune/wave23_denscnn_deepsig201610B_radioaug_selfnorm.py` | `work_dirs/amr_benchmark_retune/denscnn/deepsig201610B/radioaug_selfnorm_w23` | 62.00 | 60.72 | 87.00 | 91.87 | 4 dB | 12 dB | `pass` | 2026-07-31T01:00:00Z |
