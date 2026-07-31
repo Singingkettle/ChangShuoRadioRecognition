@@ -1,0 +1,15 @@
+{
+ "description": "W28d local GPU1: denscnn-2018 resnetamr recipe",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W28_denscnn2018",
+   "priority": 0,
+   "model": "denscnn",
+   "dataset": "deepsig201801A",
+   "variant": "resnetamr_recipe_w28",
+   "config": "configs/amr_benchmark/retune/wave28_denscnn_deepsig201801A_resnetamr_recipe.py",
+   "notes": "53.99/pass 56.5"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "description": "W28c local GPU0: cldnnw-10A amrb+mild",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W28_cldnnw_amrb_mild",
+   "priority": 0,
+   "model": "cldnnw",
+   "dataset": "deepsig201610A",
+   "variant": "amrb_mild_w28",
+   "config": "configs/amr_benchmark/retune/wave28_cldnnw_deepsig201610A_amrb_mild.py",
+   "notes": "55.24/81.95 needs 55.5/84"
+  }
+ ]
+}

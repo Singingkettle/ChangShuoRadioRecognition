@@ -47,7 +47,7 @@ _Last orchestrator run: 2026-07-31 03:11:35 UTC_
 | MCLDNN | RML2016.10B | `configs/mcldnn/mcldnn_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/mcldnn/deepsig201610B` | 65.00 | 64.65 | 93.00 | 93.87 | 4 dB | 18 dB | `pass` | 2026-07-16T04:22:44Z |
 | MCLDNN | RML2018.01A | `configs/mcldnn/mcldnn_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/mcldnn/deepsig201801A` | 60.00 | 61.56 | 95.00 | 96.83 | 18 dB | 28 dB | `pass` | 2026-07-16T04:22:44Z |
 | MCLDNN | HisarMod | `configs/mcldnn/mcldnn_iq-hisar-2019.py` | `work_dirs/amr_benchmark/mcldnn/hisar2019` | 75.00 | 70.66 | 99.00 | 98.68 | 10 dB | 18 dB | `fail` | 2026-07-16T04:22:44Z |
-| CLDNNW | RML2016.10A | `configs/cldnnw/cldnnw_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201610A` | 57.00 | 53.78 | 85.00 | 79.48 | 6 dB | 18 dB | `fail` | 2026-07-16T04:22:44Z |
+| CLDNNW | RML2016.10A | `configs/amr_benchmark/retune/wave15_cldnnw_deepsig201610A_amrb_plateau.py` | `work_dirs/amr_benchmark_retune/cldnnw/deepsig201610A/amrb_plateau_w15` | 57.00 | 55.24 | 85.00 | 81.95 | 6 dB | 18 dB | `fail` | 2026-07-31T06:40:00Z |
 | CLDNNW | RML2016.10B | `configs/amr_benchmark/retune/wave15_cldnnw_deepsig201610B_amrb_plateau.py` | `work_dirs/amr_benchmark_retune/cldnnw/deepsig201610B/amrb_plateau_w15` | 62.00 | 58.63 | 89.00 | 85.16 | 4 dB | 18 dB | `fail` | 2026-07-31T01:10:00Z |
 | CLDNNW | RML2018.01A | `configs/cldnnw/cldnnw_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/cldnnw/deepsig201801A` | 55.00 | 37.19 | 88.00 | 53.33 | 18 dB | 28 dB | `fail` | 2026-07-16T04:22:45Z |
 | CLDNNW | HisarMod | `configs/cldnnw/cldnnw_iq-hisar-2019.py` | `work_dirs/amr_benchmark/cldnnw/hisar2019` | 75.00 | 68.84 | 98.00 | 95.43 | 10 dB | 14 dB | `fail` | 2026-07-16T04:22:45Z |
@@ -71,7 +71,7 @@ _Last orchestrator run: 2026-07-31 03:11:35 UTC_
 | MLDNN | RML2016.10B | `configs/mldnn/mldnn_iq-ap-deepsig201610B.py` | `work_dirs/amr_benchmark/mldnn/deepsig201610B` | (CSRR-only) | 65.06 | (CSRR-only) | 93.62 | — | 18 dB | `measured` | 2026-07-16T04:22:48Z |
 | MLDNN | RML2018.01A | `configs/mldnn/mldnn_iq-ap-deepsig201801A.py` | `work_dirs/amr_benchmark/mldnn/deepsig201801A` | (CSRR-only) | 57.94 | (CSRR-only) | 90.77 | — | 22 dB | `measured` | 2026-07-16T04:22:48Z |
 | MLDNN | HisarMod | `configs/mldnn/mldnn_iq-ap-hisar2019.py` | `work_dirs/amr_benchmark/mldnn/hisar2019` | (CSRR-only) | 60.06 | (CSRR-only) | 73.63 | — | 16 dB | `measured` | 2026-07-16T04:22:49Z |
-| HCGDNN | RML2016.10A | `configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py` | `work_dirs/amr_benchmark/hcgdnn/deepsig201610A` | 64.90 | 63.04 | 93.00 | 93.11 | 16 dB | 18 dB | `fail` | 2026-07-16T04:22:49Z |
+| HCGDNN | RML2016.10A | `configs/amr_benchmark/retune/wave27_hcgdnn_polish_r2_lr33e6_seed20.py` | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/polish_r2_lr33e6_seed20_w27` | 64.90 | 63.43 | 93.00 | 93.36 | 16 dB | 18 dB | `pass` | 2026-07-31T06:40:00Z |
 | HCGDNN | RML2016.10B | `configs/hcgdnn/hcgdnn_iq-deepsig-201610B.py` | `work_dirs/amr_benchmark/hcgdnn/deepsig201610B` | (CSRR-only) | 65.04 | (CSRR-only) | 93.71 | — | 18 dB | `measured` | 2026-07-16T04:22:49Z |
 | HCGDNN | RML2018.01A | `configs/hcgdnn/hcgdnn_iq-deepsig-201801A.py` | `work_dirs/amr_benchmark/hcgdnn/deepsig201801A` | (CSRR-only) | 58.72 | (CSRR-only) | 93.52 | — | 24 dB | `measured` | 2026-07-16T04:22:50Z |
 | HCGDNN | HisarMod | `configs/hcgdnn/hcgdnn_iq-hisar-2019.py` | `work_dirs/amr_benchmark/hcgdnn/hisar2019` | (CSRR-only) | 57.39 | (CSRR-only) | 70.16 | — | 18 dB | `measured` | 2026-07-16T04:22:50Z |
