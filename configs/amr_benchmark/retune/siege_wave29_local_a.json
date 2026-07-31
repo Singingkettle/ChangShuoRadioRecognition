@@ -1,0 +1,15 @@
+{
+ "description": "W29 local GPU0: cnn1dpf-10A mild+selfnorm",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W29_cnn1dpf_10A",
+   "priority": 0,
+   "model": "cnn1dpf",
+   "dataset": "deepsig201610A",
+   "variant": "mild_selfnorm_w29",
+   "config": "configs/amr_benchmark/retune/wave29_cnn1dpf_deepsig201610A_mild_selfnorm.py",
+   "notes": "54.97/55.5"
+  }
+ ]
+}
