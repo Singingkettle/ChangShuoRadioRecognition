@@ -1,0 +1,15 @@
+{
+ "description": "W28 local GPU1: cnn1dpf-10A patient ES",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W28_cnn1dpf_es30",
+   "priority": 0,
+   "model": "cnn1dpf",
+   "dataset": "deepsig201610A",
+   "variant": "es_patience30_w28",
+   "config": "configs/amr_benchmark/retune/wave28_cnn1dpf_deepsig201610A_es_patience30.py",
+   "notes": "54.97/55.5"
+  }
+ ]
+}
