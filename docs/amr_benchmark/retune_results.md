@@ -17873,3 +17873,9 @@ See [`retune_campaign.md`](./retune_campaign.md) for the intervention catalog an
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-07-30 10:52:10 | cldnnw/deepsig201610A | `mild_awgn_w25` | 54.38 | 80.89 | `fail` | `False` | Δoverall +0.60pp; Δpeak +1.41pp | 54.73 mild new best | `work_dirs/amr_benchmark_retune/cldnnw/deepsig201610A/mild_awgn_w25` |
 | 2026-07-30 11:23:33 | cnn2/deepsig201610B | `radioaug_plateau_w25` | — | — | `error` | `False` | — | 56.25/64 | `work_dirs/amr_benchmark_retune/cnn2/deepsig201610B/radioaug_plateau_w25` |
+
+## Run 2026-07-30 15:53:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-30 15:53:32 | cnn2/deepsig201610B | `radioaug_selfnorm_w25` | 57.37 | 84.20 | `fail` | `False` | Δoverall +1.12pp; Δpeak +2.62pp | retry after collapse | `work_dirs/amr_benchmark_retune/cnn2/deepsig201610B/radioaug_selfnorm_w25` |
