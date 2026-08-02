@@ -1,0 +1,14 @@
+{
+ "description": "W30 local GPU0: cldnnw amrb seed3",
+ "campaign_mode": "tiered",
+ "experiments": [
+  {
+   "id": "W30_cldnnw_s3",
+   "priority": 0,
+   "model": "cldnnw",
+   "dataset": "deepsig201610A",
+   "variant": "amrb_seed3_w30",
+   "config": "configs/amr_benchmark/retune/wave30_cldnnw_deepsig201610A_amrb_seed3.py"
+  }
+ ]
+}

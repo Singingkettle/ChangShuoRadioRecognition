@@ -18333,3 +18333,1844 @@ See [`retune_campaign.md`](./retune_campaign.md) for the intervention catalog an
 | When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-07-31 10:19:41 | cnn1dpf/deepsig201610A | `mild_selfnorm_w29` | 14.33 | 21.73 | `fail` | `False` | Δoverall -40.64pp; Δpeak -62.43pp | 54.97/55.5 | `work_dirs/amr_benchmark_retune/cnn1dpf/deepsig201610A/mild_selfnorm_w29` |
+
+## Run 2026-07-31 12:58:16
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-31 12:58:16 | cnn2/deepsig201610B | `amrb_plateau_w29` | 56.70 | 82.00 | `fail` | `False` | Δoverall +0.45pp; Δpeak +0.42pp | 56.25/62.5 | `work_dirs/amr_benchmark_retune/cnn2/deepsig201610B/amrb_plateau_w29` |
+
+## Run 2026-08-01 10:35:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:35:17 | denscnn/deepsig201801A | `resnetamr_recipe_w28` | 54.19 | 90.46 | `fail` | `False` | Δoverall +0.20pp; Δpeak +1.01pp | 53.99/pass 56.5 | `work_dirs/amr_benchmark_retune/denscnn/deepsig201801A/resnetamr_recipe_w28` |
+
+## Run 2026-08-01 10:36:03
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:36:03 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:36:04
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:36:04 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 10:36:04 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 10:36:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:36:05 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 10:36:05 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 10:36:05 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 10:36:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:36:05 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 10:36:05 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 10:36:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:36:06 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 10:36:06 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 10:38:03
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:38:03 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:40:04
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:40:04 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:42:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:42:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:42:12
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:42:12 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:44:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:44:06 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:44:14
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:44:14 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:46:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:46:06 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:48:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:48:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 10:56:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 10:56:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:04:26
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:04:26 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:12:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:12:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:15:02
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:15:02 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:16:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:16:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:18:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:18:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:20:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:20:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:22:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:22:30 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:22:38
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:22:38 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:24:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:24:30 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:24:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:24:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:26:31
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:26:31 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:28:48
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:28:48 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:36:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:36:54 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:44:57
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:44:57 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:53:00
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:53:00 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:55:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:55:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:56:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:56:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 11:58:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 11:58:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:00:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:00:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:02:57
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:02:57 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:03:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:03:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:04:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:04:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:05:12
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:05:12 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:06:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:06:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:09:18
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:09:18 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:17:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:17:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:25:24
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:25:24 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:33:27
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:33:27 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:35:36
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:35:36 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:37:19
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:37:19 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:37:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:37:30 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 12:37:30 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 12:37:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:37:30 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 12:37:30 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 12:37:30 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 12:37:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:37:30 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 12:37:30 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 12:37:31
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:37:31 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 12:37:31 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 12:39:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:39:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:41:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:41:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:43:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:43:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:43:37
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:43:37 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:45:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:45:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:45:39
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:45:39 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:47:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:47:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 12:55:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 12:55:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:03:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:03:50 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:11:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:11:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:16:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:16:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:17:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:17:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:19:45
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:19:45 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:21:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:21:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:23:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:23:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:24:03
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:24:03 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:25:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:25:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:26:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:26:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:27:48
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:27:48 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:30:11
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:30:11 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:38:14
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:38:14 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:46:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:46:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:54:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:54:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.91 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:56:24
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:56:24 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 13:58:09
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 13:58:09 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:00:09
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:00:09 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:02:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:02:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:04:11
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:04:11 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:04:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:04:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:06:11
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:06:11 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:06:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:06:32 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:08:12
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:08:12 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:16:39
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:16:39 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:24:42
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:24:42 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:32:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:32:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.83 | 91.80 | `fail` | `False` | Δoverall -0.19pp; Δpeak +0.28pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:36:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:36:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:38:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:38:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:38:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:38:49 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 14:38:49 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 14:38:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:38:49 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 14:38:49 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 14:38:49 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 14:38:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:38:50 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 14:38:50 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 14:38:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:38:50 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 14:38:50 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 14:40:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:40:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:42:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:42:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:42:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:42:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:44:36
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:44:36 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:44:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:44:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:46:37
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:46:37 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:49:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:49:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 14:57:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 14:57:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:05:08
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:05:08 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:13:11
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:13:11 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:15:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:15:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:16:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:16:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:18:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:18:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:20:59
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:20:59 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:23:00
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:23:00 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:23:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:23:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:25:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:25:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:25:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:25:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:27:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:27:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:29:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:29:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:37:31
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:37:31 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:45:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:45:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:53:37
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:53:37 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.82 | 91.77 | `fail` | `False` | Δoverall -0.20pp; Δpeak +0.25pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:56:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:56:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:57:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:57:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 15:59:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 15:59:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:01:24
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:01:24 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:03:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:03:25 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:03:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:03:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:05:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:05:25 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:05:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:05:49 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:07:26
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:07:26 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:09:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:09:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:17:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:17:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:26:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:26:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:34:04
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:34:04 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:36:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:36:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:37:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:37:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:39:48
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:39:48 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:40:09
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:40:09 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 16:40:09 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 16:40:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:40:10 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 16:40:10 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 16:40:10 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 16:40:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:40:10 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 16:40:10 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 16:40:11
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:40:11 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 16:40:11 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 16:41:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:41:49 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:43:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:43:50 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:44:14
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:44:14 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:45:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:45:50 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:46:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:46:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:47:51
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:47:51 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:50:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:50:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 16:58:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 16:58:25 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:06:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:06:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:14:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:14:32 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.86 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:17:04
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:17:04 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:18:12
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:18:12 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:20:14
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:20:14 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:22:15
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:22:15 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:24:15
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:24:15 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:24:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:24:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:26:16
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:26:16 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:26:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:26:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:28:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:28:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:30:52
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:30:52 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:38:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:38:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:46:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:46:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:55:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:55:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.94 | 91.89 | `fail` | `False` | Δoverall -0.08pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:57:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:57:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 17:58:38
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 17:58:38 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:00:39
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:00:39 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:02:40
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:02:40 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:04:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:04:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:05:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:05:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:06:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:06:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:07:13
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:07:13 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:08:42
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:08:42 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:11:19
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:11:19 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:19:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:19:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:27:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:27:25 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:35:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:35:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:37:45
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:37:45 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:39:03
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:39:03 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:41:04
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:41:04 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:41:33
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:41:33 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 18:41:33 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 18:41:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:41:34 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 18:41:34 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 18:41:34 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 18:41:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:41:34 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 18:41:34 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 18:41:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:41:35 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 18:41:35 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 18:43:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:43:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:43:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:43:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:45:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:45:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:45:38
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:45:38 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:47:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:47:06 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 18:55:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 18:55:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:03:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:03:49 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:11:52
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:11:52 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.89 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:16:12
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:16:12 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:17:27
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:17:27 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:19:28
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:19:28 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:21:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:21:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:21:59
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:21:59 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:23:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:23:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:24:02
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:24:02 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:25:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:25:30 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:28:07
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:28:07 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:36:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:36:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:44:13
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:44:13 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:52:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:52:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.86 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.34pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:54:33
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:54:33 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:55:51
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:55:51 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:57:52
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:57:52 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 19:59:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 19:59:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:00:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:00:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:01:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:01:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:02:26
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:02:26 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:03:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:03:54 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:12:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:12:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:20:37
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:20:37 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:28:40
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:28:40 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.84 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:33:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:33:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:34:15
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:34:15 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:36:16
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:36:16 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:38:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:38:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:40:18
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:40:18 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:40:50
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:40:50 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:42:18
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:18 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:42:52
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:52 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:42:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:54 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 20:42:54 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 20:42:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:54 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 20:42:54 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 20:42:54 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 20:42:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:54 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 20:42:54 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 20:42:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:42:55 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 20:42:55 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 20:44:19
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:44:19 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:46:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:46:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 20:55:02
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 20:55:02 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:03:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:03:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:11:08
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:11:08 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:13:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:13:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:14:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:14:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:16:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:16:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:18:42
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:18:42 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:20:43
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:20:43 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:21:17
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:21:17 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:22:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:22:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:23:19
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:23:19 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:24:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:24:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:33:27
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:33:27 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:41:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:41:30 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:49:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:49:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:53:53
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:53:53 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:55:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:55:06 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:57:07
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:57:07 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:59:07
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:59:07 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 21:59:41
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 21:59:41 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:01:08
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:01:08 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:01:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:01:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:03:09
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:03:09 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:05:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:05:49 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:13:52
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:13:52 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:21:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:21:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:29:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:29:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.85 | 91.84 | `fail` | `False` | Δoverall -0.17pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:32:15
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:32:15 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:33:30
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:33:30 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:35:31
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:35:31 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:37:31
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:37:31 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:38:05
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:38:05 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:39:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:39:32 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:40:07
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:40:07 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:41:33
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:41:33 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:50:15
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:50:15 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 22:58:18
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 22:58:18 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:06:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:06:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.89 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:10:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:10:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:11:54
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:11:54 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:12:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:12:25 | hcgdnn/deepsig201610A | `es_patience25` | 57.88 | 86.32 | `fail` | `False` | Δoverall -5.55pp; Δpeak -7.04pp | Paper lr + ES patience 25 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/es_patience25` |
+| 2026-08-01 23:12:25 | hcgdnn/deepsig201610A | `lr1e3` | 60.87 | 89.98 | `fail` | `False` | Δoverall -2.56pp; Δpeak -3.38pp | AMC lr=1e-3 | `work_dirs/amr_benchmark_retune/hcgdnn/deepsig201610A/lr1e3` |
+
+## Run 2026-08-01 23:12:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:12:25 | lstm2/deepsig201610A | `es_patience30` | 56.76 | 84.30 | `fail` | `False` | Δoverall -6.77pp; Δpeak -9.43pp | Train longer (ES patience 30) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/es_patience30` |
+| 2026-08-01 23:12:25 | lstm2/deepsig201610A | `lr5e4` | 55.34 | 84.05 | `fail` | `False` | Δoverall -8.19pp; Δpeak -9.68pp | Lower LR for peak lift | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/lr5e4` |
+| 2026-08-01 23:12:25 | lstm2/deepsig201610A | `iq_input` | 14.95 | 18.18 | `fail` | `False` | Δoverall -48.58pp; Δpeak -75.55pp | Raw I/Q path (Keras parity) | `work_dirs/amr_benchmark_retune/lstm2/deepsig201610A/iq_input` |
+
+## Run 2026-08-01 23:12:25
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:12:25 | mcnet/deepsig201610A | `es_patience30` | 55.29 | 81.55 | `fail` | `False` | Δoverall -1.75pp; Δpeak -3.04pp | Auto ES patience 30 | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/es_patience30` |
+| 2026-08-01 23:12:25 | mcnet/deepsig201610A | `lr2e4_warmup` | 52.11 | 77.95 | `fail` | `False` | Δoverall -4.93pp; Δpeak -6.64pp | Auto lr=2e-4 warmup | `work_dirs/amr_benchmark_retune/mcnet/deepsig201610A/lr2e4_warmup` |
+
+## Run 2026-08-01 23:12:26
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:12:26 | resnetamr/deepsig201801A | `es_patience30` | 50.91 | 84.17 | `fail` | `False` | Δoverall -6.19pp; Δpeak -9.36pp | Relaxed ES (min_delta 0.05, patience 30) for −0.26 pp overall | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/es_patience30` |
+| 2026-08-01 23:12:26 | resnetamr/deepsig201801A | `lr2e4_warmup` | 54.78 | 89.62 | `fail` | `False` | Δoverall -2.32pp; Δpeak -3.91pp | lr=2e-4 + 5-epoch linear warmup + grad clip | `work_dirs/amr_benchmark_retune/resnetamr/deepsig201801A/lr2e4_warmup` |
+
+## Run 2026-08-01 23:13:55
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:13:55 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:15:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:15:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:17:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:17:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:18:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:18:32 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:19:57
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:19:57 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:20:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:20:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:21:58
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:21:58 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:24:40
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:24:40 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:32:43
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:32:43 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:40:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:40:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:48:49
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:48:49 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.91 | 91.84 | `fail` | `False` | Δoverall -0.11pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:51:06
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:51:06 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:52:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:52:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:54:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:54:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:56:21
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:56:21 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:56:56
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:56:56 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:58:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:58:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-01 23:58:59
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-01 23:58:59 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:00:22
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:00:22 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:09:07
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:09:07 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:17:10
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:17:10 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:25:13
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:25:13 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.89 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.37pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:29:34
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:29:34 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:30:44
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:30:44 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:32:45
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:32:45 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:34:46
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:34:46 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:35:20
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:35:20 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:36:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:36:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:37:23
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:37:23 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:38:47
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:38:47 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:41:29
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:41:29 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:49:32
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:49:32 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 00:57:35
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 00:57:35 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 01:05:38
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 01:05:38 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.90 | 91.84 | `fail` | `False` | Δoverall -0.12pp; Δpeak +0.32pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
+
+## Run 2026-08-02 01:08:01
+
+| When (UTC) | Experiment | Variant | Overall | Peak | Status | goal_met | vs baseline | Notes | Work dir |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-08-02 01:08:01 | fastmldnn/deepsig201610A | `paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` | 60.92 | 91.91 | `fail` | `False` | Δoverall -0.10pp; Δpeak +0.39pp | Gentle FT 120ep lr5e-5 from W9 FT80 ep37 | `work_dirs/amr_benchmark_retune/fastmldnn/deepsig201610A/paper_fixedlr_l2_ft120_lr5e5_from_w9best_w10` |
