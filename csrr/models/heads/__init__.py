@@ -6,9 +6,11 @@ from .jdm_det_head import JDMDetectionHead
 from .mldnn_head import MLDNNHead
 from .multi_task_head import MultiTaskHead
 from .snr_auxiliary_head import SNRAuxiliaryHead
+from .hierarchical_amc_head import HierarchicalAMCHead
 
 __all__ = [
     'ClsHead', 'DAEHead', 'FastMLDNNHead',
     'HCGDNNHead', 'JDMDetectionHead', 'MLDNNHead', 'MultiTaskHead',
     'SNRAuxiliaryHead',
+    'HierarchicalAMCHead',
 ]
