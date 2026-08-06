@@ -1,0 +1,25 @@
+# Copyright (c) Shuo Chang and contributors.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+_base_ = './rtmdet_tiny_complex_stft.py'
+
+model = dict(
+    backbone=dict(
+        deepen_factor=0.67,
+        widen_factor=0.75,
+    ),
+    neck=dict(
+        in_channels=[192, 384, 768],
+        out_channels=192,
+        num_csp_blocks=2,
+    ),
+    bbox_head=dict(
+        in_channels=192,
+        feat_channels=192,
+    ),
+)
+
+work_dir = 'work_dirs/torchsig_mmdet_complex_stft_rtmdet_m'

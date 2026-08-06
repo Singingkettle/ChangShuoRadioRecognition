@@ -6,11 +6,13 @@ from .csrd import CSRDDetectionDataset, CSRDModulationDataset, \
 from .samplers import *
 from .transforms import *
 from .filters import *
+from .wideband_channelized import WidebandChannelizedDataset
 
 __all__ = [
     'AMCDataset',
     'BaseClassificationDataset',
     'CSRDDetectionDataset', 'CSRDModulationDataset',
     'CSRDModulationDetPropDataset',
-    'build_dataset'
+    'build_dataset',
+    'WidebandChannelizedDataset',
 ]

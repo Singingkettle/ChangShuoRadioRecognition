@@ -1,0 +1,18 @@
+# DetectionIsEasy detection stack (tools/detection_is_easy) extra requirements.
+# The detector half is built on the MM-detection stack, which the core CSRR
+# toolbox deliberately does NOT depend on. Install these on top of a working
+# CSRR environment (which already provides torch and mmengine).
+#
+# mmcv must be the CUDA-compiled build that matches your torch/CUDA; the version
+# below is the one the paper used. See https://mmcv.readthedocs.io for the
+# matching wheel index.
+mmcv==2.1.0
+mmdet==3.3.0
+pycocotools
+numpy
+scipy
+pillow
+matplotlib
+# For (re)generating the wideband dataset from TorchSig. Only needed to rebuild
+# the data; not needed to train on an existing COCO/memmap cache.
+# torchsig

@@ -23,6 +23,7 @@ CSRR (ChangShuoRadioRecognition) is an open source Automatic Modulation Classifi
 | [CNN4](configs/cnn4) | [Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels](https://ieeexplore.ieee.org/abstract/document/9128408) |
 | [DAE](configs/dae) | [Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder](https://ieeexplore.ieee.org/abstract/document/9487492) |
 | [DensCNN](configs/denscnn) | [Deep Neural Network Architectures for Modulation Classification](https://ieeexplore.ieee.org/document/8335483) |
+| [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](docs/detection_is_easy) |
 | [DSCLDNN](configs/dscldnn) | [Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure](https://ieeexplore.ieee.org/document/9220797) |
 | [FastMLDNN](configs/fastmldnn) | [A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/10239249) |
 | [GRU2](configs/gru2) | [Automatic modulation classification using recurrent neural networks](https://ieeexplore.ieee.org/abstract/document/8322633) |

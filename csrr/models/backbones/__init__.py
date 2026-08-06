@@ -18,6 +18,7 @@ from .mcnet import MCNet
 from .mldnn import MLDNNSingleBranch, MLDNN
 from .petcgdnn import PETCGDNN
 from .resnetamr import ResNetAMR
+from .returniq_resnet1d import ReturnIQResNet1D
 
 __all__ = [
     'CGDNet', 'CLDNNL', 'CLDNNW', 'CNN1DPF', 'CNN2', 'CNN4',
@@ -25,4 +26,5 @@ __all__ = [
     'ICAMCNet', 'JDMClassificationBackbone', 'JDMDetectionBackbone',
     'LSTM2', 'MCformer', 'MCLDNN', 'MCNet',
     'MLDNNSingleBranch', 'MLDNN', 'PETCGDNN', 'ResNetAMR',
+    'ReturnIQResNet1D',
 ]
