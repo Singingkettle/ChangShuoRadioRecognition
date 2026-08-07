@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) Shuo Chang and contributors.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+
 """Submission-grade figures for the TCCN paper, unified style (Okabe-Ito colorblind-safe palette,
 serif fonts matched to the IEEEtran Times body, editable vector PDF). Builds: teaser schematic,
 SNR 2-panel, complexity curve, per-family bars. Detection example is rendered separately on the server.
@@ -65,9 +71,13 @@ def fig_teaser():
                 a.add_patch(Rectangle((t0 - 0.5, f0 - 0.5), t1 - t0, f1 - f0, edgecolor=OI["green"],
                             facecolor="none", lw=1.0, zorder=3))
             a.set_xlim(-0.5, W - 0.5); a.set_ylim(-0.5, H - 0.5)
-        if tags:  # tiny vision-label tags: the detector outputs a class with each box
-            a.text(6, 14.6, "fsk", fontsize=4.6, color=OI["green"], va="bottom", zorder=4)
-            a.text(34, 32.6, "psk", fontsize=4.6, color=OI["green"], va="bottom", zorder=4)
+        if tags:  # vision-label tags: the detector outputs a class with each box
+            import matplotlib.patheffects as pe
+            halo = [pe.withStroke(linewidth=1.1, foreground="black")]
+            a.text(6, 14.6, "fsk", fontsize=5.2, color=OI["green"], va="bottom", zorder=4,
+                   path_effects=halo)
+            a.text(34, 32.6, "psk", fontsize=5.2, color=OI["green"], va="bottom", zorder=4,
+                   path_effects=halo)
 
     def draw_nn(a, node_fc, node_ec):
         a.axis("off"); a.set_xlim(0, 1); a.set_ylim(0, 1)
@@ -76,7 +86,7 @@ def fig_teaser():
         for li in range(len(coords) - 1):
             for (x0, y0) in coords[li]:
                 for (x1, y1) in coords[li + 1]:
-                    a.plot([x0, x1], [y0, y1], color=OI["grey"], lw=0.3, alpha=0.45, zorder=1)
+                    a.plot([x0, x1], [y0, y1], color=OI["grey"], lw=0.4, alpha=0.6, zorder=1)
         for layer in coords:
             for (x0, y0) in layer:
                 a.add_patch(Circle((x0, y0), 0.055, facecolor=node_fc, edgecolor=node_ec, lw=0.6, zorder=2))
@@ -85,7 +95,8 @@ def fig_teaser():
         ax.add_patch(FancyBboxPatch((cx - w / 2, cy - h / 2), w, h,
                      boxstyle="round,pad=0.004,rounding_size=0.018", linewidth=1.0,
                      edgecolor=ec, facecolor=fc, zorder=3))
-        ax.text(cx, cy, text, ha="center", va="center", fontsize=fs, color=tc, zorder=4)
+        if text:  # optical centering: two-line blocks sit ~0.008 high without the nudge
+            ax.text(cx, cy - 0.008, text, ha="center", va="center", fontsize=fs, color=tc, zorder=4)
 
     def harrow(x0, x1, y, color=OI["black"], lw=1.1):
         ax.add_patch(FancyArrowPatch((x0, y), (x1, y), arrowstyle="-|>", mutation_scale=8,
@@ -96,9 +107,9 @@ def fig_teaser():
     cxs = [0.062, 0.200, 0.338, 0.476]
     a1 = panel(cxs[0], ymid_t, pw, ph); a1.axis("off"); a1.set_ylim(-1.28, 1.28)
     t = np.linspace(0, 1, 240); env = np.exp(-((t - 0.5) / 0.4) ** 2)
-    a1.plot(t, env * np.sin(2 * np.pi * 8.5 * t), color=OI["blue"], lw=0.9)
+    a1.plot(t, env * np.sin(2 * np.pi * 8.5 * t), color=OI["sky"], lw=0.9)
     a1.plot(t, env * np.cos(2 * np.pi * 8.5 * t), color=OI["orange"], lw=0.9)
-    a1.text(0.02, 0.98, "I", color=OI["blue"], fontsize=6, transform=a1.transAxes, va="top")
+    a1.text(0.02, 0.98, "I", color=OI["sky"], fontsize=6, transform=a1.transAxes, va="top")
     a1.text(0.02, 0.30, "Q", color=OI["orange"], fontsize=6, transform=a1.transAxes, va="top")
     show_spec(panel(cxs[1], ymid_t, pw, ph))
     draw_nn(panel(cxs[2], ymid_t, pw, ph), OI["sky"], OI["blue"])
@@ -108,7 +119,7 @@ def fig_teaser():
     for i in range(3):
         harrow(cxs[i] + pw / 2 + 0.004, cxs[i + 1] - pw / 2 - 0.004, ymid_t)
     ax.text(0.269, 0.945, "localization mAP $0.948$ (easy)", ha="center", va="bottom",
-            fontsize=7.2, color=OI["green"], style="italic")
+            fontsize=7.6, color=OI["green"], style="italic")
 
     # decision DIAMOND keyed on the vision label's family (Algorithm 1: family(c_i) in {PSK, ASK})
     sw_cx, sw_hw, sw_hh = 0.630, 0.052, 0.115
@@ -122,54 +133,58 @@ def fig_teaser():
 
     # spectral-family exit: keep the vision label
     tag_cx, tag_w, tag_h = 0.855, 0.16, 0.17
-    rbox(tag_cx, ymid_t, tag_w, tag_h, "keep vision label\n" + r"$\mathrm{FSK/OFDM/FM}$", VIS, "#E7F0F7", fs=6.2)
-    harrow(sw_cx + sw_hw + 0.004, tag_cx - tag_w / 2 - 0.004, ymid_t, color=VIS)
-    ax.text((sw_cx + sw_hw + tag_cx - tag_w / 2) / 2, ymid_t + 0.030, r"$\mathrm{FSK/OFDM/FM}$",
-            ha="center", va="bottom", fontsize=5.4, color=VIS, style="italic")
+    rbox(tag_cx, ymid_t, tag_w, tag_h, "keep vision label\nFSK/OFDM/FM", VIS, "#E7F0F7", fs=6.2)
+    harrow(sw_cx + sw_hw + 0.004, tag_cx - tag_w / 2 - 0.009, ymid_t, color=VIS)
+    ax.text((sw_cx + sw_hw + tag_cx - tag_w / 2) / 2, ymid_t + 0.030, "FSK/OFDM/FM",
+            ha="center", va="bottom", fontsize=5.6, color=VIS)
 
     # ---------------- bottom lane: the return-to-IQ branch ----------------
     ymid_b = 0.24
-    ch_cx, ch_w, ch_h = 0.315, 0.165, 0.185
-    rbox(ch_cx, ymid_b, ch_w, ch_h,
-         "channelize\n" + r"$x\,e^{-j2\pi f_c n/f_s}\!\to\mathrm{LPF}(B)\to\,\downarrow\!D$",
-         IQ, "#FBEAE0", fs=5.4)
-    ac = panel(0.475, ymid_b, pw, ph); ac.axis("off"); ac.set_xlim(-1.7, 1.7); ac.set_ylim(-1.7, 1.7)
+    ch_cx, ch_w, ch_h = 0.295, 0.165, 0.17
+    con_cx, rec_cx = cxs[3], 0.635          # constellation aligned to the TF-boxes panel above
+    rbox(ch_cx, ymid_b, ch_w, ch_h, "", IQ, "#FBEAE0")
+    ax.text(ch_cx, ymid_b + 0.033, "channelize", ha="center", va="center", fontsize=6.2, zorder=4)
+    ax.text(ch_cx, ymid_b - 0.030, r"$x\,e^{-j2\pi f_c n/f_s}\!\to\mathrm{LPF}(B)\to\,\downarrow\!D$",
+            ha="center", va="center", fontsize=5.6, zorder=4)
+    ac = panel(con_cx, ymid_b, pw, ph); ac.axis("off"); ac.set_xlim(-1.7, 1.7); ac.set_ylim(-1.7, 1.7)
     for sx in (-1, 1):
         for sy in (-1, 1):
             ac.scatter(sx + 0.12 * rng.standard_normal(16), sy + 0.12 * rng.standard_normal(16),
-                       s=1.7, color=IQ, alpha=0.85, linewidths=0)
-    draw_nn(panel(0.615, ymid_b, pw, ph), "#F9CDB0", IQ)
-    for cx, tlab in zip([0.475, 0.615], ["baseband IQ $x_b$", "IQ recognizer"]):
+                       s=3.0, color=IQ, alpha=0.9, linewidths=0)
+    draw_nn(panel(rec_cx, ymid_b, pw, ph), "#F9CDB0", IQ)
+    for cx, tlab in zip([con_cx, rec_cx], ["Baseband IQ $x_b$", "IQ recognizer"]):
         ax.text(cx, 0.055, tlab, ha="center", va="top", fontsize=7)
-    rbox(tag_cx, ymid_b, tag_w, tag_h, "IQ label\n" + r"$\mathrm{PSK/ASK/QAM}$", IQ, "#FBEAE0", fs=6.2)
-    harrow(ch_cx + ch_w / 2 + 0.004, 0.475 - pw / 2 - 0.004, ymid_b, color=IQ)
-    harrow(0.475 + pw / 2 + 0.004, 0.615 - pw / 2 - 0.004, ymid_b, color=IQ)
-    harrow(0.615 + pw / 2 + 0.004, tag_cx - tag_w / 2 - 0.004, ymid_b, color=IQ)
+    rbox(tag_cx, ymid_b, tag_w, tag_h, "IQ label\nPSK/ASK/QAM", IQ, "#FBEAE0", fs=6.2)
+    harrow(ch_cx + ch_w / 2 + 0.009, con_cx - pw / 2 - 0.004, ymid_b, color=IQ)
+    harrow(con_cx + pw / 2 + 0.004, rec_cx - pw / 2 - 0.004, ymid_b, color=IQ)
+    harrow(rec_cx + pw / 2 + 0.004, tag_cx - tag_w / 2 - 0.009, ymid_b, color=IQ)
 
     # the RETURN path: raw IQ tapped from the far left down into the channelizer
     lw_b = 1.15
-    ax.plot([cxs[0], cxs[0]], [ymid_t - ph / 2 - 0.01, ymid_b], color=OI["grey"], lw=lw_b,
-            solid_capstyle="round", zorder=1)
-    ax.add_patch(FancyArrowPatch((cxs[0], ymid_b), (ch_cx - ch_w / 2 - 0.004, ymid_b),
+    ax.plot([cxs[0], cxs[0]], [0.505, ymid_b], color=OI["grey"], lw=lw_b,
+            solid_capstyle="round", solid_joinstyle="round", zorder=1)
+    ax.add_patch(FancyArrowPatch((cxs[0], ymid_b), (ch_cx - ch_w / 2 - 0.009, ymid_b),
                  arrowstyle="-|>", mutation_scale=8, lw=lw_b, color=OI["grey"], shrinkA=0, shrinkB=0, zorder=2))
-    ax.plot([cxs[0]], [ymid_b], marker="o", ms=2.7, color=OI["grey"], zorder=2)
     ax.text(cxs[0] + 0.013, 0.42, r"$x[n]$", ha="left", va="center",
             fontsize=6.0, color=OI["grey"])
 
-    # PSK/ASK exit: the routed boxes' parameters drive the channelizer (dashed)
+    # PSK/ASK/QAM exit: the routed boxes' parameters drive the channelizer.
+    # One dashed polyline (single dash phase through both corners, mitred joins);
+    # the arrowhead rides a short SOLID stub so the head triangle stays intact.
     y_gap = 0.47
-    ax.plot([sw_cx, sw_cx], [ymid_t - sw_hh - 0.004, y_gap], color=IQ, lw=1.0, ls=(0, (3, 2)), zorder=2)
-    ax.plot([ch_cx, sw_cx], [y_gap, y_gap], color=IQ, lw=1.0, ls=(0, (3, 2)), zorder=2)
-    ax.add_patch(FancyArrowPatch((ch_cx, y_gap), (ch_cx, ymid_b + ch_h / 2 + 0.004),
-                 arrowstyle="-|>", mutation_scale=7, lw=1.0, color=IQ, linestyle=(0, (3, 2)),
+    ax.plot([sw_cx, sw_cx, ch_cx, ch_cx],
+            [ymid_t - sw_hh - 0.012, y_gap, y_gap, ymid_b + ch_h / 2 + 0.026],
+            color=IQ, lw=1.0, ls=(0, (3, 2)), solid_joinstyle="miter", zorder=2)
+    ax.add_patch(FancyArrowPatch((ch_cx, ymid_b + ch_h / 2 + 0.028), (ch_cx, ymid_b + ch_h / 2 + 0.008),
+                 arrowstyle="-|>", mutation_scale=8, lw=1.0, color=IQ,
                  shrinkA=0, shrinkB=0, zorder=2))
-    ax.text(sw_cx + 0.012, 0.555, r"$\mathrm{PSK/ASK/QAM}$", ha="left", va="center",
-            fontsize=5.0, color=IQ, style="italic")
+    ax.text(sw_cx + 0.012, 0.555, "PSK/ASK/QAM", ha="left", va="center",
+            fontsize=5.6, color=IQ)
     ax.text((ch_cx + sw_cx) / 2, y_gap - 0.028, r"$\{(f_{c,i},\,B_i)\}$", ha="center", va="top",
             fontsize=5.8, color=IQ)
 
-    ax.text(tag_cx, 0.485, "recognition $\\sim\\!0.5$ (hard)", ha="center", va="center",
-            fontsize=7.2, color=OI["black"], style="italic")
+    ax.text(tag_cx, 0.45, "recognition $\\sim\\!0.5$ (hard)", ha="center", va="center",
+            fontsize=7.6, color=OI["black"], style="italic")
     save(fig, "fig1_teaser")
 
 
@@ -213,7 +228,7 @@ def fig_complexity():
     h1 = ax.errorbar(x, mAP, yerr=mAP_sd, color=VIS, marker="o", capsize=2.5, lw=1.2,
                      label="mAP, uniform recipe (3 seeds)")
     h2 = ax.errorbar(x, own, yerr=own_sd, color=OI["green"], marker="D", ms=4.0, ls=(0, (4, 2)),
-                     capsize=2.5, lw=1.2, label="mAP, own schedule (1–3 seeds)")
+                     capsize=2.5, lw=1.2, label="mAP, own schedule (2–3 seeds)")
     h3, = ax.plot(x, APs, color=IQ, marker="s", label=r"small-object AP$_s$")
     ax.set_xticks(x); ax.set_xticklabels(sizes)
     ax.set_xlabel("detector size"); ax.set_ylabel("class-aware mAP")
