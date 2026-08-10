@@ -20,8 +20,14 @@ mmcv-lite==2.1.0            # what the paper used; replace with mmcv==2.1.0 for 
 mmdet==3.3.0
 mmengine==0.10.7
 
-torch==2.7.1                # +cu128 on the paper's machine
-torchvision==0.22.1         # +cu128
+# The CUDA build matters and the default PyPI index does not serve it: a bare
+# `torch==2.7.1` resolves to the cu126 wheel, while every reported number was produced on
+# cu128. Same torch version, different bundled cuDNN/cuBLAS, hence different kernel
+# selection -- which under `deterministic=False` adds to the run-to-run spread. The
+# extra index below makes `pip install -r` reproduce the paper's build exactly.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.7.1+cu128
+torchvision==0.22.1+cu128
 numpy==2.2.6                # NOTE: numpy 2.x, not 1.x
 scipy==1.15.3
 pycocotools==2.0.11
