@@ -71,7 +71,7 @@ each emission occupies a small patch of the spectrogram. `lowsnr`: per-signal SN
 from −20 dB to +10 dB, stratified into three equal buckets.
 
 The generated assets are large (~191 GB packed STFT memmap, ~128 GB raw IQ) and are not
-shipped. These five commands rebuild them, with the paper's exact parameters:
+shipped. Six commands rebuild them, with the paper's exact parameters:
 
 ```bash
 cd <repo-root>
@@ -79,45 +79,91 @@ DATA=data                       # or an NVMe scratch path
 RAW=$DATA/torchsig_hardshort_lowsnr_iq_65k_nvme
 MM=$DATA/torchsig_hardshort_lowsnr_stft3_memmap
 
-# 1) raw IQ scenes + per-signal metadata  (the slow step; shard it if you can)
+# 1) raw IQ scenes + per-signal metadata  (the slow step)
 python tools/detection_is_easy/prepare_torchsig_iq_stratified.py \
   --out-root $RAW \
   --train 50000 --val 5000 --test 10000 \
   --num-iq-samples 262144 --sample-rate 10000000 \
   --num-signals-min 1 --num-signals-max 6 --impairment-level 0 \
-  --fft-size 512 --stft-fft 512 --stft-hop 512 --image-size 512 \
+  --fft-size 512 --stft-fft 512 --stft-hop 512 \
   --duration-min-frac 0.005 --duration-max-frac 0.25 \
   --bandwidth-min-frac 0.0125 --bandwidth-max-frac 0.49 \
   --center-freq-min-frac -0.45 --center-freq-max-frac 0.45 \
-  --snr-db-min -20 --snr-db-max 10 \
+  --snr-buckets '-20,-10;-10,0;0,10' \
   --cochannel-overlap-probability 0.35 \
+  --fast-snr-update \
   --seed 20260640
 
-# 2) STFT tensors + single-class ("signal") COCO annotations
-python tools/detection_is_easy/export_stft_coco_from_raw.py \
-  --src-root $RAW --out-root $MM --stft-fft 512 --stft-hop 512 --image-size 512
+# 2) complex STFT tensors [2,F,T] + COCO annotations
+python tools/detection_is_easy/export_complex_stft_coco_from_raw.py \
+  --src-root $RAW --out-root $MM --stft-fft 512 --stft-hop 512
 
-# 3) 3-channel [real, imag, log-magnitude] feature tensors
+# 3) 3-channel [real, imag, log-magnitude] feature tensors  (SEPARATE --out-root)
 python tools/detection_is_easy/make_stft_feature_tensor_from_complex.py \
-  --src-root $MM/coco --out-root $MM --mode realimag_logpower3ch --workers 8
+  --src-root $MM/coco --out-root ${MM}_stft3 --mode realimag_logpower3ch --workers 8
 
 # 4) pack into the memmap the fast training path reads
 python tools/detection_is_easy/pack_coco_tensors_to_memmap.py \
-  --src-coco $MM/coco --out-root $MM --splits train,val,test --workers 8
+  --kind tensor --src-coco ${MM}_stft3/coco --out-root $MM --splits train,val,test --workers 8
 
-# 5) 57-class annotations (the class-aware task) beside the single-class ones
+# 5) single-class ("signal") annotations -- the class-agnostic localization task
+python tools/detection_is_easy/export_raw_coco_from_metadata.py \
+  --src-root $RAW --out-root $MM --single-class
+
+# 6) 57-class annotations -- the class-aware task
 python tools/detection_is_easy/build_multiclass_coco.py \
   --dataset-dir $MM --out-dir $MM/coco_multiclass/annotations --splits train,val,test
 ```
 
-After this, `$MM/coco/` holds the single-class annotations (the class-agnostic task) and
+After this, `$MM/coco/` holds the single-class annotations (used with `--root $MM/coco`) and
 `$MM/coco_multiclass/` the 57-class ones (everything else).
 
-Step 5 also links `coco/<split>/` into the multiclass root. That link is load-bearing, not
-cosmetic: the harness picks the `tensors/` data prefix by testing whether `<root>/<split>/tensors`
-exists, and the memmap loader reads the split name back out of that path. A multiclass root
-holding only `annotations/` silently resolves the split to `images` and then fails with
-`FileNotFoundError: .../memmap/images.npy`. If you see that error, the split links are missing.
+### Five things about this chain that will silently cost you the benchmark
+
+**The SNR range and the buckets are one choice, not two.** Pass `--snr-buckets` *or*
+`--snr-db-min/--snr-db-max`, never a conflicting pair — the tool now aborts on a mismatch.
+Earlier revisions derived the range from the buckets unconditionally, so a command that passed
+`--snr-db-min -20 --snr-db-max 10` without buckets silently generated over the *default*
+−10…+40 dB span in five buckets. That is a different, much easier benchmark, produced with no
+error and no warning. If you give only the range, buckets are cut into `--snr-num-buckets`
+(default 3) equal parts; the resolved plan is printed at startup — read it.
+
+**`--fast-snr-update` changes both the physics and the random stream.** It replaces TorchSig's
+per-signal spectrogram refinement with commanded time-domain power scaling, and it draws
+`snr_db` from the dataset generator's RNG. The paper used it (`summary.json` records
+`fast_snr_update: true`). Omitting it gives a different dataset from the same seed.
+
+**Step 3 must not write into its own input.** With `--src-root $MM/coco --out-root $MM` the
+output resolves back to `$MM/coco`, and the step would overwrite the `[2,F,T]` tensors it is
+reading with `[3,F,T]` ones — unresumable, and on a re-run it fails on every already-converted
+file. The tool refuses this now; give a separate `--out-root` as above.
+
+**Step 6 links `coco/<split>/` into the multiclass root, and that link is load-bearing.** The
+harness picks the `tensors/` data prefix by testing whether `<root>/<split>/tensors` exists, and
+the memmap loader reads the split name back out of that path. A multiclass root holding only
+`annotations/` resolves the split to `images` and fails with
+`FileNotFoundError: .../memmap/images.npy`.
+
+**Sharding was not released.** The paper's corpus was generated as ten shards merged by
+hardlink (`summary.json` records `merge_mode: hardlink` and `source_shards: shard_000..009`);
+the driver that produced and merged them is not part of this repository, and per-shard seeds
+were never recorded. The commands above generate monolithically. The result is a corpus drawn
+from the same distribution with the same generator settings, **not the same realization** — a
+ten-shard run and a single run consume the RNG differently. Acceptance is therefore statistical,
+via the equivalence check below, not a checksum.
+
+### Check what you built before you train on it
+
+```bash
+python tools/detection_is_easy/validate_coco.py --root $MM
+```
+
+Confirm at minimum: 57 categories with ids 0–56 identical across splits; 50 000/5 000/10 000
+images; per-signal `snr_db` spanning −20…+10 dB and not −10…+40; box widths and heights
+consistent with `duration_frac ∈ [0.005, 0.25]` and `bandwidth_frac ∈ [0.0125, 0.49]`;
+`summary.json` carrying `stft_tensor_stats` with three channels; and `memmap/<split>.npy`
+row count equal to the annotation image count. `summary.json` also records a `provenance`
+block (torchsig version, git commit, seed, argv) — quote it when reporting a reproduction.
 
 If the data does not sit under `<repo-root>/data/`, pass `--memmap-root` / `--raw-root` to the
 training harness and set `IQDET_MEMMAP_ROOT` / `IQDET_RAW_ROOT` / `IQDET_CACHE_ROOT` for
