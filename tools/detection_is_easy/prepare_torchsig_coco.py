@@ -178,19 +178,24 @@ def instance_frequency_bounds(instance: dict[str, Any]) -> tuple[float, float] |
 def create_torchsig_dataset(args: argparse.Namespace, seed: int):
     from torchsig.datasets.datasets import TorchSigIterableDataset
 
+    # The dict form is required: everything below (geometry, SNR range, co-channel
+    # probability) is applied by updating it. The old code fell back to a DatasetMetadata
+    # object on ANY exception, which skipped that whole block and generated with TorchSig's
+    # stock defaults -- silently ignoring every argument this script was given.
     try:
         from torchsig.utils.defaults import TorchSigDefaults
 
         metadata = dict(TorchSigDefaults().default_dataset_metadata)
-    except Exception:
-        from torchsig.datasets.dataset_metadata import DatasetMetadata
-
-        metadata = DatasetMetadata(
-            num_iq_samples_dataset=args.num_iq_samples,
-            fft_size=args.fft_size,
-            num_signals_min=args.num_signals_min,
-            num_signals_max=args.num_signals_max,
-            impairment_level=args.impairment_level,
+    except ImportError as exc:
+        raise RuntimeError(
+            "torchsig.utils.defaults.TorchSigDefaults is unavailable "
+            f"({exc}). This script pins torchsig==2.1.1; a different version changes the "
+            "dataset metadata contract and would silently generate a different benchmark."
+        ) from exc
+    if not isinstance(metadata, dict):
+        raise RuntimeError(
+            f"Expected TorchSigDefaults().default_dataset_metadata to be a dict, got "
+            f"{type(metadata).__name__}. Refusing to generate with unapplied arguments."
         )
 
     if isinstance(metadata, dict):
@@ -234,27 +239,31 @@ def create_torchsig_dataset(args: argparse.Namespace, seed: int):
         transforms.extend(flatten_transforms(getattr(impairments, "dataset_transforms", None)))
         component_transforms.extend(flatten_transforms(getattr(impairments, "signal_transforms", None)))
     except Exception as exc:
-        print(f"[prepare] warning: could not construct TorchSig impairments: {exc}")
+        raise RuntimeError(
+            f"Could not construct TorchSig impairments at level {args.impairment_level}: {exc}. "
+            "Generating without impairments would produce a different benchmark; refusing to "
+            "continue. This script pins torchsig==2.1.1."
+        ) from exc
 
+    # Only seeded signatures are accepted. The previous version also tried unseeded
+    # variants and a bare TorchSigIterableDataset(metadata) -- any TypeError walked
+    # silently down to a dataset with no seed and, at the end, no transforms either,
+    # which makes generation irreproducible without saying so.
     ctor_attempts = [
         dict(metadata=metadata, transforms=transforms, component_transforms=component_transforms, target_labels=None, seed=seed),
-        dict(metadata=metadata, transforms=transforms, component_transforms=component_transforms, target_labels=None),
         dict(dataset_metadata=metadata, transforms=transforms, component_transforms=component_transforms, target_labels=None, seed=seed),
-        dict(dataset_metadata=metadata, transforms=transforms, component_transforms=component_transforms, target_labels=None),
     ]
     last_error: Exception | None = None
     for kwargs in ctor_attempts:
         try:
-            if kwargs is metadata:
-                return TorchSigIterableDataset(metadata)
             return TorchSigIterableDataset(**kwargs)
         except TypeError as exc:
             last_error = exc
-    try:
-        return TorchSigIterableDataset(metadata)
-    except TypeError as exc:
-        last_error = exc
-    raise RuntimeError(f"Could not construct TorchSigIterableDataset: {last_error}")
+    raise RuntimeError(
+        "Could not construct a SEEDED TorchSigIterableDataset. Generation must be "
+        f"reproducible, so no unseeded fallback is attempted. Last error: {last_error}. "
+        "Check that torchsig==2.1.1 is installed (its constructor accepts `seed`)."
+    )
 
 
 def sample_from_dataset(dataset: Any) -> tuple[np.ndarray, list[dict[str, Any]]]:

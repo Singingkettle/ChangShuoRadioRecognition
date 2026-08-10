@@ -60,32 +60,62 @@ def data_subdir(coco_root: Path, split: str) -> str:
     return "images"
 
 
-def apply_tensor_stats(cfg, coco_root: Path) -> None:
+def apply_tensor_stats(cfg, coco_root: Path, *, require: bool = False) -> None:
+    """Inject the dataset's per-channel mean/std into the data preprocessor.
+
+    The STFT3 configs deliberately ship identity statistics (mean 0, std 1) and rely on
+    this function to replace them with the values recorded in the dataset's summary.json.
+    The real values have std ~12.8, so falling through silently means training on
+    unnormalised data -- which looks like a reproduction failure but is a plumbing failure.
+    Every path that declines to apply the statistics now says so out loud, and
+    ``require=True`` turns "config still has identity stats" into a hard error.
+    """
+
+    def _identity(mean, std) -> bool:
+        return (mean is not None and std is not None
+                and all(float(v) == 0.0 for v in mean) and all(float(v) == 1.0 for v in std))
+
+    def _bail(reason: str) -> None:
+        prep = cfg.model.get("data_preprocessor", {}) if "model" in cfg else {}
+        mean, std = prep.get("mean"), prep.get("std")
+        if _identity(mean, std):
+            msg = (f"[tensor-stats] NOT applied ({reason}); the config still carries identity "
+                   f"mean/std, so training would see unnormalised data.")
+            if require:
+                raise SystemExit(msg + " Re-run without --require-tensor-stats to override.")
+            print(msg + " Pass --require-tensor-stats to make this fatal.", flush=True)
+        else:
+            print(f"[tensor-stats] not applied ({reason}); using the config's own mean/std.",
+                  flush=True)
+
     summary_path = coco_root.parent / "summary.json"
     if not summary_path.exists():
-        return
+        return _bail(f"no summary.json at {summary_path}")
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     stats = summary.get("stft_tensor_stats")
     if not stats:
-        return
+        return _bail(f"summary.json has no 'stft_tensor_stats' key")
     if "data_preprocessor" in cfg.model:
         preprocessor_type = str(cfg.model.data_preprocessor.get("type", ""))
         if preprocessor_type == "RawIQFilterbankDetDataPreprocessor":
             # Online raw-IQ front ends have their own statistics after the
             # learnable/Fourier filterbank. Do not overwrite them with offline
             # STFT tensor statistics from the shared COCO annotation root.
+            print("[tensor-stats] skipped for RawIQFilterbankDetDataPreprocessor "
+                  "(front end has its own constants).", flush=True)
             return
         stat_mean = [float(v) for v in stats["mean"]]
         stat_std = [float(max(float(v), 1e-6)) for v in stats["std"]]
         configured_mean = cfg.model.data_preprocessor.get("mean", None)
         if configured_mean is not None and len(configured_mean) != len(stat_mean):
-            print(
-                "[tensor-stats] keeping configured mean/std because summary "
-                f"has {len(stat_mean)} channels but config has {len(configured_mean)}"
+            return _bail(
+                f"summary has {len(stat_mean)} channels but config has {len(configured_mean)}"
             )
-            return
         cfg.model.data_preprocessor.mean = stat_mean
         cfg.model.data_preprocessor.std = stat_std
+        print(f"[tensor-stats] applied from {summary_path}: "
+              f"mean={[round(v, 6) for v in stat_mean]} std={[round(v, 6) for v in stat_std]}",
+              flush=True)
 
 
 def set_num_classes(node, num_classes: int) -> None:

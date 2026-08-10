@@ -60,6 +60,34 @@ def _root_env(var, default):
 MM = _root_env("IQDET_MEMMAP_ROOT", "data/torchsig_hardshort_lowsnr_stft3_memmap")
 RAWDS = _root_env("IQDET_RAW_ROOT", "data/torchsig_hardshort_lowsnr_iq_65k_nvme")
 CACHE = _root_env("IQDET_CACHE_ROOT", "work_dirs/returniq_cache")
+# Pre-decoded raw scenes (<split>/<sample_id>.npy). Written by the export step's
+# --raw-cache-root, and on some machines the only surviving copy of the raw IQ.
+RAWCACHE = Path(os.environ["IQDET_RAW_CACHE_ROOT"]).expanduser().resolve() \
+    if os.environ.get("IQDET_RAW_CACHE_ROOT") else RAWDS / "raw_npy_cache"
+
+
+def raw_scene_path(split: str, sid: str) -> Path:
+    """Locate one scene's raw IQ, preferring the original ``.npz``.
+
+    Falls back to the pre-decoded ``.npy`` cache, which is what remains on machines where
+    the ``.npz`` scenes were deleted after packing. Returns the ``.npz`` path when neither
+    exists, so callers' ``.exists()`` guards keep behaving as before.
+    """
+    npz = RAWDS / "raw" / split / f"{sid}.npz"
+    if npz.exists():
+        return npz
+    npy = RAWCACHE / split / f"{sid}.npy"
+    if npy.exists():
+        return npy
+    return npz
+
+
+def load_raw_iq(path: Path) -> np.ndarray:
+    """Read a scene's complex IQ from either the ``.npz`` or the ``.npy`` layout."""
+    if path.suffix == ".npy":
+        return np.load(path)
+    z = np.load(path)
+    return z["iq"] if "iq" in z else z[list(z.keys())[0]]
 
 
 # ----------------------------- shared channelizer -----------------------------
@@ -205,12 +233,11 @@ def cmd_build(args):
             continue
         r = json.loads(line)
         sid, nq, fs = r["sample_id"], r["num_iq_samples"], r["sample_rate"]
-        rp = RAWDS / "raw" / args.split / f"{sid}.npz"
+        rp = raw_scene_path(args.split, sid)
         if not rp.exists():
             miss += 1
             continue
-        z = np.load(rp)
-        iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         for inst in r["instances"]:
             if inst["category_id"] not in cid2idx:
                 continue
@@ -222,10 +249,25 @@ def cmd_build(args):
             y.append(cid2idx[inst["category_id"]])
         if (k + 1) % 2000 == 0:
             print(f"[build:{args.split}] {k+1}/{len(meta_lines)} samples, {len(y)} snippets", flush=True)
+    # A missing raw tree used to be counted and ignored, so an entirely absent raw/
+    # directory wrote an empty cache and exited 0 -- and the recognizer then trained on
+    # nothing. Refuse to save a cache that is mostly holes.
+    seen = min(args.limit, len(meta_lines)) if args.limit else len(meta_lines)
+    miss_frac = miss / max(seen, 1)
+    if miss_frac > args.max_missing_frac:
+        raise SystemExit(
+            f"[build:{args.split}] {miss} of {seen} scenes had no readable raw IQ "
+            f"({miss_frac:.1%} > --max-missing-frac {args.max_missing_frac:.1%}). Looked under "
+            f"{RAWDS / 'raw' / args.split} (.npz) and {RAWCACHE / args.split} (.npy). "
+            "Refusing to write a hollow cache."
+        )
+    if not y:
+        raise SystemExit(f"[build:{args.split}] produced 0 snippets; nothing to save.")
     CACHE.mkdir(parents=True, exist_ok=True)
     outp = CACHE / f"{args.split}_L{args.L}{'_lim'+str(args.limit) if args.limit else ''}.npz"
     np.savez(outp, X=np.asarray(X, dtype=np.float32), y=np.asarray(y, dtype=np.int64), fs=fs)
-    print(f"[build:{args.split}] saved {outp}  X={np.asarray(X).shape} miss_samples={miss}")
+    print(f"[build:{args.split}] saved {outp}  X={np.asarray(X).shape} "
+          f"miss_samples={miss} ({miss_frac:.2%})")
 
 
 # --------------------------------- model --------------------------------------
@@ -433,10 +475,10 @@ def cmd_bridge(args):
                 if ok:
                     keep2.append(d)
             kept = keep2
-        rp = RAWDS / "raw" / args.split / f"{sid}.npz"
+        rp = raw_scene_path(args.split, sid)
         if kept and rp.exists():
             try:
-                z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+                iq = load_raw_iq(rp)
                 iq_t = torch.from_numpy(np.ascontiguousarray(iq)).to(dev); nq = iq_t.numel()
             except Exception:  # corrupt npz -> keep vision labels for this scene
                 iq_t = None
@@ -972,10 +1014,10 @@ def cmd_oracle(args):
             params.append((int(inst["start_in_samples"]), int(inst["duration_in_samples"]), inst["center_freq"], inst["bandwidth"]))
         if not boxes:
             continue
-        rp = RAWDS / "raw" / args.split / f"{r['sample_id']}.npz"
+        rp = raw_scene_path(args.split, r["sample_id"])
         if not rp.exists():
             continue
-        z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         iq_t = torch.from_numpy(np.ascontiguousarray(iq)).to(dev)
         snips, keep = [], []
         for bi, (s, d_, cf, bw) in enumerate(params):
@@ -1061,10 +1103,10 @@ def cmd_build_jitter(args):
             continue
         r = json.loads(line); nq, fs = r["num_iq_samples"], r["sample_rate"]
         bin_hz = fs / 512.0
-        rp = RAWDS / "raw" / args.split / f"{r['sample_id']}.npz"
+        rp = raw_scene_path(args.split, r["sample_id"])
         if not rp.exists():
             continue
-        z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         iq_t = torch.from_numpy(np.ascontiguousarray(iq)).to(dev)
         for inst in r["instances"]:
             if inst["category_id"] not in cid2idx:
@@ -1123,10 +1165,10 @@ def cmd_build_pred(args):
             glab.append(cid2idx[inst["category_id"]])
         if not gboxes:
             continue
-        rp = RAWDS / "raw" / args.split / f"{sid}.npz"
+        rp = raw_scene_path(args.split, sid)
         if not rp.exists():
             continue
-        z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         iq_t = torch.from_numpy(np.ascontiguousarray(iq)).to(dev)
         pboxes = [[d["bbox"][0]/W, (d["bbox"][0]+d["bbox"][2])/W, 0.5-(d["bbox"][1]+d["bbox"][3]/2)/H, d["bbox"][3]/H] for d in dets]
         iou = time_frequency_iou(torch.tensor(pboxes, dtype=torch.float32), torch.tensor(gboxes, dtype=torch.float32))
@@ -1189,10 +1231,10 @@ def cmd_diag(args):
         if not line.strip():
             continue
         r = json.loads(line); sid, nq, fs = r["sample_id"], r["num_iq_samples"], r["sample_rate"]
-        rp = RAWDS / "raw" / args.split / f"{sid}.npz"
+        rp = raw_scene_path(args.split, sid)
         if not rp.exists():
             continue
-        z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         gboxes, glab, gparams = [], [], []
         for inst in r["instances"]:
             if inst["category_id"] not in cid2idx:
@@ -1349,10 +1391,10 @@ def cmd_diag_quality(args):
             gsnr.append(float(inst.get("snr_db", float("nan"))))
         if not gboxes:
             continue
-        rp = RAWDS / "raw" / args.split / f"{sid}.npz"
+        rp = raw_scene_path(args.split, sid)
         if not rp.exists():
             continue
-        z = np.load(rp); iq = z["iq"] if "iq" in z else z[list(z.keys())[0]]
+        iq = load_raw_iq(rp)
         iq = np.ascontiguousarray(iq)
         iq_t = torch.from_numpy(iq).to(dev); nqs = iq_t.numel()
         pboxes, plab = [], []
@@ -1457,7 +1499,7 @@ def cmd_diag_quality(args):
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
-    b = sub.add_parser("build"); b.add_argument("--split", required=True); b.add_argument("--L", type=int, default=1024); b.add_argument("--limit", type=int, default=0); b.set_defaults(func=cmd_build)
+    b = sub.add_parser("build"); b.add_argument("--split", required=True); b.add_argument("--L", type=int, default=1024); b.add_argument("--limit", type=int, default=0); b.add_argument("--max-missing-frac", type=float, default=0.0, help="Fail if more than this fraction of scenes have no readable raw IQ."); b.set_defaults(func=cmd_build)
     t = sub.add_parser("train"); t.add_argument("--train-cache", required=True); t.add_argument("--val-cache", default=""); t.add_argument("--out", default="recognizer.pth"); t.add_argument("--epochs", type=int, default=40); t.add_argument("--bs", type=int, default=256); t.add_argument("--aug-cfo", type=float, default=0.02); t.add_argument("--seed", type=int, default=20260619); t.set_defaults(func=cmd_train)
     g = sub.add_parser("bridge"); g.add_argument("--hier-coarse-route", action="store_true", help="use coarse head to pick single/multi branch per crop (enables OFDM routing)"); g.add_argument("--input-rep", default="iq", choices=["iq","diff","iqdiff"]); g.add_argument("--split", default="test"); g.add_argument("--baseline-pred", required=True); g.add_argument("--model", default="recognizer.pth"); g.add_argument("--L", type=int, default=1024); g.add_argument("--calibrate", action="store_true"); g.add_argument("--score-thr", type=float, default=0.0); g.add_argument("--limit", type=int, default=0); g.add_argument("--hier-model", default=None, help="use hierarchical recognizer single-branch (e.g. recognizer_hier.pth)"); g.add_argument("--e2e-model", default=None, help="use e2e CFO-refine recognizer (e.g. recognizer_e2e.pth)"); g.add_argument("--refine-model", default=None, help="use learned-CFO-refine recognizer trained on clean+injection (recognizer_refine.pth)"); g.add_argument("--refine-cf", action="store_true", help="sub-bin CF refinement (fine-FFT centroid) before channelize"); g.add_argument("--power-cal", action="store_true", help="4th-power blind CFO calibration (for PSK/QAM)"); g.add_argument("--refine-bw", action="store_true", help="estimate occupied bandwidth from PSD (fixes the dominant deployment-gap cause)"); g.add_argument("--ours-score-recog", action="store_true", help="rank OURS detections by det x recognition confidence (not det score alone)"); g.add_argument("--wbf-iou", type=float, default=1.0, help="WBF: feed channelizer the score-weighted-avg cf/bw of each det IoU-cluster (mAP box set unchanged); cuts cf variance ~1/sqrt(K)"); g.add_argument("--nms-iou", type=float, default=1.0, help="class-agnostic NMS IoU on predicted boxes before recog (dedup redundant detections)"); g.add_argument("--iq-families", default=None, help="comma-separated families routed to return-to-IQ (default psk,qam,ask)"); g.add_argument("--class-nms-iou", type=float, default=1.0, help="per-class NMS IoU applied to EACH method's own labels (symmetric fair dedup)"); g.add_argument("--fidelity-gate-mode", default="off", choices=["off", "gt"], help="route IQ_SET boxes to IQ only if size-fit (bw_ratio) in [lo,hi]; gt=GT bw_ratio (upper-bound, not deployable)"); g.add_argument("--fidelity-gate-lo", type=float, default=0.85); g.add_argument("--fidelity-gate-hi", type=float, default=1.2); g.add_argument("--oracle-fix", default="off", help="UPPER-BOUND box-fix: replace predicted box param(s) with matched GT before channelize. one of off/bw/cf/time/bwcf/bwcftime (substring match)"); g.set_defaults(func=cmd_bridge)
     tr = sub.add_parser("train-refine"); tr.add_argument("--train-cache", required=True); tr.add_argument("--val-cache", required=True); tr.add_argument("--out", default="recognizer_refine.pth"); tr.add_argument("--epochs", type=int, default=45); tr.add_argument("--bs", type=int, default=256); tr.add_argument("--inject-cf", type=float, default=0.05, help="synthetic cf injection range (cycles/sample)"); tr.add_argument("--lam", type=float, default=2.0); tr.add_argument("--seed", type=int, default=20260619); tr.set_defaults(func=cmd_train_refine)

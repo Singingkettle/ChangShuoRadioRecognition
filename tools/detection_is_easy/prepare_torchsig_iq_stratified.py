@@ -10,6 +10,8 @@ import argparse
 import copy
 import json
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -193,14 +195,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bandwidth-max-frac", type=float, default=0.49)
     parser.add_argument("--center-freq-min-frac", type=float, default=-0.40)
     parser.add_argument("--center-freq-max-frac", type=float, default=0.40)
-    parser.add_argument("--snr-db-min", type=float, default=-10.0)
-    parser.add_argument("--snr-db-max", type=float, default=40.0)
+    parser.add_argument("--snr-db-min", type=float, default=None,
+                        help="Lower edge of the SNR range (default -10). Samples are stratified "
+                             "into --snr-num-buckets equal buckets across [min, max].")
+    parser.add_argument("--snr-db-max", type=float, default=None,
+                        help="Upper edge of the SNR range (default 40).")
     parser.add_argument(
         "--snr-buckets",
         type=parse_snr_buckets,
-        default=parse_snr_buckets("-10,0;0,10;10,20;20,30;30,40"),
-        help="Semicolon-separated SNR buckets, for example '-10,0;0,10;10,20'.",
+        default=None,
+        help="Explicit buckets, for example '-20,-10;-10,0;0,10'. Mutually exclusive with "
+             "--snr-db-min/--snr-db-max: pass either the range or the buckets, not both.",
     )
+    parser.add_argument("--snr-num-buckets", type=int, default=3,
+                        help="How many equal buckets to cut [--snr-db-min, --snr-db-max] into "
+                             "when --snr-buckets is not given. The paper used 3.")
     parser.add_argument("--cochannel-overlap-probability", type=float, default=0.1)
     parser.add_argument("--noise-power-db", type=float, default=None)
     parser.add_argument("--max-sample-retries", type=int, default=64)
@@ -213,14 +222,82 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def resolve_snr_stratification(args: argparse.Namespace) -> argparse.Namespace:
+    """Reconcile --snr-db-min/--snr-db-max with --snr-buckets, loudly.
+
+    An earlier version derived the range from the buckets unconditionally, so a command
+    that passed ``--snr-db-min -20 --snr-db-max 10`` without also passing ``--snr-buckets``
+    silently generated over the *default* bucket span instead. That is the difference
+    between the benchmark this repository describes and a much easier one, with no error
+    and no warning. The range and the buckets are now a single choice: give one or the
+    other, never a conflicting pair.
+    """
+    explicit_range = args.snr_db_min is not None or args.snr_db_max is not None
+    if args.snr_buckets is not None:
+        bucket_lo = min(lo for lo, _ in args.snr_buckets)
+        bucket_hi = max(hi for _, hi in args.snr_buckets)
+        if explicit_range:
+            lo = bucket_lo if args.snr_db_min is None else args.snr_db_min
+            hi = bucket_hi if args.snr_db_max is None else args.snr_db_max
+            if (lo, hi) != (bucket_lo, bucket_hi):
+                raise SystemExit(
+                    "[prepare-iq-stratified] --snr-db-min/--snr-db-max "
+                    f"({lo}, {hi}) disagree with the span of --snr-buckets "
+                    f"({bucket_lo}, {bucket_hi}). Pass the range or the buckets, not both."
+                )
+        args.snr_db_min, args.snr_db_max = bucket_lo, bucket_hi
+    else:
+        if args.snr_db_min is None:
+            args.snr_db_min = -10.0
+        if args.snr_db_max is None:
+            args.snr_db_max = 40.0
+        if args.snr_db_max <= args.snr_db_min:
+            raise SystemExit("[prepare-iq-stratified] --snr-db-max must exceed --snr-db-min.")
+        if args.snr_num_buckets < 1:
+            raise SystemExit("[prepare-iq-stratified] --snr-num-buckets must be >= 1.")
+        step = (args.snr_db_max - args.snr_db_min) / args.snr_num_buckets
+        args.snr_buckets = [
+            (args.snr_db_min + i * step, args.snr_db_min + (i + 1) * step)
+            for i in range(args.snr_num_buckets)
+        ]
+    print(
+        "[prepare-iq-stratified] SNR range "
+        f"[{args.snr_db_min}, {args.snr_db_max}] dB in {len(args.snr_buckets)} buckets: "
+        + "; ".join(f"{lo:g},{hi:g}" for lo, hi in args.snr_buckets),
+        flush=True,
+    )
+    return args
+
+
+def generation_provenance(args: argparse.Namespace) -> dict:
+    """Record what actually produced this dataset, so drift is diagnosable later."""
+    try:
+        import torchsig
+
+        torchsig_version = getattr(torchsig, "__version__", "unknown")
+    except Exception:
+        torchsig_version = "not-importable"
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(Path(__file__).resolve().parent),
+            capture_output=True, text=True, timeout=10,
+        ).stdout.strip() or "unknown"
+    except Exception:
+        commit = "unknown"
+    return {
+        "torchsig_version": torchsig_version,
+        "git_commit": commit,
+        "seed": args.seed,
+        "argv": sys.argv,
+        "python": sys.version.split()[0],
+    }
+
+
 def main() -> None:
-    args = apply_dataset_preset(parse_args())
+    args = resolve_snr_stratification(apply_dataset_preset(parse_args()))
     if args.fast_snr_update:
         install_fast_snr_update()
-    # The preset configures the TorchSig geometry; buckets define the actual
-    # SNR range used by each generated sample.
-    args.snr_db_min = min(lo for lo, _ in args.snr_buckets)
-    args.snr_db_max = max(hi for _, hi in args.snr_buckets)
 
     out_root = repo_root() / args.out_root
     if out_root.exists() and args.force:
@@ -261,6 +338,7 @@ def main() -> None:
         "fast_snr_update": bool(args.fast_snr_update),
         "snr_update_method": "time_domain_power_scaling" if args.fast_snr_update else "torchsig_spectrogram_refinement",
         "categories": categories,
+        "provenance": generation_provenance(args),
     }
     (out_root / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(f"[prepare-iq-stratified] wrote {out_root}", flush=True)

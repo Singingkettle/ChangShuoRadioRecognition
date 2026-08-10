@@ -113,25 +113,31 @@ def adapt_loader_expected_channels(node, channels: int | None) -> None:
             adapt_loader_expected_channels(value, channels)
 
 
-def override_pipeline_data_roots(node, memmap_root: str | None, raw_root: str | None) -> None:
+def override_pipeline_data_roots(node, memmap_root: str | None, raw_root: str | None,
+                                 raw_cache_root: str | None = None) -> None:
     """Repoint the heavy data roots baked into a config's Load* transforms.
 
     ``--root`` only moves the COCO annotations. The packed STFT memmap and the raw IQ
     scenes are named separately inside each config (``memmap_root`` / ``raw_root``), so
     a dataset living outside the repository needs these overrides as well.
+    ``raw_cache_root`` points the raw-IQ loader at pre-decoded ``.npy`` scenes; it is set
+    on every transform that accepts a ``raw_root``, since the two travel together.
     """
-    if memmap_root is None and raw_root is None:
+    if memmap_root is None and raw_root is None and raw_cache_root is None:
         return
     if isinstance(node, Mapping):
         if memmap_root is not None and "memmap_root" in node:
             node["memmap_root"] = memmap_root
-        if raw_root is not None and "raw_root" in node:
-            node["raw_root"] = raw_root
+        if "raw_root" in node:
+            if raw_root is not None:
+                node["raw_root"] = raw_root
+            if raw_cache_root is not None:
+                node["raw_cache_root"] = raw_cache_root
         for value in node.values():
-            override_pipeline_data_roots(value, memmap_root, raw_root)
+            override_pipeline_data_roots(value, memmap_root, raw_root, raw_cache_root)
     elif isinstance(node, (list, tuple)):
         for value in node:
-            override_pipeline_data_roots(value, memmap_root, raw_root)
+            override_pipeline_data_roots(value, memmap_root, raw_root, raw_cache_root)
 
 
 def parse_args() -> argparse.Namespace:
@@ -148,6 +154,19 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Override the raw-IQ scene directory named in the config "
              "(used by the raw-IQ input-representation cells).",
+    )
+    parser.add_argument(
+        "--raw-cache-root",
+        default=None,
+        help="Directory of pre-decoded raw-IQ .npy scenes (raw_npy_cache/<split>/<id>.npy). "
+             "Used when the original .npz scenes are not on this machine.",
+    )
+    parser.add_argument(
+        "--require-tensor-stats",
+        action="store_true",
+        help="Fail instead of warning when the dataset's normalisation statistics cannot be "
+             "applied and the config still carries identity mean/std. Recommended for any run "
+             "whose number will be reported.",
     )
     parser.add_argument("--config", default="configs/detection_is_easy/rtmdet_tiny_torchsig_smoke.py")
     parser.add_argument("--work-dir", required=True)
@@ -301,7 +320,7 @@ def main() -> None:
     tensor_channels = stft_tensor_channels(coco_root)
     adapt_stft_channels(cfg, tensor_channels)
     adapt_loader_expected_channels(getattr(cfg, "_cfg_dict", cfg), tensor_channels)
-    apply_tensor_stats(cfg, coco_root)
+    apply_tensor_stats(cfg, coco_root, require=args.require_tensor_stats)
 
     train_ann_split = args.train_ann_split or args.train_split
     train_data_split = args.train_data_split or args.train_split
@@ -328,7 +347,8 @@ def main() -> None:
         loader.dataset.ann_file = f"annotations/instances_{ann_split}.json"
         loader.dataset.data_prefix = dict(img=f"{data_split}/{data_subdir(coco_root, data_split)}/")
         adapt_loader_expected_channels(loader.dataset.pipeline, tensor_channels)
-        override_pipeline_data_roots(loader.dataset.pipeline, args.memmap_root, args.raw_root)
+        override_pipeline_data_roots(loader.dataset.pipeline, args.memmap_root, args.raw_root,
+                                     args.raw_cache_root)
         if loader_name == "train_dataloader" and args.train_sample_limit is not None:
             loader.dataset.indices = args.train_sample_limit
         if loader_name == "val_dataloader" and args.val_sample_limit is not None:

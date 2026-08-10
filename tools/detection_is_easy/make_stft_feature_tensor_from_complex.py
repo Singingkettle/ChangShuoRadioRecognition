@@ -181,6 +181,14 @@ def main() -> None:
     out_arg = ROOT / args.out_root
     out_root = out_arg / "coco" if out_arg.name != "coco" else out_arg
     out_parent = out_root.parent
+    if out_root.resolve() == src_root.resolve():
+        raise SystemExit(
+            f"--src-root and the resolved output ({out_root}) are the same directory. "
+            "This step reads [2,F,T] tensors and writes [3,F,T] tensors to the same file "
+            "names, so running in place destroys its own input and cannot be resumed "
+            "(a half-finished run leaves a mixed 2ch/3ch directory). Pass a different "
+            "--out-root, e.g. --src-root <ds>/coco --out-root <ds>_stft3."
+        )
     if out_parent.exists() and args.force:
         shutil.rmtree(out_parent)
     out_root.mkdir(parents=True, exist_ok=True)

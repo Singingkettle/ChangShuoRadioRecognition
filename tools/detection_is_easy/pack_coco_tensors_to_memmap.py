@@ -183,6 +183,27 @@ def pack_tensor(
     images = ann.get("images", [])
     if not images:
         raise ValueError(f"No images for split {split}")
+    # The memmap row for a scene is NOT looked up -- LoadTensorMemmapFromCOCOStem parses it
+    # out of the trailing integer in the file name (mmdet_plugins._sample_index_from_path),
+    # while this packer writes row i from images[i]. The two agree only while the ids run
+    # 0..N-1 in order. A filtered, reordered or sharded corpus silently pairs every scene
+    # with someone else's spectrogram: training still converges, mAP is just wrong.
+    for position, image in enumerate(images):
+        stem = Path(image["file_name"]).stem
+        try:
+            index = int(stem.rsplit("_", 1)[-1])
+        except ValueError as exc:
+            raise ValueError(
+                f"{split}: cannot parse a sample index out of '{image['file_name']}'. "
+                "The memmap loader needs the trailing integer to find the row."
+            ) from exc
+        if index != position:
+            raise ValueError(
+                f"{split}: image at position {position} is '{image['file_name']}' whose "
+                f"trailing index is {index}. The memmap loader derives the row from that "
+                "index, so a non-contiguous or reordered image list would pair every scene "
+                "with the wrong tensor. Re-export with contiguous ids from zero."
+            )
     src_dir = src_coco / split / "tensors"
     first = np.load(src_dir / images[0]["file_name"], mmap_mode="r")
     shape = (len(images),) + tuple(first.shape)

@@ -21,7 +21,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prepare_torchsig_coco import CANONICAL_CLASS_NAMES  # noqa: E402
 
 
 def _clip(v, lo, hi):
@@ -84,6 +88,8 @@ def main():
     ap.add_argument("--out-dir", required=True, help="where to write multi-class instances_{split}.json")
     ap.add_argument("--splits", default="train,val,test")
     ap.add_argument("--match-tol", type=float, default=3.0, help="max L1 (x,w,h) px distance to accept a metadata match")
+    ap.add_argument("--min-match-rate", type=float, default=0.98,
+                    help="Fail if fewer than this fraction of boxes match a metadata instance.")
     args = ap.parse_args()
 
     dd = Path(args.dataset_dir)
@@ -92,16 +98,35 @@ def main():
     od.mkdir(parents=True, exist_ok=True)
     splits = args.splits.split(",")
 
-    # global category map from all splits' metadata
-    catset = {}
+    # The category space is the CANONICAL one, not whatever happens to appear in this
+    # particular generation. Deriving it from the observed data means a rare class that
+    # was never drawn silently shrinks the label space, which changes num_classes and
+    # makes mAP incomparable with the paper.
+    categories = [
+        {"id": cid, "name": name, "supercategory": "signal"}
+        for cid, name in enumerate(CANONICAL_CLASS_NAMES)
+    ]
+    canonical_ids = {c["id"] for c in categories}
+
+    observed = {}
     for sp in splits:
         for line in (md / f"{sp}.jsonl").read_text(encoding="utf-8").splitlines():
             if not line.strip():
                 continue
             for inst in json.loads(line)["instances"]:
-                catset[int(inst["category_id"])] = inst.get("class_name", str(inst["category_id"]))
-    categories = [{"id": cid, "name": catset[cid], "supercategory": "signal"} for cid in sorted(catset)]
-    print(f"[multiclass] {len(categories)} categories: {[c['name'] for c in categories[:6]]} ...")
+                observed[int(inst["category_id"])] = inst.get("class_name", str(inst["category_id"]))
+    unknown = {cid: nm for cid, nm in observed.items() if cid not in canonical_ids}
+    if unknown:
+        raise SystemExit(
+            f"[multiclass] metadata contains {len(unknown)} category ids outside the canonical "
+            f"{len(CANONICAL_CLASS_NAMES)}-class space: {sorted(unknown.items())[:8]}. "
+            "This usually means a different torchsig version renamed a modulation. "
+            "Refusing to build an incomparable label space."
+        )
+    missing = canonical_ids - set(observed)
+    print(f"[multiclass] {len(categories)} canonical categories; "
+          f"{len(observed)} observed in metadata"
+          + (f"; {len(missing)} never drawn: {sorted(missing)[:8]}" if missing else ""))
 
     for sp in splits:
         sc = json.loads((dd / "coco" / "annotations" / f"instances_{sp}.json").read_text(encoding="utf-8"))
@@ -125,9 +150,20 @@ def main():
                 n_match += 1
                 worst = max(worst, best_d)
                 cat = best_cat
-            else:
+            elif best_cat is not None:
+                # Nearest metadata instance exists but sits outside the tolerance: keep its
+                # class rather than inventing one, and count it as unmatched.
                 miss += 1
-                cat = categories[0]["id"] if best_cat is None else best_cat  # fallback keep box
+                cat = best_cat
+            else:
+                # No metadata instance at all for this image. Relabelling to categories[0]
+                # (as the old code did) silently poisons the training set with a wrong class,
+                # so this is now fatal.
+                raise SystemExit(
+                    f"[{sp}] annotation id={a.get('id')} on image {stem} has no metadata "
+                    "instance to take a class from. The COCO annotations and metadata/ are "
+                    "out of sync; refusing to emit a mislabelled dataset."
+                )
             na = dict(a)
             na["category_id"] = cat
             new_anns.append(na)
@@ -137,8 +173,12 @@ def main():
         rate = n_match / max(n_total, 1)
         print(f"[{sp}] boxes={n_total} matched@(x,w,h)L1<={args.match_tol}px: {n_match} ({rate:.4f}) "
               f"unmatched={miss} worst-matched-dist={worst:.2f}px -> {outp}")
-        if rate < 0.98:
-            print(f"[{sp}] WARNING: match rate < 0.98 -- mapping or alignment may be off; inspect before training.")
+        if rate < args.min_match_rate:
+            raise SystemExit(
+                f"[{sp}] match rate {rate:.4f} < {args.min_match_rate} -- the box mapping or the "
+                "geometry is off, and the resulting labels would be unreliable. Fix the alignment "
+                "or lower --min-match-rate deliberately."
+            )
         link_split_dir(od.parent, dd / "coco", sp)
 
 
