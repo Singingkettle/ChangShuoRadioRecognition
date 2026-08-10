@@ -38,78 +38,303 @@ architecture, as the decisive lever.
 | Wideband data generation (TorchSig) + COCO export + memmap packing | `tools/detection_is_easy/prepare_torchsig_iq_stratified.py`, `export_*_coco_from_raw.py`, `make_stft_feature_tensor_from_complex.py`, `pack_coco_tensors_to_memmap.py`, `build_multiclass_coco.py` |
 | Paper figures + corrected block-SNR analysis | `tools/detection_is_easy/make_figs.py`, `render_example.py`, `analyze_snr_stratified.py`, `analyze_box_quality.py` |
 
+## Environment
+
+```bash
+pip install -r requirements/detection_is_easy.txt
+```
+
+That file pins the versions the paper ran on (torch 2.7.1+cu128, numpy 2.2.6, mmdet 3.3.0,
+mmengine 0.10.7, torchsig 2.1.1) on Ubuntu with 8×RTX 4090.
+
+**One choice changes your numbers: which mmcv you install.** Every reported result was
+produced with `mmcv-lite` — mmcv *without* the compiled `_ext` CUDA ops. The harness detects
+the missing extension and installs a pure-PyTorch NMS fallback (`maybe_stub_mmcv_ext()` in
+`run_mmdet_smoke.py`), and every run records this as `used_mmcv_lite_stub: true` in its
+`run_info.json`; all 268 runs carrying that field have it set. Installing full CUDA mmcv is
+supported and faster, but swaps in a different NMS implementation, so expect small
+differences. Pick one and keep it fixed for the whole comparison.
+
+`torchsig` is only needed to regenerate the dataset. The pin matters there: the generator's
+class taxonomy is what defines the 57 classes.
+
 ## Data
 
-Synthetic wideband captures from TorchSig (custom 57-class configuration; 50k/5k/10k
-train/val/test scenes, 262144 samples each). The heavy generated assets (~191 GB STFT
-memmap, ~128 GB raw IQ) are not shipped; the scripts regenerate them:
+Synthetic wideband captures from TorchSig, generated with a custom configuration:
+**50 000 / 5 000 / 10 000 train/val/test scenes** (65 000 total — the "65k" in the directory
+name is the total, not the training split), 262 144 complex samples per scene at 10 MHz,
+1–6 signals per scene, 57 classes.
+
+Two properties of this configuration are what make the task hard, and both are in the name of
+the dataset directory. `hardshort`: signal durations are 0.5 %–25 % of the observation, so
+each emission occupies a small patch of the spectrogram. `lowsnr`: per-signal SNR is drawn
+from −20 dB to +10 dB, stratified into three equal buckets.
+
+The generated assets are large (~191 GB packed STFT memmap, ~128 GB raw IQ) and are not
+shipped. These five commands rebuild them, with the paper's exact parameters:
 
 ```bash
 cd <repo-root>
-python tools/detection_is_easy/prepare_torchsig_iq_stratified.py ...   # raw IQ scenes
-python tools/detection_is_easy/export_stft_coco_from_raw.py ...        # STFT tensors + COCO
-python tools/detection_is_easy/make_stft_feature_tensor_from_complex.py ...
-python tools/detection_is_easy/pack_coco_tensors_to_memmap.py ...      # fast-train memmap
-python tools/detection_is_easy/build_multiclass_coco.py ...            # 57-class annotations
+DATA=data                       # or an NVMe scratch path
+RAW=$DATA/torchsig_hardshort_lowsnr_iq_65k_nvme
+MM=$DATA/torchsig_hardshort_lowsnr_stft3_memmap
+
+# 1) raw IQ scenes + per-signal metadata  (the slow step; shard it if you can)
+python tools/detection_is_easy/prepare_torchsig_iq_stratified.py \
+  --out-root $RAW \
+  --train 50000 --val 5000 --test 10000 \
+  --num-iq-samples 262144 --sample-rate 10000000 \
+  --num-signals-min 1 --num-signals-max 6 --impairment-level 0 \
+  --fft-size 512 --stft-fft 512 --stft-hop 512 --image-size 512 \
+  --duration-min-frac 0.005 --duration-max-frac 0.25 \
+  --bandwidth-min-frac 0.0125 --bandwidth-max-frac 0.49 \
+  --center-freq-min-frac -0.45 --center-freq-max-frac 0.45 \
+  --snr-db-min -20 --snr-db-max 10 \
+  --cochannel-overlap-probability 0.35 \
+  --seed 20260640
+
+# 2) STFT tensors + single-class ("signal") COCO annotations
+python tools/detection_is_easy/export_stft_coco_from_raw.py \
+  --src-root $RAW --out-root $MM --stft-fft 512 --stft-hop 512 --image-size 512
+
+# 3) 3-channel [real, imag, log-magnitude] feature tensors
+python tools/detection_is_easy/make_stft_feature_tensor_from_complex.py \
+  --src-root $MM/coco --out-root $MM --mode realimag_logpower3ch --workers 8
+
+# 4) pack into the memmap the fast training path reads
+python tools/detection_is_easy/pack_coco_tensors_to_memmap.py \
+  --src-coco $MM/coco --out-root $MM --splits train,val,test --workers 8
+
+# 5) 57-class annotations (the class-aware task) beside the single-class ones
+python tools/detection_is_easy/build_multiclass_coco.py \
+  --dataset-dir $MM --out-dir $MM/coco_multiclass/annotations --splits train,val,test
 ```
 
-## Train / evaluate
+After this, `$MM/coco/` holds the single-class annotations (the class-agnostic task) and
+`$MM/coco_multiclass/` the 57-class ones (everything else).
+
+Step 5 also links `coco/<split>/` into the multiclass root. That link is load-bearing, not
+cosmetic: the harness picks the `tensors/` data prefix by testing whether `<root>/<split>/tensors`
+exists, and the memmap loader reads the split name back out of that path. A multiclass root
+holding only `annotations/` silently resolves the split to `images` and then fails with
+`FileNotFoundError: .../memmap/images.npy`. If you see that error, the split links are missing.
+
+If the data does not sit under `<repo-root>/data/`, pass `--memmap-root` / `--raw-root` to the
+training harness and set `IQDET_MEMMAP_ROOT` / `IQDET_RAW_ROOT` / `IQDET_CACHE_ROOT` for
+`bridge.py`. `--root` alone only moves the annotations.
+
+## Reproducing a number
+
+Three stages. Each produces the input the next one needs.
+
+### Stage 1 — detector
+
+**Training and dumping predictions are two separate calls.** `--dump-results` only sets the
+test evaluator's output prefix; the training call never runs the test loop, so it writes no
+predictions. Train first, then re-invoke in `--eval-only` mode against the checkpoint:
 
 ```bash
-# 0) extra requirements on top of a working CSRR environment
-pip install -r requirements/detection_is_easy.txt
-
-# 1) detector (the ablation): train a 57-class detector, dump test predictions.
-#    Headline metric = the run's coco/bbox_mAP (class-aware, averaged over 57 classes).
+# train (this is the deployment detector: the run every bridged number is computed from)
 python tools/detection_is_easy/run_mmdet_train_eval.py \
-  --root <coco_multiclass> \
+  --root $MM/coco_multiclass \
   --config configs/detection_is_easy/rtmdet_m_stft3_tensor_memmap_resize512.py \
-  --epochs 20 --batch-size 8 --optimizer AdamW --lr 5e-4 --seed 0 --dump-results
-#    swap --config to sweep the axes:
-#      input rep:   rtmdet_m_complex_stft / rtmdet_m_rawiq_fourier_logmag2ch_resize512 (phase out)
-#                   rtmdet_m_rawiq_fourier_realimag_resize512 / *_learnable_* / rtmdet_m_complexiq1d_fftbridge_resize512
-#      complexity:  rtmdet_{tiny,s,m,l}_stft3_tensor_memmap_resize512
-#      family:      fcos_stft3_memmap_resize512 / atss_stft3_memmap_resize512
+  --work-dir work_dirs/baseline_mc_rtmdet_m_20e_seed20262811 \
+  --epochs 20 --batch-size 8 --optimizer config --seed 20262811
 
-# 2) recognizer (CSRR-native): cache channelized crops, then train with the CSRR trainer.
-python tools/detection_is_easy/bridge.py build --split train --L 1024   # (+ val, test)
-python tools/train.py configs/detection_is_easy/returniq_resnet1d_iq_120e_wideband.py
-
-# 3) bridge (deployment): route constellation-family boxes back to raw IQ, re-classify.
-python tools/detection_is_easy/bridge.py bridge \
-  --baseline-pred <test_predictions.bbox.json> \
-  --hier-model recognizer_hier.pth --hier-coarse-route --input-rep iq
-#    `oracle` gives the GT-box upper bound; `diag-quality` dumps per-detection diagnostics.
-
-# 4) figures
-python tools/detection_is_easy/make_figs.py
-python tools/detection_is_easy/render_example.py
+# then dump test predictions from the trained checkpoint
+python tools/detection_is_easy/run_mmdet_train_eval.py \
+  --root $MM/coco_multiclass \
+  --config configs/detection_is_easy/rtmdet_m_stft3_tensor_memmap_resize512.py \
+  --work-dir work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump \
+  --eval-only --checkpoint work_dirs/baseline_mc_rtmdet_m_20e_seed20262811/epoch_20.pth \
+  --dump-results
+# -> work_dirs/..._testdump/source_data/test_predictions.bbox.json
 ```
 
-The 120-epoch AdamW + cosine + EMA + label-smoothing recipe is the lever that lifts
-recognition; a short schedule leaves accuracy on the table and can masquerade as a
-structural limit.
+`--work-dir` is required and has no default. `--optimizer config` keeps the config's own AdamW
+(lr 1e-4); passing `--optimizer AdamW --lr 5e-4` instead selects the *other* recipe — see the
+table below, where the two are the "uniform recipe" and "own schedule" columns.
 
-## Results (3-seed, corrected block-SNR)
+### Stage 2 — recognizer
 
-| Axis | Result |
-|---|---|
-| Localization (class-agnostic) | box mAP ~0.948 — saturated |
-| Class-aware (RTMDet-M, STFT3) | mAP ~0.447 (seed 7; 0.460±0.011) — the gap |
-| Complexity tiny/S/M/L (uniform recipe) | 0.431 / 0.449 / 0.460 / 0.462 — recipe-bound, see paper |
-| Phase test (mag-only vs phase+mag) | tie (0.455±0.023 vs 0.447) — phase reaches the net, no gain |
-| Learned front end (filterbank) | 0.412 < frozen — do not learn the front end |
-| Complex-1D + FFT bridge | collapses (0.026) — FFT of learned features breaks the frequency axis |
-| Return-to-IQ deployment | +0.024 overall (0.522 → 0.546); PSK +0.14, ASK +0.12, QAM +0.08 |
+Cache the channelized crops, then train. The paper's recognizer was trained by `bridge.py`,
+which is what produces a checkpoint `bridge.py bridge` can load:
+
+```bash
+for s in train val test; do
+  python tools/detection_is_easy/bridge.py build --split $s --L 1024
+done   # -> work_dirs/returniq_cache/{train,val,test}_L1024.npz
+
+python tools/detection_is_easy/bridge.py train-hier \
+  --train-cache work_dirs/returniq_cache/train_L1024.npz \
+  --val-cache   work_dirs/returniq_cache/val_L1024.npz \
+  --out work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
+  --epochs 120 --label-smooth 0.1 --cosine --ema 0.999 --aug-cfo 0.02 --seed 101
+```
+
+**`train-hier`'s defaults are the paper's negative result, not its headline.** They are 40
+epochs, no label smoothing, no cosine schedule, no EMA — exactly the under-trained recognizer
+that produced the deployment tie the paper nearly published as a structural limit (clean
+accuracy 0.643 vs 0.869 for the recipe above). The five flags in that command are the finding.
+
+The same recognizer is also available as a first-class CSRR model, trained the usual way:
+
+```bash
+python tools/train.py configs/detection_is_easy/returniq_resnet1d_iq_120e_wideband.py
+```
+
+Use this path to study the architecture inside CSRR. Use `bridge.py train-hier` to reproduce
+the paper: the two save different checkpoint formats, and `bridge.py bridge` reads the latter.
+
+### Stage 3 — deployment bridge
+
+```bash
+python tools/detection_is_easy/bridge.py bridge \
+  --split test \
+  --baseline-pred work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump/source_data/test_predictions.bbox.json \
+  --hier-model work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
+  --L 1024 --score-thr 0.05 --limit 2963 --class-nms-iou 0.5 \
+  --ours-score-recog --iq-families psk,ask,qam
+```
+
+**Do not run this with defaults.** Four of those flags differ from the defaults, and each one
+alone changes the answer:
+
+| flag | default | paper | what the default does |
+|---|---|---|---|
+| `--score-thr` | `0.0` | `0.05` | keeps near-zero-score detections, flooding both methods |
+| `--limit` | `0` (all) | `2963` | scores a different scene set, so numbers are not comparable to the paper |
+| `--class-nms-iou` | `1.0` | `0.5` | **disables** per-class NMS; duplicate boxes inflate both sides asymmetrically |
+| `--ours-score-recog` | off | on | ranks routed detections by detection score alone, discarding recognition confidence |
+
+`oracle` gives the perfect-box upper bound; `diag-quality` writes the per-detection dump that
+Fig. 2 is built from.
+
+## Which cell is which: config, flags, seed, expected value
+
+Every headline number, with what produces it. mAP values are `coco/bbox_mAP` on the **val**
+split unless noted. All detector rows use `--root $MM/coco_multiclass` and
+`run_mmdet_train_eval.py`; "uniform" = `--optimizer AdamW --lr 5e-4`, "own" = `--optimizer config`.
+
+The class-agnostic (localization-only) task needs no separate config: point `--root` at the
+single-class annotations (`$MM/coco`) and the harness reads one category from them and sets
+`num_classes` accordingly.
+
+| paper cell | config | recipe / flags | seed | expected | tol. |
+|---|---|---|---|---|---|
+| Localization is easy (class-agnostic) | `rtmdet_m_stft3_tensor_memmap_resize512.py` | uniform, `--batch-size 8`, **`--root $MM/coco`** | any | ≈0.915 | ±0.01 |
+| Tab. I tiny / uniform | `rtmdet_tiny_stft3_tensor_memmap_resize512.py` | uniform, `--batch-size 8` | 7 | 0.420 | ±0.02 |
+| Tab. I small / uniform | `rtmdet_s_stft3_tensor_memmap_resize512.py` | uniform, `--batch-size 8` | 7 | 0.438 | ±0.02 |
+| Tab. I medium / uniform | `rtmdet_m_stft3_tensor_memmap_resize512.py` | uniform, `--batch-size 8` | 7 | 0.447 | ±0.02 |
+| Tab. I large / uniform | `rtmdet_l_stft3_tensor_memmap_resize512.py` | uniform, `--batch-size 8` | 7 | 0.451 | ±0.02 |
+| Tab. I tiny / own | `rtmdet_tiny_stft3_tensor_memmap_resize512.py` | own, `--batch-size 4` | 20262811 | 0.379 | ±0.04 |
+| Tab. I small / own | `rtmdet_s_stft3_tensor_memmap_resize512.py` | own, `--batch-size 4` | 20262811 | 0.449 | ±0.03 |
+| Tab. I medium / own **(deployment detector)** | `rtmdet_m_stft3_tensor_memmap_resize512.py` | own, **`--batch-size 8`** | 20262811 | 0.521 | ±0.04 |
+| Tab. I large / own | `rtmdet_l_stft3_tensor_memmap_resize512.py` | own, `--batch-size 4` | 20262811 | 0.482 | ±0.02 |
+| Tab. III magnitude-only (phase out) | `rtmdet_m_rawiq_fourier_logmag2ch_resize512.py` | uniform, `--batch-size 6` | 7 | 0.476 | ±0.03 |
+| Tab. III phase + magnitude | `rtmdet_m_raw_iq_filterbank_hardshort_resize512.py` | uniform, `--batch-size 6` | 7 | 0.446 | ±0.02 |
+| Tab. III phase only | `rtmdet_m_rawiq_fourier_realimag_resize512.py` | uniform, `--batch-size 6` | 7 | 0.440 | ±0.02 |
+| Tab. III learnable filterbank | `rtmdet_m_rawiq_learnable_realimag_logmag_resize512.py` | uniform, `--batch-size 6` | 7 | 0.412 | ±0.02 |
+| Tab. III complex-1D + FFT bridge | `rtmdet_m_complexiq1d_fftbridge_resize512.py` | uniform, `--batch-size 6` | 7 | 0.026 | collapse |
+| §VI-B FCOS anchor | `fcos_stft3_memmap_resize512.py` | uniform, `--batch-size 4` | 7 | 0.374 | ±0.02 |
+| §VI-B ATSS anchor | `atss_stft3_memmap_resize512.py` | uniform, `--batch-size 4` | 7 | 0.380 | ±0.02 |
+| §IV-A recognizer, recipe A | — | `train-hier --epochs 120 --label-smooth 0.1 --cosine --ema 0.999 --aug-cfo 0.02` | 101/202/303 | 0.869 clean accuracy | ±0.006 |
+| §VI-D recognizer, 40-epoch predecessor | — | `train-hier` **defaults** (`--epochs 40 --aug-cfo 0.02`) | 101 | 0.643 | ±0.01 |
+| §VI-D deployment, vision → routed | — | the Stage-3 command above | 101/202/303 | 0.522 → 0.546 (+0.024) | ±0.002 on the delta |
+| §VI-D per-family PSK / ASK / QAM | — | same command | 101/202/303 | +0.143 / +0.118 / +0.084 | ±0.011 / ±0.008 / ±0.012 |
+| §VI-D oracle (perfect box) | — | `oracle --with-oracle --limit 2000 --score-thr 0.05` | 101 | 0.420 → 0.608 | ±0.01 |
+
+Two cautions about that table.
+
+The size sweep: the medium/own cell is the best single run in the sweep (0.521), while its
+3-seed mean is 0.477 ± 0.039. The paper reports both, and the spread is why the complexity
+conclusion rests on the uniform column.
+
+The localization row: the paper quotes 0.948 for class-agnostic localization. That value was
+measured on an earlier, easier generator configuration (signal durations 5–100 % of the
+observation, SNR −10 to +20 dB, no co-channel overlap) rather than on the hardshort-lowsnr
+benchmark released here (durations 0.5–25 %, SNR −20 to +10 dB, 35 % co-channel overlap). On
+this benchmark the matched STFT3 single-class run reaches about 0.915, and the best result of
+any recipe is 0.945. The conclusion is unchanged — localization is saturated either way, and
+Fig. 2's localization recall of ≈0.99 is measured on this benchmark's test split — but expect
+≈0.915, not 0.948, when you run the command above.
+
+## Two different metrics are both called "class-aware mAP"
+
+They are not interchangeable, and mixing them is the fastest way to conclude the paper is
+wrong.
+
+- **`coco/bbox_mAP`** — mmdet's `CocoMetric`, averaged over the 57 categories, on the **val**
+  split. This is the detector ablation metric: 0.447, 0.521, 0.476, and every other cell in the
+  table above.
+- **`class_aware_detection_map`** — the time-frequency IoU metric in `iqdet_metrics.py`,
+  computed over the first 2963 **test** scenes. This is the deployment metric: 0.522 → 0.546.
+
+The deployment baseline (0.522) and the detector's val mAP (0.521) are close by coincidence.
+They are different metrics on different splits.
+
+## What counts as a successful reproduction
+
+Training is **not** deterministic: the harness sets `randomness = dict(seed=..., deterministic=False)`,
+so cuDNN picks non-deterministic kernels. Even with the same seed and the same machine, a
+detector re-run lands within roughly ±0.02 class-aware mAP; across seeds the spread is larger
+(the size-sweep cells above carry their measured 2–3-seed standard deviations).
+
+Reproduce the *conclusions*, which are robust, rather than chasing the third decimal:
+
+1. Class-agnostic localization ≈ 0.95 while 57-class mAP ≈ 0.45. The gap is the paper.
+2. Magnitude-only and phase+magnitude tie. Neither wins by more than the seed spread.
+3. The learnable front end loses to the frozen one.
+4. mAP is flat across tiny → large under a fixed recipe.
+5. Routing PSK/ASK/QAM boxes back to IQ gains ≈ +0.02 overall and ≈ +0.1 on PSK.
+6. The recognizer's 120-epoch recipe beats its 40-epoch predecessor by ≈ +0.23 clean accuracy.
+   This is a budget effect, not an architecture effect.
+
+If (1)–(6) hold, the reproduction succeeded even if individual cells differ in the second
+decimal.
+
+## Figures
+
+```bash
+python tools/detection_is_easy/make_figs.py            # Figs. 1, 2, 4, 5 -> figs/*.pdf
+python tools/detection_is_easy/render_example.py \
+  --ann $MM/coco_multiclass/annotations/instances_test.json \
+  --raw $RAW/raw/test \
+  --pred work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump/source_data/test_predictions.bbox.json
+```
+
+`make_figs.py` is self-contained: it reads only the committed `snr_data.csv` beside it, which
+is the output of `analyze_snr_stratified.py` on the recipe-A diagnostic dump. Regenerate that
+CSV with:
+
+```bash
+python tools/detection_is_easy/bridge.py diag-quality \
+  --hier-model work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
+  --baseline-pred <the test dump> --L 1024 --score-thr 0.05 --with-oracle --limit 2000 \
+  --out work_dirs/returniq_cache/box_quality_oracle_rcpA.jsonl
+python tools/detection_is_easy/analyze_snr_stratified.py \
+  --jsonl work_dirs/returniq_cache/box_quality_oracle_rcpA.jsonl --limit 2000
+```
 
 ## Documented deviations / notes
 
 - **Block-SNR correction.** All SNR-stratified results use
-  `block_snr = snr_db + 10*log10(1/(tf*ff))`; do not label results "low-SNR" on the raw axis.
-- **mmcv `_ext` stub.** For CPU-only import/smoke runs, the tools call
-  `maybe_stub_mmcv_ext()` (in `run_mmdet_smoke.py`) to stub compiled mmcv ops.
+  `block_snr = snr_db + 10*log10(1/(tf*ff))`, where `tf` and `ff` are the signal's time and
+  frequency occupancy. The generator's `snr_db` is a whole-observation average and understates
+  visibility by a median of about +16.7 dB. Do not label results "low-SNR" on the raw axis.
+- **mmcv `_ext` stub.** See the environment section: the paper's numbers come from the
+  pure-PyTorch NMS fallback, recorded per run in `run_info.json`.
+- **Normalisation statistics.** The raw-IQ filterbank configs carry per-channel mean/std taken
+  from the offline STFT3 statistics rather than recomputed on their own front-end output. They
+  began as a placeholder and were never revised, so they are what every reported number for
+  those cells was trained with. Treat them as part of the recipe and do not recompute them:
+  both arms of the phase test share the same constants, so the comparison stays fair, but
+  changing them changes the values.
+- **The localization number.** See the caution under the reproduction table: the paper's 0.948
+  comes from an earlier, easier generator configuration; this benchmark gives ≈0.915 for the
+  matched run.
 - **Synthetic provenance.** Classes, boxes, and SNR are generator ground truth; there is no
-  measurement noise floor to hide behind — the recognition gap is structural, and the
-  released configs make every number regenerable.
+  measurement noise floor to hide behind — the recognition gap is structural, and the released
+  configs make every number regenerable.
 
 Licensed under the Apache License, Version 2.0.

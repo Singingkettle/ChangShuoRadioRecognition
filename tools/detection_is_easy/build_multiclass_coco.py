@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 
@@ -54,6 +55,26 @@ def xwh_dist(a, b):
     mirror-flipped per-image between metadata and the render, but x/w/h are preserved, so
     (x,w,h) uniquely identifies which metadata instance a rendered box is (to read its class)."""
     return abs(a[0] - b[0]) + abs(a[2] - b[2]) + abs(a[3] - b[3])
+
+
+def link_split_dir(mc_root: Path, coco_root: Path, split: str) -> None:
+    """Mirror ``coco/<split>/`` into the multiclass root so the root is directly trainable.
+
+    The training harness decides between the ``tensors/`` and ``images/`` data prefix by
+    testing whether ``<root>/<split>/tensors`` exists, and the memmap loader reads the split
+    name back out of that path. A multiclass root holding only ``annotations/`` therefore
+    resolves the split to "images" and then looks for a non-existent ``images.npy``. Linking
+    the split directory across is enough: the per-sample files are never opened, only their
+    names are parsed.
+    """
+    src = coco_root / split
+    dst = mc_root / split
+    if dst.exists() or not src.exists():
+        return
+    try:
+        os.symlink(src, dst, target_is_directory=True)
+    except OSError:                      # no symlink privilege (e.g. Windows): mirror the names
+        (dst / "tensors").mkdir(parents=True, exist_ok=True)
 
 
 def main():
@@ -118,6 +139,7 @@ def main():
               f"unmatched={miss} worst-matched-dist={worst:.2f}px -> {outp}")
         if rate < 0.98:
             print(f"[{sp}] WARNING: match rate < 0.98 -- mapping or alignment may be off; inspect before training.")
+        link_split_dir(od.parent, dd / "coco", sp)
 
 
 if __name__ == "__main__":

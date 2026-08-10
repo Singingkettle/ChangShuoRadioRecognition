@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -197,7 +198,10 @@ are required before any manuscript claim about front-end window sensitivity.
 
 Metric note: {metric_note or "none"}.
 """
-    report_path = ROOT / "paper" / "iteration_reports" / f"{experiment_name}.md"
+    # Beside the run, not in a repo-level paper/ directory: a training run should not create
+    # folders outside its own work-dir. Set IQDET_REPORT_DIR to collect reports elsewhere.
+    report_dir = Path(os.environ["IQDET_REPORT_DIR"]) if os.environ.get("IQDET_REPORT_DIR") else work_dir
+    report_path = report_dir / f"{experiment_name}.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report, encoding="utf-8")
     print(f"[mmdet-summary] wrote {work_dir / 'summary.csv'}")

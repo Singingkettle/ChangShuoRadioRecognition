@@ -10,8 +10,12 @@ _base_ = './rtmdet_m_stft_3ch_resize512.py'
 # on the hardshort-lowsnr 65k raw IQ, 57-class via --root coco_multiclass. This is the A5 (frozen-Fourier)
 # cell and the BASE for the phase-ablation: channel_mode='realimag_logmag' (phase IN) vs a magnitude-only
 # variant (phase OUT). apply_tensor_stats() skips RawIQFilterbank preprocessors, so these mean/std stand.
-# NOTE: mean/std below are PLACEHOLDER (offline STFT3 stats); recompute the raw-IQ->Fourier output stats
-# before the final fair runs. This config is for the data-path smoke first.
+# NOTE ON THE NORMALISATION STATISTICS: mean/std below were carried over from the offline STFT3
+# statistics rather than recomputed on this front end's own output. They started as a placeholder,
+# but every reported number for this cell (and for the magnitude-only cell it is the base of) was
+# trained with exactly these values, so they are part of the published recipe. Do not "fix" them
+# when reproducing -- recomputing them changes the phase-test comparison. The same constants are
+# used by both arms of that test, so the comparison itself stays fair.
 raw_root = 'data/torchsig_hardshort_lowsnr_iq_65k_nvme/raw'
 
 model = dict(

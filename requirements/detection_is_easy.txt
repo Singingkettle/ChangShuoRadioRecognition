@@ -3,16 +3,32 @@
 # toolbox deliberately does NOT depend on. Install these on top of a working
 # CSRR environment (which already provides torch and mmengine).
 #
-# mmcv must be the CUDA-compiled build that matches your torch/CUDA; the version
-# below is the one the paper used. See https://mmcv.readthedocs.io for the
-# matching wheel index.
-mmcv==2.1.0
+# Versions below are the ones the paper actually ran on (server: Ubuntu, CUDA 12.8,
+# Python 3.10, 8x RTX 4090). They are pinned rather than bounded because detection
+# mAP is sensitive to the op implementations underneath.
+#
+# READ THIS BEFORE INSTALLING mmcv
+# --------------------------------
+# Every number in the paper was produced with `mmcv-lite`, i.e. mmcv WITHOUT the
+# compiled `_ext` CUDA ops. The harness detects the missing extension and installs
+# a pure-PyTorch NMS fallback (`maybe_stub_mmcv_ext()` in run_mmdet_smoke.py); each
+# run records this as `used_mmcv_lite_stub: true` in its run_info.json, and all 268
+# runs that carry the field have it set. Installing full CUDA-compiled mmcv instead
+# is supported and faster, but it swaps NMS for a different implementation, so small
+# differences from the reported values are expected. Pick one and keep it fixed.
+mmcv-lite==2.1.0            # what the paper used; replace with mmcv==2.1.0 for the CUDA ops
 mmdet==3.3.0
-pycocotools
-numpy
-scipy
-pillow
-matplotlib
-# For (re)generating the wideband dataset from TorchSig. Only needed to rebuild
-# the data; not needed to train on an existing COCO/memmap cache.
-# torchsig
+mmengine==0.10.7
+
+torch==2.7.1                # +cu128 on the paper's machine
+torchvision==0.22.1         # +cu128
+numpy==2.2.6                # NOTE: numpy 2.x, not 1.x
+scipy==1.15.3
+pycocotools==2.0.11
+pillow==12.2.0
+matplotlib==3.10.9
+
+# For (re)generating the wideband dataset from TorchSig. Only needed to rebuild the
+# data; not needed to train on an existing COCO/memmap cache. The generator's class
+# taxonomy is version-dependent, so this pin is what defines the 57 classes.
+torchsig==2.1.1

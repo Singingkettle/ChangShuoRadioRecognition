@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -44,9 +45,21 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-MM = ROOT / "data" / "torchsig_hardshort_lowsnr_stft3_memmap"
-RAWDS = ROOT / "data" / "torchsig_hardshort_lowsnr_iq_65k_nvme"
-CACHE = ROOT / "work_dirs" / "returniq_cache"
+
+def _root_env(var, default):
+    """Resolve a data root: $IQDET_<var> if set, else the repo-relative default."""
+    v = os.environ.get(var)
+    return Path(v).expanduser().resolve() if v else ROOT / default
+
+
+# Where the three heavy assets live. Override with environment variables when the data
+# sits outside the repository (the usual case: a fast NVMe scratch disk).
+#   IQDET_MEMMAP_ROOT  packed STFT memmap + coco/ + metadata/  (produced by pack_coco_tensors_to_memmap.py)
+#   IQDET_RAW_ROOT     raw IQ scenes                           (produced by prepare_torchsig_iq_stratified.py)
+#   IQDET_CACHE_ROOT   channelized crop caches *_L1024.npz     (produced by `bridge.py build`)
+MM = _root_env("IQDET_MEMMAP_ROOT", "data/torchsig_hardshort_lowsnr_stft3_memmap")
+RAWDS = _root_env("IQDET_RAW_ROOT", "data/torchsig_hardshort_lowsnr_iq_65k_nvme")
+CACHE = _root_env("IQDET_CACHE_ROOT", "work_dirs/returniq_cache")
 
 
 # ----------------------------- shared channelizer -----------------------------

@@ -113,9 +113,42 @@ def adapt_loader_expected_channels(node, channels: int | None) -> None:
             adapt_loader_expected_channels(value, channels)
 
 
+def override_pipeline_data_roots(node, memmap_root: str | None, raw_root: str | None) -> None:
+    """Repoint the heavy data roots baked into a config's Load* transforms.
+
+    ``--root`` only moves the COCO annotations. The packed STFT memmap and the raw IQ
+    scenes are named separately inside each config (``memmap_root`` / ``raw_root``), so
+    a dataset living outside the repository needs these overrides as well.
+    """
+    if memmap_root is None and raw_root is None:
+        return
+    if isinstance(node, Mapping):
+        if memmap_root is not None and "memmap_root" in node:
+            node["memmap_root"] = memmap_root
+        if raw_root is not None and "raw_root" in node:
+            node["raw_root"] = raw_root
+        for value in node.values():
+            override_pipeline_data_roots(value, memmap_root, raw_root)
+    elif isinstance(node, (list, tuple)):
+        for value in node:
+            override_pipeline_data_roots(value, memmap_root, raw_root)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default="data/torchsig_mini/coco")
+    parser.add_argument(
+        "--memmap-root",
+        default=None,
+        help="Override the packed-STFT memmap directory named in the config "
+             "(default: the config's own repo-relative path).",
+    )
+    parser.add_argument(
+        "--raw-root",
+        default=None,
+        help="Override the raw-IQ scene directory named in the config "
+             "(used by the raw-IQ input-representation cells).",
+    )
     parser.add_argument("--config", default="configs/detection_is_easy/rtmdet_tiny_torchsig_smoke.py")
     parser.add_argument("--work-dir", required=True)
     parser.add_argument("--device", default="cuda:0")
@@ -295,6 +328,7 @@ def main() -> None:
         loader.dataset.ann_file = f"annotations/instances_{ann_split}.json"
         loader.dataset.data_prefix = dict(img=f"{data_split}/{data_subdir(coco_root, data_split)}/")
         adapt_loader_expected_channels(loader.dataset.pipeline, tensor_channels)
+        override_pipeline_data_roots(loader.dataset.pipeline, args.memmap_root, args.raw_root)
         if loader_name == "train_dataloader" and args.train_sample_limit is not None:
             loader.dataset.indices = args.train_sample_limit
         if loader_name == "val_dataloader" and args.val_sample_limit is not None:
@@ -347,6 +381,7 @@ def main() -> None:
     cfg.dump(str(generated))
     run_info = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "argv": sys.argv,          # the literal command, for copy-paste reproduction
         "args": vars(args),
         "classes": classes,
         "device": cfg.device,

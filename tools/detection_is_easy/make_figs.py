@@ -7,8 +7,13 @@
 
 """Submission-grade figures for the TCCN paper, unified style (Okabe-Ito colorblind-safe palette,
 serif fonts matched to the IEEEtran Times body, editable vector PDF). Builds: teaser schematic,
-SNR 2-panel, complexity curve, per-family bars. Detection example is rendered separately on the server.
-Run: python paper/tccn/make_figs.py   (outputs paper/tccn/figs/*.pdf)"""
+SNR 2-panel, complexity curve, per-family bars. The detection example (Fig. 3) is rendered
+separately by render_example.py, which needs the dataset and a prediction dump.
+
+Self-contained: every value these figures plot is either a literal in this file or a row of
+snr_data.csv beside it (the committed copy of what analyze_snr_stratified.py emits).
+
+Run: python tools/detection_is_easy/make_figs.py   (writes tools/detection_is_easy/figs/*.pdf)"""
 import os, csv
 import matplotlib
 matplotlib.use("Agg")

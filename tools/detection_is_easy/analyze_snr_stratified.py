@@ -10,15 +10,41 @@
 metadata snr_db is a whole-observation average (signal occupies only ~2% of the time-freq area), so it
 understates the signal's true visibility by the time-freq dilution. We re-label every signal with the
 block-level SNR = snr_db + 10log10(1/(time_frac*freq_frac)) and re-stratify localization recall vs
-class-aware recognition (vision / return-to-IQ / perfect-box) + constellation-family rescue."""
-import json, numpy as np
+class-aware recognition (vision / return-to-IQ / perfect-box) + constellation-family rescue.
+
+Input is the per-detection diagnostic dump written by ``bridge.py diag-quality``. The paper's
+Fig. 2 comes from the recipe-A dump over the first 2000 test scenes:
+
+    python tools/detection_is_easy/bridge.py diag-quality --hier-model <recognizer>.pth \\
+      --L 1024 --score-thr 0.05 --with-oracle --limit 2000 --out box_quality_oracle_rcpA.jsonl
+    python tools/detection_is_easy/analyze_snr_stratified.py --jsonl <that file> --limit 2000
+
+The emitted CSV is the one committed as ``snr_data.csv`` next to this script."""
+import argparse, json, numpy as np
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-MM = ROOT / "data/torchsig_hardshort_lowsnr_stft3_memmap"
-RAWDS = ROOT / "data/torchsig_hardshort_lowsnr_iq_65k_nvme"
-JSONL = ROOT / "work_dirs/returniq_cache/box_quality_oracle.jsonl"
-LIMIT = 2000
+
+_ap = argparse.ArgumentParser(description=__doc__,
+                              formatter_class=argparse.RawDescriptionHelpFormatter)
+_ap.add_argument("--memmap-root", default=str(ROOT / "data/torchsig_hardshort_lowsnr_stft3_memmap"),
+                 help="packed dataset root (supplies coco_multiclass/annotations)")
+_ap.add_argument("--raw-root", default=str(ROOT / "data/torchsig_hardshort_lowsnr_iq_65k_nvme"),
+                 help="raw scene root (supplies metadata/test.jsonl with per-signal snr_db)")
+_ap.add_argument("--jsonl", default=str(ROOT / "work_dirs/returniq_cache/box_quality_oracle.jsonl"),
+                 help="per-detection dump from `bridge.py diag-quality`")
+_ap.add_argument("--limit", type=int, default=2000,
+                 help="number of test scenes; must match the --limit used for the dump")
+_ap.add_argument("--out-dir", default=str(ROOT / "work_dirs/returniq_cache"),
+                 help="where the CSV and PNG are written")
+_args = _ap.parse_args()
+
+MM = Path(_args.memmap_root)
+RAWDS = Path(_args.raw_root)
+JSONL = Path(_args.jsonl)
+LIMIT = _args.limit
+OUT_DIR = Path(_args.out_dir)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 cats = sorted(json.loads((MM / "coco_multiclass/annotations/instances_train.json").read_text())["categories"], key=lambda c: c["id"])
 cid2idx = {c["id"]: i for i, c in enumerate(cats)}
@@ -78,11 +104,11 @@ for i in range(len(EDGES)-1):
         print(f"[{lo:>4},{hi:>4}) {tot:>6} {recall:>9.3f} {va:>8.3f} {ia:>8.3f} {oa:>8.3f} | {cva:>9.3f} {cia:>8.3f}")
         rows.append([lo, hi, tot, recall, va, ia, oa, cva, cia])
 
-with open(ROOT / "work_dirs/returniq_cache/snr_stratified_corrected.csv", "w") as f:
+with open(OUT_DIR / "snr_stratified_corrected.csv", "w") as f:
     f.write("blocksnr_lo,blocksnr_hi,n_gt,loc_recall,vision_recog,IQ_pred,IQ_perfect,constel_vision,constel_IQ\n")
     for r in rows:
         f.write(",".join(f"{x:.4f}" if isinstance(x, float) else str(x) for x in r) + "\n")
-print("\n[saved] work_dirs/returniq_cache/snr_stratified_corrected.csv")
+print(f"\n[saved] {OUT_DIR / 'snr_stratified_corrected.csv'}")
 
 try:
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
@@ -98,7 +124,7 @@ try:
     ax[1].plot(xc, [r[8] for r in rows], "^-", label="constellation: return-to-IQ", lw=2, color="#2ca02c")
     ax[1].set_xlabel("signal-block SNR (dB)  [corrected]"); ax[1].set_ylabel("recognition accuracy"); ax[1].set_ylim(0, 1.02)
     ax[1].set_title("Return-to-IQ rescues constellation families"); ax[1].grid(alpha=0.3); ax[1].legend(fontsize=8)
-    fig.tight_layout(); fig.savefig(ROOT / "work_dirs/returniq_cache/snr_stratified_corrected.png", dpi=130)
-    print("[saved] work_dirs/returniq_cache/snr_stratified_corrected.png")
+    fig.tight_layout(); fig.savefig(OUT_DIR / "snr_stratified_corrected.png", dpi=130)
+    print(f"[saved] {OUT_DIR / 'snr_stratified_corrected.png'}")
 except Exception as e:
     print(f"[plot skipped] {e}")

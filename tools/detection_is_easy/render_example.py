@@ -22,11 +22,20 @@ Two corrections over the first version of this script:
 
 The background spectrogram is recomputed from the scene's raw IQ with the same STFT the
 dataset export used, so it is geometrically identical to the stored tensor.
-Run on the server: python render_example.py
+
+Three inputs are needed; all default to the repo-relative layout and can be pointed
+elsewhere on the command line:
+
+    python tools/detection_is_easy/render_example.py \\
+      --ann  <memmap-root>/coco_multiclass/annotations/instances_test.json \\
+      --raw  <raw-root>/raw/test \\
+      --pred work_dirs/<detector-run>_testdump/source_data/test_predictions.bbox.json
 """
+import argparse
 import json
 import sys
 from collections import defaultdict
+from pathlib import Path
 
 import numpy as np
 
@@ -36,12 +45,22 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 
-MM = ("/tmp/citybuster/IQDet_data/"
-      "torchsig_hardshort_lowsnr_stft512_3ch_singleclass_torchsig_hardshort_lowsnr_iq_65k_nvme_memmap")
-ANN = f"{MM}/coco_multiclass/annotations/instances_test.json"
-RAW = "/tmp/citybuster/IQDet_data/torchsig_hardshort_lowsnr_iq_65k_nvme/raw/test"
-PRED = ("work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump/"
-        "source_data/test_predictions.bbox.json")
+ROOT = Path(__file__).resolve().parents[2]
+
+ap = argparse.ArgumentParser(description=__doc__,
+                             formatter_class=argparse.RawDescriptionHelpFormatter)
+ap.add_argument("--ann", default=str(ROOT / "data/torchsig_hardshort_lowsnr_stft3_memmap"
+                                            "/coco_multiclass/annotations/instances_test.json"),
+                help="57-class COCO annotations for the test split")
+ap.add_argument("--raw", default=str(ROOT / "data/torchsig_hardshort_lowsnr_iq_65k_nvme/raw/test"),
+                help="directory of raw test scenes (<stem>.npz)")
+ap.add_argument("--pred", default=str(ROOT / "work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump"
+                                             "/source_data/test_predictions.bbox.json"),
+                help="detector prediction dump (run_mmdet_train_eval.py --eval-only --dump-results)")
+ap.add_argument("--out", default=str(ROOT / "fig3_example.pdf"), help="output PDF")
+args = ap.parse_args()
+
+ANN, RAW, PRED = args.ann, args.raw, args.pred
 N_FFT = HOP = IMG = 512
 
 # paper colour contract: green = ground truth, blue = vision head
@@ -120,11 +139,13 @@ ax.set_xticks([]); ax.set_yticks([])
 ax.legend(handles=[Line2D([0], [0], color=GT_C, lw=LW_GT, label="ground truth"),
                    Line2D([0], [0], color=PR_C, lw=LW_PR, ls=(0, (4, 2)), label="prediction")],
           loc="upper right")
-fig.savefig("work_dirs/detection_example.pdf")
-fig.savefig("work_dirs/detection_example.png", dpi=400)
+out = Path(args.out)
+out.parent.mkdir(parents=True, exist_ok=True)
+fig.savefig(out)
+fig.savefig(out.with_suffix(".png"), dpi=400)
 n_wrong = sum(1 for a in gts
               if cats[a["category_id"]] not in
               [cats[p["category_id"]] for p in sorted(preds_by_img.get(pick, []),
                                                       key=lambda d: -d["score"])[:len(gts)]])
-print(f"SAVED detection_example.pdf/png  scene={pick} ({im['file_name']}) "
+print(f"SAVED {out} (+ .png)  scene={pick} ({im['file_name']}) "
       f"n_gt={len(gts)} labels_not_matched={n_wrong}")
