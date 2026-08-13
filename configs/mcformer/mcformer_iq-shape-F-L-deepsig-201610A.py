@@ -1,3 +1,5 @@
+# Transformer encoder (MCformer) for AMC on I/Q.
+# Paper: "MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification", IEEE Commun. Lett. (2022).
 _base_ = [
     '../_base_/datasets/deepsig/iq-shape-F-L-deepsig201610A.py',
     '../_base_/schedules/amc.py',

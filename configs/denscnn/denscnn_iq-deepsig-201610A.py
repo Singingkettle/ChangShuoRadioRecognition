@@ -1,3 +1,5 @@
+# DenseNet-style AMC CNN (DensCNN) on I/Q.
+# Paper: "Deep Neural Network Architectures for Modulation Classification", IEEE Asilomar (2017).
 _base_ = [
     '../_base_/datasets/deepsig/iq-deepsig201610A.py',
     '../_base_/schedules/amc.py',

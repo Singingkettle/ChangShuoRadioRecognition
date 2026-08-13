@@ -1,3 +1,5 @@
+# Parallel-fusion 1-D CNN (A/P branches) for AMC.
+# Paper: "Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks".
 _base_ = [
     '../_base_/datasets/deepsig/ap-deepsig201610A.py',
     '../_base_/schedules/amc.py',

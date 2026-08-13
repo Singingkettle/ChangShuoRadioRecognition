@@ -1,3 +1,5 @@
+# CGDNet CNN–GRU hybrid AMC on I/Q.
+# Paper: "CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition", IEEE Commun. Lett. (2021).
 _base_ = [
     '../_base_/datasets/deepsig/iq-l2norm-deepsig201610A.py',
     '../_base_/schedules/amc.py',

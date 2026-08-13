@@ -15,28 +15,29 @@ CSRR (ChangShuoRadioRecognition) is an open source Automatic Modulation Classifi
 
 | Method | Paper |
 |--------|-------|
-| [CGDNet](configs/cgdnet) | [CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition](https://ieeexplore.ieee.org/abstract/document/9349627) |
-| [CLDNNW](configs/cldnnw) | [Deep architectures for modulation recognition](https://ieeexplore.ieee.org/abstract/document/7920754) |
-| [CLDNNL](configs/cldnnl) | [Deep Neural Network Architectures for Modulation Classification](https://ieeexplore.ieee.org/document/8335483) |
-| [CNN1DPF](configs/cnn1dpf) | [Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks](https://lirias.kuleuven.be/retrieve/546033) |
-| [CNN2](configs/cnn2) | [Convolutional Radio Modulation Recognition Networks](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16) |
-| [CNN4](configs/cnn4) | [Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels](https://ieeexplore.ieee.org/abstract/document/9128408) |
-| [DAE](configs/dae) | [Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder](https://ieeexplore.ieee.org/abstract/document/9487492) |
-| [DensCNN](configs/denscnn) | [Deep Neural Network Architectures for Modulation Classification](https://ieeexplore.ieee.org/document/8335483) |
+| [CGDNet](configs/cgdnet) | [CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition](docs/cgdnet) |
+| [CLDNNW](configs/cldnnw) | [Deep architectures for modulation recognition](docs/cldnnw) |
+| [CLDNNL](configs/cldnnl) | [Deep Neural Network Architectures for Modulation Classification](docs/cldnnl) |
+| [CNN1DPF](configs/cnn1dpf) | [Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks](docs/cnn1dpf) |
+| [CNN2](configs/cnn2) | [Convolutional Radio Modulation Recognition Networks](docs/cnn2) |
+| [CNN4](configs/cnn4) | [Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels](docs/cnn4) |
+| [DAE](configs/dae) | [Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder](docs/dae) |
+| [DensCNN](configs/denscnn) | [Deep Neural Network Architectures for Modulation Classification](docs/denscnn) |
 | [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](docs/detection_is_easy) |
-| [DSCLDNN](configs/dscldnn) | [Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure](https://ieeexplore.ieee.org/document/9220797) |
-| [FastMLDNN](configs/fastmldnn) | [A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/10239249) |
-| [GRU2](configs/gru2) | [Automatic modulation classification using recurrent neural networks](https://ieeexplore.ieee.org/abstract/document/8322633) |
-| [HCGDNN](configs/hcgdnn) | [A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/document/9764618) |
-| [LSTM2](configs/lstm2) | [Deep Learning Models for Wireless Signal Classification With Distributed Low-Cost Spectrum Sensors](https://ieeexplore.ieee.org/abstract/document/8357902) |
-| [IC-AMCNet](configs/icamcnet) | [CNN-Based Automatic Modulation Classification for Beyond 5G Communications](https://ieeexplore.ieee.org/abstract/document/8977561) |
+| [DSCLDNN](configs/dscldnn) | [Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure](docs/dscldnn) |
+| [FastMLDNN](configs/fastmldnn) | [A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification](docs/fastmldnn) |
+| [GRU2](configs/gru2) | [Automatic modulation classification using recurrent neural networks](docs/gru2) |
+| [HCGDNN](configs/hcgdnn) | [A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification](docs/hcgdnn) |
+| [LSTM2](configs/lstm2) | [Deep Learning Models for Wireless Signal Classification With Distributed Low-Cost Spectrum Sensors](docs/lstm2) |
+| [IC-AMCNet](configs/icamcnet) | [CNN-Based Automatic Modulation Classification for Beyond 5G Communications](docs/icamcnet) |
 | [JDM](configs/jdm) | [Joint Signal Detection and Automatic Modulation Classification via Deep Learning](docs/jdm) |
-| [MCformer](configs/mcformer) | [MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/9685815) |
-| [MCLDNN](configs/mcldnn) | [A Spatiotemporal Multi-Channel Learning Framework for Automatic Modulation Recognition](https://ieeexplore.ieee.org/abstract/document/9106397) |
-| [MCNET](configs/mcnet) | [MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/8963964) |
-| [MLDNN](configs/mldnn) | [Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/document/9462447) |
-| [PET-CGDNN](configs/petcgdnn) | [An Efficient Deep Learning Model for Automatic Modulation Recognition Based on Parameter Estimation and Transformation](https://ieeexplore.ieee.org/abstract/document/9507514) |
-| [TRN](configs/trn) | [Signal Modulation Classification Based on the Transformer Network](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340) |
+| [MCformer](configs/mcformer) | [MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification](docs/mcformer) |
+| [MCLDNN](configs/mcldnn) | [A Spatiotemporal Multi-Channel Learning Framework for Automatic Modulation Recognition](docs/mcldnn) |
+| [MCNET](configs/mcnet) | [MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification](docs/mcnet) |
+| [MLDNN](configs/mldnn) | [Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification](docs/mldnn) |
+| [PET-CGDNN](configs/petcgdnn) | [An Efficient Deep Learning Model for Automatic Modulation Recognition Based on Parameter Estimation and Transformation](docs/petcgdnn) |
+| [ResNetAMR](configs/resnetamr) | [Deep Neural Network Architectures for Modulation Classification (ResNet)](docs/resnetamr) |
+| [TRN](configs/trn) | [Signal Modulation Classification Based on the Transformer Network](docs/trn) |
 
 ## Installation
 

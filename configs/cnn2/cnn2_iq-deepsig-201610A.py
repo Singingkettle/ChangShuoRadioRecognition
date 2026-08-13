@@ -1,3 +1,5 @@
+# O’Shea CNN1 (CSRR CNN2) for radio modulation recognition on I/Q.
+# Paper: "Convolutional Radio Modulation Recognition Networks", IntelliSys / Springer (2016).
 _base_ = [
     '../_base_/schedules/amc.py',
     '../_base_/runtimes/amc.py'
