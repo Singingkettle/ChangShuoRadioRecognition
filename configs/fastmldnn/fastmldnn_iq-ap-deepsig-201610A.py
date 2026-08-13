@@ -1,3 +1,5 @@
+# Fast multi-loss DNN (own method) on I/Q + A/P; paper-native 50/10/40.
+# Paper: "A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification", IEEE TCCN (2023).
 _base_ = [
     './iq-ap-deepsig201610A.py',
     './runtimes.py',

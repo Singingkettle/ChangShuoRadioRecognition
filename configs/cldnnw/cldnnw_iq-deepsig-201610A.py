@@ -1,3 +1,5 @@
+# West/O’Shea CLDNN (CSRR CLDNNW) on I/Q; ZeroPad restored to match TF.
+# Paper: "Deep architectures for modulation recognition", IEEE DySPAN (2017).
 _base_ = [
     '../_base_/datasets/deepsig/iq-l2norm-deepsig201610A.py',
     '../_base_/schedules/amc.py',

@@ -1,3 +1,5 @@
+# Efficient M-block CNN (MCNet) for robust AMC on I/Q.
+# Paper: "MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification", IEEE Commun. Lett. (2020).
 _base_ = [
     '../_base_/datasets/deepsig/iq-deepsig201610A.py',
     '../_base_/schedules/amc.py',

@@ -1,3 +1,5 @@
+# Transformer network for modulation classification on image-like inputs.
+# Paper: "Signal Modulation Classification Based on the Transformer Network", IEEE TCCN (2022).
 _base_ = [
     './data_img-deepsig201610A.py',
     './schedule.py',

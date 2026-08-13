@@ -1,3 +1,5 @@
+# Multipath CNN (CSRR CNN4) for robust AMC on I/Q.
+# Paper: "Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels", IEEE VTC (2020).
 _base_ = [
     '../_base_/datasets/deepsig/iq-deepsig201610A.py',
     '../_base_/schedules/amc.py',
