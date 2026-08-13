@@ -2,7 +2,7 @@
 # signal-detection module. Frames are the stored wideband_data (received
 # frame, noise applied once); the detector consumes the fftshift-ed FFT
 # (amplitude + phase).
-data_root = '/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026'
+data_root = 'data/ChangShuoTwc2026'
 dataset_type = 'CSRDDetectionDataset'
 
 # Deterministic per-version 50/10/40 split (repo convention); no split files

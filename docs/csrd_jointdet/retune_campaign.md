@@ -322,7 +322,7 @@ python tools/jdm/retune_sweep.py \
   --manifest configs/jdm/experiments/retune/wave3_manifest.json --dry-run
 
 # Execute on GPU 1 only (AMR retains GPU 0)
-nohup /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python \
+nohup python \
   tools/jdm/retune_sweep.py \
   --manifest configs/jdm/experiments/retune/wave3_manifest.json \
   --goal-mode --gpu 1 --max-parallel 1 \
@@ -430,7 +430,7 @@ python tools/jdm/retune_sweep.py --goal-status
 
 # P2 joint: merge Track B det + wave3b AMC → fuse_scores test (GPU1)
 # Log: work_dirs/jdm/retune/joint_wave3b_amc.log
-PYTHON=/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python
+PYTHON=python
 $PYTHON tools/merge_jdm_checkpoints.py \
   work_dirs/jdm/retune/det_wave3b_5ep_lr1e3/best_detection_mAP_epoch_5.pth \
   work_dirs/jdm/retune/amc_wave3b_detprops_30ep/best_accuracy_top1_epoch_23.pth \
@@ -451,13 +451,13 @@ CUDA_VISIBLE_DEVICES=1 $PYTHON tools/test_det.py \
 ```bash
 # P0-A: empirical anchors, 30 epochs (GPU 0)
 CUDA_VISIBLE_DEVICES=0 nohup \
-  /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python \
+  python \
   tools/train.py configs/jdm/experiments/retune/det_30ep_anchor096146_bw20.py \
   > work_dirs/jdm/retune/det_30ep_anchor096146_bw20/train.log 2>&1 &
 
 # P0-B: paper anchors, 30 epochs (GPU 1)
 CUDA_VISIBLE_DEVICES=1 nohup \
-  /home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python \
+  python \
   tools/train.py configs/jdm/experiments/retune/det_30ep_anchor110130150_bw20.py \
   > work_dirs/jdm/retune/det_30ep_anchor110130150_bw20/train.log 2>&1 &
 ```

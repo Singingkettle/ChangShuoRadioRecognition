@@ -3,8 +3,8 @@
 Date: 2026-07-06
 
 Scope: compare the JDM paper (Xing et al., IEEE TWC 2024, arXiv:2405.00736) against
-on-disk data at `/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026` and the
-`twc` generator in `~/Projects/ChangShuoRadioData-twc`.
+on-disk data at `data/ChangShuoTwc2026` and the
+`twc` generator in `ChangShuoRadioData (twc/)`.
 
 ## Summary
 
@@ -109,7 +109,7 @@ absolute mAP levels are not strictly comparable without the authors' split files
 
 The 2026 export fixes wideband noise stacking (`wideband_data` policy, commit
 `78b086b` in local `ChangShuoRadioData-twc`). The old 2024 export at
-`/home/citybuster/Data/WirelessRadio/data/ChangShuo` has the same 124×1000 scale and
+`the 2024-05 CSRD export` has the same 124×1000 scale and
 similar bandwidth clusters but different noise/SNR semantics on some version classes.
 **Prefer `ChangShuoTwc2026` for all new JDM work.**
 
@@ -132,17 +132,17 @@ retune on this export; document deviations in every results table.
 
 ```bash
 # Full scale + distribution scan
-/home/citybuster/Applications/conda/envs/ChangShuoRadioRecognition/bin/python \
+python \
   tools/jdm/retune_sweep.py --audit-dataset
 
 # SNR verification (AWGN versions)
 python tools/misc/verify_csrd_snr.py \
-  --data-root /home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026
+  --data-root data/ChangShuoTwc2026
 ```
 
 ## References
 
 - `docs/csrd_jointdet/paper_and_history_notes.md` — paper protocol summary
 - `docs/csrd_jointdet/dataset_generation.md` — regen protocol & noise fix
-- `~/Projects/ChangShuoRadioData-twc/twc/generate.m` — ground-truth generator logic
+- `ChangShuoRadioData (twc/)/twc/generate.m` — ground-truth generator logic
 - `csrr/datasets/csrd.py` — split & loading code

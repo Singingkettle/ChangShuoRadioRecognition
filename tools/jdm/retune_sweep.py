@@ -75,8 +75,7 @@ DEFAULT_RETUNE_ROOT = _REPO_ROOT / "work_dirs" / "jdm" / "retune"
 DEFAULT_GOALS_PATH = _REPO_ROOT / "configs" / "jdm" / "retune" / "goals.json"
 GOAL_STATUS_PATH = DEFAULT_RETUNE_ROOT / "GOAL_STATUS.json"
 
-DEFAULT_DATA_ROOT = Path(
-    "/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026")
+DEFAULT_DATA_ROOT = _REPO_ROOT / "data" / "ChangShuoTwc2026"
 
 _LOG = logging.getLogger("jdm.retune")
 

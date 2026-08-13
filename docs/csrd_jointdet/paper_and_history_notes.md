@@ -145,7 +145,7 @@ directly reusable mmengine-2.x code. Everything below is a clean-room rewrite.
 
 ## 3. Dataset on disk
 
-`/home/citybuster/Data/WirelessRadio/data/ChangShuo/` (symlinked into the repo as
+`the 2024-05 CSRD export/` (symlinked into the repo as
 `data/ChangShuo`), 124 version directories `v1 … v124`, ≈69 MB each (~8.5 GB total).
 This is the CSRD/`twc`-style output matching the paper's CRML23 recipe:
 

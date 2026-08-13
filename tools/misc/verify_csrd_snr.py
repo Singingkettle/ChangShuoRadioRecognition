@@ -13,7 +13,7 @@ frame and compares the measured SNR against the labeled SNR:
 Example::
 
     python tools/misc/verify_csrd_snr.py \
-        --data-root /home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026 \
+        --data-root data/ChangShuoTwc2026 \
         --versions v79 v84 v89 v94 v98
 """
 import argparse

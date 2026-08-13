@@ -2,7 +2,7 @@
 # classification module. One sample per annotated signal: the frame is
 # band-filtered around the ground-truth (center frequency, bandwidth) and
 # shifted to baseband, mirroring the proposal filtering used at inference.
-data_root = '/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026'
+data_root = 'data/ChangShuoTwc2026'
 dataset_type = 'CSRDModulationDataset'
 
 classes = ('16QAM', '64QAM', '8PSK', 'BPSK', 'QPSK')

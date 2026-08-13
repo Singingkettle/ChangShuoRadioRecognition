@@ -1,7 +1,11 @@
 # JDM Goal Mode
 
-Goal mode drives the JDM retune campaign until active P0/P1 numeric targets are
-met or the manifest queue is exhausted.
+**Campaign closed.** Paper-protocol detection simulate and AMC are met; further
+numeric siege is not productive. See [`README.md`](README.md#results).
+The notes below are the search log that produced the operating point.
+
+Goal mode drove the JDM retune campaign until active P0/P1 numeric targets were
+met or the manifest queue was exhausted.
 
 **Orchestrator:** `tools/jdm/retune_sweep.py`  
 **Goals config:** `configs/jdm/retune/goals.json`  

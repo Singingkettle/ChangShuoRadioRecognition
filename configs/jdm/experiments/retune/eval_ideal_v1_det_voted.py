@@ -1,11 +1,11 @@
-# Ideal (v1) detector eval at the box-voting operating point (2026-07-29).
+# Ideal (v1) detector eval at the box-voting operating point.
 #
-# Identical protocol to eval_ideal_v1_det_testonly.py, but enables the
-# narrative-neutral inference-time box voting (weighted box fusion) that lifts
-# high-IoU AP where the paper gap sits: ideal det mAP 0.759 -> 0.824.
-# The exact-paper NMS version stays in eval_ideal_v1_det_testonly.py.
+# Identical protocol to eval_ideal_v1_det_testonly.py, plus inference-time
+# box voting. vote_score_pow=4.5 is the promoted OP (ideal det mAP 0.8254).
+# Exact-paper NMS stays in eval_ideal_v1_det_testonly.py.
 _base_ = 'eval_ideal_v1_det_testonly.py'
 
-model = dict(head=dict(test_cfg=dict(box_voting=True, vote_iou_thr=0.75)))
+model = dict(head=dict(test_cfg=dict(
+    box_voting=True, vote_iou_thr=0.75, vote_score_pow=4.5)))
 
 work_dir = 'work_dirs/jdm/retune/eval_ideal_v1_det_voted'

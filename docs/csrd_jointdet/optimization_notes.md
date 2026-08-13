@@ -60,7 +60,7 @@ Date: 2026-07-04
 
 ## Baseline
 
-Dataset: `/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026`
+Dataset: `data/ChangShuoTwc2026`
 
 Detector checkpoint:
 `work_dirs/jdm/jdm-det_fft-csrd/best_detection_mAP_epoch_2.pth`

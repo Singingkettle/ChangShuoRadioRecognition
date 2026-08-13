@@ -30,7 +30,7 @@ averages over classes, matching the aggregate class-aware joint mAP.
 The regenerated CSRD data root used by the JDM configs is:
 
 ```bash
-/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026
+data/ChangShuoTwc2026
 ```
 
 Detector-only test with SNR curve:
