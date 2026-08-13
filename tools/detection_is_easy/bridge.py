@@ -83,11 +83,24 @@ def raw_scene_path(split: str, sid: str) -> Path:
 
 
 def load_raw_iq(path: Path) -> np.ndarray:
-    """Read a scene's complex IQ from either the ``.npz`` or the ``.npy`` layout."""
+    """Read a scene's complex IQ from either the ``.npz`` or the ``.npy`` layout.
+
+    A ``.npz`` left truncated by an interrupted generation run raises deep inside zipfile
+    with no file name attached, which used to abort a multi-hour cache build on a single
+    bad scene. Fall back to the decoded cache when one exists, and name the file when it
+    does not.
+    """
     if path.suffix == ".npy":
         return np.load(path)
-    z = np.load(path)
-    return z["iq"] if "iq" in z else z[list(z.keys())[0]]
+    try:
+        z = np.load(path)
+        return z["iq"] if "iq" in z else z[list(z.keys())[0]]
+    except Exception as exc:
+        cached = RAWCACHE / path.parent.name / f"{path.stem}.npy"
+        if cached.exists():
+            print(f"[raw] {path} is unreadable ({exc}); falling back to {cached}", flush=True)
+            return np.load(cached)
+        raise RuntimeError(f"cannot read raw IQ scene {path}: {exc}") from exc
 
 
 # ----------------------------- shared channelizer -----------------------------
