@@ -30,7 +30,7 @@ CSRR（ChangShuoRadioRecognition）是一个基于 PyTorch 和 [MMEngine](https:
 | [HCGDNN](configs/hcgdnn) | [A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/document/9764618) |
 | [LSTM2](configs/lstm2) | [Deep Learning Models for Wireless Signal Classification With Distributed Low-Cost Spectrum Sensors](https://ieeexplore.ieee.org/abstract/document/8357902) |
 | [IC-AMCNet](configs/icamcnet) | [CNN-Based Automatic Modulation Classification for Beyond 5G Communications](https://ieeexplore.ieee.org/abstract/document/8977561) |
-| [JDM](configs/jdm) | [Joint Signal Detection and Automatic Modulation Classification via Deep Learning](docs/csrd_jointdet) |
+| [JDM](configs/jdm) | [Joint Signal Detection and Automatic Modulation Classification via Deep Learning](docs/jdm) |
 | [MCformer](configs/mcformer) | [MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/9685815) |
 | [MCLDNN](configs/mcldnn) | [A Spatiotemporal Multi-Channel Learning Framework for Automatic Modulation Recognition](https://ieeexplore.ieee.org/abstract/document/9106397) |
 | [MCNET](configs/mcnet) | [MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification](https://ieeexplore.ieee.org/abstract/document/8963964) |

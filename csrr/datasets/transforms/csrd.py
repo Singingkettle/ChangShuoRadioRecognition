@@ -25,7 +25,7 @@ class LoadCSRDFrame(BaseTransform):
     older exports whose per-signal components each embedded the (same)
     wideband noise vector, summing stacked that noise ``num_signals``
     times, silently degrading the effective SNR far below the label
-    (see docs/csrd_jointdet/dataset_generation.md).
+    (see docs/jdm/dataset_generation.md).
 
     **Added keys**: ``iq`` (float32, shape (2, L)); optionally
     ``signal_components`` (float32, shape (num_signals, 2, L)).

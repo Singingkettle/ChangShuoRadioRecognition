@@ -329,4 +329,4 @@ classifier-side robustness attack for the simulate joint gap
 5. Declare mismatch ceiling when signal-count / split prevent AR@k or ideal bars.
 6. Do **not** treat full-124 mixed test as Fig. 8/13 simulate.
 
-Artifacts live under `docs/csrd_jointdet/paper_assets/` (PDF + `figs/`).
+Do not vendor the PDF or rasterized pages; keep a local copy outside git.

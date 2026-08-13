@@ -2,7 +2,7 @@
 """Provenance helper for paper figure digitization.
 
 Rasterizes a local copy of arXiv:2405.00736 (not vendored in this repo) and
-points at docs/csrd_jointdet/paper_figure_targets.md.
+points at docs/jdm/paper_figure_targets.md.
 Does not auto-OCR radar charts; numeric tables are hand-digitized (±0.03–0.04).
 """
 from __future__ import annotations
@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[2]
-_TARGETS = _REPO / "docs/csrd_jointdet/paper_figure_targets.md"
+_TARGETS = _REPO / "docs/jdm/paper_figure_targets.md"
 
 
 def main() -> None:

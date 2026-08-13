@@ -3,7 +3,7 @@
 本文规定一篇新论文的代码如何规范地放进 ChangShuoRadioRecognition (CSRR)。
 
 **算法短名 = `configs/` 下的目录名。** 这是该方法在本仓库的唯一代号。tools
-目录、分支名、README Method 列的链接都跟它走,不要再发明第二个名字,也不要
+目录、docs 目录、分支名、README 两列链接都跟它走,不要再发明第二个名字,也不要
 改已经进仓库的目录名。
 
 原则:**一篇论文 = `configs/<算法名>/` + `tools/<算法名>/` + `docs/<算法名>/`
@@ -12,9 +12,7 @@
 
 参考样例:
 
-- **JDM**:算法名就是 `jdm`。配置在 `configs/jdm/`,工具在 `tools/jdm/`。
-  文档因历史原因在 `docs/csrd_jointdet/`,**保持这个路径,不要改名为
-  `docs/jdm`,也不要把 `configs/jdm` 改成别的名字**。
+- **JDM**:`configs/jdm/` + `tools/jdm/` + `docs/jdm/`(三者同名)。
 - **DetectionIsEasy**:`configs/detection_is_easy/` + `tools/detection_is_easy/`
   + `docs/detection_is_easy/`(三者同名;新论文按这个做)。
 
@@ -72,9 +70,8 @@
 
 ## 4. docs/ — 论文文档
 
-- **新论文**:文档目录必须与算法短名相同,即 `docs/<算法名>/README.md`。
-- **已有论文**:不要为了对齐规范去改名。JDM 继续用 `docs/csrd_jointdet/`。
-- 按 `docs/csrd_jointdet/README.md` / `docs/detection_is_easy/README.md` 的模板写:
+- 文档目录必须与算法短名相同,即 `docs/<算法名>/README.md`。
+- 按 `docs/jdm/README.md` / `docs/detection_is_easy/README.md` 的模板写:
 
   1. 标题:`# <显示名> — <论文标题>`
   2. blockquote 引用(作者、标题、期刊、年份/under review、DOI/arXiv)
@@ -91,10 +88,9 @@
 ## 5. 顶层 README.md + README_zh-CN.md
 
 - 在 `## Supported Methods` 表加一行(按字母序插入):
-  `| [<显示名>](configs/<算法名>) | [<论文标题>](docs/<文档目录>) |`
-- 显示名可以是论文常用写法(如 `JDM`),但 **Method 列链接必须指向
-  `configs/<算法名>`**。论文标题列链接实际文档目录(JDM 链到
-  `docs/csrd_jointdet`,不是 `docs/jdm`)。
+  `| [<显示名>](configs/<算法名>) | [<论文标题>](docs/<算法名>) |`
+- 显示名可以是论文常用写法(如 `JDM`),但 **两列链接都必须跟算法短名走**
+  (`configs/jdm`、`docs/jdm`)。
 - **两个 README 是逐行镜像**:同一行号插入同样内容,两边都改,行号必须一致。
 - 两个文件都是 CRLF 行尾,同样注意保行尾编辑。
 
