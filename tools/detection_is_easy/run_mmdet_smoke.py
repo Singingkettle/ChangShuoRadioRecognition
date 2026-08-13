@@ -22,6 +22,8 @@ TOOL_DIR = Path(__file__).resolve().parent
 if str(TOOL_DIR) not in sys.path:
     sys.path.insert(0, str(TOOL_DIR))
 
+MMCV_EXT_STUB_TAG = "<iqdet-mmcv-lite-stub>"
+
 
 def category_names(coco_root: Path) -> tuple[str, ...]:
     ann_dir = coco_root / "annotations"
@@ -159,7 +161,7 @@ def maybe_stub_mmcv_ext() -> bool:
         pass
 
     module = types.ModuleType("mmcv._ext")
-    module.__file__ = "<iqdet-mmcv-lite-stub>"
+    module.__file__ = MMCV_EXT_STUB_TAG
     module.__package__ = "mmcv"
     module.__loader__ = None
     module.__spec__ = importlib.machinery.ModuleSpec("mmcv._ext", loader=None)
@@ -219,6 +221,54 @@ def maybe_stub_mmcv_ext() -> bool:
     return True
 
 
+def mmcv_ext_is_stubbed() -> bool:
+    """True when `mmcv._ext` is our stand-in rather than a compiled extension."""
+    module = sys.modules.get("mmcv._ext")
+    if module is not None:
+        return getattr(module, "__file__", "") == MMCV_EXT_STUB_TAG
+    try:
+        import mmcv._ext  # type: ignore  # noqa: F401
+    except ModuleNotFoundError:
+        return True
+    return False
+
+
+def patch_focal_loss_for_mmcv_lite() -> bool:
+    """Route mmdet's `FocalLoss` to its pure-PyTorch kernel when mmcv has no CUDA ops.
+
+    RTMDet trains under mmcv-lite because its classification loss (QualityFocalLoss) is
+    pure PyTorch. FCOS, ATSS, RetinaNet -- anything whose head uses `FocalLoss` -- does
+    not: for a CUDA tensor mmdet dispatches to `mmcv.ops.sigmoid_focal_loss`, which calls
+    the compiled `mmcv._ext` kernel and dies in the first backward pass.
+
+    mmdet already ships the identical computation as `py_sigmoid_focal_loss`; the CUDA op
+    is a speed optimisation, not a different loss. Pointing the dispatch at the Python
+    kernel therefore reproduces the same numbers on an mmcv-lite install, and mirrors
+    exactly what the branch below it already does on CPU.
+
+    Returns True when the patch was applied.
+    """
+    if not mmcv_ext_is_stubbed():
+        return False
+
+    import torch.nn.functional as F
+    from mmdet.models.losses import focal_loss as mmdet_focal_loss
+
+    def sigmoid_focal_loss(pred, target, weight=None, gamma=2.0, alpha=0.25,
+                           reduction="mean", avg_factor=None):
+        # The CUDA op takes class indices; the Python one takes one-hot targets. This is
+        # the same conversion mmdet performs in its own CPU branch.
+        num_classes = pred.size(1)
+        target = F.one_hot(target, num_classes=num_classes + 1)
+        target = target[:, :num_classes]
+        return mmdet_focal_loss.py_sigmoid_focal_loss(
+            pred, target, weight, gamma=gamma, alpha=alpha,
+            reduction=reduction, avg_factor=avg_factor)
+
+    mmdet_focal_loss.sigmoid_focal_loss = sigmoid_focal_loss
+    return True
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default="data/torchsig_mini/coco")
@@ -232,6 +282,8 @@ def main() -> None:
     import torch
     from mmengine.config import Config
     from mmengine.runner import Runner
+
+    patch_focal_loss_for_mmcv_lite()
 
     root = repo_root()
     if str(root) not in sys.path:

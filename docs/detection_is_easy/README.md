@@ -55,6 +55,12 @@ the missing extension and installs a pure-PyTorch NMS fallback (`maybe_stub_mmcv
 supported and faster, but swaps in a different NMS implementation, so expect small
 differences. Pick one and keep it fixed for the whole comparison.
 
+The same missing extension also removes the CUDA focal-loss kernel. RTMDet never notices --
+its classification loss is pure PyTorch -- but every `FocalLoss` head (FCOS, ATSS, RetinaNet)
+dies in the first backward pass without it. `patch_focal_loss_for_mmcv_lite()` routes those
+heads to mmdet's own `py_sigmoid_focal_loss`, which computes the same quantity, and each run
+records whether the fallback was active as `used_pytorch_focal_loss` in `run_info.json`.
+
 `torchsig` is only needed to regenerate the dataset. The pin matters there: the generator's
 class taxonomy is what defines the 57 classes.
 

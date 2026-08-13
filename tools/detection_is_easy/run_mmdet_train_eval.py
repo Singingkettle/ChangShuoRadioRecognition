@@ -27,7 +27,13 @@ if str(TOOL_DIR) not in sys.path:
     sys.path.insert(0, str(TOOL_DIR))
 
 from export_mmdet_summary import write_outputs  # noqa: E402
-from run_mmdet_smoke import apply_tensor_stats, category_names, data_subdir, maybe_stub_mmcv_ext  # noqa: E402
+from run_mmdet_smoke import (  # noqa: E402
+    apply_tensor_stats,
+    category_names,
+    data_subdir,
+    maybe_stub_mmcv_ext,
+    patch_focal_loss_for_mmcv_lite,
+)
 
 
 def set_num_classes(node, num_classes: int) -> None:
@@ -274,6 +280,10 @@ def main() -> None:
     from mmengine.config import Config
     from mmengine.runner import Runner
 
+    # Must happen after the stub is installed and before the model is built: FCOS/ATSS
+    # otherwise die in the first backward pass on a missing CUDA focal-loss kernel.
+    used_py_focal = patch_focal_loss_for_mmcv_lite()
+
     coco_root = ROOT / args.root
     classes = category_names(coco_root)
 
@@ -408,6 +418,7 @@ def main() -> None:
         "cuda_available": torch.cuda.is_available(),
         "cuda_device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
         "used_mmcv_lite_stub": used_stub,
+        "used_pytorch_focal_loss": used_py_focal,
         "seed": args.seed,
         "resume_from": args.resume_from,
         "checkpoint": args.checkpoint,
