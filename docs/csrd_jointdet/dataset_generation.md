@@ -1,7 +1,7 @@
 # CSRD (twc profile) dataset regeneration — noise fix + protocol
 
-Companion docs: `README.md` / `paper_and_history_notes.md` in this directory
-(JDM method, model-side expectations). This file documents the **data side**:
+Companion docs: `README.md` in this directory (JDM method, model-side
+expectations). This file documents the **data side**:
 why the dataset was regenerated, the exact root cause of the
 "noise added repeatedly" (SNR 重复添加噪声) defect, the fix, the generation
 protocol, and the empirical SNR verification.
@@ -10,14 +10,11 @@ protocol, and the empirical SNR verification.
 
 - Repo: <https://github.com/Singingkettle/ChangShuoRadioData>, `twc/` folder
   (the simulation code of the TWC paper, DOI `10.1109/TWC.2024.3450972`).
-- Local working clone: `~/Projects/ChangShuoRadioData-twc`
-  - upstream base: commit `c3eb8d0` (twc folder introduced in `3d38a7d`,
-    2026-02-03)
-  - **fix commit (local only, not pushed): `78b086b`**
-    `fix(twc): store noise exactly once per frame to prevent repeated noise stacking`
-- Toolchain: MATLAB R2024a (`~/Applications/MATLAB/R2024a`), headless
-  (`matlab -batch`), CPU only. Requires Communications / Signal Processing /
-  DSP System toolboxes (all present on this machine).
+- Noise-policy fix: commit `78b086b`
+  `fix(twc): store noise exactly once per frame to prevent repeated noise stacking`
+  (upstream `twc/` was introduced in `3d38a7d`).
+- Toolchain: MATLAB with Communications / Signal Processing / DSP System
+  toolboxes; headless `matlab -batch`.
 
 ## 2. Root cause of the repeated-noise defect
 
@@ -32,8 +29,7 @@ history):
    (−6 dB for 4 signals). This is the literal "noise added repeatedly in the
    SNR section".
 2. **Guarded revision** @ `0241d26` (2024-05) — the version that produced the
-   OLD on-disk dataset (`/home/citybuster/Data/WirelessRadio/data/ChangShuo`,
-   dated 2024-05-22). It added `if sub_signal_index == 1` around the `awgn`
+   2024-05 on-disk export. It added `if sub_signal_index == 1` around the `awgn`
    calls, so the wideband sum carries the noise exactly once (we verified this
    empirically, see §5). But it introduced/kept three other defects:
    - `real`/`real_awgn` versions: sub-signals 2..N were saved **without the
@@ -94,11 +90,9 @@ single noise realization lives inside sub-signal 1).
 | channel configs (124 versions) | v1 ideal; v2–v71 Rician (7 speeds × K=1..10); v72–v78 Rayleigh (7 speeds); v79–v98 AWGN (20 SNRs); v99–v103 clock offset (max 1,3,5,7,9 ppm); v104 "real" (random fading+offset+SNR); v105–v124 "real_awgn" (fading+offset, fixed SNR each) |
 | frames per version | 1000 |
 
-Output (do **not** delete the old dataset, kept for comparison):
-
-- old: `/home/citybuster/Data/WirelessRadio/data/ChangShuo` (8.4 GB)
-- new: `/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026`
-  (~9–11 GB expected; 124 versions × 1000 items)
+Output: write the 124×1000 export to `data/ChangShuoTwc2026` (symlink into the
+CSRR repo). Keep any 2024-era export aside for SNR comparison; do not mix the
+two under the same `data_root`.
 
 Layout per version (schema consumed by `csrr/datasets/csrd.py`):
 
@@ -121,10 +115,9 @@ for the new export.
 Launch command (durable, CPU-only):
 
 ```bash
-cd ~/Projects/ChangShuoRadioData-twc/twc
-nohup setsid matlab -batch \
-  "generate(1000, '/home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026')" \
-  > /home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026/generate.log 2>&1 &
+cd /path/to/ChangShuoRadioData/twc
+matlab -batch "generate(1000, '/path/to/ChangShuoTwc2026')"
+# then: ln -s /path/to/ChangShuoTwc2026 <csrr>/data/ChangShuoTwc2026
 ```
 
 ## 5. Empirical SNR verification
@@ -161,12 +154,10 @@ The residual ±0.2 dB spread is the natural per-realization variance of a
 After generation completes, re-run the full check:
 
 ```bash
-python tools/misc/verify_csrd_snr.py \
-  --data-root /home/citybuster/Data/WirelessRadio/data/ChangShuoTwc2026
+python tools/misc/verify_csrd_snr.py --data-root data/ChangShuoTwc2026
 ```
 
-## 6. Status / blockers
+## 6. Status
 
-- Generation runs CPU-only (GPUs untouched, per the active training sweep).
-- MATLAB present and licensed — no blocker.
-- Disk: 7.1 TB free before generation — no blocker.
+Generation is CPU-only. After the export lands at `data/ChangShuoTwc2026`,
+JDM configs resolve `data_root` relative to the CSRR repo.

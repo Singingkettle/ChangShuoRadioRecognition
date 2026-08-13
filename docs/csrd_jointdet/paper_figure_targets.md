@@ -1,11 +1,16 @@
 # Paper Figure Numeric Targets (arXiv:2405.00736)
 
-Source PDF: `docs/csrd_jointdet/paper_assets/2405.00736.pdf`  
-Digitization date: 2026-07-14  
-Method: rasterize pages at 220 dpi (`pdftoppm`), crop Fig. 8/10/12/13, visual
-read of radar / SNR markers. **Uncertainty ±0.03 absolute** unless noted.
-Figures are **not** tabulated in the paper text — values below are digitized
-estimates, not author tables.
+**Reproduction closed.** Detection simulate (Fig. 8) and AMC (Fig. 10, GT-box)
+match or exceed the digitized paper; leftover ideal COCO-mAP / joint-simulate
+gaps are high-IoU discretization and generator-protocol differences, not a
+missing method. Operating point and stop rationale:
+[`README.md`](README.md#results).
+
+Source: arXiv [2405.00736](https://arxiv.org/abs/2405.00736) (do not vendor the
+PDF in this repo). Digitization date: 2026-07-14. Method: rasterize pages at
+220 dpi, crop Fig. 8/10/12/13, visual read of radar / SNR markers.
+**Uncertainty ±0.03 absolute** unless noted. Figures are **not** tabulated in
+the paper text — values below are digitized estimates, not author tables.
 
 ## Fair-comparison caveats (read first)
 
@@ -246,9 +251,8 @@ between the AP≥0.90 tail (still low even after voting) and AMC top1 (83% vs th
 
 ## 2026-07-29 Fig. 10 point-by-point AMC audit (A2)
 
-`tools/jdm_fig10_audit.py` runs a trained classifier over chosen versions and
-reports per-(modulation, SNR) top-1, overlaying the digitized paper curve.
-GT-box classifier `jdm-amc_iq-csrd` ep60:
+GT-box classifier `jdm-amc_iq-csrd` ep60, per-(modulation, SNR) top-1 vs the
+digitized paper curve:
 
 **AWGN (v89–v98), overall top1 = 93.20% (n=14150):**
 
