@@ -101,8 +101,10 @@
 ## 6. 提交与 PR
 
 - 分支名 `paper/<算法名>`,与 `configs/` 目录名一致。
-- 作者身份用仓库一致的 `ChangShuo <changshuo@bupt.edu.cn>`。不要把 Cursor /
-  助手写成 co-author 或 contributors。
+- **contributor 一律是 [Singingkettle](https://github.com/Singingkettle)**。git
+  author/committer 用该账号绑定的 `ChangShuo <changshuo@bupt.edu.cn>`。
+  **禁止** `Co-authored-by:` 行,禁止把 Cursor / 助手 / 其他 GitHub 账号写进
+  contributors、PR 作者或提交元数据。
 - 提交信息单行、无 conventional-commit 前缀(参考 main 历史);一篇论文的入库尽量
   整理成 **一个干净提交**(改进期用 `--amend` + `push --force-with-lease`,PR 被
   review 后不再改写历史)。
