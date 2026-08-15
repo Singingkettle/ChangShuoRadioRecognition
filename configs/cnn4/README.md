@@ -1,5 +1,7 @@
 # CNN4 — Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels
 
+English | [简体中文](README_zh-CN.md)
+
 > K. Youssef et al. / AMR-Benchmark CNN2 multipath, "Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels", *IEEE VTC (2020)*.
 > [https://ieeexplore.ieee.org/abstract/document/9128408](https://ieeexplore.ieee.org/abstract/document/9128408)
 

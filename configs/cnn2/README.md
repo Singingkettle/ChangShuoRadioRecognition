@@ -1,5 +1,7 @@
 # CNN2 — Convolutional Radio Modulation Recognition Networks
 
+English | [简体中文](README_zh-CN.md)
+
 > T. J. O’Shea, J. Corgan, and T. C. Clancy, "Convolutional Radio Modulation Recognition Networks", *EAI IntelliSys / Springer (2016)*.
 > [https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16](https://link.springer.com/chapter/10.1007%2F978-3-319-44188-7_16)
 

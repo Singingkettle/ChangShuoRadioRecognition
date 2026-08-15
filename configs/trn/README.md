@@ -1,5 +1,7 @@
 # TRN — Signal Modulation Classification Based on the Transformer Network
 
+English | [简体中文](README_zh-CN.md)
+
 > J. Cai et al., "Signal Modulation Classification Based on the Transformer Network", *IEEE Trans. Cogn. Commun. Netw. (2022)*.
 > [https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9779340)
 

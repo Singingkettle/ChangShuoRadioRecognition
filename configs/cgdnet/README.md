@@ -1,5 +1,7 @@
 # CGDNet — CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition
 
+English | [简体中文](README_zh-CN.md)
+
 > Y. Wang et al., "CGDNet: Efficient Hybrid Deep Learning Model for Robust Automatic Modulation Recognition", *IEEE Commun. Lett.* (2021).
 > [https://ieeexplore.ieee.org/abstract/document/9349627](https://ieeexplore.ieee.org/abstract/document/9349627)
 

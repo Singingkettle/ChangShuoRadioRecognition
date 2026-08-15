@@ -1,5 +1,7 @@
 # DensCNN — Deep Neural Network Architectures for Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > X. Liu, D. Yang, and A. El Gamal, "Deep Neural Network Architectures for Modulation Classification", *IEEE Asilomar (2017)*.
 > [https://ieeexplore.ieee.org/document/8335483](https://ieeexplore.ieee.org/document/8335483)
 

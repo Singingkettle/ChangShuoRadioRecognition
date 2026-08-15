@@ -1,9 +1,8 @@
 # DeepSig
 
-English | [简体中文](deepsig_zh-CN.md)
+[English](deepsig.md) | 简体中文
 
-It is recommended to symlink the dataset root to `$CSRR/data`. If your folder structure is different, you may need to
-change the corresponding paths in config files.
+建议把数据集根目录软链接到 `$CSRR/data`。若你的目录结构不同，可能需要改配置文件里的对应路径。
 
 ```
 ChangShuoRadioRecognition
@@ -34,4 +33,4 @@ ChangShuoRadioRecognition
 
 ```
 
-The deepsig data have to be converted into the specified format using `tools/convert_datasets/convert_amc.py`:
+DeepSig 原始数据必须用 `tools/convert_datasets/convert_amc.py` 转成上述格式：

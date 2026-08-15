@@ -1,5 +1,7 @@
 # MLDNN — Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > S. Chang et al., "Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification", *IEEE Trans. Veh. Technol. (2021)*.
 > [https://ieeexplore.ieee.org/document/9462447](https://ieeexplore.ieee.org/document/9462447)
 

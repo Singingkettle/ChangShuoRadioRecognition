@@ -1,5 +1,7 @@
 # FastMLDNN — A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > S. Chang et al., "A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification", *IEEE Trans. Cogn. Commun. Netw. (2023)*.
 > [https://ieeexplore.ieee.org/abstract/document/10239249](https://ieeexplore.ieee.org/abstract/document/10239249)
 

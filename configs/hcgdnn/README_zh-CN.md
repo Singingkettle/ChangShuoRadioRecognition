@@ -1,20 +1,20 @@
 # HCGDNN — A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification
 
-English | [简体中文](README_zh-CN.md)
+[English](README.md) | 简体中文
 
 > S. Chang et al., "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification", *IEEE Wireless Commun. Lett. (2022)*.
 > [https://ieeexplore.ieee.org/document/9764618](https://ieeexplore.ieee.org/document/9764618)
 
-PyTorch / MMEngine port in CSRR. Algorithm short name **`hcgdnn`**
-(= `configs/hcgdnn/`).
+CSRR 中的 PyTorch / MMEngine 移植。算法短名 **`hcgdnn`**
+（即 `configs/hcgdnn/`）。
 
-## Method in one paragraph
+## 方法简述
 
-Own-method Tier A: hierarchical classification head on a convolutional gated network. Paper-native 50/10/40.
+自有方法 A 档：卷积门控网络上的层次分类头。论文原生 50/10/40。
 
-## Paper section → code map
+## 论文章节 → 代码对照
 
-| paper | code |
+| 论文 | 代码 |
 |---|---|
 | Network / backbone | `csrr/models/backbones/hcgdnn.py::HCGDNN` |
 | Train / test configs | `configs/hcgdnn/` |
@@ -22,29 +22,29 @@ Own-method Tier A: hierarchical classification head on a convolutional gated net
 | Dataset loader | `csrr/datasets/amc.py::AMCDataset` |
 | Input modality | I/Q |
 
-## Data
+## 数据
 
-DeepSig RML JSON under `data/ModulationClassification/DeepSig/` uses CSRR
-**50/10/40** (`train.json` / `validation.json` / `test.json`). Some public Keras
-ports use per-(modulation, SNR) **6:2:2**; small overall gaps on a few datasets may
-cite that difference.
+DeepSig RML 的 JSON 位于 `data/ModulationClassification/DeepSig/`，本仓库采用
+**50/10/40** 划分（`train.json` / `validation.json` / `test.json`）。部分公开的
+Keras 移植按每个（调制，信噪比）做 **6:2:2**；个别数据集上的小幅总体差距可能
+来自这一划分差异。
 
-HisarMod live JSON under `data/ModulationClassification/Hisar/HisarMod2019.1/`
-already follows the **official Test + Train 80/20** protocol
-(~416k / 104k / 260k). Do not attribute Hisar residuals to a 50/10/40 Hisar split.
+HisarMod 的 JSON 位于 `data/ModulationClassification/Hisar/HisarMod2019.1/`，
+已经遵循**官方 Test + Train 80/20** 协议（约 416k / 104k / 260k）。不要把
+Hisar 上的残差归因于 50/10/40 划分。
 
-## Train / evaluate
+## 训练 / 评测
 
 ```bash
-# train (default work_dir under work_dirs/)
+# 训练（默认 work_dir 在 work_dirs/ 下）
 python tools/train.py configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py
 
-# test a checkpoint
+# 测试一个 checkpoint
 python tools/test.py configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py \
     work_dirs/<run>/best_accuracy_top1_epoch_*.pth
 ```
 
-## Results
+## 结果
 
 | Dataset | Overall (meas / target %) | Peak (meas / target %) | Status |
 |---|---|---|---|
@@ -53,9 +53,9 @@ python tools/test.py configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py \
 | RML2018.01A | 58.72 / (CSRR-only) | 93.52 / (CSRR-only) | `measured` |
 | HisarMod | 57.39 / (CSRR-only) | 70.16 / (CSRR-only) | `measured` |
 
-Numbers are measured on the official `configs/` roots versus published / commonly cited targets (overall ≥ target−2.0 pp, peak ≥ target−1.5 pp).
+数字来自官方 `configs/` 根配置的实测结果，对照已发表或常用引用目标（总体准确率 ≥ 目标−2.0 个百分点，峰值 ≥ 目标−1.5 个百分点）。
 
-## Documented deviations / notes
+## 已记录的偏差 / 说明
 
-10A tracking pass 63.43/93.36 vs 64.9/93. Other datasets measured-only. Paper-exact sieges closed.
+10A 跟踪通过，63.43/93.36 对 64.9/93。其他数据集仅为实测。论文精确围攻已关闭。
 

@@ -1,5 +1,7 @@
 # DSCLDNN — Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure
 
+English | [简体中文](README_zh-CN.md)
+
 > Z. Zhang et al., "Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure", *IEEE Access (2020)*.
 > [https://ieeexplore.ieee.org/document/9220797](https://ieeexplore.ieee.org/document/9220797)
 

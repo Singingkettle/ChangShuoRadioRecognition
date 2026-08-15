@@ -1,5 +1,7 @@
 ## Installation
 
+English | [简体中文](install_zh-CN.md)
+
 ### Requirements
 
 - Ubuntu 22.04 LTS

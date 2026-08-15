@@ -1,5 +1,7 @@
 # JDM — Joint Signal Detection and Automatic Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > H. Xing, X. Zhang, S. Chang, J. Ren, Z. Zhang, J. Xu, S. Cui,
 > "Joint Signal Detection and Automatic Modulation Classification via Deep
 > Learning", *IEEE Trans. Wireless Commun.*, vol. 23, no. 11, 2024.

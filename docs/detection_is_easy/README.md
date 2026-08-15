@@ -1,5 +1,7 @@
 # DetectionIsEasy — Detection Is Easy, Recognition Is Hard
 
+English | [简体中文](README_zh-CN.md)
+
 Reproduction code for the wideband detection+recognition study:
 
 > S. Chang, Z. Yang, J. He, S. Huang, and Z. Feng, "Detection Is Easy, Recognition Is
