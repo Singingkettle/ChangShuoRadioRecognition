@@ -1,3 +1,5 @@
+# Hierarchical classification-head gated DNN (own method) on I/Q.
+# Paper: "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification", IEEE WCL (2022).
 _base_ = [
     './iq-deepsig201610A.py',
     './runtimes.py',

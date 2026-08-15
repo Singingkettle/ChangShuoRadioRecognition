@@ -1,16 +1,6 @@
-# Canonical comparison registry for the AMR-Benchmark reproduction: keeps only
-# the 15 baseline methods (no MLDNN/HCGDNN/FastMLDNN/DSCLDNN/MCformer/TRN).
-#
-# Path convention (IMPORTANT): the Phase 2 orchestrator
-# (``tools/amr_benchmark/run_migration.py``) writes every run to the NESTED
-# layout ``work_dirs/amr_benchmark/<model>/<dataset>/res/paper.pkl`` (model =
-# the matrix key / backbone dir, dataset = short label). The performance
-# framework builds the pickle path as ``<work_dir>/<publish_subdir>/res/
-# paper.pkl``, so we set ``work_dir='work_dirs/amr_benchmark'`` and make every
-# publish entry the ``<model>/<dataset>`` subdir. (The previous flat
-# ``<config_name>`` convention resolved to non-existent
-# ``work_dirs/<config_name>/res/paper.pkl`` and silently produced empty
-# figures.)
+# Optional 15-method comparison subset (no MLDNN/HCGDNN/FastMLDNN/DSCLDNN/
+# MCformer/TRN). Same nested ``<model>/<dataset>/res/paper.pkl`` layout as
+# ``amc.py``; point ``work_dir`` at the tree you collected.
 
 # Display name -> orchestrator model key (== matrix key == work_dir subdir).
 _MODEL_KEYS = dict(

@@ -86,28 +86,54 @@ class CLDNNW(BaseBackbone):
             a feature extractor without the top classifier.
     """
 
-    def __init__(self, frame_length=128, num_classes=-1, init_cfg=None):
+    def __init__(self, frame_length=128, num_classes=-1, use_zero_pad=True,
+                 init_cfg=None):
         super(CLDNNW, self).__init__(init_cfg=init_cfg)
         self.frame_length = frame_length
         self.num_classes = num_classes
-        # Compared to AMR-Benchmark, we remove the Padding layer.
-        # Basically, the padding layer is mainly used to keep the size same before and after (such as) conv.
-        # However, in this CLDNN, the padding layer cannot keep the same, and it introduces some useless information '0'
-        # As a result, we remove the padding layers.
-        self.cnn1 = nn.Sequential(
-            nn.Conv2d(1, 50, kernel_size=(1, 8), padding='valid'),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-        )
-        self.cnn2 = nn.Sequential(
-            nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-            nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-        )
-        self.lstm = nn.LSTM(input_size=(self.frame_length * 2 - 7 * 4) * 2, hidden_size=50, batch_first=True)
+        self.use_zero_pad = use_zero_pad
+        # TF AMR-Benchmark CLDNN uses ZeroPadding2D((0, 2)) before each of the
+        # three (1, 8) convs (channels_first). That shrinks width by 3 per conv
+        # and yields LSTM input_size 488 @ L=128. CSRR previously dropped the
+        # pads (shrink-by-7, LSTM 456); ``use_zero_pad=True`` restores the TF
+        # topology. Set False only to load legacy no-pad checkpoints.
+        # nn.ZeroPad2d((left, right, top, bottom)) ≡ TF pad on W by 2 each side.
+        if use_zero_pad:
+            self.cnn1 = nn.Sequential(
+                nn.ZeroPad2d((2, 2, 0, 0)),
+                nn.Conv2d(1, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+            )
+            self.cnn2 = nn.Sequential(
+                nn.ZeroPad2d((2, 2, 0, 0)),
+                nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+                nn.ZeroPad2d((2, 2, 0, 0)),
+                nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+            )
+            # 2*(L-3) + 2*(L-9) = (2L - 12)*2 = (L*2 - 3*4)*2
+            self._lstm_feat = (self.frame_length * 2 - 3 * 4) * 2
+        else:
+            self.cnn1 = nn.Sequential(
+                nn.Conv2d(1, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+            )
+            self.cnn2 = nn.Sequential(
+                nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+                nn.Conv2d(50, 50, kernel_size=(1, 8), padding='valid'),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.5),
+            )
+            self._lstm_feat = (self.frame_length * 2 - 7 * 4) * 2
+        self.lstm = nn.LSTM(input_size=self._lstm_feat, hidden_size=50,
+                            batch_first=True)
 
         if self.num_classes > 0:
             self.classifier = nn.Sequential(
@@ -122,7 +148,7 @@ class CLDNNW(BaseBackbone):
         x1 = self.cnn1(x)
         x2 = self.cnn2(x1)
         x = torch.concatenate((x1, x2), dim=3)
-        x = torch.reshape(x, [-1, 50, (self.frame_length * 2 - 7 * 4) * 2])
+        x = torch.reshape(x, [-1, 50, self._lstm_feat])
         x, _ = self.lstm(x)
         if self.num_classes > 0:
             x = self.classifier(x[:, -1, :])

@@ -1,3 +1,5 @@
+# IC-AMCNet deep CNN with Gaussian noise regularization on I/Q.
+# Paper: "CNN-Based Automatic Modulation Classification for Beyond 5G Communications", IEEE Commun. Lett. (2020).
 _base_ = [
     '../_base_/datasets/deepsig/iq-deepsig201610A.py',
     '../_base_/schedules/amc.py',

@@ -1,3 +1,5 @@
+# Two-layer GRU AMC on reshaped I/Q (L×F).
+# Paper: "Automatic modulation classification using recurrent neural networks", IEEE ICSPCC (2017).
 _base_ = [
     '../_base_/datasets/deepsig/iq-shape-L-F-deepsig201610A.py',
     '../_base_/schedules/amc.py',

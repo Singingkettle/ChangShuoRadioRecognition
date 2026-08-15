@@ -1,3 +1,5 @@
+# Multitask-learning DNN (own method) on I/Q + A/P; paper-native 50/10/40.
+# Paper: "Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification", IEEE TVT (2021).
 _base_ = [
     './iq-ap-deepsig201610A.py',
     './schedules.py',
