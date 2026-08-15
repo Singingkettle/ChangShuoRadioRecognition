@@ -255,11 +255,11 @@ def fig_snr():
 # ============================ Fig 4 — complexity curve ============================
 def fig_complexity():
     sizes = ["tiny", "small", "medium", "large"]
-    mAP = [0.431, 0.449, 0.460, 0.462]        # uniform recipe, 3-seed (7/17/27) means
-    mAP_sd = [0.010, 0.010, 0.011, 0.015]     # 3-seed standard deviations
-    own = [0.408, 0.429, 0.477, 0.486]        # own gentler schedule (lr 1e-4), seed means
-    own_sd = [0.041, 0.017, 0.039, 0.005]     # n=2/3/3/2 seeds
-    APs = [0.192, 0.226, 0.245, 0.249]        # uniform seed 7
+    mAP = [0.432, 0.443, 0.472, 0.451]        # uniform recipe (bs8), 3-seed (7/17/27) means
+    mAP_sd = [0.004, 0.021, 0.012, 0.007]     # 3-seed standard deviations
+    own = [0.433, 0.470, 0.492, 0.504]        # own gentler schedule (lr 1e-4, bs4), 3-seed means
+    own_sd = [0.004, 0.014, 0.010, 0.015]     # 3-seed standard deviations
+    APs = [0.211, 0.233, 0.261, 0.276]        # own-schedule 3-seed mean
     x = np.arange(len(sizes))
     # The two mAP series share an x position, so their markers and whiskers merged (at
     # "medium" the two markers were 0.15 pt apart). Dodge them by +-0.08 index units.
@@ -289,8 +289,8 @@ def fig_complexity():
 # ============================ Fig 5 — per-family bars ============================
 def fig_family():
     fams = ["PSK", "ASK", "QAM", "FSK", "FM", "OFDM"]
-    vis = [0.309, 0.233, 0.133, 0.750, 0.863, 0.484]
-    iq = [0.451, 0.350, 0.217, 0.696, 0.636, 0.290]
+    vis = [0.281, 0.217, 0.130, 0.662, 0.870, 0.363]   # 3-seed vision-head per-family mAP
+    iq = [0.435, 0.349, 0.210, 0.654, 0.651, 0.000]    # 3-seed return-to-IQ per-family mAP
     x = np.arange(len(fams)); w = 0.38
     fig, ax = plt.subplots(figsize=(W_SINGLE, 2.33), layout="constrained")
     ax.bar(x - w / 2, vis, w, color=VIS, edgecolor="black", label="vision head")
