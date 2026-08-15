@@ -9,7 +9,7 @@
 #     model = dict(detector=dict(init_cfg=dict(
 #         type='Pretrained', checkpoint='work_dirs/jdm-det_fft-csrd/best.pth')))
 #
-# Run with: python tools/test_det.py configs/jdm/jdm-joint_iq-csrd.py <ckpt>
+# Run with: python tools/test.py configs/jdm/jdm-joint_iq-csrd.py <ckpt>
 _base_ = [
     '../_base_/datasets/csrd/det-fft-csrd.py',
     '../_base_/runtimes/det.py',

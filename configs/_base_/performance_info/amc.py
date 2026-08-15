@@ -1,15 +1,10 @@
 # AMC method registry: maps display names used in figures to (a) a stable
 # colour/legend index and (b) the work-dir subdirectory holding that run.
 #
-# Path convention (IMPORTANT): the Phase 2 orchestrator
-# (``tools/amr_benchmark/run_migration.py``) writes every run to the NESTED
-# layout ``work_dirs/amr_benchmark/<model>/<dataset>/res/paper.pkl`` (model ==
-# the matrix key / backbone dir, dataset == short label). The performance
-# framework loads ``<work_dir>/<publish_subdir>/res/paper.pkl``, so we set
-# ``work_dir='work_dirs/amr_benchmark'`` and each publish entry is the
-# ``<model>/<dataset>`` subdir. (The previous flat ``<config_name>``
-# convention resolved to non-existent ``work_dirs/<config_name>/res/
-# paper.pkl`` and silently produced empty figures for every method.)
+# Path convention: ``tools/test.py`` writes ``<work_dir>/res/paper.pkl``.
+# Comparison plots that collect many methods can use a nested tree
+# ``<work_dir>/<model>/<dataset>/res/paper.pkl``; publish entries below are
+# the ``<model>/<dataset>`` subdir. Point ``work_dir`` at that tree.
 #
 # Dataset keys:
 #   deepsig201610A -> RML2016.10A ; deepsig201610B -> RML2016.10B
@@ -18,7 +13,7 @@
 # Display name -> orchestrator model key (== matrix key == work_dir subdir).
 # Order defines the stable colour/legend index used across all plots.
 _MODEL_KEYS = dict(
-    # AMR-Benchmark methods (15)
+    # Published AMC baselines (15)
     CNN1='cnn2',
     CNN2='cnn4',
     MCNET='mcnet',

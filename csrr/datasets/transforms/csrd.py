@@ -25,7 +25,7 @@ class LoadCSRDFrame(BaseTransform):
     older exports whose per-signal components each embedded the (same)
     wideband noise vector, summing stacked that noise ``num_signals``
     times, silently degrading the effective SNR far below the label
-    (see docs/jdm/dataset_generation.md).
+    (see configs/jdm/dataset_generation.md).
 
     **Added keys**: ``iq`` (float32, shape (2, L)); optionally
     ``signal_components`` (float32, shape (num_signals, 2, L)).
@@ -97,7 +97,7 @@ class LoadDetProposal(BaseTransform):
 
     Looks up ``(file_name, signal_index)`` or hard-negative
     ``(file_name, hard_neg_index)`` in a JSON cache produced by
-    ``tools/precompute_amc_proposals.py`` and writes ``proposal_box``
+    ``configs/jdm/scripts/precompute_amc_proposals.py`` and writes ``proposal_box``
     ``(left, right)`` in FFT-bin units for :class:`CSRDSignalToBaseband`.
 
     Args:

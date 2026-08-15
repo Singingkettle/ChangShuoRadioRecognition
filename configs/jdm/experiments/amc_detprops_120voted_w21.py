@@ -1,6 +1,6 @@
 # AMC fine-tune on det120 + box-voting proposals (ideal-joint operating point).
 # Same recipe as amc_detprops_strongdet_w17.py; only the proposal source changes.
-# Prerequisite: tools/precompute_amc_proposals.py on det_full_120ep with
+# Prerequisite: configs/jdm/scripts/precompute_amc_proposals.py on det_full_120ep with
 #   --cfg-options model.head.test_cfg.box_voting=True vote_iou_thr=0.75
 # Paper: Xing et al., IEEE TWC 2024.
 _base_ = './amc_detprops_strongdet_w17.py'
