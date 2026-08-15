@@ -161,6 +161,22 @@ The parameters of `trainpred_hi` are unrecorded; the +0.093 cache was built at t
 default `--score-thr 0.1` over all 50000 scenes, then randomly subsampled (fixed seed) to
 match the GT cache's crop count so the comparison is not handed extra data.
 
+The recipe is per-detector, and it generalizes. Repeating the whole procedure on FCOS --
+dump FCOS's train predictions, build the predicted-box cache, train the recogniser on it,
+deploy on FCOS's test predictions -- gives **+0.189 +- 0.002** over three seeds
+(0.469 -> 0.659), larger than RTMDet's, as the weaker vision head leaves more for the IQ
+branch to rescue. The training must match the detector: a recogniser trained on RTMDet's
+boxes and deployed on FCOS's, with no retraining, gains only +0.040 (above the GT-box
+recipe-A's +0.034 on FCOS, so the distribution transfers in part), and only training on the
+detector's own boxes recovers the full gain.
+
+| Deployment detector | recogniser trained on | fused delta |
+|---|---|---|
+| RTMDet | its own predicted boxes (3 seeds) | +0.093 +- 0.001 |
+| FCOS   | its own predicted boxes (3 seeds) | +0.189 +- 0.002 |
+| FCOS   | RTMDet's predicted boxes (transfer) | +0.040 |
+| FCOS   | GT boxes (recipe-A)                 | +0.034 |
+
 **The dose-response curve mixes two metrics (§VI-D).** The reported 0.643 -> 0.714 -> 0.869
 takes a different metric from each of three runs. Measured cleanly, each metric is monotone on
 its own: stage2-single accuracy 0.632 / 0.691 / 0.867, combined fine accuracy 0.534 / 0.699 /
