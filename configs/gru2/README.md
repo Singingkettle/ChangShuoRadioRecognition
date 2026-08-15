@@ -1,5 +1,7 @@
 # GRU2 — Automatic modulation classification using recurrent neural networks
 
+English | [简体中文](README_zh-CN.md)
+
 > D. Hong et al. / AMR-Benchmark GRU, "Automatic modulation classification using recurrent neural networks", *IEEE ICSPCC (2017)*.
 > [https://ieeexplore.ieee.org/abstract/document/8322633](https://ieeexplore.ieee.org/abstract/document/8322633)
 

@@ -1,5 +1,7 @@
 # CSRD (twc profile) dataset regeneration — noise fix + protocol
 
+English | [简体中文](dataset_generation_zh-CN.md)
+
 Companion docs: `README.md` in this directory (JDM method, model-side
 expectations). This file documents the **data side**:
 why the dataset was regenerated, the exact root cause of the

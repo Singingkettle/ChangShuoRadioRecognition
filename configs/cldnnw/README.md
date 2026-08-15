@@ -1,5 +1,7 @@
 # CLDNNW — Deep architectures for modulation recognition
 
+English | [简体中文](README_zh-CN.md)
+
 > N. E. West and T. O’Shea, "Deep architectures for modulation recognition", *IEEE DySPAN (2017)*.
 > [https://ieeexplore.ieee.org/abstract/document/7920754](https://ieeexplore.ieee.org/abstract/document/7920754)
 

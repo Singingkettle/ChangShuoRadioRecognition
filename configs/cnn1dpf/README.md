@@ -1,5 +1,7 @@
 # CNN1DPF — Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks
 
+English | [简体中文](README_zh-CN.md)
+
 > S. Peng et al. / AMR-Benchmark 1DCNN-PF, "Automatic Modulation Classification Using Parallel Fusion of Convolutional Neural Networks", *ISSCS / related (AMR-Benchmark port)*.
 > [https://lirias.kuleuven.be/retrieve/546033](https://lirias.kuleuven.be/retrieve/546033)
 

@@ -1,5 +1,7 @@
 # Paper Figure Numeric Targets (arXiv:2405.00736)
 
+English | [简体中文](paper_figure_targets_zh-CN.md)
+
 **Reproduction closed.** Detection simulate (Fig. 8) and AMC (Fig. 10, GT-box)
 match or exceed the digitized paper; leftover ideal COCO-mAP / joint-simulate
 gaps are high-IoU discretization and generator-protocol differences, not a

@@ -1,165 +1,200 @@
-# 新论文代码入库规范 (Adding a New Paper's Code)
+# Adding a New Paper's Code
 
-本文规定一篇新论文的代码如何规范地放进 ChangShuoRadioRecognition (CSRR)。
+English | [简体中文](adding_a_new_paper_zh-CN.md)
 
-**算法短名 = `configs/` 下的目录名。** 这是该方法在本仓库的唯一代号。分支名、
-README 两列链接、可选的 `scripts/` 都跟它走，不要再发明第二个名字，也不要改
-已经进仓库的目录名。
+This page is how a new paper's code is added to ChangShuoRadioRecognition (CSRR).
 
-原则:**一篇论文 = `configs/<算法名>/`（配置 + `README.md` + 可选 `scripts/`）
-+ 需要时的 csrr 原生模块 + 双 README 各一行**。不要发明新的顶层目录（不要建
-`projects/` 之类），也不要为新论文再建 `tools/<算法名>/` 或 `docs/<算法名>/`。
+**The algorithm short name is the directory name under `configs/`.** That is the
+only name for the method in this repo. The branch name, both README columns, and
+any optional `scripts/` follow it. Do not invent a second name, and do not
+rename a directory that is already in the tree.
 
-训练和测试统一从共享入口进入：
+Rule: **one paper = `configs/<name>/` (configs + English/Chinese README pair +
+optional `scripts/`) + native `csrr/` modules when needed + one row in each
+root README.** Do not invent a new top-level directory (`projects/` and the
+like). Do not add `tools/<name>/` or `docs/<name>/` for a new paper.
+
+Train and test always enter through the shared scripts:
 
 ```bash
-python tools/train.py configs/<算法名>/<config>.py
-python tools/test.py configs/<算法名>/<config>.py <checkpoint.pth>
+python tools/train.py configs/<name>/<config>.py
+python tools/test.py configs/<name>/<config>.py <checkpoint.pth>
 ```
 
-参考样例:
+Examples:
 
-- **JDM**:`configs/jdm/README.md` + 根配置 + `configs/jdm/scripts/`（合并权重、
-  提图、proposal 预计算等该论文独有的步骤）。
-- **普通 AMC 方法**（如 CNN2）:只有 `configs/cnn2/*.py` + `configs/cnn2/README.md`，
-  没有 `scripts/`。
-- **DetectionIsEasy**:`tools/detection_is_easy/` + `docs/detection_is_easy/` 是
-  **历史例外，勿仿**。新论文不要再按这个三件套做。
+- **JDM**: `configs/jdm/README.md` + root configs + `configs/jdm/scripts/`
+  (merge checkpoints, rasterize figures, precompute proposals, and other
+  paper-specific steps).
+- **A typical AMC method** (CNN2): only `configs/cnn2/*.py` + the README pair.
+  No `scripts/`.
+- **DetectionIsEasy**: `tools/detection_is_easy/` + `docs/detection_is_easy/`
+  is a **historical exception. Do not copy it.** New papers do not use that
+  triad.
 
-## 1. configs/<算法名>/ — 配置、说明、可选脚本
+## Documentation language
 
-- 一篇论文一个文件夹。**文件夹名 = 算法短名**（小写下划线），一经选定不要改。
-  **里面每个配置文件 = 一个实验设置**。
-- 命名:`<method>_<modality>-<dataset>.py`（如 `cnn2_iq-deepsig-201610A.py`、
-  `jdm-det_fft-csrd.py`）。同一方法、能复现论文数字的变体可放 `experiments/`
-  子目录，命名 `<主配置名>_<变体后缀>.py`。
-- **`experiments/` 只留复现主线**（论文协议评测、实际采用的工作点）。围攻失败
-  的 lr/epoch/seed/EMA/SWA 变体、manifest、goal 文件不要入库。
-- 每个配置（至少每个 root 配置）头部加注释:
+Every user-facing document is a pair. **English is the default file.**
+
+- English: `foo.md`
+- Chinese: `foo_zh-CN.md` in the same directory
+- Header links: `English | [简体中文](foo_zh-CN.md)` on the English page, and
+  `[English](foo.md) | 简体中文` on the Chinese page
+
+A new paper must ship `configs/<name>/README.md` and
+`configs/<name>/README_zh-CN.md`. Do not put the method notes under
+`docs/<name>/`.
+
+## 1. configs/<name>/ — configs, notes, optional scripts
+
+- One folder per paper. **Folder name = short name** (lowercase, underscores).
+  Do not change it later. **Each config file is one experiment.**
+- Naming: `<method>_<modality>-<dataset>.py` (for example
+  `cnn2_iq-deepsig-201610A.py`, `jdm-det_fft-csrd.py`). Variants that actually
+  reproduce the paper numbers may live under `experiments/` as
+  `<main-config>_<suffix>.py`.
+- **`experiments/` is reproduction mainline only** (paper-protocol evals and
+  the operating point you actually report). Failed lr / epoch / seed / EMA /
+  SWA variants, manifests, and goal files stay out of git.
+- Every config (at least every root config) starts with:
 
   ```python
-  # <一两行方法描述>
-  # Paper: "<论文标题>", <期刊/会议> (<年份或 under review>).
+  # <one or two lines about the method>
+  # Paper: "<title>", <venue> (<year or under review>).
   ```
 
-- `_base_` 只允许三种引用:同目录 `./xxx.py`、共享基座 `../_base_/...`、外部包
-  `mmdet::...`。**禁止** `../<别的论文夹>/`、绝对路径、仓库外相对路径。
-- 配置内的 `data_root` / `work_dir` / `ann_file` 一律仓库相对路径（`data/...`、
-  `work_dirs/...`）。**严禁 `/home/<user>/...` 等机器绝对路径**（投稿代码在别人
-  机器上必须能跑）。
+- `_base_` may only point at `./xxx.py` in the same folder, shared
+  `../_base_/...`, or an external package `mmdet::...`. **No**
+  `../<other-paper>/`, absolute paths, or paths outside the repo.
+- `data_root` / `work_dir` / `ann_file` are repo-relative (`data/...`,
+  `work_dirs/...`). **No** `/home/<user>/...` machine paths.
 
-### README.md
+### README.md and README_zh-CN.md
 
-说明文档只放 `configs/<算法名>/README.md`，按这个模板写:
+Notes live only in the README pair under `configs/<name>/`. Use this outline:
 
-1. 标题:`# <显示名> — <论文标题>`
-2. blockquote 引用（作者、标题、期刊、年份/under review、DOI/arXiv）
+1. Title: `# <display name> — <paper title>`
+2. Blockquote citation (authors, title, venue, year / under review, DOI / arXiv)
 3. `## Method in one paragraph`
-4. `## Paper section → code map`:`| paper | code |` 两列表，论文章节/公式 → 代码路径
-5. `## Data`:数据来源、在盘布局、重资产不入库时给再生成命令；写清和公开协议
-   不一致的划分（例如 DeepSig 用 50/10/40）
-6. `## Train / evaluate`:一个带编号注释的 bash 块，入口必须是 `tools/train.py`
-   / `tools/test.py`；该论文独有的步骤写 `python configs/<算法名>/scripts/...`
-7. `## Results`:主结果表（测得 vs 公开数字，带种子数/误差条口径）
-8. `## Documented deviations / notes`:与论文的实现偏差、坑、约定
+4. `## Paper section → code map`: `| paper | code |`
+5. `## Data`: where the data comes from, on-disk layout, regenerate command if
+   heavy assets are not in git; document any split that differs from the public
+   protocol (DeepSig uses 50/10/40 here)
+6. `## Train / evaluate`: one numbered bash block. Entry points must be
+   `tools/train.py` / `tools/test.py`. Paper-specific steps use
+   `python configs/<name>/scripts/...`
+7. `## Results`: measured vs published numbers, with seed / error-bar policy
+8. `## Documented deviations / notes`
 
-复现的含义是：官方 `configs/<算法名>/` 跑出来的数字和公开结果别差太远。不要
-另建 `amr_benchmark` 这类旁路目录来代表「一组算法」。
+Reproduction means: the official `configs/<name>/` runs should not sit far from
+the published numbers. Do not invent an `amr_benchmark` (or similar) side
+folder to stand for “a group of algorithms.”
 
-不要把围攻日志（`retune_campaign.md` / `retune_results.md` / `goal_mode.md`
-之类）放进这个文件夹。主结果和偏差写进 README 即可。
+Do not check in siege logs (`retune_campaign.md`, `retune_results.md`,
+`goal_mode.md`). Put the main table and the deviations in the README.
 
-### scripts/（可选）
+### scripts/ (optional)
 
-只有该论文真有独特步骤时才建 `configs/<算法名>/scripts/`，例如合并两个模块的
-checkpoint、生成论文图、预计算 proposal。目录平铺，不要再套一层 `tools/`。
+Create `configs/<name>/scripts/` only when this paper has unique steps: merging
+two module checkpoints, drawing paper figures, precomputing proposals. Keep the
+directory flat. Do not nest another `tools/`.
 
-- 脚本用仓库相对路径；用向上查找 `tools/train.py` + `csrr/` 的方式定位仓库根，
-  不要写死 `parents[N]`，也不要写 `/home/<user>/...`。
-- 论文如依赖 mmdet 等核心框架不依赖的栈，插件模块也可放这里，并保证:
-  - 配置里 `custom_imports = dict(imports=['<模块名>'], allow_failed_imports=False)`
-    用**裸模块名**;
-  - 调用方在 `Config.fromfile` 之前把 `scripts/` 插进 `sys.path`。
-- **自包含检查**:逐个确认每条 `import` 在仓库内或 requirements 里能解析。
-- 额外依赖写 `requirements/<算法名>.txt`（参考 `requirements/detection_is_easy.txt`），
-  文件头注释说明用途与安装前提。
+- Scripts use repo-relative paths. Find the repo root by walking up until
+  `tools/train.py` and `csrr/` exist. Do not hard-code `parents[N]` or
+  `/home/<user>/...`.
+- If the paper needs a stack the core framework does not (for example mmdet),
+  plugins may live here too:
+  - configs use a bare module name in
+    `custom_imports = dict(imports=['<module>'], allow_failed_imports=False)`
+  - the caller inserts `scripts/` on `sys.path` before `Config.fromfile`
+- Every `import` must resolve in-repo or in requirements.
+- Extra deps go in `requirements/<name>.txt` (see
+  `requirements/detection_is_easy.txt`), with a header comment on purpose and
+  install prerequisites.
 
-普通分类方法共用 `tools/train.py` / `tools/test.py`，**不要**为它们建空的
-`scripts/`。
+Ordinary classifiers share `tools/train.py` / `tools/test.py`. **Do not**
+create an empty `scripts/` for them.
 
-## 2. csrr/ — 框架原生模块
+## 2. csrr/ — native framework modules
 
-- 新 backbone → `csrr/models/backbones/<name>.py`，`@BACKBONES.register_module()`，
-  继承 `BaseBackbone`，`forward` 返回 tuple `(x,)`；新 head → `csrr/models/heads/`，
-  实现 `forward/loss/predict`（`loss`/`predict` 消费 `DataSample`）；新 dataset →
-  `csrr/datasets/`，`@DATASETS.register_module()`，设 `METAINFO = {'classes': (...)}`。
-- 在对应 `__init__.py` 加 import 行并把类名加进 `__all__`。**两个陷阱**:
-  1. 这些 `__init__.py` 是 **CRLF 行尾** — 用字节级/保行尾的方式编辑，不要整文件
-     重写（会产生全文件假 diff）；
-  2. `__all__` 里前一项若无尾逗号，直接续写会触发 Python 隐式字符串拼接
-     (`'a' 'b'` → `'ab'`)— 加新项前确认上一项带逗号。
-- 只放「干净可复用」的模型代码；论文专属的胶水/编排逻辑放
-  `configs/<算法名>/scripts/`，不要新建 `tools/<算法名>/`。
+- New backbone → `csrr/models/backbones/<name>.py`,
+  `@BACKBONES.register_module()`, subclass `BaseBackbone`, `forward` returns
+  `(x,)`. New head → `csrr/models/heads/`, implement `forward` / `loss` /
+  `predict` on `DataSample`. New dataset → `csrr/datasets/`,
+  `@DATASETS.register_module()`, set `METAINFO = {'classes': (...)}`.
+- Add the import and the class name to the matching `__init__.py`. Two traps:
+  1. Those `__init__.py` files use **CRLF**. Edit at byte level; do not rewrite
+     the whole file (that produces a fake full-file diff).
+  2. If the last `__all__` entry has no trailing comma, appending a name
+     silently concatenates strings (`'a' 'b'` → `'ab'`). Confirm the previous
+     item has a comma.
+- Keep only reusable model code here. Paper-specific glue goes in
+  `configs/<name>/scripts/`, not `tools/<name>/`.
 
-## 3. tools/ — 共享入口，不是论文目录
+## 3. tools/ — shared entry points, not per-paper folders
 
-- **训练**:`tools/train.py`
-- **测试**:`tools/test.py`（分类收 `pred_score` 写 `paper.pkl`；检测 / joint
-  配置走 mmengine `Runner.test()`）
-- 共享杂项可以留在 `tools/analyze.py`、`tools/convert_datasets/`、`tools/misc/`
-- **禁止**再为新论文建 `tools/<算法名>/`
-- DetectionIsEasy 的 `tools/detection_is_easy/` 是历史例外，勿仿
+- **Train:** `tools/train.py`
+- **Test:** `tools/test.py` (classification collects `pred_score` into
+  `paper.pkl`; detection / joint configs use mmengine `Runner.test()`)
+- Shared extras may stay in `tools/analyze.py`, `tools/convert_datasets/`,
+  `tools/misc/`
+- **Do not** add `tools/<name>/` for a new paper
+- `tools/detection_is_easy/` is a historical exception. Do not copy it.
 
-## 4. 顶层 README.md + README_zh-CN.md
+## 4. Root README.md + README_zh-CN.md
 
-- 在 `## Supported Methods` 表加一行（按字母序插入）:
-  `| [<显示名>](configs/<算法名>) | [<论文标题>](configs/<算法名>) |`
-- 显示名可以是论文常用写法（如 `JDM`），但 **两列链接都链到 `configs/<算法名>`**。
-- **两个 README 是逐行镜像**:同一行号插入同样内容，两边都改，行号必须一致。
-- 两个文件都是 CRLF 行尾，同样注意保行尾编辑。
+- Add one alphabetical row under `## Supported Methods`:
+  `| [<display>](configs/<name>) | [<paper title>](configs/<name>) |`
+- The display name may be the paper's usual spelling (`JDM`), but **both
+  columns link to `configs/<name>`**.
+- The two READMEs are line-for-line mirrors: same insertion line, both files,
+  same line numbers.
+- Both files are CRLF. Preserve line endings.
 
-## 5. 提交与 PR
+## 5. Commit and PR
 
-- 分支名 `paper/<算法名>`，与 `configs/` 目录名一致。
-- **contributor 一律是 [Singingkettle](https://github.com/Singingkettle)**。git
-  author/committer 用该账号绑定的 `ChangShuo <changshuo@bupt.edu.cn>`。
-  **禁止** `Co-authored-by:` 行，禁止把 Cursor / 助手 / 其他 GitHub 账号写进
-  contributors、PR 作者或提交元数据。
-- 提交信息单行、无 conventional-commit 前缀（参考 main 历史）；一篇论文的入库尽量
-  整理成 **一个干净提交**（改进期用 `--amend` + `push --force-with-lease`，PR 被
-  review 后不再改写历史）。
-- PR 保持**纯新增**:除注册行外不动既有代码；diff 里不允许出现与本论文无关的文件。
+- Branch name `paper/<name>`, matching the `configs/` directory.
+- **The only contributor is [Singingkettle](https://github.com/Singingkettle).**
+  git author/committer is `ChangShuo <changshuo@bupt.edu.cn>` for that account.
+  **No `Co-authored-by:` lines.** Do not put Cursor, an assistant, or another
+  GitHub account in contributors, PR author, or commit metadata.
+- One-line commit message, no conventional-commit prefix (follow `main`).
+  Prefer **one clean commit** per paper (`--amend` + `--force-with-lease`
+  during iteration; do not rewrite history after review).
+- Keep the PR a **pure add**: do not touch unrelated existing code. The diff
+  must not contain files that are not this paper.
 
-## 6. 严禁入库
+## 6. Do not check in
 
-- 论文稿件类文件:`.tex` / `.pdf` / `.bib` / 审稿回复 / 图源 PDF（画图**脚本**可以
-  入，成品图不入）
-- 数据集与重资产（memmap、npz 缓存、checkpoint）— 提供再生成脚本，不提交字节
-- 机器绝对路径、私人服务器信息、密钥
-- 一次性探索脚本（`build_*/aggregate_*/audit_*`、keepalive、sweep orchestrator）
-  和围攻失败配置 — 只入复现主线
-- `amr_benchmark`、`tools/<算法名>/`、`docs/<算法名>/` 这类旁路（DetectionIsEasy
-  历史例外除外）
+- Manuscript files: `.tex` / `.pdf` / `.bib` / reviewer replies / figure-source
+  PDFs (plot **scripts** are fine; finished figures are not)
+- Datasets and heavy assets (memmap, npz caches, checkpoints) — ship a
+  regenerate script, not the bytes
+- Machine absolute paths, private server details, secrets
+- One-off exploration (`build_*` / `aggregate_*` / `audit_*`, keepalive, sweep
+  orchestrators) and failed siege configs — mainline only
+- `amr_benchmark`, `tools/<name>/`, `docs/<name>/` side paths (DetectionIsEasy
+  historical exception only)
 
-## 7. 入库前验收清单
+## 7. Pre-merge checklist
 
 ```bash
-# 语法门:全部新 .py 可编译
-python -m py_compile configs/<算法名>/*.py
-# 若有专属脚本:
-python -m py_compile configs/<算法名>/scripts/*.py
+# Syntax: every new .py compiles
+python -m py_compile configs/<name>/*.py
+# If the paper has scripts:
+python -m py_compile configs/<name>/scripts/*.py
 
-# 死引用清零(对新增文件跑,应全部 0 命中)
-grep -rE '<旧工程目录名>|/home/' configs/<算法名>
+# Dead references (must be zero hits on new files)
+grep -rE '<old-project-name>|/home/' configs/<name>
 
-# __init__ 注册正确(__all__ 无隐式拼接、import 行在位)
+# Registry __init__ is valid (no implicit string concat; import present)
 python -c "import ast; ast.parse(open('csrr/datasets/__init__.py').read())"
 
-# 双 README 行号一致;两列都链到 configs/<算法名>
-grep -n '<显示名>' README.md README_zh-CN.md
+# Dual root READMEs share line numbers; both columns link to configs/<name>
+grep -n '<display>' README.md README_zh-CN.md
 ```
 
-- 服务器实跑:所有配置 `Config.fromfile` 全过；原生模型经 registry 构建 + 前向/
-  反向；能训则至少跑 1 个 epoch（离线服务器经 git bundle + scp 同步，缺依赖用本地
-  下载 wheel 离线装）。
-- 合并后在 main 上再 grep 复核一遍。
+- On the server: every config loads with `Config.fromfile`; native models build
+  from the registry and run forward / backward; if you can train, run at least
+  one epoch.
+- After merge, grep `main` once more.

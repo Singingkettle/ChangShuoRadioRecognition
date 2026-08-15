@@ -1,5 +1,7 @@
 # MCformer — MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > S. Hamidi-Rad and S. Jain, "MCformer: A Transformer Based Deep Neural Network for Automatic Modulation Classification", *IEEE Commun. Lett. (2022)*.
 > [https://ieeexplore.ieee.org/abstract/document/9685815](https://ieeexplore.ieee.org/abstract/document/9685815)
 

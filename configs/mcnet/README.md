@@ -1,5 +1,7 @@
 # MCNET — MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification
 
+English | [简体中文](README_zh-CN.md)
+
 > T. Huynh-The et al., "MCNet: An Efficient CNN Architecture for Robust Automatic Modulation Classification", *IEEE Commun. Lett. (2020)*.
 > [https://ieeexplore.ieee.org/abstract/document/8963964](https://ieeexplore.ieee.org/abstract/document/8963964)
 

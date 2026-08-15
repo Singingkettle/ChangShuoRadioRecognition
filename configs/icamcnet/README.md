@@ -1,5 +1,7 @@
 # IC-AMCNet — CNN-Based Automatic Modulation Classification for Beyond 5G Communications
 
+English | [简体中文](README_zh-CN.md)
+
 > A. P. Hermawan et al., "CNN-Based Automatic Modulation Classification for Beyond 5G Communications", *IEEE Commun. Lett. (2020)*.
 > [https://ieeexplore.ieee.org/abstract/document/8977561](https://ieeexplore.ieee.org/abstract/document/8977561)
 
