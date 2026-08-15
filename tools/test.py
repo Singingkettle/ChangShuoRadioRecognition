@@ -11,10 +11,12 @@ from mmengine.registry import init_default_scope
 from mmengine.runner import Runner, load_checkpoint
 
 
+_DETECTION_MODEL_TYPES = frozenset(('SignalDetector', 'JDMFramework'))
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Test a model and save predictions for plotting')
+        description='Test a model (classification or detection)')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file path')
     parser.add_argument('--work-dir', help='the dir to save results')
@@ -29,9 +31,55 @@ def parse_args():
         help=('also save per-sample feature vectors (`feas`) and per-class '
               'centers (`centers`) into paper.pkl when the backbone or '
               'classifier exposes a `pre_logits` stage. Disabled by default '
-              'to preserve the existing fast test path.'))
+              'to preserve the existing fast test path. Ignored for '
+              'detection / joint configs.'))
     args = parser.parse_args()
     return args
+
+
+def _evaluator_is_detection(evaluator):
+    if isinstance(evaluator, (list, tuple)):
+        return any(_evaluator_is_detection(item) for item in evaluator)
+    if not isinstance(evaluator, dict):
+        return False
+    name = str(evaluator.get('type', ''))
+    return name in ('SignalDetectionMetric',) or 'Detection' in name
+
+
+def _is_detection_cfg(cfg):
+    model = cfg.get('model') or {}
+    if isinstance(model, dict) and model.get('type') in _DETECTION_MODEL_TYPES:
+        return True
+    return _evaluator_is_detection(cfg.get('test_evaluator'))
+
+
+def _set_default_snr_outputs(evaluator, work_dir):
+    """Place SNR curve artifacts in the active work dir by default."""
+    if isinstance(evaluator, (list, tuple)):
+        for item in evaluator:
+            _set_default_snr_outputs(item, work_dir)
+        return
+    if not isinstance(evaluator, dict) or not evaluator.get('snrwise', False):
+        return
+    evaluator.setdefault('snr_curve_out',
+                         osp.join(work_dir, 'snr_curve.json'))
+    evaluator.setdefault('snr_plot_out',
+                         osp.join(work_dir, 'snr_curve.pdf'))
+
+
+def _run_detection_test(args, cfg):
+    if args.work_dir is not None:
+        cfg.work_dir = args.work_dir
+    elif cfg.get('work_dir', None) is None:
+        cfg.work_dir = osp.join('./work_dirs',
+                                osp.splitext(osp.basename(args.config))[0])
+
+    cfg.load_from = args.checkpoint
+    cfg.test_dataloader.setdefault('collate_fn', dict(type='default_collate'))
+    _set_default_snr_outputs(cfg.test_evaluator, cfg.work_dir)
+
+    runner = Runner.from_cfg(cfg)
+    runner.test()
 
 
 def _try_extract_features(model, inputs):
@@ -62,6 +110,10 @@ def main():
     cfg = Config.fromfile(args.config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
+
+    if _is_detection_cfg(cfg):
+        _run_detection_test(args, cfg)
+        return
 
     if args.work_dir is not None:
         work_dir = args.work_dir

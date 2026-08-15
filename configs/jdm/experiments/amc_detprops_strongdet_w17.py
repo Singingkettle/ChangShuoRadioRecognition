@@ -1,6 +1,6 @@
 # AMC fine-tune on detector-proposal crops (simulate-joint operating point).
 # Starts from the GT-box AMC checkpoint; 60-epoch cosine at 1e-4.
-# Prerequisite: tools/precompute_amc_proposals.py → the proposal_cache below.
+# Prerequisite: configs/jdm/scripts/precompute_amc_proposals.py → the proposal_cache below.
 # Paper: Xing et al., IEEE TWC 2024.
 _base_ = '../jdm-amc_iq-csrd.py'
 
