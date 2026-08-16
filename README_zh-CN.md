@@ -37,6 +37,7 @@ CSRR（ChangShuoRadioRecognition）是一个基于 PyTorch 和 [MMEngine](https:
 | [MLDNN](configs/mldnn) | [Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification](configs/mldnn) |
 | [PET-CGDNN](configs/petcgdnn) | [An Efficient Deep Learning Model for Automatic Modulation Recognition Based on Parameter Estimation and Transformation](configs/petcgdnn) |
 | [ResNetAMR](configs/resnetamr) | [Deep Neural Network Architectures for Modulation Classification (ResNet)](configs/resnetamr) |
+| [SNR-Ladder](configs/snr_ladder) | [Do SNR-Aware Training Gains Survive a Frozen-Model Readout? A Null-Ladder Audit of Modulation Classification](configs/snr_ladder) |
 | [TRN](configs/trn) | [Signal Modulation Classification Based on the Transformer Network](configs/trn) |
 
 ## 安装
