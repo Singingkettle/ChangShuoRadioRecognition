@@ -1,0 +1,3 @@
+# snr_ladder audit scripts: per-bin probes/readouts (scikit-learn) on top of the
+# core stack; scipy/matplotlib are already required by the base framework.
+scikit-learn

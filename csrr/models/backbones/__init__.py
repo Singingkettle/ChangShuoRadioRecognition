@@ -13,10 +13,12 @@ from .icamcnet import ICAMCNet
 from .jdm import JDMClassificationBackbone, JDMDetectionBackbone
 from .lstm2 import LSTM2
 from .mcformer import MCformer
+from .mcformer_film import MCformerFiLM
 from .mcldnn import MCLDNN
 from .mcnet import MCNet
 from .mldnn import MLDNNSingleBranch, MLDNN
 from .petcgdnn import PETCGDNN
+from .petcgdnn_film import PETCGDNNFiLM
 from .resnetamr import ResNetAMR
 from .returniq_resnet1d import ReturnIQResNet1D
 
@@ -24,7 +26,7 @@ __all__ = [
     'CGDNet', 'CLDNNL', 'CLDNNW', 'CNN1DPF', 'CNN2', 'CNN4',
     'DAE', 'DensCNN', 'DSCLDNN', 'FastMLDNN', 'GRU2', 'HCGDNN',
     'ICAMCNet', 'JDMClassificationBackbone', 'JDMDetectionBackbone',
-    'LSTM2', 'MCformer', 'MCLDNN', 'MCNet',
-    'MLDNNSingleBranch', 'MLDNN', 'PETCGDNN', 'ResNetAMR',
+    'LSTM2', 'MCformer', 'MCformerFiLM', 'MCLDNN', 'MCNet',
+    'MLDNNSingleBranch', 'MLDNN', 'PETCGDNN', 'PETCGDNNFiLM', 'ResNetAMR',
     'ReturnIQResNet1D',
 ]
