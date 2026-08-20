@@ -11,7 +11,7 @@ _base_ = ['../_base_/runtimes/amc.py']
 # return-to-IQ `build` step: train_L1024.npz / val_L1024.npz / test_L1024.npz,
 # each with arrays X [N, 2, L] (float32) and y [N] (int64, 57 classes).
 #
-# This default is where `python tools/detection_is_easy/bridge.py build` writes them
+# This default is where `python configs/detection_is_easy/bridge.py build` writes them
 # (bridge.py's CACHE root). If you moved the caches, override on the command line:
 #   --cfg-options train_dataloader.dataset.data_root=<dir> #                 val_dataloader.dataset.data_root=<dir> #                 test_dataloader.dataset.data_root=<dir>
 data_root = 'work_dirs/returniq_cache'

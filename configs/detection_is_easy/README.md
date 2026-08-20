@@ -9,7 +9,7 @@ Reproduction code for the wideband detection+recognition study:
 > IEEE Transactions on Cognitive Communications and Networking (TCCN), under review.
 
 Companion locations: the ablation configs live in [`configs/detection_is_easy/`](../../configs/detection_is_easy),
-the campaign tools in [`tools/detection_is_easy/`](../../tools/detection_is_easy).
+the campaign tools in [`configs/detection_is_easy/`](../../configs/detection_is_easy).
 
 ## Method in one paragraph
 
@@ -29,16 +29,16 @@ architecture, as the decisive lever.
 | paper | code |
 |---|---|
 | Detector ablation grid (input rep / complexity / family) | `configs/detection_is_easy/rtmdet_*`, `fcos_*`, `atss_*`, `yolox_*`, `faster_rcnn_*`, `cascade_rcnn_*`, `deformable_detr_*` |
-| STFT / raw-IQ Load transforms, complex data preprocessors, complex-1D backbone | `tools/detection_is_easy/mmdet_plugins.py` |
-| Complex-1D primitives + analytic filterbanks | `tools/detection_is_easy/iqdet_complex.py` |
+| STFT / raw-IQ Load transforms, complex data preprocessors, complex-1D backbone | `configs/detection_is_easy/mmdet_plugins.py` |
+| Complex-1D primitives + analytic filterbanks | `configs/detection_is_easy/iqdet_complex.py` |
 | Return-to-IQ recognizer backbone (1-D ResNet, iq/diff/iqdiff) | `csrr/models/backbones/returniq_resnet1d.py` |
 | Hierarchical AMC head (coarse router + 45-class single + 12-class OFDM) | `csrr/models/heads/hierarchical_amc_head.py` |
 | Channelized-crop dataset (57-class, `*_L1024.npz` caches) | `csrr/datasets/wideband_channelized.py` |
 | Recognizer training recipe (120 ep AdamW + cosine + EMA + label smoothing) | `configs/detection_is_easy/returniq_resnet1d_{iq,diff,iqdiff}_120e_wideband.py` |
-| Detect → channelize → recognize bridge, oracle bounds, diagnostics | `tools/detection_is_easy/bridge.py` |
-| Class-aware detection mAP + time-frequency IoU metrics | `tools/detection_is_easy/iqdet_metrics.py` |
-| Wideband data generation (TorchSig) + COCO export + memmap packing | `tools/detection_is_easy/prepare_torchsig_iq_stratified.py`, `export_*_coco_from_raw.py`, `make_stft_feature_tensor_from_complex.py`, `pack_coco_tensors_to_memmap.py`, `build_multiclass_coco.py` |
-| Paper figures + corrected block-SNR analysis | `tools/detection_is_easy/make_figs.py`, `render_example.py`, `analyze_snr_stratified.py`, `analyze_box_quality.py` |
+| Detect → channelize → recognize bridge, oracle bounds, diagnostics | `configs/detection_is_easy/bridge.py` |
+| Class-aware detection mAP + time-frequency IoU metrics | `configs/detection_is_easy/iqdet_metrics.py` |
+| Wideband data generation (TorchSig) + COCO export + memmap packing | `configs/detection_is_easy/prepare_torchsig_iq_stratified.py`, `export_*_coco_from_raw.py`, `make_stft_feature_tensor_from_complex.py`, `pack_coco_tensors_to_memmap.py`, `build_multiclass_coco.py` |
+| Paper figures + corrected block-SNR analysis | `configs/detection_is_easy/make_figs.py`, `render_example.py`, `analyze_snr_stratified.py`, `analyze_box_quality.py` |
 
 ## Environment
 
@@ -88,7 +88,7 @@ RAW=$DATA/torchsig_hardshort_lowsnr_iq_65k_nvme
 MM=$DATA/torchsig_hardshort_lowsnr_stft3_memmap
 
 # 1) raw IQ scenes + per-signal metadata  (the slow step)
-python tools/detection_is_easy/prepare_torchsig_iq_stratified.py \
+python configs/detection_is_easy/prepare_torchsig_iq_stratified.py \
   --out-root $RAW \
   --train 50000 --val 5000 --test 10000 \
   --num-iq-samples 262144 --sample-rate 10000000 \
@@ -103,23 +103,23 @@ python tools/detection_is_easy/prepare_torchsig_iq_stratified.py \
   --seed 20260640
 
 # 2) complex STFT tensors [2,F,T] + COCO annotations
-python tools/detection_is_easy/export_complex_stft_coco_from_raw.py \
+python configs/detection_is_easy/export_complex_stft_coco_from_raw.py \
   --src-root $RAW --out-root $MM --stft-fft 512 --stft-hop 512
 
 # 3) 3-channel [real, imag, log-magnitude] feature tensors  (SEPARATE --out-root)
-python tools/detection_is_easy/make_stft_feature_tensor_from_complex.py \
+python configs/detection_is_easy/make_stft_feature_tensor_from_complex.py \
   --src-root $MM/coco --out-root ${MM}_stft3 --mode realimag_logpower3ch --workers 8
 
 # 4) pack into the memmap the fast training path reads
-python tools/detection_is_easy/pack_coco_tensors_to_memmap.py \
+python configs/detection_is_easy/pack_coco_tensors_to_memmap.py \
   --kind tensor --src-coco ${MM}_stft3/coco --out-root $MM --splits train,val,test --workers 8
 
 # 5) single-class ("signal") annotations -- the class-agnostic localization task
-python tools/detection_is_easy/export_raw_coco_from_metadata.py \
+python configs/detection_is_easy/export_raw_coco_from_metadata.py \
   --src-root $RAW --out-root $MM --single-class
 
 # 6) 57-class annotations -- the class-aware task
-python tools/detection_is_easy/build_multiclass_coco.py \
+python configs/detection_is_easy/build_multiclass_coco.py \
   --dataset-dir $MM --out-dir $MM/coco_multiclass/annotations --splits train,val,test
 ```
 
@@ -163,7 +163,7 @@ via the equivalence check below, not a checksum.
 ### Check what you built before you train on it
 
 ```bash
-python tools/detection_is_easy/validate_coco.py --root $MM
+python configs/detection_is_easy/validate_coco.py --root $MM
 ```
 
 Confirm at minimum: 57 categories with ids 0–56 identical across splits; 50 000/5 000/10 000
@@ -189,14 +189,14 @@ predictions. Train first, then re-invoke in `--eval-only` mode against the check
 
 ```bash
 # train (this is the deployment detector: the run every bridged number is computed from)
-python tools/detection_is_easy/run_mmdet_train_eval.py \
+python configs/detection_is_easy/run_mmdet_train_eval.py \
   --root $MM/coco_multiclass \
   --config configs/detection_is_easy/rtmdet_m_stft3_tensor_memmap_resize512.py \
   --work-dir work_dirs/baseline_mc_rtmdet_m_20e_seed20262811 \
   --epochs 20 --batch-size 8 --optimizer config --seed 20262811
 
 # then dump test predictions from the trained checkpoint
-python tools/detection_is_easy/run_mmdet_train_eval.py \
+python configs/detection_is_easy/run_mmdet_train_eval.py \
   --root $MM/coco_multiclass \
   --config configs/detection_is_easy/rtmdet_m_stft3_tensor_memmap_resize512.py \
   --work-dir work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump \
@@ -216,10 +216,10 @@ which is what produces a checkpoint `bridge.py bridge` can load:
 
 ```bash
 for s in train val test; do
-  python tools/detection_is_easy/bridge.py build --split $s --L 1024
+  python configs/detection_is_easy/bridge.py build --split $s --L 1024
 done   # -> work_dirs/returniq_cache/{train,val,test}_L1024.npz
 
-python tools/detection_is_easy/bridge.py train-hier \
+python configs/detection_is_easy/bridge.py train-hier \
   --train-cache work_dirs/returniq_cache/train_L1024.npz \
   --val-cache   work_dirs/returniq_cache/val_L1024.npz \
   --out work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
@@ -243,7 +243,7 @@ the paper: the two save different checkpoint formats, and `bridge.py bridge` rea
 ### Stage 3 — deployment bridge
 
 ```bash
-python tools/detection_is_easy/bridge.py bridge \
+python configs/detection_is_easy/bridge.py bridge \
   --split test \
   --baseline-pred work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump/source_data/test_predictions.bbox.json \
   --hier-model work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
@@ -350,8 +350,8 @@ decimal.
 ## Figures
 
 ```bash
-python tools/detection_is_easy/make_figs.py            # Figs. 1, 2, 4, 5 -> figs/*.pdf
-python tools/detection_is_easy/render_example.py \
+python configs/detection_is_easy/make_figs.py            # Figs. 1, 2, 4, 5 -> figs/*.pdf
+python configs/detection_is_easy/render_example.py \
   --ann $MM/coco_multiclass/annotations/instances_test.json \
   --raw $RAW/raw/test \
   --pred work_dirs/baseline_mc_rtmdet_m_20e_seed20262811_testdump/source_data/test_predictions.bbox.json
@@ -362,11 +362,11 @@ is the output of `analyze_snr_stratified.py` on the recipe-A diagnostic dump. Re
 CSV with:
 
 ```bash
-python tools/detection_is_easy/bridge.py diag-quality \
+python configs/detection_is_easy/bridge.py diag-quality \
   --hier-model work_dirs/returniq_cache/recognizer_hierrcpA_s101.pth \
   --baseline-pred <the test dump> --L 1024 --score-thr 0.05 --with-oracle --limit 2000 \
   --out work_dirs/returniq_cache/box_quality_oracle_rcpA.jsonl
-python tools/detection_is_easy/analyze_snr_stratified.py \
+python configs/detection_is_easy/analyze_snr_stratified.py \
   --jsonl work_dirs/returniq_cache/box_quality_oracle_rcpA.jsonl --limit 2000
 ```
 

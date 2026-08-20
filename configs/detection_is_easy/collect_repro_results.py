@@ -12,7 +12,7 @@ line, the git commit the code was on, the wall clock, and whether the mmcv-lite 
 were active. Runs of the same cell are then pooled across seeds, because a single seed
 cannot settle a 0.01 difference on this benchmark.
 
-    python tools/detection_is_easy/collect_repro_results.py --root work_dirs/repro \
+    python configs/detection_is_easy/collect_repro_results.py --root work_dirs/repro \
         --out reports/repro_cells.csv --markdown reports/repro_cells.md
 
 Cells are matched to the paper by the `paper_cell` string the campaign records in
@@ -52,7 +52,11 @@ ALSO_IN = {
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
 
 
 def read_summary(path: Path) -> dict[str, float]:
@@ -246,7 +250,7 @@ def main() -> None:
     ap.add_argument("--out", default="reports/repro_cells.csv", help="per-run CSV")
     ap.add_argument("--pooled-out", default=None, help="per-cell CSV (default: --out with _pooled)")
     ap.add_argument("--markdown", default=None, help="also write a comparison table")
-    ap.add_argument("--reference", default="docs/detection_is_easy/paper_values.csv",
+    ap.add_argument("--reference", default="configs/detection_is_easy/paper_values.csv",
                     help="per-cell paper values, each citing the table it came from")
     ap.add_argument("--tolerance", type=float, default=DEFAULT_TOLERANCE,
                     help="band for calling a cell reproduced; set it from a measured "

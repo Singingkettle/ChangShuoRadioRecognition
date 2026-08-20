@@ -15,15 +15,23 @@ class-aware recognition (vision / return-to-IQ / perfect-box) + constellation-fa
 Input is the per-detection diagnostic dump written by ``bridge.py diag-quality``. The paper's
 Fig. 2 comes from the recipe-A dump over the first 2000 test scenes:
 
-    python tools/detection_is_easy/bridge.py diag-quality --hier-model <recognizer>.pth \\
+    python configs/detection_is_easy/bridge.py diag-quality --hier-model <recognizer>.pth \\
       --L 1024 --score-thr 0.05 --with-oracle --limit 2000 --out box_quality_oracle_rcpA.jsonl
-    python tools/detection_is_easy/analyze_snr_stratified.py --jsonl <that file> --limit 2000
+    python configs/detection_is_easy/analyze_snr_stratified.py --jsonl <that file> --limit 2000
 
 The emitted CSV is the one committed as ``snr_data.csv`` next to this script."""
 import argparse, json, numpy as np
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+def _repo_root():
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
+
+
+ROOT = _repo_root()
 
 _ap = argparse.ArgumentParser(description=__doc__,
                               formatter_class=argparse.RawDescriptionHelpFormatter)

@@ -23,7 +23,7 @@ CSRR（ChangShuoRadioRecognition）是一个基于 PyTorch 和 [MMEngine](https:
 | [CNN4](configs/cnn4) | [Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels](configs/cnn4) |
 | [DAE](configs/dae) | [Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder](configs/dae) |
 | [DensCNN](configs/denscnn) | [Deep Neural Network Architectures for Modulation Classification](configs/denscnn) |
-| [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](docs/detection_is_easy) |
+| [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](configs/detection_is_easy) |
 | [DSCLDNN](configs/dscldnn) | [Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure](configs/dscldnn) |
 | [FastMLDNN](configs/fastmldnn) | [A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification](configs/fastmldnn) |
 | [GRU2](configs/gru2) | [Automatic modulation classification using recurrent neural networks](configs/gru2) |

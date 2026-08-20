@@ -15,7 +15,11 @@ from pathlib import Path
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
 
 
 TOOL_DIR = Path(__file__).resolve().parent
@@ -167,44 +171,25 @@ def maybe_stub_mmcv_ext() -> bool:
     module.__spec__ = importlib.machinery.ModuleSpec("mmcv._ext", loader=None)
 
     def nms(bboxes, scores, iou_threshold: float, offset: int = 0):
-        """Pure PyTorch NMS fallback for smoke validation.
+        """NMS backed by torchvision's compiled CUDA kernel.
 
-        This is intentionally simple and only covers the standard axis-aligned
-        NMS signature used by RTMDet inference. Full experiments should use
-        the OpenMMLab CUDA extension.
+        The original pure-Python fallback was fine for single-stage inference
+        (a few hundred boxes) but O(N^2) in Python -- catastrophic for two-stage
+        RPN training, which runs NMS on thousands of proposals every iteration
+        (Faster/Cascade R-CNN otherwise sit at ~8.5 s/iter). torchvision.ops.nms
+        is the same axis-aligned NMS as a compiled op and returns the kept
+        indices sorted by score, matching mmcv's contract.
         """
-
         import torch
+        from torchvision.ops import nms as tv_nms
 
         if bboxes.numel() == 0:
             return torch.empty((0,), dtype=torch.long, device=bboxes.device)
-
-        x1, y1, x2, y2 = bboxes.unbind(dim=1)
-        widths = (x2 - x1 + offset).clamp(min=0)
-        heights = (y2 - y1 + offset).clamp(min=0)
-        areas = widths * heights
-        order = scores.argsort(descending=True)
-        keep = []
-
-        while order.numel() > 0:
-            current = order[0]
-            keep.append(current)
-            if order.numel() == 1:
-                break
-
-            rest = order[1:]
-            xx1 = torch.maximum(x1[current], x1[rest])
-            yy1 = torch.maximum(y1[current], y1[rest])
-            xx2 = torch.minimum(x2[current], x2[rest])
-            yy2 = torch.minimum(y2[current], y2[rest])
-            inter_w = (xx2 - xx1 + offset).clamp(min=0)
-            inter_h = (yy2 - yy1 + offset).clamp(min=0)
-            inter = inter_w * inter_h
-            union = (areas[current] + areas[rest] - inter).clamp(min=torch.finfo(bboxes.dtype).eps)
-            iou = inter / union
-            order = rest[iou <= iou_threshold]
-
-        return torch.stack(keep) if keep else torch.empty((0,), dtype=torch.long, device=bboxes.device)
+        boxes = bboxes.float()
+        if offset != 0:
+            boxes = boxes.clone()
+            boxes[:, 2:] = boxes[:, 2:] + offset
+        return tv_nms(boxes, scores.float(), float(iou_threshold))
 
     def __getattr__(name: str):
         def missing_op(*args, **kwargs):
@@ -266,6 +251,63 @@ def patch_focal_loss_for_mmcv_lite() -> bool:
             reduction=reduction, avg_factor=avg_factor)
 
     mmdet_focal_loss.sigmoid_focal_loss = sigmoid_focal_loss
+    return True
+
+
+def patch_roi_align_for_mmcv_lite() -> bool:
+    """Route RoIAlign through torchvision on an mmcv-lite install.
+
+    Two-stage detectors (Faster R-CNN, Cascade R-CNN) pool region features with
+    ``mmcv.ops.RoIAlign``, whose forward calls the compiled ``mmcv._ext.roi_align_forward``
+    kernel and dies on mmcv-lite. torchvision ships the identical average RoIAlign as a
+    CUDA op, so pointing the module forward at ``torchvision.ops.roi_align`` reproduces the
+    same pooled features (mmdet uses pool_mode='avg', aligned=True). mmcv's adaptive
+    sampling_ratio of 0 maps to torchvision's -1.
+
+    Returns True when the patch was applied.
+    """
+    if not mmcv_ext_is_stubbed():
+        return False
+
+    from torchvision.ops import roi_align as tv_roi_align
+    from mmcv.ops import RoIAlign as _mmcv_RoIAlign
+
+    def forward(self, input, rois):
+        out_h, out_w = self.output_size
+        ratio = self.sampling_ratio if (self.sampling_ratio and self.sampling_ratio > 0) else -1
+        return tv_roi_align(
+            input, rois, output_size=(int(out_h), int(out_w)),
+            spatial_scale=float(self.spatial_scale), sampling_ratio=int(ratio),
+            aligned=bool(self.aligned))
+
+    _mmcv_RoIAlign.forward = forward
+    return True
+
+
+def patch_msda_for_mmcv_lite() -> bool:
+    """Force pure-PyTorch multi-scale deformable attention on an mmcv-lite install.
+
+    Deformable DETR calls ``MultiScaleDeformableAttnFunction`` for CUDA tensors, which hits
+    the compiled ``mmcv._ext.ms_deform_attn_forward`` kernel and dies on mmcv-lite. mmcv
+    already ships the identical ``multi_scale_deformable_attn_pytorch`` (differentiable torch
+    ops, its own CPU/fallback path); routing the Function's ``apply`` at it reproduces the
+    same output and gradients, only slower.
+
+    Returns True when the patch was applied.
+    """
+    if not mmcv_ext_is_stubbed():
+        return False
+
+    import mmcv.ops.multi_scale_deform_attn as msda
+    pytorch_impl = msda.multi_scale_deformable_attn_pytorch
+
+    class _MSDAFallback:
+        @staticmethod
+        def apply(value, value_spatial_shapes, value_level_start_index,
+                  sampling_locations, attention_weights, im2col_step):
+            return pytorch_impl(value, value_spatial_shapes, sampling_locations, attention_weights)
+
+    msda.MultiScaleDeformableAttnFunction = _MSDAFallback
     return True
 
 

@@ -41,7 +41,15 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
+def _repo_root():
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
+
+
+ROOT = _repo_root()
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

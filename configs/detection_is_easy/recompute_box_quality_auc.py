@@ -21,7 +21,7 @@ analysis:
 Also fits a multivariate logistic model over the candidate scalars and reports its AUC,
 which bounds what any hand-designed "signal-fidelity IoU" could achieve.
 
-    python tools/detection_is_easy/recompute_box_quality_auc.py \\
+    python configs/detection_is_easy/recompute_box_quality_auc.py \\
       --jsonl work_dirs/returniq_cache/box_quality_oracle.jsonl \\
       --out work_dirs/returniq_cache/box_quality_auc.csv
 """

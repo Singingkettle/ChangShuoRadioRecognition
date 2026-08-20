@@ -16,7 +16,11 @@ from pathlib import Path
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
 
 
 ROOT = repo_root()
@@ -33,6 +37,8 @@ from run_mmdet_smoke import (  # noqa: E402
     data_subdir,
     maybe_stub_mmcv_ext,
     patch_focal_loss_for_mmcv_lite,
+    patch_roi_align_for_mmcv_lite,
+    patch_msda_for_mmcv_lite,
 )
 
 
@@ -283,6 +289,8 @@ def main() -> None:
     # Must happen after the stub is installed and before the model is built: FCOS/ATSS
     # otherwise die in the first backward pass on a missing CUDA focal-loss kernel.
     used_py_focal = patch_focal_loss_for_mmcv_lite()
+    used_py_roi = patch_roi_align_for_mmcv_lite()
+    used_py_msda = patch_msda_for_mmcv_lite()
 
     coco_root = ROOT / args.root
     classes = category_names(coco_root)
@@ -419,6 +427,8 @@ def main() -> None:
         "cuda_device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
         "used_mmcv_lite_stub": used_stub,
         "used_pytorch_focal_loss": used_py_focal,
+        "used_pytorch_roi_align": used_py_roi,
+        "used_pytorch_msda": used_py_msda,
         "seed": args.seed,
         "resume_from": args.resume_from,
         "checkpoint": args.checkpoint,

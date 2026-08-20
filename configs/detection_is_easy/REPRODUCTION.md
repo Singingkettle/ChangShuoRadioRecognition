@@ -7,8 +7,8 @@ released code, and states, cell by cell, where the re-run lands relative to the 
 numbers. It is a factual log. It draws no conclusions the measurements do not force.
 
 Every number below was produced on server hardware from the released `main` branch. The
-comparison table is generated mechanically by `tools/detection_is_easy/collect_repro_results.py`
-against `docs/detection_is_easy/paper_values.csv`, which stores each reported value next to
+comparison table is generated mechanically by `configs/detection_is_easy/collect_repro_results.py`
+against `configs/detection_is_easy/paper_values.csv`, which stores each reported value next to
 the table or section it came from.
 
 ## What was run, on what
@@ -198,15 +198,54 @@ Found while running from the fresh clone; each is committed to `main`:
   name. `load_raw_iq` now falls back to the decoded `.npy` cache, or names the scene if it
   cannot.
 
+## Cross-detector taxonomy sweep
+
+The predicted-box recipe is not tied to RTMDet or FCOS. We ran the whole per-detector chain --- train the
+detector, dump its predicted boxes on train and test, build a count-matched (174,136) predicted-box crop
+cache, train three recognizers (seeds 101/202/303), bridge and deploy --- on thirteen detectors spanning the
+anchor-free, anchor-based, adaptive, dense, two-stage, multi-stage, set-prediction, and DETR families. Every
+one gains; the paper reports this as Table `tab:taxonomy` and the per-family values are in
+`taxonomy-results.csv`.
+
+Configs are the nine `*_stft3_memmap_resize512.py` added here (`cascade_rcnn`, `faster_rcnn`,
+`conditional_detr`, `dab_detr`, `deformable_detr`, `dino`, `gfl`, `retinanet`, `sparse_rcnn`), plus RTMDet,
+FCOS, and ATSS already present. Each inherits its mmdet base with `_base_ = 'mmdet::...'` and loads
+`mmdet_plugins` (the documented mmdet exception).
+
+Per detector `<fam>`, from a fresh clone:
+
+```bash
+# 1. detector (20 ep). DETRs collapse at the uniform 5e-4 -- see the learning-rate note below.
+python configs/detection_is_easy/run_mmdet_train_eval.py \
+  --root data/torchsig_hardshort_lowsnr_stft3_memmap/coco_multiclass \
+  --config configs/detection_is_easy/<fam>_stft3_memmap_resize512.py \
+  --work-dir work_dirs/<fam>_det --epochs 20 --batch-size 4 --optimizer AdamW --lr 5e-4 \
+  --seed 7 --require-tensor-stats
+# 2. dump its predicted boxes on test and on train (same script, --eval-only --dump-results;
+#    add --test-split train for the train dump)
+# 3. count-matched predicted-box crop cache
+python configs/detection_is_easy/build_pred_matched.py --fam <fam> \
+  --baseline-pred work_dirs/<fam>_traindump/source_data/test_predictions.bbox.json \
+  --work-dir work_dirs/<fam>_buildpred
+# 4. three recognizers on that cache, then bridge --split test (see "Recognizer and deployment cells")
+```
+
+**Learning-rate deviations (recorded, not tuned).** Under the uniform lr `5e-4` every DETR variant collapses
+to a zero-mAP detector (sane loss, degenerate queries). Lower the rate per family: RetinaNet and the
+deformable-attention DETRs (Deformable-DETR, DINO) to `1e-4`; the plain DETRs (Conditional-DETR, DAB-DETR) to
+`5e-5`. The op fallbacks in `run_mmdet_smoke.py` and `run_mmdet_train_eval.py` (RoIAlign, multi-scale
+deformable attention, and NMS routed to `torchvision` / pure PyTorch) are what let the two-stage and DETR
+detectors run under mmcv-lite without compiled ops.
+
 ## Provenance
 
 Per-cell CSVs, the pooled comparison, and every run's `run_info.json` (with the literal
 command line in `argv`, the git commit, and the two run-time contract flags) are archived
 alongside this record. The paper-value reference table is
-`docs/detection_is_easy/paper_values.csv`; regenerate the comparison with:
+`configs/detection_is_easy/paper_values.csv`; regenerate the comparison with:
 
 ```
-python tools/detection_is_easy/collect_repro_results.py \
+python configs/detection_is_easy/collect_repro_results.py \
   --root work_dirs/repro --markdown reports/repro_cells.md \
-  --reference docs/detection_is_easy/paper_values.csv
+  --reference configs/detection_is_easy/paper_values.csv
 ```

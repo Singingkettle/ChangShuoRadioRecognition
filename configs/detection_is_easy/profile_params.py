@@ -6,12 +6,12 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 
 """Count parameters of RTMDet tiny/s/m/l on STFT3 (57-class) for the complexity table.
-Run: python tools/detection_is_easy/profile_params.py"""
+Run: python configs/detection_is_easy/profile_params.py"""
 import sys
 sys.path.insert(0, ".")
 from run_mmdet_smoke import maybe_stub_mmcv_ext
 maybe_stub_mmcv_ext()
-sys.path.insert(0, "tools/detection_is_easy")
+sys.path.insert(0, "configs/detection_is_easy")
 import mmdet_plugins  # noqa: F401
 from mmengine.config import Config
 from mmengine.registry import init_default_scope

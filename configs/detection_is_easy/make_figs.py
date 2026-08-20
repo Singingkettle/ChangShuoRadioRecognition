@@ -13,7 +13,7 @@ separately by render_example.py, which needs the dataset and a prediction dump.
 Self-contained: every value these figures plot is either a literal in this file or a row of
 snr_data.csv beside it (the committed copy of what analyze_snr_stratified.py emits).
 
-Run: python tools/detection_is_easy/make_figs.py   (writes tools/detection_is_easy/figs/*.pdf)"""
+Run: python configs/detection_is_easy/make_figs.py   (writes configs/detection_is_easy/figs/*.pdf)"""
 import os, csv
 import matplotlib
 matplotlib.use("Agg")

@@ -17,7 +17,7 @@ Answers two different questions:
   wrong SNR span, which is otherwise invisible: it trains fine and simply reports different
   numbers.
 
-    python tools/detection_is_easy/validate_coco.py --root data/torchsig_hardshort_lowsnr_stft3_memmap
+    python configs/detection_is_easy/validate_coco.py --root data/torchsig_hardshort_lowsnr_stft3_memmap
 
 Exit code 0 = all checks pass, 1 = at least one FAIL.
 """
@@ -54,7 +54,11 @@ FAILURES: list[str] = []
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
 
 
 def check(ok: bool, label: str, detail: str = "") -> bool:

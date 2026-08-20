@@ -26,7 +26,7 @@ dataset export used, so it is geometrically identical to the stored tensor.
 Three inputs are needed; all default to the repo-relative layout and can be pointed
 elsewhere on the command line:
 
-    python tools/detection_is_easy/render_example.py \\
+    python configs/detection_is_easy/render_example.py \\
       --ann  <memmap-root>/coco_multiclass/annotations/instances_test.json \\
       --raw  <raw-root>/raw/test \\
       --pred work_dirs/<detector-run>_testdump/source_data/test_predictions.bbox.json
@@ -45,7 +45,15 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 
-ROOT = Path(__file__).resolve().parents[2]
+def _repo_root():
+    _p = Path(__file__).resolve()
+    for _up in [_p, *_p.parents]:
+        if (_up / "tools" / "train.py").exists() and (_up / "csrr").is_dir():
+            return _up
+    raise RuntimeError("CSRR repo root not found above " + str(_p))
+
+
+ROOT = _repo_root()
 
 ap = argparse.ArgumentParser(description=__doc__,
                              formatter_class=argparse.RawDescriptionHelpFormatter)
