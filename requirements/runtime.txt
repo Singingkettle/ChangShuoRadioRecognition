@@ -15,3 +15,5 @@ tsne-torch
 # accelerate the cvs load speed
 pyarrow
 lightgbm
+mmengine==0.10.7
+opencv-python

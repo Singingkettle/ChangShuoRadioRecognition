@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional, Sequence
 
-import mmcv
+import cv2
 import numpy as np
 from mmengine.dist import master_only
 from mmengine.visualization import Visualizer
@@ -101,11 +101,13 @@ class UniversalVisualizer(Visualizer):
         if resize is not None:
             h, w = image.shape[:2]
             if w < h:
-                image = mmcv.imresize(image, (resize, resize * h // w))
+                image = cv2.resize(image, (resize, resize * h // w))
             else:
-                image = mmcv.imresize(image, (resize * w // h, resize))
+                image = cv2.resize(image, (resize * w // h, resize))
         elif rescale_factor is not None:
-            image = mmcv.imrescale(image, rescale_factor)
+            _h, _w = image.shape[:2]
+            image = cv2.resize(
+                image, (int(_w * rescale_factor), int(_h * rescale_factor)))
 
         texts = []
         self.set_image(image)
@@ -157,7 +159,7 @@ class UniversalVisualizer(Visualizer):
 
         if out_file is not None:
             # save the image to the target file instead of vis_backends
-            mmcv.imwrite(drawn_img[..., ::-1], out_file)
+            cv2.imwrite(out_file, drawn_img[..., ::-1])
         else:
             self.add_image(name, drawn_img, step=step)
 
