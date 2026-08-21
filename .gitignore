@@ -122,3 +122,4 @@ venv.bak/
 *.pth
 *.py~
 *.sh~
+*.jsonl

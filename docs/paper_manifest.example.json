@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "method_short_name",
+  "paper": {
+    "title": "Full paper title",
+    "venue": "Venue or journal",
+    "status": "under review"
+  },
+  "official_configs": [
+    "configs/method_short_name/method_modality-dataset.py"
+  ],
+  "build_configs": [
+    "configs/method_short_name/method_modality-dataset.py"
+  ],
+  "runtime_check": [
+    "{python}",
+    "configs/method_short_name/check_release.py",
+    "--build-only"
+  ],
+  "requirements": "requirements/method_short_name.txt",
+  "reproduction_level": "statistical",
+  "known_limitations": [
+    "State why an exact realization cannot be regenerated."
+  ],
+  "external_framework_exceptions": [],
+  "declared_core_changes": [
+    {
+      "path": "csrr/models/example.py",
+      "reason": "Reusable component required by the paper.",
+      "tests": [
+        "tests/test_models/test_example.py"
+      ]
+    }
+  ]
+}
