@@ -23,7 +23,7 @@ CSRR (ChangShuoRadioRecognition) is an open source Automatic Modulation Classifi
 | [CNN4](configs/cnn4) | [Robust and Fast Automatic Modulation Classification with CNN under Multipath Fading Channels](configs/cnn4) |
 | [DAE](configs/dae) | [Real-Time Radio Technology and Modulation Classification via an LSTM Auto-Encoder](configs/dae) |
 | [DensCNN](configs/denscnn) | [Deep Neural Network Architectures for Modulation Classification](configs/denscnn) |
-| [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](docs/detection_is_easy) |
+| [DetectionIsEasy](configs/detection_is_easy) | [Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition](configs/detection_is_easy) |
 | [DSCLDNN](configs/dscldnn) | [Automatic Modulation Classification Using CNN-LSTM Based Dual-Stream Structure](configs/dscldnn) |
 | [FastMLDNN](configs/fastmldnn) | [A Fast Multi-Loss Learning Deep Neural Network for Automatic Modulation Classification](configs/fastmldnn) |
 | [GRU2](configs/gru2) | [Automatic modulation classification using recurrent neural networks](configs/gru2) |
@@ -197,8 +197,8 @@ If you use this toolbox in your research, please cite:
 
 @article{chang2022hcgdnn,
   author={Chang, Shuo and Zhang, Ruiyun and Ji, Kejia and Huang, Sai and Feng, Zhiyong},
-  journal={IEEE Transactions on Wireless Communications}, 
-  title={A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification}, 
+  journal={IEEE Transactions on Wireless Communications},
+  title={A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification},
   year={2022},
   doi={10.1109/TWC.2022.3168884}
 }

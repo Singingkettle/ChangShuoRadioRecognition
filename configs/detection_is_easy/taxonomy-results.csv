@@ -1,0 +1,14 @@
+detector,family,fused_delta_mean,fused_delta_sd,det_mAP,converged_lr,rcpA_delta,transfer_delta
+FCOS,anchor-free,0.1892,0.0018,na,5e-4,0.0337,0.0403
+Sparse R-CNN,set prediction,0.1874,0.0008,0.347,5e-4,0.0389,0.0471
+ATSS,adaptive,0.1808,0.0002,na,5e-4,0.0374,0.0477
+DAB-DETR,DETR,0.1778,0.0008,0.239,5e-5,0.0,0.0
+Deformable-DETR,DETR,0.1673,0.0018,0.405,1e-4,0.0142,0.0189
+Conditional-DETR,DETR,0.1659,0.0035,0.239,5e-5,0.0,0.0
+Cascade R-CNN,multi-stage,0.1395,0.0011,0.566,5e-4,0.0302,0.0373
+DINO,DETR,0.1261,0.0027,0.606,1e-4,-0.04,-0.0402
+GFL,dense,0.1224,0.0013,0.508,5e-4,0.0433,0.0471
+YOLOX,SimOTA,0.1157,0.0007,0.522,5e-4,0.0446,0.0484
+Faster R-CNN,two-stage,0.1141,0.0034,0.524,5e-4,0.042,0.0469
+RetinaNet,anchor-based,0.0994,0.0013,0.468,1e-4,0.0,0.0
+RTMDet,one-stage,0.0924,0.0006,0.472,5e-4,0.0274,na

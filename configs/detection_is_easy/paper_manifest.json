@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "name": "detection_is_easy",
+  "paper": {
+    "title": "Detection Is Easy, Recognition Is Hard",
+    "venue": "IEEE Transactions on Cognitive Communications and Networking",
+    "status": "under review"
+  },
+  "official_configs": [
+    "configs/detection_is_easy/atss_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/cascade_rcnn_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/conditional_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/dab_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/deformable_detr_r50_complex_stft_resize512.py",
+    "configs/detection_is_easy/deformable_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/dino_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/faster_rcnn_r50_complex_stft_resize512.py",
+    "configs/detection_is_easy/faster_rcnn_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/fcos_r50_complex_stft_resize512.py",
+    "configs/detection_is_easy/fcos_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/gfl_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/retinanet_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/returniq_resnet1d_diff_120e_wideband.py",
+    "configs/detection_is_easy/returniq_resnet1d_iq_120e_wideband.py",
+    "configs/detection_is_easy/returniq_resnet1d_iqdiff_120e_wideband.py",
+    "configs/detection_is_easy/rtmdet_l_mc_stft3_memmap.py",
+    "configs/detection_is_easy/rtmdet_tiny_complex_stft.py",
+    "configs/detection_is_easy/sparse_rcnn_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/yolox_s_complex_stft_resize512.py",
+    "configs/detection_is_easy/yolox_s_stft3_memmap_resize512.py"
+  ],
+  "build_configs": [
+    "configs/detection_is_easy/cascade_rcnn_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/conditional_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/dab_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/deformable_detr_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/dino_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/faster_rcnn_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/gfl_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/retinanet_stft3_memmap_resize512.py",
+    "configs/detection_is_easy/sparse_rcnn_stft3_memmap_resize512.py"
+  ],
+  "runtime_check": [
+    "{python}",
+    "configs/detection_is_easy/check_release.py",
+    "--build-only"
+  ],
+  "requirements": "requirements/detection_is_easy.txt",
+  "reproduction_level": "statistical",
+  "known_limitations": [
+    "The ten-shard generation and merge driver used for the paper corpus is not released.",
+    "Per-shard random seeds are not fully recorded, so the same realization cannot be regenerated.",
+    "Acceptance must use a predeclared statistical-equivalence rule rather than a checksum."
+  ],
+  "external_framework_exceptions": [
+    {
+      "package": "mmdet",
+      "scope": "configs/detection_is_easy",
+      "reason": "The paper audits thirteen object-detector families implemented with MMDetection."
+    },
+    {
+      "package": "mmcv",
+      "scope": "requirements/detection_is_easy.txt",
+      "reason": "MMDetection compatibility is isolated to this paper and is not a CSRR core dependency."
+    }
+  ],
+  "declared_core_changes": [
+    {
+      "path": "csrr/__init__.py",
+      "reason": "Drop the unconditional mmcv import and its version assert so the core depends on mmengine only; mmcv/mmdet stay isolated to this paper.",
+      "tests": [
+        "tests/test_core_mm_free.py"
+      ]
+    },
+    {
+      "path": "csrr/utils/collect_env.py",
+      "reason": "Make the mmcv version probe optional (try/except ImportError) so collect_env runs when mmcv is not installed.",
+      "tests": [
+        "tests/test_core_mm_free.py"
+      ]
+    },
+    {
+      "path": "csrr/visualization/visualizer.py",
+      "reason": "Port the mmcv image ops to cv2 for the mmengine-only core, creating the parent directory and raising on a failed write so a saved visualization is never silently lost.",
+      "tests": [
+        "tests/test_visualizer_imwrite.py"
+      ]
+    }
+  ]
+}

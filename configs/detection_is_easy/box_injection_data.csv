@@ -1,0 +1,14 @@
+# Oracle (perfect GT boxes) pure-IQ class-aware mAP with injected box error; 40-epoch flat recognizer (recognizer_L1024.pth), 2000-scene subset.
+# Source: results/run-artifacts/{cfsweep,cftail,boxsweep}.log. Unlabeled leading blocks of cftail/boxsweep are omitted (perturbation level not recorded in the log).
+perturbation,level,overall_mAP,psk,qam,ask,source_log
+cf_bins,0.0,0.4658,0.3919,0.2332,0.2617,cfsweep.log
+cf_bins,0.25,0.4642,0.3963,0.2334,0.2714,cfsweep.log
+cf_bins,0.5,0.4607,0.395,0.221,0.2619,cfsweep.log
+cf_bins,0.75,0.4591,0.3875,0.2178,0.2624,cfsweep.log
+cf_bins,1.0,0.4537,0.3823,0.2016,0.2535,cfsweep.log
+cf_bins,3.0,0.4343,0.3562,0.1867,0.2391,cftail.log
+cf_bins,4.0,0.4234,0.3464,0.1802,0.2399,cftail.log
+bw_scale,0.4,0.329,0.2812,0.0699,0.1158,boxsweep.log
+time_frac,0.1,0.4145,0.3467,0.1248,0.2493,boxsweep.log
+time_frac,0.2,0.4145,0.3479,0.1196,0.234,boxsweep.log
+combined_cf1_bw0.3_t0.15,1.0,0.349,0.3074,0.047,0.1513,boxsweep.log
