@@ -1,9 +1,9 @@
 # Copyright (c) Shuo Chang and contributors. Licensed under the Apache License, Version 2.0.
 # Return-to-IQ hierarchical recognizer on channelized wideband crops (input rep: iq).
-# This is the recognition half of "Detection Is Easy, Recognition Is Hard": the
+# This is the return-to-IQ recognition branch of the DetectionIsEasy study: the
 # detector supplies the boxes; this net re-classifies the IQ inside them. The 120-epoch
 # AdamW + cosine + EMA + label-smoothing recipe is the budget lever that lifts accuracy.
-# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition", IEEE TCCN (under review).
+# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition", IEEE Transactions on Wireless Communications (in preparation).
 _base_ = ['../_base_/runtimes/amc.py']
 
 # ----------------------------- data ------------------------------------------

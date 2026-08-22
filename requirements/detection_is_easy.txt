@@ -19,6 +19,10 @@
 mmcv-lite==2.1.0            # what the paper used; replace with mmcv==2.1.0 for the CUDA ops
 mmdet==3.3.0
 mmengine==0.10.7
+# mmengine 0.10.7 resolves `mmdet::` config bases through `pkg_resources`, which setuptools
+# dropped in 2025. A clean venv with current setuptools therefore fails every `mmdet::`
+# config (found by the third-round clean-clone gate); the campaign environment ran 59.6.0.
+setuptools==59.6.0
 
 # The CUDA build matters and the default PyPI index does not serve it: a bare
 # `torch==2.7.1` resolves to the cu126 wheel, while every reported number was produced on

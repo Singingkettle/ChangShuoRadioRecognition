@@ -2,9 +2,9 @@
   "schema_version": 1,
   "name": "detection_is_easy",
   "paper": {
-    "title": "Detection Is Easy, Recognition Is Hard",
-    "venue": "IEEE Transactions on Cognitive Communications and Networking",
-    "status": "under review"
+    "title": "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition",
+    "venue": "IEEE Transactions on Wireless Communications",
+    "status": "in preparation"
   },
   "official_configs": [
     "configs/detection_is_easy/atss_stft3_memmap_resize512.py",
@@ -59,29 +59,36 @@
       "reason": "The paper audits thirteen object-detector families implemented with MMDetection."
     },
     {
-      "package": "mmcv",
+      "package": "mmcv-lite",
       "scope": "requirements/detection_is_easy.txt",
-      "reason": "MMDetection compatibility is isolated to this paper and is not a CSRR core dependency."
+      "reason": "The reported experiments used the lite distribution and documented PyTorch operator fallbacks."
     }
   ],
   "declared_core_changes": [
     {
       "path": "csrr/__init__.py",
-      "reason": "Drop the unconditional mmcv import and its version assert so the core depends on mmengine only; mmcv/mmdet stay isolated to this paper.",
+      "reason": "Avoid forcing a paper-level MMDetection/MMCV environment on unrelated CSRR methods while keeping the DetectionIsEasy runtime explicitly pinned.",
       "tests": [
         "tests/test_core_mm_free.py"
       ]
     },
     {
       "path": "csrr/utils/collect_env.py",
-      "reason": "Make the mmcv version probe optional (try/except ImportError) so collect_env runs when mmcv is not installed.",
+      "reason": "Report MMDetection/MMCV when installed without breaking environment collection for papers that do not install those optional frameworks.",
+      "tests": [
+        "tests/test_core_mm_free.py"
+      ]
+    },
+    {
+      "path": "csrr/utils/dependency.py",
+      "reason": "Use the Python standard-library importlib.metadata implementation when available so the mmengine-only core does not require the optional importlib-metadata backport on modern Python.",
       "tests": [
         "tests/test_core_mm_free.py"
       ]
     },
     {
       "path": "csrr/visualization/visualizer.py",
-      "reason": "Port the mmcv image ops to cv2 for the mmengine-only core, creating the parent directory and raising on a failed write so a saved visualization is never silently lost.",
+      "reason": "Use the existing cv2 runtime directly and make failed image writes observable; this is independent of the paper-level MMDetection integration.",
       "tests": [
         "tests/test_visualizer_imwrite.py"
       ]

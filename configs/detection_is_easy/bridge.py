@@ -470,7 +470,7 @@ def cmd_bridge(args):
     fused_l = {}                          # domain-matched fusion: IQ for constellation families, vision else
     # CORRECTED domain-matching (from DEPLOYMENT per-family): amplitude-phase CONSTELLATION families ->
     # return-to-IQ (IQ wins: psk +0.16, ask +0.12, qam +0.05); frequency/analog families (fsk/msk/chirp/
-    # fm/am/ofdm) -> vision (spectrogram wins those on real boxes). Override via --iq-families.
+    # fm/am/ofdm) -> vision (spectrogram wins those on detector-predicted boxes). Override via --iq-families.
     IQ_SET = set((getattr(args, "iq_families", None) or "psk,qam,ask").split(","))
     nb = 0
     for si, sid in enumerate(order):
@@ -782,7 +782,8 @@ def make_hier_model(n_single, n_multi):
 def make_e2e_model(n_cls, L):
     """Differentiable Stage-2: a CFO-estimation head -> differentiable rotation correction -> recognizer.
     Trained end-to-end on the recognition loss so it learns to UNDO the predicted-box center-frequency error
-    (the dominant IQ-killer per the crossover law). This is the realizable form of end-to-end joint training."""
+    (a candidate source of IQ degradation in the exploratory crossover analysis).
+    This is a realizable approximation to end-to-end joint training."""
     import torch
     import torch.nn as nn
     import torch.nn.functional as F

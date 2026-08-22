@@ -4,8 +4,8 @@
 # You may obtain a copy of the License at
 #     http://www.apache.org/licenses/LICENSE-2.0
 
-# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband
-# Signal Detection and Recognition" IEEE TCCN (under review).
+# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition",
+# IEEE Transactions on Wireless Communications (in preparation).
 # YOLOX-S on the hardshort-lowsnr STFT3 memmap (57-class via --root coco_multiclass).
 # A third detector family for the cross-detector generalization of the predicted-box
 # recipe. Reads the packed memmap like the RTMDet configs, not per-image .npy tensors.

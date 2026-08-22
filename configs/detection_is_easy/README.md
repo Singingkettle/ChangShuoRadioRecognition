@@ -1,28 +1,30 @@
-# DetectionIsEasy — Detection Is Easy, Recognition Is Hard
+# DetectionIsEasy: Detection Is Easy, Recognition Is Hard
 
 English | [简体中文](README_zh-CN.md)
 
 Reproduction code for the wideband detection+recognition study:
 
-> S. Chang, Z. Yang, J. He, S. Huang, and Z. Feng, "Detection Is Easy, Recognition Is
-> Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition,"
-> IEEE Transactions on Cognitive Communications and Networking (TCCN), under review.
+> S. Chang, Z. Yang, J. He, S. Huang, and Z. Feng, "Detection Is Easy, Recognition Is Hard:
+> Rethinking Vision-Based Wideband Signal Detection and Recognition," manuscript in preparation for IEEE Transactions on Wireless Communications.
 
 Companion locations: the ablation configs live in [`configs/detection_is_easy/`](../../configs/detection_is_easy),
 the campaign tools in [`configs/detection_is_easy/`](../../configs/detection_is_easy).
 
 ## Method in one paragraph
 
-Wideband spectrum sensing is cast as object detection on an STFT spectrogram. Two findings
-drive everything. First, localization is saturated: a vision detector reaches class-agnostic
-box mAP ≈0.893 on the released benchmark — finding the signals is easy. Second, fine-grained
-recognition is the gap: 57-class class-aware mAP is only ~0.45, because the spectrogram
-under-uses the phase that carries modulation identity. The paper ablates the pure-vision
+Wideband spectrum sensing is cast as object detection on an STFT spectrogram. A controlled
+same-prediction audit evaluates each detector's own 10,000-scene test predictions twice: for
+three RTMDet-M seeds of one recipe, class-agnostic COCO AP 0.695 versus class-aware
+COCO AP 0.487, a gap of 0.208 +- 0.006 (scene-paired
+bootstrap interval of the mean [0.203, 0.209]); the deployment detector gives 0.712 versus 0.465. This is
+evidence of a gap for this detector family, recipe, and synthetic realization, not a universal claim. Separately,
+the operational return-to-IQ experiments use a custom time-frequency mAP on 2,963 archived-IQ
+scenes; those values must not be compared directly with COCO AP. The paper ablates the pure-vision
 recipe along input representation, phase utility, detector complexity, and detector family,
 then adds a domain-matched return-to-IQ branch: boxes labeled as constellation families
 (PSK/ASK/QAM) are channelized back to baseband IQ and re-classified by a 1-D hierarchical
-recognizer, which lifts deployment mAP by +0.028 with a recognizer trained on ground-truth
-boxes and by +0.093 once the recognizer is trained on the detector's own predicted boxes —
+recognizer, which lifts operational AP by +0.028 with a recognizer trained on ground-truth
+boxes and by +0.092 once the recognizer is trained on the detector's own predicted boxes —
 with the recognizer's training budget and its training-box distribution, not its
 architecture, as the decisive levers.
 
@@ -50,6 +52,9 @@ pip install -r requirements/detection_is_easy.txt
 
 That file pins the versions the paper ran on (torch 2.7.1+cu128, numpy 2.2.6, mmdet 3.3.0,
 mmengine 0.10.7, torchsig 2.1.1) on Ubuntu with 8×RTX 4090.
+It also pins `setuptools==59.6.0`: mmengine 0.10.7 resolves `mmdet::` config bases through
+`pkg_resources`, which newer setuptools no longer ships, so a clean environment with current
+setuptools cannot load any `mmdet::` config.
 
 **One choice changes your numbers: which mmcv you install.** Every reported result was
 produced with `mmcv-lite` — mmcv *without* the compiled `_ext` CUDA ops. The harness detects
@@ -312,7 +317,8 @@ differs, `REPRODUCTION.md` says why.
 | §VI-D deployment, vision → routed | — | the Stage-3 command above | 101/202/303 | +0.028 fused delta (reproduced vision baseline 0.474) | ±0.002 on the delta | 0.522 → 0.546 (+0.024) |
 | §VI-D per-family PSK / ASK / QAM | — | same command | 101/202/303 | +0.153 / +0.132 / +0.081 | ±0.011 / ±0.008 / ±0.012 | +0.143 / +0.118 / +0.084 |
 | §VI-D oracle (perfect box) | — | `oracle --with-oracle --limit 2000 --score-thr 0.05` | 101 | 0.420 → 0.608 | ±0.01 | 0.608 (unchanged) |
-| §VII recognizer trained on the detector's own predicted boxes | — | predicted-box crop cache at `--score-thr 0.1` (`build_pred_matched.py`), the recipe-A `train-hier` flags, then the Stage-3 command | 101/202/303 | +0.093 ± 0.001 fused delta on RTMDet; +0.189 ± 0.002 on FCOS | ±0.002 on the delta | −0.019 (cache built from high-score boxes) |
+| §VI-A same-prediction gap, three detector seeds | — | `same_pred_bootstrap.py` on inference-only dumps (`run_mmdet_train_eval.py --eval-only --dump-results`) of the archived own-schedule medium checkpoints | 20262811/17/27 | AP_loc 0.695 vs AP_cls 0.487, gap 0.208 +- 0.006 | scene-paired bootstrap [0.203, 0.209] | one seed (0.712 / 0.465) |
+| §VII recognizer trained on the detector's own predicted boxes | — | predicted-box crop cache at `--score-thr 0.1` (`build_pred_matched.py`), the recipe-A `train-hier` flags, then the Stage-3 command | 101/202/303 | +0.092 ± 0.001 fused delta on RTMDet; +0.189 ± 0.002 on FCOS | ±0.002 on the delta | −0.019 (cache built from high-score boxes) |
 
 Three cautions about that table.
 

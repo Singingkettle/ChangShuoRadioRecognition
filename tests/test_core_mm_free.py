@@ -43,3 +43,8 @@ def test_collect_env_runs_and_mmcv_is_optional():
 
     info = collect_env()
     assert isinstance(info, dict) and info
+
+
+def test_dependency_prefers_stdlib_metadata_on_modern_python():
+    source = (ROOT / "csrr/utils/dependency.py").read_text(encoding="utf-8")
+    assert "from importlib.metadata import PackageNotFoundError, distribution" in source

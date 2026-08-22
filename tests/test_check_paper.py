@@ -46,6 +46,7 @@ def make_repo(tmp_path, level="statistical"):
     config = "configs/demo/demo_iq-data.py"
     write(root / config, "# Paper: \"Demo\", Venue (under review).\nmodel = dict(type='Demo')\n")
     write(paper / "helper.py", "print('helper')\n")
+    write(paper / "release_check.py", "raise SystemExit(0)\n")
     manifest = {
         "schema_version": 1,
         "name": "demo",
@@ -56,7 +57,7 @@ def make_repo(tmp_path, level="statistical"):
         },
         "official_configs": [config],
         "build_configs": [config],
-        "runtime_check": ["{python}", "-c", "raise SystemExit(0)"],
+        "runtime_check": ["{python}", "configs/demo/release_check.py"],
         "requirements": "requirements/demo.txt",
         "reproduction_level": level,
         "known_limitations": ["different realization"] if level != "exact" else [],
@@ -150,6 +151,23 @@ def test_checker_does_not_flag_its_own_detection_patterns():
     assert CHECK.scan_machine_references([checker_path]) == []
 
 
+def test_generated_latex_string_is_not_mistaken_for_unc():
+    value = r'line = "\\footnotesize\\setlength{\\tabcolsep}{5pt}"'
+    assert CHECK.machine_reference_reasons(value) == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        chr(92) * 2 + "server" + chr(92) + "private" + chr(92) + "run",
+        'path = "' + chr(92) * 4 + "server" + chr(92) * 2 + "private"
+        + chr(92) * 2 + 'run"',
+    ],
+)
+def test_literal_and_source_escaped_unc_are_rejected(value):
+    assert CHECK.machine_reference_reasons(value)
+
+
 def test_path_boundary_does_not_accept_same_prefix(tmp_path):
     paper = tmp_path / "configs" / "name"
     evil = tmp_path / "configs" / "name_evil" / "config.py"
@@ -200,20 +218,48 @@ def test_statistical_requires_limitations(tmp_path):
     assert any("limitations" in row[0] and not row[2] for row in report.rows)
 
 
+def test_declared_external_framework_must_be_exactly_pinned(tmp_path):
+    root, manifest = make_repo(tmp_path)
+    manifest["external_framework_exceptions"] = [{
+        "package": "mmdet", "scope": "configs/demo",
+        "reason": "the reported experiment used this framework",
+    }]
+    write(root / "configs" / "demo" / "paper_manifest.json", json.dumps(manifest))
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    assert report.failed()
+    row = next(item for item in report.rows if "external frameworks are exactly pinned" in item[0])
+    assert not row[2] and "mmdet" in row[3]
+
+    write(root / "requirements" / "demo.txt", "mmdet==3.3.0\n")
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    row = next(item for item in report.rows if "external frameworks are exactly pinned" in item[0])
+    assert row[2]
+
+
+def test_external_base_namespace_requires_manifest_declaration(tmp_path):
+    root, manifest = make_repo(tmp_path)
+    config = root / "configs" / "demo" / "demo_iq-data.py"
+    write(config, "# Paper: Demo\n_base_ = 'mmdet::retinanet/example.py'\n")
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    row = next(item for item in report.rows if item[0].startswith("_base_ stays"))
+    assert not row[2]
+
+    manifest["external_framework_exceptions"] = [{
+        "package": "mmdet", "scope": "configs/demo",
+        "reason": "same framework as the measured experiment",
+    }]
+    write(root / "requirements" / "demo.txt", "mmdet==3.3.0\n")
+    write(root / "configs" / "demo" / "paper_manifest.json", json.dumps(manifest))
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    row = next(item for item in report.rows if item[0].startswith("_base_ stays"))
+    assert row[2]
+
+
 def test_changed_core_must_be_declared():
     changed = ["configs/demo/a.py", "csrr/visualization/visualizer.py"]
     assert CHECK.undeclared_core_changes(changed, {"declared_core_changes": []}) == [
         "csrr/visualization/visualizer.py"
     ]
-
-
-@pytest.mark.parametrize("package", CHECK.MM_FAMILY)
-def test_core_probe_blocks_every_mm_family(tmp_path, package):
-    root = tmp_path / package
-    write(root / "csrr" / "__init__.py", f"import {package}\n")
-    ok, detail = CHECK._blocked_import_probe(root)
-    assert not ok
-    assert "blocked" in detail
 
 
 def test_branch_policy():
@@ -267,15 +313,28 @@ def test_runtime_propagates_failure(tmp_path):
     assert report.failed()
 
 
-def git(root, *args, env=None):
+
+
+def git(root, *args, env=None, input=None):
     return subprocess.run(
         ["git", *args],
         cwd=str(root),
         env=env,
+        input=input,
         check=True,
         capture_output=True,
         text=True,
     )
+
+
+def init_paper_branch(root):
+    git(root, "init")
+    git(root, "config", "user.name", "ChangShuo")
+    git(root, "config", "user.email", "changshuo@bupt.edu.cn")
+    git(root, "add", ".")
+    git(root, "commit", "-m", "Base")
+    git(root, "branch", "-M", "main")
+    git(root, "switch", "-c", "paper/demo")
 
 
 def test_premerge_rejects_trailing_whitespace(tmp_path):
@@ -310,3 +369,104 @@ def test_premerge_rejects_dirty_worktree(tmp_path):
     report = CHECK.validate_premerge(root, "demo", "main", manifest)
     assert report.failed()
     assert any("worktree and index" in row[0] and not row[2] for row in report.rows)
+
+
+# ---------------------------------------------------------------------------
+# Round-3 adversarial probes turned into regression tests.
+# ---------------------------------------------------------------------------
+
+
+def test_wildcard_and_arbitrary_equality_are_not_exact_pins():
+    pins = CHECK.pinned_requirement_names
+    assert pins("mmdet==3.*\n") == set()
+    assert pins("mmdet===3.3.0\n") == set()
+    assert pins("mmdet==3.3.0,!=3.3.1\n") == set()
+    assert pins("mmdet==3.3.0; python_version>='3.10'\n") == set()
+    assert pins("mmdet==3.3.0  # the measured version\n") == {"mmdet"}
+    assert pins("MMCV_Lite==2.1.0\n") == {"mmcv-lite"}
+    assert pins("mmdet @ git+https://example.org/mmdetection@" + "a" * 40 + "\n") == {"mmdet"}
+
+
+def test_requirement_includes_are_followed_inside_repo(tmp_path):
+    root, manifest = make_repo(tmp_path)
+    write(root / "requirements" / "demo.txt", "-r demo-extra.txt\nnumpy==2.2.6\n")
+    write(root / "requirements" / "demo-extra.txt", "mmdet>=3.3\n")
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    row = next(r for r in report.rows if r[0].startswith("paper requirements use exact"))
+    assert not row[2] and "mmdet>=3.3" in row[3]
+
+    write(root / "requirements" / "demo-extra.txt", "mmdet==3.3.0\n")
+    manifest["external_framework_exceptions"] = [{
+        "package": "mmdet", "scope": "configs/demo", "reason": "measured with it",
+    }]
+    write(root / "configs" / "demo" / "paper_manifest.json", json.dumps(manifest))
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    assert next(r for r in report.rows if "exactly pinned" in r[0])[2]
+    assert next(r for r in report.rows if r[0].startswith("paper requirements use exact"))[2]
+
+
+def test_requirement_include_outside_repo_or_editable_fails(tmp_path):
+    root, _ = make_repo(tmp_path)
+    write(root / "requirements" / "demo.txt", "-r ../../outside.txt\n-e .\nnumpy==2.2.6\n")
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    row = next(r for r in report.rows if r[0].startswith("paper requirements use exact"))
+    assert not row[2] and "include" in row[3] and "editable" in row[3]
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [["bash", "-c", "echo hi"], ["{python}", "-c", "pass"], ["{python}", "-m", "pytest"],
+     ["sh", "configs/demo/release_check.py"]],
+)
+def test_runtime_check_must_be_python_plus_repo_script(tmp_path, argv):
+    root, manifest = make_repo(tmp_path)
+    manifest["runtime_check"] = argv
+    write(root / "configs" / "demo" / "paper_manifest.json", json.dumps(manifest))
+    report, _ = CHECK.validate_static(root, "demo", run_import_probe=False)
+    assert any(r[0].startswith("runtime_check is") and not r[2] for r in report.rows)
+    with pytest.raises(ValueError):
+        CHECK.runtime_argv(root, manifest)
+
+
+def test_inline_co_authored_by_is_rejected():
+    record = {
+        "author_name": "ChangShuo", "author_email": "changshuo@bupt.edu.cn",
+        "committer_name": "ChangShuo", "committer_email": "changshuo@bupt.edu.cn",
+        "message": "Fix x Co-Authored-By: Bot <bot@example.com>",
+    }
+    assert "Co-authored-by present" in CHECK.validate_commit_record(record)
+
+
+def test_control_characters_cannot_hide_a_trailer(tmp_path):
+    root, manifest = make_repo(tmp_path)
+    init_paper_branch(root)
+    with (root / "README.md").open("a", encoding="utf-8") as stream:
+        stream.write("more\n")
+    git(root, "add", "README.md")
+    git(root, "commit", "-q", "-F", "-", input="One line\x1eCo-authored-by: Bot <bot@example.com>")
+    report = CHECK.validate_premerge(root, "demo", "main", manifest)
+    assert next(r for r in report.rows if r[0] == "commit records are parseable")[2]
+    row = next(r for r in report.rows if r[0].startswith("commit author/committer/message"))
+    assert not row[2] and "Co-authored-by" in row[3]
+
+
+def test_suffixless_and_notebook_files_are_scanned(tmp_path):
+    docker = tmp_path / "Dockerfile"
+    docker.write_text("WORKDIR " + "/" + "data/private\n", encoding="utf-8")
+    notebook = tmp_path / "x.ipynb"
+    notebook.write_text('{"cells": ["' + "C" + ':\\\\private"]}', encoding="utf-8")
+    assert CHECK.scan_machine_references([docker, notebook])
+
+
+def test_posix_style_unc_and_network_urls_are_rejected():
+    assert CHECK.machine_reference_reasons("p = '" + "//" + "nas/share/data'")
+    assert CHECK.machine_reference_reasons("p = 'smb:" + "//" + "nas/share'")
+    # a protocol-relative public URL is stripped before the scan
+    assert CHECK.machine_reference_reasons("see https:" + "//" + "github.com/org/repo") == []
+
+
+def test_placeholder_and_math_cannot_hide_machine_paths():
+    assert CHECK.machine_reference_reasons('p = "<' + "D" + ':\\\\data\\\\x>"')
+    assert CHECK.machine_reference_reasons('p = "$' + "/" + 'home/user$"')
+    assert CHECK.machine_reference_reasons("read from <repo>/data/file") == []
+    assert CHECK.machine_reference_reasons(r"$\mathrm{ddof}=1$ and $p{0.5\columnwidth}$") == []

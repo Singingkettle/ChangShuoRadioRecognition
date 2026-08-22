@@ -26,36 +26,46 @@ python tools/test.py configs/<name>/<config>.py <checkpoint.pth>
 - **JDM**:`configs/jdm/README.md` + 根配置 + `configs/jdm/scripts/`(合并权重、
   渲染图、预算 proposals 等论文专属步骤)。
 - **典型 AMC 方法**(CNN2):只有 `configs/cnn2/*.py` + README 一对。
-- **DetectionIsEasy**:唯一一个**有文档记录的依赖例外**——它的检测段用 `mmdet`。
-  该依赖**只**隔离在 `requirements/detection_is_easy.txt`,**永远不是核心依赖**。
-  新论文不要模仿它;新论文一律原生实现(见 §0)。
+- **DetectionIsEasy**:检测器实验和公开运行路径都使用 `mmdet`、`mmcv-lite` 与
+  `mmengine`,版本钉在 `requirements/detection_is_easy.txt`。这是正常、显式声明的
+  论文级集成,不代表这些检测器已在 CSRR 中原生重实现。
 
 ## 0. 依赖与框架边界(先读)
 
-CSRR **只**建立在 `mmengine` 之上,这是刻意为之。
+CSRR 基础安装是 PyTorch + `mmengine`。若实际实验实现使用了外部框架,单篇论文可
+安装包括 `mmdet`、`mmcv` 在内的框架。仅为减少依赖而发布另一套实现,却没有独立
+等价性证据,是不允许的。
 
-- **`csrr/` 核心必须只靠 `mmengine` 就能 import 并运行。** 任何 `csrr/`
-  模块不得硬 import 其他 MM 家族包(`import mmcv`、`import mmdet`……)。
-  MM 家族原本提供的图像小工具一律改用 `cv2` / `PIL` / `numpy` 实现。
-
-- **核心安装只依赖 `mmengine`(及 PyTorch)。不要再引入其他 MM 家族库**——
-  `mmdet`、`mmcv`、`mmpretrain`、`mmsegmentation`……。MM 家族体量大、耦合紧、
-  版本脆弱,引入它会让环境臃肿、跨机器复现困难。
-- **核心依赖版本钉死、保持不变。** 不要为一篇新论文抬版本。若某论文确需更新的
-  核心,单独提出。
-- **本仓库没有的模型,在 `csrr/` 下原生实现**(§2),注册进 CSRR registry。
-  **不要**为拿一个 backbone / head / detector 而去引外部 MM 家族包。原生模型
-  文件放 `csrr/models/…`,并**与论文的 scripts 分开**。
+- **区分基础环境与论文环境。** `requirements/runtime.txt` 是轻量基础安装;
+  `requirements/<name>.txt` 是单篇论文运行所需的完整、钉版环境扩展,可以包含
+  MM 家族包。安装该文件是论文复现的一部分,不是未支持的临时绕路。
+- **公开运行路径必须与实测路径一致。** 若论文数字来自 MMDetection,官方配置、
+  registry、预处理、评测器、后处理和 runtime 门禁都应使用文档声明的
+  MMDetection 栈。不得把适配层称作 CSRR 原生实现,也不得用未经验证的重写版本
+  替换真正产生数字的代码。
+- **外部框架必须显式声明。** 在 manifest 的 `external_framework_exceptions`
+  (沿用的旧字段名)逐项记录包名、仓库内作用域和必要性。README 必须写明精确
+  版本、OS/CUDA 约束、compiled/lite 变体及所有可能改变预测的算子回退。
+- **钉完整兼容元组。** 至少记录 Python、PyTorch、torchvision、MMEngine、用到的
+  MMDetection/MMCV、NumPy、CUDA wheel 源和任务评测器。精确版本只是必要条件;
+  每次运行还要记录实际解析到的版本和 fallback 标志。
+- **核心依赖升级要单独论证。** 只有共享 `csrr/` 模块确实需要、所有支持的安装
+  文档与 CI 环境均已更新、且干净基础安装通过时,才能把某包从论文额外依赖提升到
+  `requirements/runtime.txt`;否则保持论文级作用域。
+- **原生实现是可选工程路线,不是依赖禁令。** 缺失组件可以在 `csrr/` 下实现
+  (§2),也可直接集成实验实际使用的外部框架。重写版本只有在冻结输入的
+  forward/后处理对照与逐 seed 指标等价性均通过后,才能替代实验实现。
 - **一篇论文运行所需的一切,除它的配置文件和原生模型文件外,都放在
   `configs/<name>/`。** 不要把论文的任何东西放到 `tools/<name>/`、`projects/`
   或 `docs/<name>/`。
-- 论文专属的额外依赖可以钉在 `requirements/<name>.txt`,但**强烈不建议在这里加
-  MM 家族库**;它只留给 DetectionIsEasy 的 mmdet 例外——该例外保持隔离且可选。
 - **钉精确版本,不用范围。** 核心钉 `mmengine==<版本>`;论文额外依赖同样
   `pkg==x.y.z`。范围钉(`>=a,<b`)跨机器漂移,破坏字节级复现。
-- requirements 地图:`requirements/runtime.txt` = `setup.py` 实际安装的
-  (**必须保持无 MM 家族**);`requirements/<name>.txt` = 单篇论文的隔离额外
-  依赖;`mminstall.txt` 属遗留,不得再增长。
+- **精确就是精确。** `pkg==x.*`、`pkg===x`、复合约束、带环境标记的行和可编辑
+  安装都不算钉版;`name @ git+<url>@<40 位十六进制 sha>` 算。`-r`/`-c` include
+  只在仍位于仓库内时被跟进,因此松钉无法藏在被 include 的文件里。
+- requirements 地图:`requirements/runtime.txt` = `setup.py` 默认安装的依赖;
+  `requirements/<name>.txt` = 单篇论文声明的环境扩展;`mminstall.txt` 属遗留,
+  不得再增长。
 
 仓库地图——每个顶层目录只有一个职责:
 
@@ -103,9 +113,10 @@ CSRR **只**建立在 `mmengine` 之上,这是刻意为之。
 - `_base_` 可以指向:(a) 同目录 `./xxx.py`;(b) **本论文自己 `configs/<name>/`
   内**的另一个配置——例如 `configs/<name>/experiments/` 下的变体通过
   `../<root-config>.py` 继承论文根配置(JDM 模板正是这么做的);(c) 共享
-  `../_base_/...`;或 (d) 外部 `mmdet::...`**(mmdet 仅限 DetectionIsEasy
-  例外)**。**不允许** `../<other-paper>/`、绝对路径、或仓库外路径。每个
-  `_base_` 目标都必须能在盘上解析到。
+  `../_base_/...`;或 (d) manifest 已声明且 requirements 已钉版的外部框架目标,
+  如 `mmdet::...`。**不允许** `../<other-paper>/`、绝对路径、或仓库外路径。
+  每个本地 `_base_` 目标必须能在盘上解析到;外部目标必须在干净 clone runtime
+  门禁中成功加载。
 - `data_root` / `work_dir` / `ann_file` 用仓库相对路径(`data/...`、
   `work_dirs/...`)。**不允许** `/home/<user>/...` 机器路径。
 
@@ -118,11 +129,12 @@ CSRR **只**建立在 `mmengine` 之上,这是刻意为之。
 - 脚本用仓库相对路径。**向上走到同时存在 `tools/train.py` 和 `csrr/` 处作为
   仓库根来定位。不要写死 `parents[N]` 或 `/home/<user>/...`。**
 - 每个 `import` 必须能在仓库内或 requirements 里解析。
-- 对 DetectionIsEasy 的 mmdet 例外,插件模块也放这里:配置用裸模块名
+- 外部框架插件模块也放这里:配置用裸模块名
   `custom_imports = dict(imports=['<module>'], allow_failed_imports=False)`,
   调用方在 `Config.fromfile` 前把本目录插入 `sys.path`。
 - 额外依赖写 `requirements/<name>.txt`(参考 `requirements/detection_is_easy.txt`),
-  带一段用途与安装前提的头注释。MM 家族额外依赖不建议(§0)。
+  带一段用途与安装前提的头注释。不只写顶层包版本,还要写清框架变体和算子
+  fallback(§0)。
 
 ### README.md 与 README_zh-CN.md
 
@@ -145,6 +157,12 @@ CSRR **只**建立在 `mmengine` 之上,这是刻意为之。
 `docs/paper_manifest.example.json`。它是论文身份、官方配置、构建门禁配置、
 运行验收、依赖、复现等级、外部框架例外和核心改动声明的唯一机器真源。显式清单
 用于区分配置与运行脚本。
+
+`external_framework_exceptions` 虽沿用旧字段名,但现在是论文级外部框架依赖的
+权威清单。每个 `package` 必须对应 manifest requirements 文件中的精确
+`package==version`;`scope` 标明仓库内集成范围;`reason` 说明它为何属于实测实现。
+只有已声明、已钉版时才允许 `mmdet::` 之类外部配置命名空间;不得为了绕过路径检查
+而虚列包名。
 
 manifest 中的路径必须仓库相对、真实存在且不能逃逸仓库。每个官方配置都必须在
 文件头附近带 `# Paper:`。任何改动的 `csrr/` 文件都要在
@@ -187,12 +205,11 @@ checkpoint、summary 路径和真实归档位置。缺证据写 `na + 原因`;�
 
 ## 2. csrr/ — 原生框架模块(所有缺失的组件都放这里)
 
-若论文需要一个 CSRR 没有的**框架组件**——不只是模型,还包括数据集、特殊的数据
-加载/预处理 transform、sampler、filter、评测 metric、loss——**在对应的 `csrr/`
-子包里原生实现并注册。** 不要为它引 MM 家族包(§0),也**不要一股脑塞进
-`configs/<name>/` 和配置文件混在一起。** CSRR 有完整的 registry 体系(见
-`csrr/registry.py`:`DATASETS`、`TRANSFORMS`、`METRICS`、`MODELS`、
-`DATA_SAMPLERS`、`DATA_FILTERS`……),每类可复用组件都有归属。
+若论文需要可复用的 **CSRR 原生组件**——模型、数据集、transform、sampler、
+filter、metric 或 loss——就在匹配的 `csrr/` 子包中实现并注册。已声明外部框架的
+论文专属适配层留在 `configs/<name>/`,不得把它表述成 CSRR 原生模块。CSRR 有完整
+registry(见 `csrr/registry.py`:`DATASETS`、`TRANSFORMS`、`METRICS`、`MODELS`、
+`DATA_SAMPLERS`、`DATA_FILTERS`……),真正可复用的原生组件都有归属。
 
 各类组件的归属(CSRR 子包 → registry):
 
@@ -230,10 +247,9 @@ registry 所在子包(上表),并确认 `register_all_modules()` 能 import 到�
      全文件 diff)。
   2. 若 `__all__` 最后一项没有尾逗号,追加名字会静默拼接字符串
      (`'a' 'b'` → `'ab'`)。确认上一项带逗号。
-- 这里只放可复用的框架代码。**论文专属胶水**——绘图脚本、数据生成编排、以及
-  (DetectionIsEasy 例外的)mmdet 插件模块——放 `configs/<name>/`,不放
-  `tools/<name>/`。mmdet 例外的插件是唯一放 `configs/<name>/` 而非 `csrr/`
-  的情况,因为它注册进的是 mmdet 而不是 CSRR 原生 registry。
+- 这里只放可复用的框架代码。**论文专属胶水**——绘图脚本、数据生成编排和
+  外部框架插件模块——放 `configs/<name>/`,不放 `tools/<name>/`。注册进
+  MMDetection 或其他外部 registry 的插件不是 CSRR 原生组件。
 
 ## 3. tools/ — 共享入口,不是每篇论文的文件夹
 
@@ -268,9 +284,9 @@ registry 所在子包(上表),并确认 `register_all_modules()` 能 import 到�
 
 ## 6. 不要提交
 
-- **核心** requirements 里出现另一个 MM 家族库(`mmdet`、`mmcv`、`mmpretrain`……)。
-  核心保持只 `mmengine`(§0);DetectionIsEasy 的 mmdet 例外隔离在
-  `requirements/detection_is_easy.txt`。
+- 未声明或未精确钉版的外部框架依赖。论文级 `mmdet`/`mmcv` 依赖允许存在,但必须
+  同时出现在 `requirements/<name>.txt`、manifest、README 和干净 clone 门禁中;
+  提升为共享 runtime 依赖需满足 §0。
 - 稿件文件:`.tex` / `.pdf` / `.bib` / 审稿回复 / 图源 PDF(绘图**脚本**可以,
   成品图不行)
 - 数据集与重资产(memmap、npz 缓存、checkpoint、预测转储、`.jsonl` 诊断)——
@@ -292,16 +308,23 @@ python tools/misc/check_paper.py <name>
 python tools/misc/check_paper.py <name> --pre-merge --base-ref origin/main
 ```
 
-静态门禁核 manifest、中英文档、配置头与路径、语法、依赖钉版、MM 家族隔离、
-机器路径、私有端点和 README 一致性。合并前门禁核分支名、author/committer、
-单行提交信息、无 `Co-authored-by`、`git diff --check`、禁入产物以及声明过的
+静态门禁核 manifest、中英文档、配置头与路径、语法、依赖钉版、外部框架声明、
+机器路径、私有端点和 README 一致性。依赖扫描会跟进仓库内的 `-r`/`-c` include,
+并拒绝通配、任意相等、复合与可编辑说明符。`runtime_check` 必须是 `{python}`
+后接一个真实存在的仓库内 `.py` 脚本;解释器标志(`-c`、`-m`)和其他可执行文件
+一律拒绝,免得 shell-free 门禁变成 shell。合并前门禁核分支名、author/committer、
+单行提交信息、提交信息任何位置都没有 `Co-authored-by`(提交记录逐个 commit 读取,
+信息里的控制字符藏不住 trailer)、`git diff --check`、禁入产物以及声明过的
 核心改动/测试。
 
 机器路径扫描覆盖机器本地 POSIX 根——`/home`、`/data`、`/mnt`、`/scratch`、
 `/workspace`、`/root`、`/Users`、`/tmp`、`/opt`、`/var`、`/srv`(排除 `/usr`,
 好让 `#!/usr/bin/env` shebang 不被误判)——Windows 盘符/UNC、私有 IPv4 和写死的
-`parents[N]`;公开 URL 与尖括号占位符不误报。核心 import probe 同时屏蔽
-`mmcv`、`mmdet`、`mmpretrain`、`mmseg` 和 `mmsegmentation`。
+`parents[N]`,以及 POSIX 风格的 `//<host>/<share>` 根、`smb://`、`file://` 类网络
+文件 URL;无后缀的配置文件(`Dockerfile`、`Makefile`、`.env`)和 notebook 同样
+会被扫描。公开 URL 与尖括号占位符不误报,但占位符或 `$math$` 片段只有在自身不含
+机器路径时才会被跳过。不再设置人为的“屏蔽 MM 家族”
+import probe;依赖正确性通过安装已声明环境并执行论文实际 runtime 来证明。
 
 ### 门禁 B——干净 clone 运行验收
 
@@ -316,6 +339,10 @@ runtime argv 取自 manifest,以 `shell=False` 执行。它必须使用当前 ch
 checkout。每个官方配置要能加载,每个 build config 要能构建模型,改动的核心代码
 要有聚焦测试。模型契约若不止构建,还要跑 forward/backward 或至少一轮 smoke。
 全量测试与 merge-base 对比,不得新增失败。
+
+使用外部框架时,runtime 日志还要记录实际解析的包版本、加速器/编译算子可用性、
+fallback 是否启用以及 registry/default scope。门禁必须覆盖产生论文数字的同一配置
+族和预/后处理路径;CSRR 原生 smoke 通过不能替代 MMDetection 实验,反之亦然。
 
 ### 门禁 C——实验数据与论文证据
 

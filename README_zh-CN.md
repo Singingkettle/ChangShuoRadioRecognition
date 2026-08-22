@@ -9,7 +9,7 @@ CSRR（ChangShuoRadioRecognition）是一个基于 PyTorch 和 [MMEngine](https:
 - **配置驱动**：所有实验通过 Python 配置文件管理
 - **多种 AMC 方法**：支持 20+ 种最先进的 AMC 算法
 - **性能分析**：内置工具可生成论文级别的图表
-- **最小依赖**：仅依赖 MMEngine，无需其他 MM 系列框架
+- **分层依赖**：基础工具箱使用 MMEngine；单篇论文可钉定 MMDetection/MMCV 等可选框架，以保持开源实现与实测实现一致
 
 ## 支持的方法
 
@@ -47,6 +47,7 @@ CSRR（ChangShuoRadioRecognition）是一个基于 PyTorch 和 [MMEngine](https:
 - Python >= 3.8
 - PyTorch >= 1.8
 - MMEngine >= 0.7.0
+- 论文需要时安装其专属依赖（例如 DetectionIsEasy 钉定 MMDetection/MMCV）
 
 ### 安装步骤
 

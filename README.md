@@ -9,7 +9,7 @@ CSRR (ChangShuoRadioRecognition) is an open source Automatic Modulation Classifi
 - **Config-Driven**: All experiments are configured via Python config files
 - **Multiple AMC Methods**: Supports 20+ state-of-the-art AMC algorithms
 - **Performance Analysis**: Built-in tools for generating publication-ready figures and tables
-- **Minimal Dependencies**: Only depends on MMEngine, no other MM-family packages required
+- **Layered Dependencies**: The base toolbox uses MMEngine; individual papers may pin optional frameworks such as MMDetection/MMCV to match their measured implementation
 
 ## Supported Methods
 
@@ -47,6 +47,7 @@ CSRR (ChangShuoRadioRecognition) is an open source Automatic Modulation Classifi
 - Python >= 3.8
 - PyTorch >= 1.8
 - MMEngine >= 0.7.0
+- Paper-specific extras when required (for example, DetectionIsEasy pins MMDetection/MMCV)
 
 ### Install
 

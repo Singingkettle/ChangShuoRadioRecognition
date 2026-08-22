@@ -28,42 +28,61 @@ Examples:
   (merge checkpoints, rasterize figures, precompute proposals, and other
   paper-specific steps).
 - **A typical AMC method** (CNN2): only `configs/cnn2/*.py` + the README pair.
-- **DetectionIsEasy**: the one **documented dependency exception** — its
-  detection stage uses `mmdet`. That dependency is isolated to
-  `requirements/detection_is_easy.txt` and is **never a core dependency**. New
-  papers do not copy it; they implement natively (see §0).
+- **DetectionIsEasy**: its detector experiments and public runtime both use
+  `mmdet`, `mmcv-lite`, and `mmengine`, pinned in
+  `requirements/detection_is_easy.txt`. This is an ordinary, declared
+  paper-level integration, not a claim that the detectors were reimplemented
+  natively in CSRR.
 
 ## 0. Dependencies and framework scope (read first)
 
-CSRR is built on **`mmengine` only**. That is deliberate.
+The base CSRR installation is PyTorch + `mmengine`. Papers may install external
+frameworks, including `mmdet` and `mmcv`, when those packages are part of the
+actual experimental implementation. Releasing a different implementation merely
+to reduce dependencies is prohibited unless equivalence is independently shown.
 
-- **`csrr/` core must import and run with `mmengine` alone.** No `csrr/`
-  module may hard-import another MM-family package (`import mmcv`,
-  `import mmdet`, …). Anything image-utility-like that MM-family used to
-  provide is done with `cv2` / `PIL` / `numpy` instead.
-
-- **The core install depends on `mmengine` (and PyTorch). Do not add another
-  MM-family library** — `mmdet`, `mmcv`, `mmpretrain`, `mmsegmentation`, … The
-  MM-family is large, tightly coupled, and version-fragile; pulling it in bloats
-  the environment and breaks reproducibility across machines.
-- **Core dependency versions are pinned and stay fixed.** Do not bump them for a
-  new paper. If a paper truly needs a newer core, raise it separately.
-- **A model this repo does not have is implemented natively under `csrr/`**
-  (§2), registered in the CSRR registry. **Do not** reach for an external
-  MM-family package to supply a backbone / head / detector. Native model files
-  live under `csrr/models/…` and are **kept separate from a paper's scripts**.
+- **Distinguish base and paper environments.** `requirements/runtime.txt` is
+  the lightweight base installation. `requirements/<name>.txt` is the complete,
+  pinned environment extension needed by one paper and may include MM-family
+  packages. Installing that file is part of reproducing the paper, not an
+  unsupported workaround.
+- **The released path must match the measured path.** If reported experiments
+  used MMDetection, the official configs, registry, preprocessing, evaluator,
+  post-processing, and runtime check must use the documented MMDetection stack.
+  Do not label an adapter as a native CSRR implementation, and do not substitute
+  an unvalidated rewrite for the code that generated the reported numbers.
+- **External frameworks are declared, not hidden.** List each one in the
+  manifest's `external_framework_exceptions` (legacy field name), including its
+  package, repository scope, and why it is required. The README must state the
+  exact versions, OS/CUDA constraints, compiled-versus-lite variant, and every
+  operator fallback that can alter predictions.
+- **Pin the full compatibility tuple.** Record at least Python, PyTorch,
+  torchvision, MMEngine, MMDetection/MMCV where used, NumPy, CUDA wheel source,
+  and task evaluators. Exact package versions are necessary but not sufficient:
+  runtime provenance also records the resolved versions and fallback flags.
+- **Core dependency changes are deliberate.** A package may be promoted from a
+  paper extra to `requirements/runtime.txt` only when shared CSRR modules need it,
+  all supported installation instructions and CI environments are updated, and
+  a clean base install is tested. Otherwise keep it paper-scoped.
+- **Native implementation remains an option, not a dependency rule.** A missing
+  component may be implemented under `csrr/` (§2), or integrated from the same
+  external framework used in the experiments. A rewrite requires frozen-input
+  forward/post-processing comparisons and seed-level metric equivalence before
+  it can replace the experimental implementation.
 - **Everything a paper needs to run, except its configs and its native model
   files, lives under `configs/<name>/`.** Nothing for a paper goes under
   `tools/<name>/`, `projects/`, or `docs/<name>/`.
-- Paper-only extra dependencies may be pinned in `requirements/<name>.txt`, but
-  **adding an MM-family library there is strongly discouraged**; it is reserved
-  for the DetectionIsEasy mmdet exception, which stays isolated and optional.
 - **Pin exact versions, not ranges.** The core pin is `mmengine==<pinned>`;
   paper extras pin `pkg==x.y.z` too. Range pins (`>=a,<b`) drift across
   machines and break byte-level reproduction.
-- Requirements map: `requirements/runtime.txt` = what `setup.py` installs
-  (**must stay MM-free**); `requirements/<name>.txt` = one paper's isolated
-  extras; `mminstall.txt` is legacy and must not grow.
+- **Exact means exact.** `pkg==x.*`, `pkg===x`, compound specifiers,
+  environment-marker lines and editable installs are not accepted as pins;
+  `name @ git+<url>@<40-hex-sha>` is. `-r`/`-c` includes are followed only
+  while they stay inside the repository, so a loose pin cannot hide in an
+  included file.
+- Requirements map: `requirements/runtime.txt` = what `setup.py` installs by
+  default; `requirements/<name>.txt` = one paper's declared environment
+  extension; `mminstall.txt` is legacy and must not grow.
 
 Repo map — every top-level directory and its single role:
 
@@ -115,9 +134,11 @@ A new paper must ship `configs/<name>/README.md` and
   **inside this paper's own `configs/<name>/`** — for example a variant under
   `configs/<name>/experiments/` that inherits the paper's root config via
   `../<root-config>.py` (the JDM template does exactly this); (c) a shared
-  `../_base_/...`; or (d) an external `mmdet::...` **(mmdet only for the
-  DetectionIsEasy exception)**. **No** `../<other-paper>/`, absolute paths, or
-  paths outside the repo. Every `_base_` target must resolve on disk.
+  `../_base_/...`; or (d) an external framework target such as `mmdet::...`
+  when that package is pinned and declared in the manifest. **No**
+  `../<other-paper>/`, absolute paths, or paths outside the repo. Every local
+  `_base_` target must resolve on disk; every external target must load in the
+  clean-clone runtime gate.
 - `data_root` / `work_dir` / `ann_file` are repo-relative (`data/...`,
   `work_dirs/...`). **No** `/home/<user>/...` machine paths.
 
@@ -132,13 +153,13 @@ it goes under `csrr/` (§2).
   `tools/train.py` and `csrr/` both exist. Do not hard-code `parents[N]` or
   `/home/<user>/...`.**
 - Every `import` must resolve in-repo or in requirements.
-- For the DetectionIsEasy mmdet exception, the plugin module lives here too:
-  configs use a bare module name in
+- An external-framework plugin module lives here too: configs use a bare module name in
   `custom_imports = dict(imports=['<module>'], allow_failed_imports=False)`, and
   the caller inserts this directory on `sys.path` before `Config.fromfile`.
 - Extra deps go in `requirements/<name>.txt` (see
   `requirements/detection_is_easy.txt`), with a header comment on purpose and
-  install prerequisites. MM-family extras are discouraged (§0).
+  install prerequisites. Document the exact framework variant and operator
+  fallbacks, not only the top-level package version (§0).
 
 ### README.md and README_zh-CN.md
 
@@ -165,6 +186,14 @@ truth for the paper identity, official configs, build-gate configs, runtime
 check, requirements, reproduction level, external-framework exceptions, and
 declared core changes. This explicit list prevents run scripts from being
 misclassified as configs.
+
+Despite its legacy name, `external_framework_exceptions` is the authoritative
+list of paper-level framework dependencies. Each `package` must match an exact
+`package==version` entry in the manifest's requirements file; `scope` identifies
+the repository subtree that integrates it; `reason` states why it is part of the
+measured implementation. An external config namespace such as `mmdet::` is legal
+only when that package is declared and pinned. Do not list a package merely to
+bypass the path check.
 
 Every path in the manifest is repo-relative, exists, and stays inside the
 repository. Every official config has `# Paper:` near its head. A changed
@@ -219,13 +248,13 @@ Do not check in siege logs (`retune_campaign.md`, `retune_results.md`,
 
 ## 2. csrr/ — native framework modules (where any missing component goes)
 
-If the paper needs a **framework component** CSRR does not have — not only a
-model, but also a dataset, a special data-loading / preprocessing transform, a
-sampler, a filter, a metric, a loss — **implement it natively in the matching
-`csrr/` subpackage and register it.** Do not pull in an MM-family package for it
-(§0), and **do not dump it into `configs/<name>/` next to the configs.** CSRR has
-a full registry (see `csrr/registry.py`: `DATASETS`, `TRANSFORMS`, `METRICS`,
-`MODELS`, `DATA_SAMPLERS`, `DATA_FILTERS`, …), so every reusable piece has a home.
+If a paper needs a reusable **native CSRR component** — a model, dataset,
+transform, sampler, filter, metric, or loss — implement it in the matching
+`csrr/` subpackage and register it. Paper-specific adapters for a declared
+external framework stay under `configs/<name>/`; they are not represented as
+native CSRR modules. CSRR has a full registry (see `csrr/registry.py`:
+`DATASETS`, `TRANSFORMS`, `METRICS`, `MODELS`, `DATA_SAMPLERS`,
+`DATA_FILTERS`, …), so every genuinely reusable native piece has a home.
 
 Where each component type goes (CSRR subpackage → registry):
 
@@ -270,11 +299,9 @@ whose registry is actually wired (the table above) and confirm
      silently concatenates strings (`'a' 'b'` → `'ab'`). Confirm the previous
      item has a comma.
 - Keep only reusable framework code here. **Paper-specific glue** — figure
-  scripts, data-generation orchestration, and (for the DetectionIsEasy
-  exception) the mmdet plugin module — goes in `configs/<name>/`, not
-  `tools/<name>/`. The mmdet-exception plugin is the one case that lives in
-  `configs/<name>/` rather than `csrr/`, because it is mmdet-registered, not a
-  native CSRR component.
+  scripts, data-generation orchestration, and external-framework plugin modules
+  — goes in `configs/<name>/`, not `tools/<name>/`. A plugin registered into
+  MMDetection or another external registry is not a native CSRR component.
 
 ## 3. tools/ — shared entry points, not per-paper folders
 
@@ -314,9 +341,10 @@ whose registry is actually wired (the table above) and confirm
 
 ## 6. Do not check in
 
-- Another MM-family library in the **core** requirements (`mmdet`, `mmcv`,
-  `mmpretrain`, …). Core stays `mmengine`-only (§0); the DetectionIsEasy mmdet
-  exception is isolated to `requirements/detection_is_easy.txt`.
+- An undeclared or loosely pinned external framework dependency. Paper-scoped
+  `mmdet`/`mmcv` dependencies are allowed, but they must be in
+  `requirements/<name>.txt`, the manifest, the README, and the clean-clone gate;
+  shared-runtime promotion follows §0.
 - Manuscript files: `.tex` / `.pdf` / `.bib` / reviewer replies / figure-source
   PDFs (plot **scripts** are fine; finished figures are not)
 - Datasets and heavy assets (memmap, npz caches, checkpoints, prediction dumps,
@@ -340,17 +368,28 @@ python tools/misc/check_paper.py <name> --pre-merge --base-ref origin/main
 ```
 
 The static gate validates the manifest, bilingual docs, config headers and
-paths, syntax, exact dependency pins, MM-family isolation, machine paths,
-private endpoints and README consistency. The pre-merge gate validates the
-branch, author/committer, one-line messages, absence of `Co-authored-by`,
+paths, syntax, exact dependency pins, external-framework declarations, machine paths,
+private endpoints and README consistency. The requirements scan follows
+in-repository `-r`/`-c` includes and rejects wildcard, arbitrary-equality,
+compound and editable specifiers. `runtime_check` must be `{python}` followed by
+an existing in-repository `.py` script; interpreter flags (`-c`, `-m`) and other
+executables are rejected so the shell-free gate cannot become a shell. The
+pre-merge gate validates the branch, author/committer, one-line messages,
+absence of `Co-authored-by` anywhere in the message (commit records are read one
+commit at a time, so control characters in a message cannot hide a trailer),
 `git diff --check`, forbidden artifacts, and declared core changes/tests.
 
 The machine-path scan covers machine-local POSIX roots — `/home`, `/data`,
 `/mnt`, `/scratch`, `/workspace`, `/root`, `/Users`, `/tmp`, `/opt`, `/var`,
 `/srv` (`/usr` is excluded so a `#!/usr/bin/env` shebang is not a finding) —
-Windows drive/UNC paths, private IPv4 endpoints and hard `parents[N]`. Public
-URLs and angle-bracket placeholders remain valid. The core import probe blocks
-`mmcv`, `mmdet`, `mmpretrain`, `mmseg` and `mmsegmentation`, not only one package.
+Windows drive/UNC paths, POSIX-style `//<host>/<share>` roots, `smb://` and
+`file://`-style network URLs, private IPv4 endpoints and hard `parents[N]`.
+Suffix-less configuration files (`Dockerfile`, `Makefile`, `.env`) and notebooks
+are scanned as well. Public URLs and angle-bracket placeholders remain valid,
+but a placeholder or `$math$` span is skipped only when it contains no machine
+path itself. There is no artificial
+"MM-family blocked" import probe: dependency correctness is established by
+installing the declared environment and executing the actual paper runtime.
 
 ### Gate B — clean-clone runtime
 
@@ -369,6 +408,12 @@ build config constructs its model; touched core code has focused tests. Run
 forward/backward or at least a one-epoch smoke test when the model contract
 requires behavior beyond construction. Compare the full test suite against the
 merge-base result and permit no new failure.
+
+For an external framework, the runtime log additionally records resolved package
+versions, accelerator/compiled-op availability, fallback activation, and the
+registry/default scope. The gate must exercise the same config family and
+pre/post-processing path that produced the manuscript results. A successful
+native-CSRR smoke test cannot stand in for an MMDetection experiment, or vice versa.
 
 ### Gate C — experimental evidence and manuscript
 

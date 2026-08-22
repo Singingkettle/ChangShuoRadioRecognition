@@ -142,7 +142,7 @@ def fig_teaser():
         ax.text(cx, 0.545, tlab, ha="center", va="top", fontsize=7)
     for i in range(3):
         harrow(cxs[i] + pw / 2 + 0.004, cxs[i + 1] - pw / 2 - 0.004, ymid_t)
-    ax.text(0.269, 0.945, "localization mAP $0.893$ (easy)", ha="center", va="bottom",
+    ax.text(0.269, 0.945, "same-prediction localization AP $0.712$", ha="center", va="bottom",
             fontsize=7.6, color=OI["green"], style="italic")
 
     # decision DIAMOND keyed on the vision label's family (Algorithm 1: family(c_i) in {PSK, ASK})
@@ -207,7 +207,7 @@ def fig_teaser():
     ax.text((ch_cx + sw_cx) / 2, y_gap - 0.028, r"$\{(f_{c,i},\,B_i)\}$", ha="center", va="top",
             fontsize=5.8, color=IQ)
 
-    ax.text(tag_cx, 0.45, "recognition $\\sim\\!0.5$ (hard)", ha="center", va="center",
+    ax.text(tag_cx, 0.45, "same-prediction class-aware AP $0.465$", ha="center", va="center",
             fontsize=7.6, color=OI["black"], style="italic")
     save(fig, "fig1_teaser", exact=False)
 
@@ -327,7 +327,7 @@ def fig_predbox_family():
     save(fig, "fig5_predbox_family")
 
 
-# ============================ Fig 6 — box-error injection (crossover law, measured) ============================
+# ============================ Fig 6: exploratory box-error injection ============================
 def fig_box_injection():
     """Oracle pure-IQ class-aware mAP under injected box error, 40-epoch flat recognizer.
     Data: box_injection_data.csv (from results/run-artifacts/{cfsweep,cftail,boxsweep}.log)."""
@@ -345,14 +345,15 @@ def fig_box_injection():
     h_qam, = ax.plot(xs, col("qam"), color=OI["orange"], marker="s", label="QAM")
     h_ask, = ax.plot(xs, col("ask"), color=OI["sky"], marker="D", label="ASK")
     # Reference levels from the other perturbations and from deployment (all-classes scale).
-    # bandwidth x0.4 (0.329) and the deployed pure-IQ level on real boxes (0.33) coincide, so
+    # bandwidth x0.4 (0.329) and the operational pure-IQ level on detector-predicted boxes
+    # (0.33) coincide, so
     # they share one line. In-axes text labels collided with the PSK / all-classes curves, so
     # the reference lines are described in a second legend instead; the two legends sit in the
     # two empty bands (above the all-classes curve, below the QAM curve).
     y_bw, y_t, y_c = one("bw_scale", 0.4), one("time_frac", 0.2), one("combined_cf1_bw0.3_t0.15", 1.0)
     refs = [(y_t, (0, (4, 2)), r"onset error $0.2\times$duration (%.3f)" % y_t),
             (y_c, (0, (1, 1.5)), r"combined: $1$ bin, bw $\times0.3$, onset $0.15$ (%.3f)" % y_c),
-            (y_bw, (0, (6, 2, 1, 2)), r"bandwidth $\times0.4$ (%.3f) $\approx$ deployed pure-IQ, real boxes (0.33)" % y_bw)]
+            (y_bw, (0, (6, 2, 1, 2)), r"bandwidth $\times0.4$ (%.3f) $\approx$ operational pure-IQ (0.33)" % y_bw)]
     h_refs = [ax.axhline(y, color="#555555", lw=0.7, ls=ls, zorder=1, label=lab) for y, ls, lab in refs]
     ax.set_xlabel("injected center-frequency error (STFT bins)")
     ax.set_ylabel("oracle pure-IQ class-aware mAP")

@@ -3,7 +3,13 @@ import re
 from functools import wraps
 from inspect import isfunction
 
-from importlib_metadata import PackageNotFoundError, distribution
+try:
+    # Python 3.8+ provides this in the standard library.  Keeping the
+    # backport as a fallback avoids making it an unconditional core runtime
+    # dependency solely for older supported interpreters.
+    from importlib.metadata import PackageNotFoundError, distribution
+except ImportError:  # pragma: no cover - exercised only on Python < 3.8
+    from importlib_metadata import PackageNotFoundError, distribution
 from mmengine.utils import digit_version
 
 

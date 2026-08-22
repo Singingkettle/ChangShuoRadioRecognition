@@ -1,25 +1,27 @@
-# DetectionIsEasy — Detection Is Easy, Recognition Is Hard
+# DetectionIsEasy：检测易、识别难——重新审视基于视觉的宽带信号检测与识别
 
 [English](README.md) | 简体中文
 
 宽带检测+识别研究的复现代码：
 
-> S. Chang, Z. Yang, J. He, S. Huang, and Z. Feng, "Detection Is Easy, Recognition Is
-> Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition,"
-> IEEE Transactions on Cognitive Communications and Networking (TCCN), under review.
+> S. Chang, Z. Yang, J. He, S. Huang, and Z. Feng, "Detection Is Easy, Recognition Is Hard:
+> Rethinking Vision-Based Wideband Signal Detection and Recognition," IEEE Transactions on Wireless Communications 在准备稿。
 
 配套位置：消融配置在 [`configs/detection_is_easy/`](../../configs/detection_is_easy)，
 战役工具在 [`configs/detection_is_easy/`](../../configs/detection_is_easy)。
 
 ## 方法简述
 
-宽带频谱感知被写成 STFT 谱图上的目标检测。两件事驱动全文。第一，定位已经饱和：
-视觉检测器在已发布基准上的类无关框 mAP 约 0.893 — 找到信号很容易。第二，细粒度
-识别才是缺口：57 类的类感知 mAP 只有约 0.45，因为谱图没有用好携带调制身份的
-相位。论文沿输入表示、相位效用、检测器复杂度与检测器家族消融纯视觉配方，再加
+宽带频谱感知被写成 STFT 谱图上的目标检测。同预测审计对每个检测器自己的 10,000 场景
+测试预测评两次：同一配方的三个 RTMDet-M seed 给出类无关 COCO AP 0.695、类感知
+COCO AP 0.487，差距 0.208 +- 0.006（均值的场景配对 bootstrap
+区间 [0.203, 0.209]）；部署检测器为 0.712 对 0.465。这证明的是该检测器家族、配方和合成数据
+实例下的差距，不是普遍定律。
+回到 IQ 的运行评测另用 2,963 个归档 IQ 场景上的定制时频 mAP，这一口径不得与 COCO
+AP 直接相减。论文沿输入表示、相位效用、检测器复杂度与检测器家族消融纯视觉配方，再加
 一条领域匹配的回到 IQ 分支：标成星座家族（PSK/ASK/QAM）的框被信道化回基带 IQ，
-再用一维层次识别器重分类，用 GT 框训练的识别器把部署 mAP 提高 +0.028，改在检测器
-自己的预测框上训练后提高 +0.093 — 起决定作用的是识别器的训练预算与训练框分布，
+再用一维层次识别器重分类，用 GT 框训练的识别器把运行评测 mAP 提高 +0.028，改在检测器
+自己的预测框上训练后提高 +0.092 — 起决定作用的是识别器的训练预算与训练框分布，
 不是架构。
 
 ## 论文章节 → 代码对照
@@ -53,6 +55,9 @@ NMS 回退（`run_mmdet_smoke.py` 里的 `maybe_stub_mmcv_ext()`），每次运�
 `run_info.json` 里记 `used_mmcv_lite_stub: true`；带这个字段的 268 次运行全部
 为真。装完整 CUDA mmcv 受支持也更快，但会换成另一套 NMS 实现，预期会有小差异。
 选定一种后，整组对比都不要换。
+该文件还钉了 `setuptools==59.6.0`：mmengine 0.10.7 通过 `pkg_resources` 解析 `mmdet::`
+配置基类，而新版 setuptools 已不再提供它，因此带当前 setuptools 的干净环境无法加载任何
+`mmdet::` 配置。
 
 同一个缺失扩展也拿掉了 CUDA focal-loss 核。RTMDet 不会察觉 — 它的分类损失是
 纯 PyTorch — 但每个 `FocalLoss` 头（FCOS、ATSS、RetinaNet）没有它就会在第一次
@@ -298,7 +303,8 @@ python configs/detection_is_easy/bridge.py bridge \
 | §VI-D deployment, vision → routed | — | the Stage-3 command above | 101/202/303 | +0.028 fused delta（复现视觉基线 0.474） | ±0.002 on the delta | 0.522 → 0.546 (+0.024) |
 | §VI-D per-family PSK / ASK / QAM | — | same command | 101/202/303 | +0.153 / +0.132 / +0.081 | ±0.011 / ±0.008 / ±0.012 | +0.143 / +0.118 / +0.084 |
 | §VI-D oracle (perfect box) | — | `oracle --with-oracle --limit 2000 --score-thr 0.05` | 101 | 0.420 → 0.608 | ±0.01 | 0.608（未变） |
-| §VII recognizer trained on the detector's own predicted boxes | — | 按 `--score-thr 0.1` 建预测框裁剪缓存（`build_pred_matched.py`），用 recipe-A 的 `train-hier` 开关训练，再跑阶段 3 命令 | 101/202/303 | RTMDet 上 +0.093 ± 0.001 fused delta；FCOS 上 +0.189 ± 0.002 | ±0.002 on the delta | −0.019（缓存由高分框构建） |
+| §VI-A 同预测差距，三个检测器 seed | — | 对归档 own-schedule medium checkpoint 仅做推理转储（`run_mmdet_train_eval.py --eval-only --dump-results`），再跑 `same_pred_bootstrap.py` | 20262811/17/27 | AP_loc 0.695 对 AP_cls 0.487，差距 0.208 +- 0.006 | 场景配对 bootstrap [0.203, 0.209] | 单 seed（0.712 / 0.465） |
+| §VII recognizer trained on the detector's own predicted boxes | — | 按 `--score-thr 0.1` 建预测框裁剪缓存（`build_pred_matched.py`），用 recipe-A 的 `train-hier` 开关训练，再跑阶段 3 命令 | 101/202/303 | RTMDet 上 +0.092 ± 0.001 fused delta；FCOS 上 +0.189 ± 0.002 | ±0.002 on the delta | −0.019（缓存由高分框构建） |
 
 关于这张表有三点要注意。
 

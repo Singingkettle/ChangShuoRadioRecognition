@@ -18,12 +18,33 @@ from pathlib import Path
 
 HARD, WARN = "HARD", "WARN"
 REPRODUCTION_LEVELS = {"exact", "statistical", "pipeline_only"}
-MM_FAMILY = ("mmcv", "mmdet", "mmpretrain", "mmseg", "mmsegmentation")
 AUTHOR_NAME, AUTHOR_EMAIL = "ChangShuo", "changshuo@bupt.edu.cn"
 SCANNED_SUFFIXES = {
-    ".py", ".sh", ".bash", ".ps1", ".bat", ".cmd", ".yaml", ".yml",
-    ".json", ".toml", ".ini", ".cfg", ".md", ".txt", ".csv",
+    ".py", ".pyi", ".sh", ".bash", ".ps1", ".bat", ".cmd", ".yaml", ".yml",
+    ".json", ".toml", ".ini", ".cfg", ".conf", ".properties", ".md", ".rst",
+    ".txt", ".csv", ".ipynb", ".html", ".htm", ".env", ".log",
 }
+# Suffix-less files that routinely carry machine-specific settings.
+SCANNED_BASENAMES = {
+    "Dockerfile", "Makefile", ".env", ".gitignore", ".gitattributes", ".dockerignore",
+}
+ALLOWED_REQUIREMENT_OPTIONS = (
+    "--extra-index-url", "--index-url", "-i", "--find-links", "-f", "--no-binary",
+    "--only-binary", "--prefer-binary", "--pre", "--trusted-host", "--use-feature",
+    "--no-index",
+)
+REQUIREMENT_INCLUDE = re.compile(r"^(?:-r|--requirement|-c|--constraint)(?:\s+|=)(\S+)$")
+# Exact means exact: no wildcard, no arbitrary equality, no compound specifier, no
+# environment marker, no hash option on the same line.
+EXACT_PIN = re.compile(r"^([A-Za-z0-9][A-Za-z0-9_.-]*)(?:\[[^]]+\])?==([^=\s,;*]+)$")
+GIT_SHA_PIN = re.compile(
+    r"^(?:([A-Za-z0-9][A-Za-z0-9_.-]*)\s*@\s*)?git\+\S+@[0-9a-fA-F]{40}(?:#\S*)?$")
+# A placeholder or math span may not hide a machine path (see _strip_non_paths).
+_HIDDEN_PATH = re.compile(
+    r"(?<![A-Za-z0-9_])/(?:home|data|mnt|scratch|workspace|root|Users|tmp|opt|var|srv)(?:[/\\])"
+    r"|(?<![A-Za-z0-9])[A-Za-z]:[/\\]|\\\\[A-Za-z0-9_.-]+[/\\]"
+    r"|(?<![:A-Za-z0-9_./\\])//[A-Za-z0-9_.-]+/",
+    re.IGNORECASE)
 FORBIDDEN_ARTIFACT_SUFFIXES = {
     ".tex", ".pdf", ".bib", ".bbl", ".blg", ".aux", ".pth", ".pt", ".ckpt",
     ".onnx", ".npy", ".npz", ".memmap", ".jsonl",
@@ -112,9 +133,20 @@ def base_targets(config_text):
 
 
 def _strip_non_paths(line):
+    """Drop public URLs, angle-bracket placeholders and $math$ before scanning.
+
+    A placeholder or math span is removed only when its own content is not a
+    machine path, so a drive letter, UNC root or machine-local POSIX root written
+    inside the brackets or dollar signs is still scanned, while a placeholder-rooted
+    relative path and ordinary LaTeX math stay allowed.
+    """
     line = re.sub(r"https?://[^\s)>\]]+", "", line)
-    line = re.sub(r"\S*<[^>\r\n]+>\S*", "", line)
-    return re.sub(r"[$][^$\r\n]*[$]", "", line)
+
+    def keep_if_path(match):
+        return match.group(0) if _HIDDEN_PATH.search(match.group(1)) else ""
+
+    line = re.sub(r"\S*<([^>\r\n]+)>\S*", keep_if_path, line)
+    return re.sub(r"[$]([^$\r\n]*)[$]", keep_if_path, line)
 
 
 def machine_reference_reasons(text):
@@ -126,8 +158,20 @@ def machine_reference_reasons(text):
         if re.search(r"(?<![A-Za-z0-9_])/(?:home|data|mnt|scratch|workspace|root|Users|tmp|opt|var|srv)(?:[/\\])",
                      line, re.IGNORECASE):
             reasons.append(f"line {line_no}: POSIX machine path")
-        if re.search(r"(?<![A-Za-z0-9])(?:[A-Za-z]:[/\\]|\\\\[A-Za-z0-9_.-]+[/\\])", line):
+        # Recognize both literal UNC text and its common source-escaped form.
+        # Matching separator multiplicity prevents generated LaTeX command
+        # pairs from being mistaken for network paths.
+        drive_path = re.search(r"(?<![A-Za-z0-9])[A-Za-z]:[/\\]", line)
+        literal_unc = re.search(
+            r"(?<!\\)\\\\[A-Za-z0-9_.-]+\\(?!\\)[A-Za-z0-9_.-]+", line)
+        escaped_unc = re.search(
+            r"(?<!\\)\\\\\\\\[A-Za-z0-9_.-]+\\\\(?!\\)[A-Za-z0-9_.-]+", line)
+        # POSIX-style network root (two leading slashes, no URL scheme in front).
+        posix_unc = re.search(r"(?<![:A-Za-z0-9_./\\])//[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", line)
+        if drive_path or literal_unc or escaped_unc or posix_unc:
             reasons.append(f"line {line_no}: Windows/UNC absolute path")
+        if re.search(r"\b(?:smb|cifs|nfs|afp|sftp|ssh|file)://[A-Za-z0-9]", line):
+            reasons.append(f"line {line_no}: network file URL")
         if re.search(r"\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|"
                      r"172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b", line):
             reasons.append(f"line {line_no}: private IPv4 address")
@@ -141,10 +185,112 @@ def machine_reference_reasons(text):
 def scan_machine_references(paths):
     findings = []
     for path in sorted(Path(item) for item in paths):
-        if path.suffix.lower() not in SCANNED_SUFFIXES or not path.is_file():
+        scanned = path.suffix.lower() in SCANNED_SUFFIXES or path.name in SCANNED_BASENAMES
+        if not scanned or not path.is_file():
             continue
         findings.extend(f"{path}: {reason}" for reason in machine_reference_reasons(read(path)))
     return findings
+
+
+def canonical_package_name(value):
+    return re.sub(r"[-_.]+", "-", str(value).strip().lower())
+
+
+def _requirement_line(raw):
+    """Strip a pip comment: ``#`` starts one at line start or after whitespace."""
+    return re.sub(r"(?:^|\s)#.*$", "", raw).strip()
+
+
+def exact_pin_name(spec):
+    """Canonical package name when ``spec`` is an exact pin, else ``None``.
+
+    Exact means ``name==x.y.z`` (no ``*`` wildcard, no ``===``, no compound
+    specifier, no environment marker) or ``name @ git+<url>@<40-hex-sha>``.
+    """
+    match = EXACT_PIN.match(spec)
+    if match:
+        return canonical_package_name(match.group(1))
+    match = GIT_SHA_PIN.match(spec)
+    if match and match.group(1):
+        return canonical_package_name(match.group(1))
+    return None
+
+
+def iter_requirement_specs(root, path, _seen=None):
+    """Yield ``(file, kind, text)`` over a requirements file and its in-repo includes.
+
+    ``kind`` is ``spec``, ``option``, ``editable`` or ``bad-include``. ``-r``/``-c``
+    includes are followed only while they stay inside the repository, so a loose
+    pin cannot hide in an included file.
+    """
+    root, path = Path(root).resolve(), Path(path).resolve()
+    seen = set() if _seen is None else _seen
+    if path in seen or not path.is_file():
+        return
+    seen.add(path)
+    for raw in read(path).splitlines():
+        line = _requirement_line(raw)
+        if not line:
+            continue
+        include = REQUIREMENT_INCLUDE.match(line)
+        if include:
+            target = (path.parent / include.group(1)).resolve()
+            if not is_within(target, root) or not target.is_file():
+                yield path, "bad-include", line
+            else:
+                yield from iter_requirement_specs(root, target, seen)
+        elif line.startswith(("-e", "--editable")):
+            yield path, "editable", line
+        elif line.startswith("-"):
+            yield path, "option", line
+        else:
+            yield path, "spec", line
+
+
+def pinned_requirement_names(text):
+    """Normalized names of exact pins in one requirements text (no include walking)."""
+    names = set()
+    for raw in text.splitlines():
+        line = _requirement_line(raw)
+        if line and not line.startswith("-"):
+            name = exact_pin_name(line)
+            if name:
+                names.add(name)
+    return names
+
+
+def pinned_requirement_names_from_file(root, path):
+    """Normalized names of exact pins, following in-repository ``-r``/``-c`` includes."""
+    names = set()
+    for _, kind, text in iter_requirement_specs(root, path):
+        name = exact_pin_name(text) if kind == "spec" else None
+        if name:
+            names.add(name)
+    return names
+
+
+def runtime_check_problems(root, argv):
+    """Policy for ``runtime_check``: ``{python}`` followed by an existing in-repo
+    ``.py`` script. Interpreter flags such as ``-c``/``-m`` and other executables
+    are rejected so the shell-free gate cannot be turned into a shell."""
+    if not (isinstance(argv, list) and argv
+            and all(isinstance(item, str) and item for item in argv)):
+        return ["runtime_check must be a non-empty argv array of strings"]
+    problems = []
+    if argv[0] != "{python}":
+        problems.append("argv[0] must be the {python} placeholder")
+    if len(argv) < 2 or not argv[1].endswith(".py"):
+        problems.append("argv[1] must be a repository .py script (no -c/-m)")
+    for token in argv[1:]:
+        if token.endswith(".py"):
+            try:
+                target = repo_relative_path(root, token)
+            except (TypeError, ValueError) as exc:
+                problems.append(f"{token}: {exc}")
+                continue
+            if not target.is_file():
+                problems.append(f"{token}: missing")
+    return problems
 
 
 def branch_is_valid(branch, name):
@@ -162,7 +308,7 @@ def validate_commit_record(record):
     message = record["message"].strip()
     if len(message.splitlines()) != 1:
         problems.append("commit message/body is not one line")
-    if re.search(r"(?im)^Co-authored-by:", message):
+    if re.search(r"(?i)co-authored-by\s*:", message):
         problems.append("Co-authored-by present")
     return problems
 
@@ -237,22 +383,9 @@ def _check_manifest(root, name, manifest, report):
     report.add("build_configs is a subset of official_configs", HARD,
                not build_bad, "; ".join(build_bad[:3]))
 
-    runtime = manifest.get("runtime_check")
-    runtime_ok = (isinstance(runtime, list) and bool(runtime)
-                  and all(isinstance(item, str) and item for item in runtime))
-    runtime_path_bad = []
-    if runtime_ok:
-        for token in runtime[1:]:
-            if token.endswith(".py"):
-                try:
-                    target = repo_relative_path(root, token)
-                except (TypeError, ValueError) as exc:
-                    runtime_path_bad.append(f"{token}: {exc}")
-                    continue
-                if not target.exists():
-                    runtime_path_bad.append(token)
-    report.add("runtime_check is an argv array with existing script paths", HARD,
-               runtime_ok and not runtime_path_bad, "; ".join(runtime_path_bad[:3]))
+    runtime_bad = runtime_check_problems(root, manifest.get("runtime_check"))
+    report.add("runtime_check is {python} plus an existing in-repo script (no -c/-m/shell)",
+               HARD, not runtime_bad, "; ".join(runtime_bad[:3]))
     req = manifest.get("requirements")
     try:
         req_path = repo_relative_path(root, req)
@@ -273,6 +406,7 @@ def _check_manifest(root, name, manifest, report):
 
     exceptions = manifest.get("external_framework_exceptions")
     exception_ok = isinstance(exceptions, list)
+    exception_packages = set()
     if exception_ok:
         for item in exceptions:
             if not (isinstance(item, dict) and all(
@@ -280,6 +414,7 @@ def _check_manifest(root, name, manifest, report):
                     for key in ("package", "scope", "reason"))):
                 exception_ok = False
                 break
+            exception_packages.add(canonical_package_name(item["package"]))
             try:
                 scope = repo_relative_path(root, item["scope"])
             except (TypeError, ValueError):
@@ -289,6 +424,17 @@ def _check_manifest(root, name, manifest, report):
                 exception_ok = False
                 break
     report.add("external framework exceptions are structured", HARD, exception_ok)
+    req_names = set()
+    try:
+        requirement_path = repo_relative_path(root, manifest.get("requirements"))
+        if requirement_path.is_file():
+            req_names = pinned_requirement_names_from_file(root, requirement_path)
+    except (TypeError, ValueError):
+        pass
+    missing_external_pins = sorted(exception_packages - req_names)
+    report.add("declared external frameworks are exactly pinned in requirements", HARD,
+               exception_ok and not missing_external_pins,
+               ", ".join(missing_external_pins))
 
     core = manifest.get("declared_core_changes")
     core_bad = []
@@ -342,12 +488,22 @@ def _check_markdown_pairs(root, name, report):
                HARD, not bad, "; ".join(bad[:3]))
 
 
-def _check_base_targets(root, name, report):
+def _check_base_targets(root, name, manifest, report):
     cfg_root, paper_root = Path(root) / "configs", Path(root) / "configs" / name
     shared_root, illegal, dangling = cfg_root / "_base_", [], []
+    declared_external = {
+        canonical_package_name(item.get("package"))
+        for item in (manifest or {}).get("external_framework_exceptions", [])
+        if isinstance(item, dict) and item.get("package")
+    }
     for config in paper_root.rglob("*.py"):
         for target in base_targets(read(config)):
-            if target.startswith("mmdet::"):
+            external = re.match(r"^([A-Za-z0-9_.-]+)::", target)
+            if external:
+                namespace = canonical_package_name(external.group(1))
+                if namespace in declared_external:
+                    continue
+                illegal.append(f"{config.name}->{target} (undeclared external namespace)")
                 continue
             resolved = (config.parent / target).resolve()
             if not (is_within(resolved, paper_root) or is_within(resolved, shared_root)):
@@ -399,37 +555,18 @@ def _check_requirements(root, manifest, report):
     if not req.exists():
         return
     loose = []
-    for line in read(req).splitlines():
-        value = line.strip()
-        if not value or value.startswith(("#", "-")):
-            continue
-        if value.startswith("git+") and re.search(r"@[0-9a-fA-F]{40}(?:#|$)", value):
-            continue
-        if "==" not in value:
-            loose.append(value)
-    report.add("paper requirements use exact versions or immutable git SHAs",
+    for source, kind, text in iter_requirement_specs(root, req):
+        if kind == "option":
+            if not text.startswith(ALLOWED_REQUIREMENT_OPTIONS):
+                loose.append(f"{source.name}: unsupported option {text}")
+        elif kind == "bad-include":
+            loose.append(f"{source.name}: include missing or outside repository: {text}")
+        elif kind == "editable":
+            loose.append(f"{source.name}: editable install {text}")
+        elif exact_pin_name(text) is None and not GIT_SHA_PIN.match(text):
+            loose.append(f"{source.name}: {text}")
+    report.add("paper requirements use exact versions or immutable git SHAs (includes followed)",
                HARD, not loose, "; ".join(loose[:3]))
-
-
-def _blocked_import_probe(root):
-    probe = (
-        "import builtins\n"
-        f"blocked={repr(MM_FAMILY)}\n"
-        "original=builtins.__import__\n"
-        "def guarded(name,*args,**kwargs):\n"
-        " root=name.split('.')[0]\n"
-        " if root in blocked: raise ModuleNotFoundError(name+' blocked')\n"
-        " return original(name,*args,**kwargs)\n"
-        "builtins.__import__=guarded\n"
-        "import csrr\nprint('ok')\n"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", probe], cwd=str(root), capture_output=True,
-        text=True, timeout=120, shell=False)
-    detail = ""
-    if result.returncode or "ok" not in result.stdout:
-        detail = (result.stderr.strip().splitlines() or [result.stdout.strip() or "failed"])[-1]
-    return result.returncode == 0 and "ok" in result.stdout, detail[:160]
 
 
 def validate_static(root, name, run_import_probe=True):
@@ -441,7 +578,7 @@ def validate_static(root, name, run_import_probe=True):
     manifest = load_manifest(root, name, report)
     _check_manifest(root, name, manifest, report)
     _check_markdown_pairs(root, name, report)
-    _check_base_targets(root, name, report)
+    _check_base_targets(root, name, manifest, report)
     compile_bad = []
     for path in sorted(paper_dir.rglob("*.py")):
         try:
@@ -462,20 +599,6 @@ def validate_static(root, name, run_import_probe=True):
     _check_root_readmes(root, name, report)
     _check_reproduction_claim(root, name, manifest, report)
     _check_requirements(root, manifest, report)
-    runtime_req, mm_core = root / "requirements" / "runtime.txt", []
-    if runtime_req.exists():
-        mm_core = re.findall(
-            r"(?im)^\s*(mmcv|mmdet|mmpretrain|mmseg|mmsegmentation)\b",
-            read(runtime_req))
-    report.add("core runtime requirements are MM-family-free", HARD,
-               not mm_core, ", ".join(sorted(set(mm_core))))
-    if run_import_probe:
-        try:
-            ok, detail = _blocked_import_probe(root)
-        except Exception as exc:
-            ok, detail = False, str(exc)
-        report.add("import csrr works with all non-mmengine MM packages blocked",
-                   HARD, ok, detail)
     return report, manifest
 
 
@@ -485,22 +608,23 @@ def _git(root, *args):
 
 
 def _commit_records(root, revision_range):
-    fmt = "%H%x1f%an%x1f%ae%x1f%cn%x1f%ce%x1f%B%x1e"
-    result = _git(root, "log", f"--format={fmt}", revision_range)
-    if result.returncode:
-        return [], result.stderr.strip()
+    """One ``git show`` per commit with NUL-separated fields and the message last,
+    so control characters inside a message can neither split a record nor hide a
+    trailer from the policy check."""
+    listing = _git(root, "rev-list", revision_range)
+    if listing.returncode:
+        return [], listing.stderr.strip()
     records = []
-    for raw in result.stdout.split("\x1e"):
-        raw = raw.strip("\r\n ")
-        if not raw:
-            continue
-        fields = raw.split("\x1f", 5)
-        if len(fields) == 6:
-            records.append({
-                "sha": fields[0], "author_name": fields[1],
-                "author_email": fields[2], "committer_name": fields[3],
-                "committer_email": fields[4], "message": fields[5],
-            })
+    for sha in listing.stdout.split():
+        shown = _git(root, "show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%B", sha)
+        fields = shown.stdout.split("\x00", 4)
+        if shown.returncode or len(fields) != 5:
+            return [], f"unparseable commit record {sha[:8]}"
+        records.append({
+            "sha": sha, "author_name": fields[0], "author_email": fields[1],
+            "committer_name": fields[2], "committer_email": fields[3],
+            "message": fields[4],
+        })
     return records, ""
 
 
@@ -530,6 +654,7 @@ def validate_premerge(root, name, base_ref, manifest):
         return report
     revision_range = f"{merge_base.stdout.strip()}..HEAD"
     records, record_error = _commit_records(root, revision_range)
+    report.add("commit records are parseable", HARD, not record_error, record_error)
     report.add("paper branch contains commits after base", HARD, bool(records), record_error)
     commit_bad = []
     for record in records:
@@ -579,9 +704,9 @@ def runtime_argv(root, manifest):
     if manifest is None:
         raise ValueError("manifest unavailable")
     argv = manifest.get("runtime_check")
-    if not isinstance(argv, list) or not argv or not all(
-            isinstance(item, str) and item for item in argv):
-        raise ValueError("runtime_check must be a non-empty argv array")
+    problems = runtime_check_problems(root, argv)
+    if problems:
+        raise ValueError("; ".join(problems))
     return [sys.executable if item == "{python}" else item for item in argv]
 
 

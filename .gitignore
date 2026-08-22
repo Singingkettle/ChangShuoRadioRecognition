@@ -123,3 +123,4 @@ venv.bak/
 *.py~
 *.sh~
 *.jsonl
+configs/detection_is_easy/figs/

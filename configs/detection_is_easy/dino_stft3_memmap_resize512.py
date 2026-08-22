@@ -3,7 +3,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #     http://www.apache.org/licenses/LICENSE-2.0
-# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition", IEEE TCCN (under review).
+# Paper: "Detection Is Easy, Recognition Is Hard: Rethinking Vision-Based Wideband Signal Detection and Recognition", IEEE Transactions on Wireless Communications (in preparation).
 
 _base_ = 'mmdet::dino/dino-4scale_r50_8xb2-12e_coco.py'
 

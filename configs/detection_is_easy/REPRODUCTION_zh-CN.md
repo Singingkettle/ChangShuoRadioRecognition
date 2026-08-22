@@ -106,7 +106,7 @@ complex-1D + FFT、FCOS、ATSS、定位，以及部署检测器的单次最好�
 | recipe-A deployment | psk / ask / qam delta | +0.153 / +0.132 / +0.081 | +0.153 / +0.132 / +0.081 | +0.143 / +0.118 / +0.084 | run-index 23 |
 | oracle (perfect box), recipe-A | pure-IQ class mAP | 0.608 | 0.608 | 0.608 | run-index 24 |
 | differential phase deployment | fused delta | +0.022 | +0.022 | +0.019 | run-index 26 |
-| predicted-box recogniser, RTMDet (3 seeds) | fused delta | +0.093 +- 0.001 | +0.093 +- 0.001 | -0.019（高分缓存） | 见下面 “最初报告为 -0.019” |
+| predicted-box recogniser, RTMDet (3 seeds) | fused delta | +0.092 +- 0.001 | +0.092 +- 0.001 | -0.019（高分缓存） | 见下面 “最初报告为 -0.019” |
 | predicted-box recogniser, FCOS (3 seeds) | fused delta | +0.189 +- 0.002 | +0.189 +- 0.002 | --（首次投稿无此格） | |
 | predicted-box recogniser, RTMDet, per family (3 seeds) | psk / qam / ask delta | +0.453 +- 0.011 / +0.537 +- 0.023 / +0.373 +- 0.016 | +0.453 / +0.537 / +0.373 | psk +0.457（仅种子 101） | `work_dirs/repro/deployment/bridge_predhi_s{101,202,303}/summary.csv` |
 
@@ -173,8 +173,8 @@ tiny / small / medium / large 为 0.433 +- 0.004 / 0.470 +- 0.014 / 0.492 +- 0.0
 种子散布内打平，可学习前端仍输给冻结前端。稿件还在 Table III 加了一格离线 STFT3
 参考（0.472），首次投稿没有列出。
 
-**预测框识别器（§VII）— 最初报告 −0.019，订正为 +0.093。** 首次投稿“在预测框上
-训识别器”的负表行报告部署增量为 −0.019。复现给出 **+0.093**，三种子
+**预测框识别器（§VII）— 最初报告 −0.019，订正为 +0.092。** 首次投稿“在预测框上
+训识别器”的负表行报告部署增量为 −0.019。复现给出 **+0.092**（三种子逐 seed 差值的均值 +0.0924；早先文本印的 +0.093 是取整后绝对值 0.567 − 0.474 的差），三种子
 （+0.0930/+0.0922/+0.0919，sd < 0.001），对照 recipe-A 基线 +0.028。三处检查
 钉住了机制：
 
@@ -185,11 +185,11 @@ tiny / small / medium / large 为 0.433 +- 0.004 / 0.470 +- 0.014 / 0.492 +- 0.0
 - *解释了最初报告的 −0.019。* 首次投稿的裁剪缓存名叫 `trainpred_hi`；构建参数
   从未记录，里面有 194k 个裁剪。用高检测分数截断（`--score-thr 0.5`）建类似缓存，
   留下 87k 个接近完美的框，部署增量是 **−0.027** — 复现了最初报告的 −0.019。
-  在完整路由框分布上训练（`--score-thr 0.1`）才给出 +0.093。最初发表的负结果是
+  在完整路由框分布上训练（`--score-thr 0.1`）才给出 +0.092。最初发表的负结果是
   从高分、接近 GT 的框建缓存造成的伪影。稿件现在把预测框识别器报告为正结果
-  +0.093 +- 0.001，并以高分缓存解释早先的符号。
+  +0.092 +- 0.001，并以高分缓存解释早先的符号。
 
-`trainpred_hi` 的参数没有记录；+0.093 缓存按已发布默认 `--score-thr 0.1` 在全部
+`trainpred_hi` 的参数没有记录；+0.092 缓存按已发布默认 `--score-thr 0.1` 在全部
 50000 场景上构建，再按固定种子随机子采样到与 GT 缓存相同的裁剪数，以免比较
 被多出来的数据带走。
 
@@ -202,7 +202,7 @@ tiny / small / medium / large 为 0.433 +- 0.004 / 0.470 +- 0.014 / 0.492 +- 0.0
 
 | Deployment detector | recogniser trained on | fused delta |
 |---|---|---|
-| RTMDet | its own predicted boxes (3 seeds) | +0.093 +- 0.001 |
+| RTMDet | its own predicted boxes (3 seeds) | +0.092 +- 0.001 |
 | FCOS   | its own predicted boxes (3 seeds) | +0.189 +- 0.002 |
 | FCOS   | RTMDet's predicted boxes (transfer) | +0.040 |
 | FCOS   | GT boxes (recipe-A)                 | +0.034 |
@@ -274,6 +274,90 @@ python configs/detection_is_easy/build_pred_matched.py --fam <fam> \
 DINO）降到 `1e-4`；纯 DETR（Conditional-DETR、DAB-DETR）降到 `5e-5`。`run_mmdet_smoke.py` 与
 `run_mmdet_train_eval.py` 里的算子回退（RoIAlign、多尺度可变形注意力、NMS 改走 `torchvision` / 纯 PyTorch）
 是让 two-stage 与 DETR 检测器在无编译算子的 mmcv-lite 下能跑起来的关键。
+
+## 第三轮审计（2026-08-21/22）：新增了什么、为什么
+
+第三次独立审计从归档的 `summary.csv` 重新推导了上面的每个数字，并关闭了第二轮遗留的
+未决项。没有重新训练任何模型，也没有改动学习率、训练计划、模型或数据划分。以下全部
+是对归档产物的推理或分析，每一步都有已发布脚本。
+
+**同预测差距扩展到三个检测器 seed（原先只有一个）。** 两个缺失的预测转储仅用推理重建
+（`run_mmdet_train_eval.py --eval-only --dump-results`），来源是 own-schedule medium 格的
+归档 `epoch_20.pth`（seed 20262811/17/27，batch 4），harness 使用原始部署转储的同一
+commit（`88c02ff`）。对部署 checkpoint 本身重新转储得到与原始
+`test_predictions.bbox.json` 逐字节相同的文件（SHA-256 一致），因此 checkpoint + commit
+完全决定这些数字。`same_pred_bootstrap.py` 用 `pycocotools` 对每个转储评两次
+（`useCats=1` / `useCats=0`），并附 2,000 次场景配对 bootstrap（单一固定种子，两种评测和
+全部 seed 共享同一场景权重；加权重累积在单位权重下精确复现 `COCOeval.stats[0]`）：
+
+| 检测器 seed | checkpoint | AP_cls | AP_loc | 差距 [95% 场景 bootstrap] |
+|---|---|---|---|---|
+| 20262811 (own schedule, batch 4) | `repro/axisB_own/bo_m_own_s20262811_bs4/epoch_20.pth` | 0.486 | 0.688 | 0.203 [0.197, 0.204] |
+| 17 (own schedule, batch 4) | `repro/axisB_own/bo_m_own_s17/epoch_20.pth` | 0.496 | 0.703 | 0.207 [0.202, 0.209] |
+| 27 (own schedule, batch 4) | `repro/axisB_own/bo_m_own_s27/epoch_20.pth` | 0.479 | 0.694 | 0.215 [0.210, 0.217] |
+| 20262811 (deployment, batch 8) | `repro/deploy/deploy_m_own_s20262811/epoch_20.pth` | 0.465 | 0.712 | 0.246 [0.241, 0.247] |
+
+三 seed 平均差距 0.208 +- 0.006（seed 间 sd），均值的配对
+bootstrap 区间 [0.203, 0.209]；每个 seed 的每次重采样都为正。命令：
+
+```
+python configs/detection_is_easy/same_pred_bootstrap.py \
+  --annotation <memmap-root>/coco_multiclass/annotations/instances_test.json \
+  --prediction 17=<work-dir>/source_data/test_predictions.bbox.json [--prediction SEED=PATH ...] \
+  --resamples 2000 --seed 20260821 --output same_pred_bootstrap.json
+```
+
+**路由规则在验证集上冻结（原先是在测试集上事后选的）。** 转储部署检测器在验证集上的
+预测（`--test-split val`；验证 `bbox_mAP` 0.472 复现），三个匹配预测框识别器用与测试集
+相同的开关跑 `bridge.py bridge --split val`。规则在看结果前写定：某家族三 seed 平均
+逐家族增益为正则路由到 IQ。
+
+| 家族 | 视觉 AP（验证） | IQ - 视觉，seed 101/202/303 | 路由 |
+|---|---|---|---|
+| am | 0.730 | -0.248 / -0.243 / -0.251 | vision |
+| ask | 0.208 | +0.335 / +0.340 / +0.323 | IQ |
+| chirp | 0.727 | -0.145 / -0.149 / -0.151 | vision |
+| fm | 0.856 | -0.314 / -0.313 / -0.311 | vision |
+| fsk | 0.643 | -0.054 / -0.052 / -0.052 | vision |
+| msk | 0.788 | -0.038 / -0.042 / -0.043 | vision |
+| ofdm | 0.348 | -0.348 / -0.348 / -0.348 | vision |
+| psk | 0.262 | +0.439 / +0.419 / +0.436 | IQ |
+| qam | 0.124 | +0.465 / +0.461 / +0.443 | IQ |
+
+融合后验证 AP 0.463 -> 0.540 / 0.541 / 0.541
+（+0.077 / +0.078 / +0.078）。规则恰好选出 PSK/ASK/QAM，因此
+上面的测试集路由数字不变；它们现在是验证集冻结规则下的一次评测，并披露写规则之前
+测试集已被看过。
+
+**框质量 AUC 改为按场景分组交叉验证（原先是样本内点估计）。** `box_quality_auc_cv.py`
+做五折按场景分组交叉验证，11 特征逻辑回归的 L2 强度在训练折内选择，并对折外 AUC 做
+2,000 次场景 bootstrap。在 oracle-correct 子集上：40-epoch 转储 IoU
+0.678 [0.660, 0.696]，多变量
+0.686；recipe-A（120-epoch）转储 IoU
+0.564、能量污染 0.583、
+多变量 0.605。没有任何标量是可靠预测子；
+归档表的值来自 40-epoch 转储（`box_quality_oracle.jsonl`，135,434 / 60,529 行），
+不是框误差统计用的 recipe-A 转储。
+
+**本轮订正的数字。** RTMDet 预测框增益为 **+0.092 +- 0.001**（逐 seed 差值
+0.0930/0.0922/0.0919 的均值）；早先的 **+0.093** 是取整后绝对值 0.567 - 0.474 的差。SNR
+诊断的分母从生成器元数据恢复（前 2,000 个测试场景：7,040 个信号，6,668 个落在
+[-5, 35) dB，179 个更低，193 个不低于 35 dB；9 个场景 / 10 个信号不在匹配转储中）。
+两个历史负结果数值（加权框融合 +0.0004、40-epoch 差分相位 +0.003 +- 0.003）无法追溯到
+任何日志，不再报告。
+
+**干净 clone 门禁的发现。** 在带当前 pip/setuptools 的全新 Python 3.10 venv 里安装
+`requirements/detection_is_easy.txt`，9 个发布配置 0 个能构建：mmengine 0.10.7 通过
+`pkg_resources` 解析 `mmdet::` 基类，而 setuptools 8x 已不再提供它；此前门禁通过只是因为
+系统级 `pkg_resources` 漏了进来。requirements 现在钉 `setuptools==59.6.0`（战役环境的版本），
+9/9 构建已在干净 venv 中复现。
+
+**发布检查器。** `tools/misc/check_paper.py` 经 96 个对抗用例探测并加固：`pkg==x.*`、
+`===`、复合说明符和可编辑安装不算钉版；跟进仓库内 `-r`/`-c` include；`runtime_check`
+必须是 `{python}` 加仓库内脚本；提交信息任何位置的 `Co-authored-by` 都被拒绝且提交记录
+逐个 commit 读取；扫描 POSIX 风格 `//<host>/<share>` 根、`smb://` 类 URL、无后缀配置文件
+以及藏在占位符或 `$math$` 中的路径。约定文档（`docs/adding_a_new_paper*.md`）描述了同样
+的规则。
 
 ## 出处
 
