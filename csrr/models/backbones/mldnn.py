@@ -161,12 +161,14 @@ class MLDNN(BaseBackbone):
     """
 
     def __init__(self, num_classes=-1, dropout_rate=0.5, avg_pool=None, use_GRU=False, is_BIGRU=False, fusion_method='',
-                 gradient_truncation=False, init_cfg=None):
+                 gradient_truncation=False, merge_log_probability=False,
+                 init_cfg=None):
         super(MLDNN, self).__init__(init_cfg=init_cfg)
         self.num_classes = num_classes
         self.ap_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method, is_init=True)
         self.iq_net = SingleBranch(dropout_rate, avg_pool, use_GRU, is_BIGRU, fusion_method, is_init=True)
         self.gradient_truncation = gradient_truncation
+        self.merge_log_probability = merge_log_probability
         if self.num_classes > 0:
             self.classifier_ap = nn.Sequential(
                 nn.Linear(100, 256),
@@ -205,6 +207,9 @@ class MLDNN(BaseBackbone):
             iq_p = F.softmax(iq, dim=1)
             snr_p = F.softmax(snr, dim=1)
             merge = torch.mul(ap_p, snr_p[:, :1]) + torch.mul(iq_p, snr_p[:, -1:])
+            if self.merge_log_probability:
+                merge = torch.log(
+                    merge.clamp_min(torch.finfo(merge.dtype).tiny))
             if self.training:
                 return (merge, ap, iq, snr)
             else:

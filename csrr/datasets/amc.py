@@ -22,9 +22,11 @@ class AMCDataset(BaseClassificationDataset):
                  lazy_init: bool = False,
                  max_refetch: int = 1000,
                  use_snr: Optional[dict] = None,
-                 cache: bool = False) -> None:
+                 cache: bool = False,
+                 cache_file: Optional[str] = None) -> None:
 
         self.cache = cache
+        self.cache_file = cache_file
         self.use_snr = use_snr
 
         super().__init__(ann_file, metainfo, data_root, filter_cfg, indices, serialize_data, pipeline,
@@ -42,6 +44,47 @@ class AMCDataset(BaseClassificationDataset):
         metainfo['classes'] = metainfo['modulations']
         raw_data_list = annotations['data_list']
         SNRs = metainfo['snrs']
+        packed_iq = None
+        packed_index = None
+        packed_rows = None
+        required_auto_cache = False
+        if self.cache and self.cache_file is not None:
+            cache_path = self.cache_file
+            if cache_path == 'auto':
+                split = os.path.splitext(os.path.basename(self.ann_file))[0]
+                cache_root = os.environ.get(
+                    'CSRR_AMC_CACHE_DIR')
+                if cache_root:
+                    required_auto_cache = True
+                else:
+                    cache_root = os.path.join(self.data_root, 'cache')
+                cache_path = os.path.join(cache_root, f'{split}_iq.pkl')
+            elif not os.path.isabs(cache_path):
+                cache_path = os.path.join(self.data_root, cache_path)
+
+            if os.path.isfile(cache_path):
+                packed = load(cache_path)
+                if not isinstance(packed, dict):
+                    raise TypeError(
+                        f'Packed IQ cache must be a dict: {cache_path}')
+                packed_iq = packed.get('iq')
+                packed_index = packed.get('index')
+                if not isinstance(packed_iq, np.ndarray):
+                    raise TypeError(
+                        f'Packed IQ cache has no ndarray iq: {cache_path}')
+                if not isinstance(packed_index, dict):
+                    raise TypeError(
+                        f'Packed IQ cache has no index dict: {cache_path}')
+                if len(packed_index) != len(raw_data_list):
+                    raise ValueError(
+                        'Packed IQ cache/annotation length mismatch: '
+                        f'{len(packed_index)} != {len(raw_data_list)}')
+                if not packed_index or packed_iq.shape[0] % len(packed_index):
+                    raise ValueError(
+                        f'Packed IQ cache has invalid shape: {cache_path}')
+                packed_rows = packed_iq.shape[0] // len(packed_index)
+            elif self.cache_file != 'auto' or required_auto_cache:
+                raise FileNotFoundError(cache_path)
 
         # Meta information load from annotation file will not influence the
         # existed meta information load from `BaseDataset.METAINFO` and
@@ -57,8 +100,22 @@ class AMCDataset(BaseClassificationDataset):
             data_info = dict(gt_label=gt_label, snr_label=snr_label, snr=snr, modulation=raw_data_info['modulation'])
             data_path = os.path.join(self.data_root, 'iq', raw_data_info['file_name'])
             if self.cache:
-                x = np.load(data_path)
-                data_info['iq'] = x.astype(np.float32)
+                if packed_iq is None:
+                    x = np.load(data_path)
+                else:
+                    file_name = raw_data_info['file_name']
+                    if file_name not in packed_index:
+                        raise KeyError(
+                            f'Packed IQ cache is missing {file_name!r}')
+                    index = packed_index[file_name]
+                    if not isinstance(index, (int, np.integer)) or not (
+                            0 <= index < len(packed_index)):
+                        raise ValueError(
+                            f'Invalid packed IQ index for {file_name!r}: '
+                            f'{index!r}')
+                    start = int(index) * packed_rows
+                    x = packed_iq[start:start + packed_rows]
+                data_info['iq'] = x.astype(np.float32, copy=False)
             else:
                 data_info['iq_path'] = data_path
             data_list.append(data_info)

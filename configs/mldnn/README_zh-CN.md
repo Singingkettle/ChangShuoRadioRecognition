@@ -1,61 +1,67 @@
-# MLDNN — Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification
+# MLDNN — 基于多任务学习的自动调制识别深度神经网络
 
 [English](README.md) | 简体中文
 
-> S. Chang et al., "Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification", *IEEE Trans. Veh. Technol. (2021)*.
-> [https://ieeexplore.ieee.org/document/9462447](https://ieeexplore.ieee.org/document/9462447)
+> S. Chang 等, "Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification," *IEEE Internet of Things Journal*, 2021. [IEEE 9462447](https://ieeexplore.ieee.org/document/9462447)
 
-CSRR 中的 PyTorch / MMEngine 移植。算法短名 **`mldnn`**
-（即 `configs/mldnn/`）。
+## 方法简介
 
-## 方法简述
+MLDNN 从 I/Q 与幅度/相位两种视图联合学习调制识别，并使用高/低信噪比辅助任务。网络学习一个 SNR 门控来混合两条调制分类分支的概率，发布实现则在对数概率域计算该混合分支的损失。
 
-自有方法 A 档：共享主干、调制（及可选 SNR）多头的多任务 MLDNN。论文原生 50/10/40。
+## 论文章节 → 代码映射
 
-## 论文章节 → 代码对照
-
-| 论文 | 代码 |
+| 论文内容 | 代码 |
 |---|---|
-| Network / backbone | `csrr/models/backbones/mldnn.py::MLDNN` |
-| Train / test configs | `configs/mldnn/` |
-| Shared AMC schedule / runtime | `configs/_base_/schedules/amc.py`, `configs/_base_/runtimes/amc.py` |
-| Dataset loader | `csrr/datasets/amc.py::AMCDataset` |
-| Input modality | I/Q + A/P |
+| I/Q 与 A/P 分支、SNR 门控 | `csrr/models/backbones/mldnn.py` |
+| 四任务损失与预测 | `csrr/models/heads/mldnn_head.py` |
+| I/Q 到 A/P 的定义 | `csrr/datasets/transforms/processing.py` |
+| 2016.10A 协议 | `mldnn_iq-ap-deepsig-201610a.py`, `experiments/mldnn_iq-ap-deepsig-201610a_final.py` |
+| 2018.01A 协议 | `mldnn_iq-ap-deepsig-201801a.py`, `experiments/mldnn_iq-ap-deepsig-201801a_final.py` |
+| 两阶段执行与检查 | `reproduce.py`, `check_release.py` |
 
 ## 数据
 
-DeepSig RML 的 JSON 位于 `data/ModulationClassification/DeepSig/`，本仓库采用
-**50/10/40** 划分（`train.json` / `validation.json` / `test.json`）。部分公开的
-Keras 移植按每个（调制，信噪比）做 **6:2:2**；个别数据集上的小幅总体差距可能
-来自这一划分差异。
+从 DeepSig 下载 RadioML.2016.10A 与 RadioML.2018.01A，并转换到 `data/ModulationClassification/DeepSig/`。CSRR 按分层方式生成 50% 训练集、10% 验证集和独立的 40% 测试集；`train_and_validation.json` 是前两者严格合并得到的 60%。转换程序同时生成打包 I/Q 缓存，避免逐样本读取文件。
 
-HisarMod 的 JSON 位于 `data/ModulationClassification/Hisar/HisarMod2019.1/`，
-已经遵循**官方 Test + Train 80/20** 协议（约 416k / 104k / 260k）。不要把
-Hisar 上的残差归因于 50/10/40 划分。
+```bash
+python tools/convert_datasets/convert_amc.py \
+  --data_root data/ModulationClassification
+python configs/mldnn/check_release.py --check-data
+```
 
 ## 训练 / 评测
 
 ```bash
-# 训练（默认 work_dir 在 work_dirs/ 下）
-python tools/train.py configs/mldnn/mldnn_iq-ap-deepsig201610A.py
+# 1. 安装实测环境，并禁止 CSRR 安装过程改写依赖。
+python -m pip install -r requirements/mldnn.txt
+python -m pip install -e . --no-deps
 
-# 测试一个 checkpoint
-python tools/test.py configs/mldnn/mldnn_iq-ap-deepsig201610A.py \
-    work_dirs/<run>/best_accuracy_top1_epoch_*.pth
+# 2. 执行验证选择、全新 60% 训练、单次测试和固定聚合。
+python configs/mldnn/reproduce.py --dataset all --devices 0 1 2
+
+# 3. 也可用共享入口检查单次运行。
+python tools/train.py configs/mldnn/mldnn_iq-ap-deepsig-201610a.py
+python tools/train.py \
+  configs/mldnn/experiments/mldnn_iq-ap-deepsig-201610a_final.py
+python tools/test.py \
+  configs/mldnn/experiments/mldnn_iq-ap-deepsig-201610a_final.py \
+  work_dirs/<run>/epoch_<selected>.pth --phase-rotation-tta-views 8
 ```
+
+该流程按验证集 top-1 最大值选择 epoch，并列时取最早者；选择记录会原子写入。随后关闭验证，在合并后的 60% 上从头训练，并拒绝在同一运行目录中进行第二次测试。
 
 ## 结果
 
-| Dataset | Overall (meas / target %) | Peak (meas / target %) | Status |
-|---|---|---|---|
-| RML2016.10A | 62.31 / 62.00 | 92.73 / 92.00 | `pass` |
-| RML2016.10B | 65.06 / (CSRR-only) | 93.62 / (CSRR-only) | `measured` |
-| RML2018.01A | 57.94 / (CSRR-only) | 90.77 / (CSRR-only) | `measured` |
-| HisarMod | 60.06 / (CSRR-only) | 73.63 / (CSRR-only) | `measured` |
+| 数据集 | 论文 MAA | 复现 MAA | 状态 |
+|---|---:|---:|---|
+| RadioML.2016.10A | 63.40% | 63.5841% | 已复现 |
+| RadioML.2018.01A | 60.70% | 60.7149% | 已复现 |
 
-数字来自官方 `configs/` 根配置的实测结果，对照已发表或常用引用目标（总体准确率 ≥ 目标−2.0 个百分点，峰值 ≥ 目标−1.5 个百分点）。
+固定聚合规则：2016.10A 使用种子 31/37/41，每个模型固定 8 个相位视图，再做等概率平均；2018.01A 使用种子 17 和验证集选出的 epoch 370。全程不按测试集选择权重、删除成员或依结果重试。
 
-## 已记录的偏差 / 说明
+## 已记录的差异 / 说明
 
-10A 是论文精确通过。其他数据集仅为 CSRR 实测。
+复现等级：`statistical`。
+
+50/10/40 两阶段协议移除了历史版本把测试集用于验证的行为。实测 2016 路径固定使用轻度优化稳定化与参数滑动平均；两个数据集均使用内存打包 I/Q、严格 MAA，以及论文给定的优化器、学习率、批大小、epoch 上限和四项损失。CUDA 内核可能导致 checkpoint 字节不同，因此按预先声明的聚合 MAA 验收。
 

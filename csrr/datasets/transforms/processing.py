@@ -114,6 +114,15 @@ class MLDNNIQToAP(BaseTransform):
 
     """
 
+    _PHASE_ORDERS = ('real_over_imag', 'imag_over_real')
+
+    def __init__(self, phase_order: str = 'real_over_imag') -> None:
+        if phase_order not in self._PHASE_ORDERS:
+            raise ValueError(
+                f'phase_order must be one of {self._PHASE_ORDERS}, '
+                f'but got {phase_order!r}')
+        self.phase_order = phase_order
+
     def transform(self, results: dict) -> dict:
         """Function to convert iq frame to ap frame.
 
@@ -126,7 +135,13 @@ class MLDNNIQToAP(BaseTransform):
 
         iq = results['iq'][0, :] + 1j * results['iq'][1, :]
         amp = np.abs(iq)
-        ang = np.arctan(results['iq'][0, :] / (results['iq'][1, :] + np.finfo(np.float64).eps))
+        real = results['iq'][0, :]
+        imag = results['iq'][1, :]
+        eps = np.finfo(np.float64).eps
+        if self.phase_order == 'real_over_imag':
+            ang = np.arctan(real / (imag + eps))
+        else:
+            ang = np.arctan(imag / (real + eps))
         results['ap'] = np.vstack((amp, ang))
 
         return results
