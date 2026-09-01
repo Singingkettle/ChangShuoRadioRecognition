@@ -64,25 +64,36 @@ def _by_gridsearch(mpps, gts, grid_step, outputs):
     return metrics, best_pps
 
 
-def _by_optimization(mpps, gts, method, outputs):
+def _by_optimization(mpps, gts, method, outputs, temperature=745.0,
+                     disagreement_only=False):
     mpps = np.stack(mpps, axis=0)
     m, n, c = mpps.shape
     gts = label_binarize(gts, classes=[i for i in range(c)])
 
-    pre_max_index = np.argmax(mpps, axis=2)
-    gt_max_index = np.argmax(gts, axis=1)
-    diff_index = pre_max_index - np.reshape(gt_max_index, (1, -1))
-    no_zero_index = np.nonzero((np.sum(np.abs(diff_index), axis=0)))[0]
-
-    bad_pre_matrix = mpps[:, no_zero_index[:], :]
-    targets = gts[no_zero_index[:], :]
+    if disagreement_only:
+        pre_max_index = np.argmax(mpps, axis=2)
+        gt_max_index = np.argmax(gts, axis=1)
+        diff_index = pre_max_index - np.reshape(gt_max_index, (1, -1))
+        selected = np.nonzero(np.sum(np.abs(diff_index), axis=0))[0]
+        optimization_matrix = mpps[:, selected, :]
+        targets = gts[selected, :]
+    else:
+        optimization_matrix = mpps
+        targets = gts
 
     def get_merge_weight_by_optimization(x, t, method):
         x = x.astype(dtype=np.float64)
         t = t.astype(dtype=np.float64)
         m = x.shape[0]
         n = x.shape[1]
-        tau = 1000 / (np.max(x[:]) + np.finfo(np.float64).eps)
+        if not n:
+            raise ValueError('fusion optimization received no samples')
+        if temperature is None:
+            tau = 1000 / (np.max(x[:]) + np.finfo(np.float64).eps)
+        else:
+            tau = float(temperature)
+            if not np.isfinite(tau) or tau <= 0:
+                raise ValueError('temperature must be a finite positive value')
 
         r1 = 2 * tau / n
         r2 = 2 * tau * tau / n
@@ -99,7 +110,7 @@ def _by_optimization(mpps, gts, method, outputs):
 
             y6 = (y5 - t)
             y7 = np.power(y6, 2)
-            f = np.mean(y7[:])
+            f = np.sum(y7) / n
             return f
 
         def obj_der(w):
@@ -165,8 +176,8 @@ def _by_optimization(mpps, gts, method, outputs):
 
             return H
 
-        w0 = np.ones((m,), dtype=np.float64)/m
-        w0[-1] = 1 - np.sum(w0[:-1])
+        w0 = np.zeros((m,), dtype=np.float64)
+        w0[-1] = 1
 
         lb = [0, ] * m
         ub = [1, ] * m
@@ -182,7 +193,7 @@ def _by_optimization(mpps, gts, method, outputs):
         best_w = res.x
         return best_w
 
-    w = get_merge_weight_by_optimization(bad_pre_matrix, targets, method)
+    w = get_merge_weight_by_optimization(optimization_matrix, targets, method)
     mpps = np.dot(w.T, np.reshape(mpps, (m, -1)))
     best_pps = np.reshape(mpps, (n, c))
 
@@ -202,6 +213,8 @@ class HCGDNNWeightsAccuracy(BaseMetric):
                  thrs: Union[float, Sequence[Union[float, None]], None] = 0.,
                  collect_device: str = 'cpu',
                  weights: Dict[str, Union[str, float]] = dict(optimization='trust-constr'),
+                 optimization_temperature: Optional[float] = 745.0,
+                 optimization_disagreement_only: bool = False,
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
 
@@ -216,6 +229,8 @@ class HCGDNNWeightsAccuracy(BaseMetric):
             self.thrs = tuple(thrs)
 
         self.weights = weights
+        self.optimization_temperature = optimization_temperature
+        self.optimization_disagreement_only = optimization_disagreement_only
 
     def process(self, data_batch, data_samples: Sequence[dict]):
         """Process one batch of data samples.
@@ -280,7 +295,10 @@ class HCGDNNWeightsAccuracy(BaseMetric):
 
         gts = target.cpu().numpy()
         if 'optimization' in self.weights:
-            sub_metrics, pred = _by_optimization(mpps, gts, self.weights['optimization'], outputs)
+            sub_metrics, pred = _by_optimization(
+                mpps, gts, self.weights['optimization'], outputs,
+                temperature=self.optimization_temperature,
+                disagreement_only=self.optimization_disagreement_only)
         elif 'gridsearch' in self.weights:
             sub_metrics, pred = _by_gridsearch(mpps, gts, self.weights['gridsearch'], outputs)
         else:

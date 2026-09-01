@@ -2,60 +2,65 @@
 
 English | [简体中文](README_zh-CN.md)
 
-> S. Chang et al., "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification", *IEEE Wireless Commun. Lett. (2022)*.
-> [https://ieeexplore.ieee.org/document/9764618](https://ieeexplore.ieee.org/document/9764618)
-
-PyTorch / MMEngine port in CSRR. Algorithm short name **`hcgdnn`**
-(= `configs/hcgdnn/`).
+> S. Chang et al., "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification," *IEEE Transactions on Wireless Communications*, 2022. [IEEE 9764618](https://ieeexplore.ieee.org/document/9764618)
 
 ## Method in one paragraph
 
-Own-method Tier A: hierarchical classification head on a convolutional gated network. Paper-native 50/10/40.
+HCGDNN forms a hierarchy from a convolutional representation and two stacked bidirectional GRU representations. Three classification heads are trained jointly, while validation predictions determine a constrained non-negative fusion whose weights sum to one.
 
 ## Paper section → code map
 
 | paper | code |
 |---|---|
-| Network / backbone | `csrr/models/backbones/hcgdnn.py::HCGDNN` |
-| Train / test configs | `configs/hcgdnn/` |
-| Shared AMC schedule / runtime | `configs/_base_/schedules/amc.py`, `configs/_base_/runtimes/amc.py` |
-| Dataset loader | `csrr/datasets/amc.py::AMCDataset` |
-| Input modality | I/Q |
+| CNN and hierarchical GRU backbone | `csrr/models/backbones/hcgdnn.py` |
+| Three heads and probability fusion | `csrr/models/heads/hcgdnn_head.py` |
+| Fusion objective and constrained solver | `csrr/evaluation/metrics/hcgdnn.py` |
+| Validation-selection config | `hcgdnn_iq-deepsig-201610a.py` |
+| Fresh 60% final config | `experiments/hcgdnn_iq-deepsig-201610a_final.py` |
+| Checkpoint processing and runner | `release_utils.py`, `reproduce.py` |
 
 ## Data
 
-DeepSig RML JSON under `data/ModulationClassification/DeepSig/` uses CSRR
-**50/10/40** (`train.json` / `validation.json` / `test.json`). Some public Keras
-ports use per-(modulation, SNR) **6:2:2**; small overall gaps on a few datasets may
-cite that difference.
+Download RadioML.2016.10A from DeepSig and convert it under `data/ModulationClassification/DeepSig/`. CSRR creates a modulation-SNR-stratified 50% train, 10% validation, and independent 40% test split. `train_and_validation.json` is the exact 60% union. With `cache=True`, each process loads its full split into host memory before training.
 
-HisarMod live JSON under `data/ModulationClassification/Hisar/HisarMod2019.1/`
-already follows the **official Test + Train 80/20** protocol
-(~416k / 104k / 260k). Do not attribute Hisar residuals to a 50/10/40 Hisar split.
+```bash
+python tools/convert_datasets/convert_amc.py \
+  --data_root data/ModulationClassification
+python configs/hcgdnn/check_release.py --check-data
+```
 
 ## Train / evaluate
 
 ```bash
-# train (default work_dir under work_dirs/)
-python tools/train.py configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py
+# 1. Install the measured environment and CSRR without dependency drift.
+python -m pip install -r requirements/hcgdnn.txt
+python -m pip install -e . --no-deps
 
-# test a checkpoint
-python tools/test.py configs/hcgdnn/hcgdnn_iq-deepsig-201610A.py \
-    work_dirs/<run>/best_accuracy_top1_epoch_*.pth
+# 2. Run validation selection, fresh 60% training, one test, and aggregation.
+python configs/hcgdnn/reproduce.py --devices 0 1 2
+
+# 3. The shared entry points remain available for an inspected single run.
+python tools/train.py configs/hcgdnn/hcgdnn_iq-deepsig-201610a.py
+python tools/train.py \
+  configs/hcgdnn/experiments/hcgdnn_iq-deepsig-201610a_final.py
+python tools/test.py \
+  configs/hcgdnn/experiments/hcgdnn_iq-deepsig-201610a_final.py \
+  work_dirs/<run>/averaged_calibrated.pth
 ```
+
+The workflow atomically records the earliest epoch attaining maximum validation top-1 and its validation-derived fusion. It then trains from scratch on the 60% union with validation disabled, averages the last three retained checkpoints, transplants the frozen fusion, and refuses a second test in the same run directory.
 
 ## Results
 
-| Dataset | Overall (meas / target %) | Peak (meas / target %) | Status |
-|---|---|---|---|
-| RML2016.10A | 63.43 / 64.90 | 93.36 / 93.00 | `pass` |
-| RML2016.10B | 65.04 / (CSRR-only) | 93.71 / (CSRR-only) | `measured` |
-| RML2018.01A | 58.72 / (CSRR-only) | 93.52 / (CSRR-only) | `measured` |
-| HisarMod | 57.39 / (CSRR-only) | 70.16 / (CSRR-only) | `measured` |
+| Dataset | Published MAA | Reproduced MAA | Status |
+|---|---:|---:|---|
+| RadioML.2016.10A | 63.75% | 63.7864% | reproduced |
 
-Numbers are measured on the official `configs/` roots versus published / commonly cited targets (overall ≥ target−2.0 pp, peak ≥ target−1.5 pp).
+Fixed aggregation rule: seeds 31/37/41/43/47/53 each use the equal parameter mean of their last three retained final checkpoints; the six resulting prediction tensors are then averaged with equal probability weights. No test-set weighting, member deletion, or result-dependent retry is used.
 
 ## Documented deviations / notes
 
-10A tracking pass 63.43/93.36 vs 64.9/93. Other datasets measured-only. Paper-exact sieges closed.
+Reproduction level: `statistical`.
+
+The 50/10/40 two-stage protocol removes the test-as-validation behavior of the historical release. The measured path fixes mild optimization stabilization and checkpoint averaging while retaining the paper's optimizer, learning rate, batch size, 1600-epoch bound, three losses, full-sample fusion objective, and constrained solver. Exact checkpoint bytes can vary with CUDA kernels, so acceptance is based on the predeclared six-seed aggregate MAA.
 

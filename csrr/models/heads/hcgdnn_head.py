@@ -159,9 +159,10 @@ class HCGDNNHead(BaseModule):
     def _get_predictions(self, cls_score, data_samples):
         """Post-process the output of head.
 
-        Including softmax and set ``pred_label`` of data samples.
+        ``cls_score`` is already the weighted sum of the three heads'
+        probabilities. A second softmax would distort checkpoint ensembles.
         """
-        pred_scores = F.softmax(cls_score, dim=1)
+        pred_scores = cls_score
         pred_labels = pred_scores.argmax(dim=1, keepdim=True).detach()
 
         out_data_samples = []

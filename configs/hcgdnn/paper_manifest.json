@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "name": "hcgdnn",
+  "paper": {
+    "title": "A Hierarchical Classification Head based Convolutional Gated Deep Neural Network for Automatic Modulation Classification",
+    "venue": "IEEE Transactions on Wireless Communications",
+    "status": "published (2022)"
+  },
+  "official_configs": [
+    "configs/hcgdnn/hcgdnn_iq-deepsig-201610a.py",
+    "configs/hcgdnn/experiments/hcgdnn_iq-deepsig-201610a_final.py"
+  ],
+  "build_configs": [
+    "configs/hcgdnn/hcgdnn_iq-deepsig-201610a.py",
+    "configs/hcgdnn/experiments/hcgdnn_iq-deepsig-201610a_final.py"
+  ],
+  "runtime_check": [
+    "{python}",
+    "configs/hcgdnn/check_release.py",
+    "--build-only"
+  ],
+  "requirements": "requirements/hcgdnn.txt",
+  "reproduction_level": "statistical",
+  "known_limitations": [
+    "CUDA kernels and random initialization can change exact checkpoint bytes; acceptance uses the predeclared six-seed aggregate MAA."
+  ],
+  "external_framework_exceptions": [],
+  "declared_core_changes": [
+    {
+      "path": "csrr/evaluation/metrics/hcgdnn.py",
+      "reason": "Match the paper's full-sample fusion objective, temperature, derivatives, and initialization.",
+      "tests": ["tests/test_evaluation/test_hcgdnn_fusion.py"]
+    },
+    {
+      "path": "csrr/models/heads/hcgdnn_head.py",
+      "reason": "Preserve the weighted probability fusion during prediction and checkpoint ensembling.",
+      "tests": ["tests/test_evaluation/test_hcgdnn_fusion.py"]
+    }
+  ]
+}
