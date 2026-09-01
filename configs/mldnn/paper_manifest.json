@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "name": "mldnn",
+  "paper": {
+    "title": "Multitask-Learning-Based Deep Neural Network for Automatic Modulation Classification",
+    "venue": "IEEE Internet of Things Journal",
+    "status": "published (2021)"
+  },
+  "official_configs": [
+    "configs/mldnn/mldnn_iq-ap-deepsig-201610a.py",
+    "configs/mldnn/experiments/mldnn_iq-ap-deepsig-201610a_final.py",
+    "configs/mldnn/mldnn_iq-ap-deepsig-201801a.py",
+    "configs/mldnn/experiments/mldnn_iq-ap-deepsig-201801a_final.py"
+  ],
+  "build_configs": [
+    "configs/mldnn/mldnn_iq-ap-deepsig-201610a.py",
+    "configs/mldnn/experiments/mldnn_iq-ap-deepsig-201610a_final.py",
+    "configs/mldnn/mldnn_iq-ap-deepsig-201801a.py",
+    "configs/mldnn/experiments/mldnn_iq-ap-deepsig-201801a_final.py"
+  ],
+  "runtime_check": [
+    "{python}",
+    "configs/mldnn/check_release.py",
+    "--build-only"
+  ],
+  "requirements": "requirements/mldnn.txt",
+  "reproduction_level": "statistical",
+  "known_limitations": [
+    "CUDA kernels and random initialization can change exact checkpoint bytes; acceptance uses the predeclared fixed-seed aggregate MAA."
+  ],
+  "external_framework_exceptions": [],
+  "declared_core_changes": [
+    {
+      "path": "csrr/datasets/amc.py",
+      "reason": "Load converter-generated packed IQ caches without per-sample disk reads.",
+      "tests": ["tests/test_amc_packed_cache.py"]
+    },
+    {
+      "path": "csrr/datasets/transforms/processing.py",
+      "reason": "Make both A/P phase definitions used by the paper and released source explicit.",
+      "tests": ["tests/test_models/test_mldnn_release.py"]
+    },
+    {
+      "path": "csrr/evaluation/metrics/__init__.py",
+      "reason": "Expose constant-memory validation metrics through the CSRR registry.",
+      "tests": ["tests/test_evaluation/test_streaming_metrics.py"]
+    },
+    {
+      "path": "csrr/evaluation/metrics/streaming.py",
+      "reason": "Evaluate the large 2018 validation split from exact sufficient statistics.",
+      "tests": ["tests/test_evaluation/test_streaming_metrics.py"]
+    },
+    {
+      "path": "csrr/models/backbones/mldnn.py",
+      "reason": "Expose the released negative-log-likelihood semantics for the gated mixture.",
+      "tests": ["tests/test_models/test_mldnn_release.py"]
+    }
+  ]
+}
